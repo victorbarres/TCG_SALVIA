@@ -1,0 +1,60 @@
+
+#
+# TCG Scene: girl-kick-boy
+#
+# scene setting induces a passive expression
+#
+
+
+image: none
+resolution: 0 * 0
+
+
+region BOY_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 100
+	uncertainty: 1
+
+	object BOY { concept: BOY }
+
+	perceive { BOY }
+}
+
+region KICK_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 90
+	uncertainty: 1
+
+	object KICK { concept: KICK }
+	relation KICK_AGENT { concept: AGENT from: KICK to: GIRL }
+	relation KICK_PATIENT { concept: PATIENT from: KICK to: BOY }
+	
+	perceive { KICK, KICK_PATIENT, KICK_AGENT }
+	update { GIRL = HUMAN }		# still not clearly indentified
+}
+
+region GIRL_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 70
+	uncertainty: 1
+	
+	object GIRL { concept: GIRL }
+	
+	perceive { GIRL }
+}
+
+region GIRL_FACE_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 40
+	uncertainty: 1
+	
+	object LAUGH { concept: LAUGH }
+	relation LAUGH_AGENT { concept: AGENT from: LAUGH to: GIRL }
+	
+	perceive { LAUGH, LAUGH_AGENT }
+}
+

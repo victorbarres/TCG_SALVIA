@@ -1,0 +1,62 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	
+	"definitions" : {
+		"node" : {
+			"type" : "object",
+			"required" : ["name", "concept", "shared", "head"],
+			"properties" : {
+				"name" : {"type" : "string"},
+				"concept" : {"type" : "string"},
+				"shared" : {"type" : "boolean"},
+				"head": {"type" : "boolean"}
+				}
+			},
+		"edge" : {
+			"type" : "object",
+			"required" : ["name", "concept", "from", "to"],
+			"properties" : {
+				"name" : {"type" : "string"},
+				"concept" : {"type" : "string"},
+				"from" : {"type" : "string"},
+				"to": {"type" : "string"}
+				}
+			},
+		"form" : {
+			"type" : "object",
+			"required" : ["name", "type"],
+			"properties" : {
+				"name" : {"type" : "string"},
+				"type" : {"type" : "string"},
+				"classes" : {"type" : "array", "items" :{"type" : "string"}},
+				"phon" : {"type" : "string"}
+				}
+			},
+		"SemFrame" : { 
+			"type" : "object",
+			"required" : ["nodes", "edges"],
+			"properties" : {
+				"nodes" : {"type" : "array", "items" : {"$ref" : "#/definitions/node"}},
+				"edges" : {"type" : "array", "items" : {"$ref" : "#/definitions/edge"}}
+				}
+			},
+		"SynForm" : {
+			"type" : "array",
+			"items" : {"$ref": "#/definitions/form"}
+			},
+		"SymLinks" : {
+			"type" : "object"
+			}
+		},
+	
+	"type" : "object",
+	"required" : ["name", "class", "SemFrame", "SynForm", "SymLinks"],
+	"properties" : {
+		"name": {"type" : "string"},
+		"class" : {"type" : "string"},
+		"preference" : {"type" : "integer"},
+		"SemFrame" : {"$ref" : "#/definitions/SemFrame"},
+		"SynForm"  : {"$ref" : "#/definitions/SynForm"},
+		"SymLinks" : {"$ref" : "#/definitions/SymLinks"}
+		}
+}

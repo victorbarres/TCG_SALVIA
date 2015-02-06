@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+#title{
+	height: 50px;
+	font-family: consolas;
+}
+
+#scene_pic{
+	width: 600px;
+	border: 1px;
+	float: left;
+}
+
+#scene_regions{
+	width: 600px;
+	border: 10px;
+	margin-left: 10px;
+	float: left;
+}
+
+.section_title{
+	font-weight: bold;
+	font-size: 12pt;
+}
+
+.reg{
+	margin: 20px;
+	font-size:10pt;
+	background-color: #9090EE;
+}
+
+.highlight_reg{
+	margin: 20px;
+	font-size:10pt;
+	background-color: #5050EE;
+}
+
+.reg_name{
+	font-weight: bold;
+}
+
+.reg_details{
+	margin-left: 10px;	
+}
+
+.reg_data{
+	margin-left: 10px;
+	background-color: #DDDDFF;
+}
+
+.mask{
+	position: absolute;
+	background-color: blue;
+	opacity: 0.2;
+	border-radius: 100px;
+}
+
+.highlight_mask{
+	position: absolute;
+	background-color:  blue;
+	opacity: 0.4;
+	border-radius: 100px;
+}
+</style>
+
+<html>
+<head>
+<title> TCG Scene </title>
+<link rel="shortcut icon", href="TCG.ico">
+</head>
+<div id="title">
+<img src="TCG.ico" alt="TCG icon" style="width:50px;height:50px", align="left">
+<h1>Scene Input</h1>
+</div>
+
+<body>
+<div id="scene_input">
+<div id="scene_pic"></div>
+<div id="scene_regions"></div>
+</div>
+
+<script>
+
+//My data
+var scene= {};
+var scale = 0;
+
+function AJAX_JSON_Req(url){
+	var AJAX_req = new XMLHttpRequest();
+	AJAX_req.open("GET", url, true);
+	AJAX_req.setRequestHeader("Content-type", "application/json");
+	
+	AJAX_req.onreadystatechange = function()
+	{	
+		if(AJAX_req.readyState == 4 && AJAX_req.status == 200)
+		{
+			var jsonData = JSON.parse( AJAX_req.responseText);
+			scene = jsonData.scene;
+			scale = 600/scene.resolution[0];
+			dispSceneImage();
+			dispRegions();
+			
+		}
+	};
+	AJAX_req.send()
+}
+
+AJAX_JSON_Req("./TCG_scene.json");
+
+function dispSceneImage(){
+	var scene_div = document.getElementById("scene_pic");
+	
+	var scene_title = document.createElement("div");
+	scene_title.setAttribute("class", "section_title");
+	scene_title.innerHTML = "INPUT SCENE";
+	scene_div.appendChild(scene_title);
+	
+	var scene_image = document.createElement("div");
+	scene_image.setAttribute("id", "img");
+	scene_div.appendChild(scene_image);
+	var image = document.createElement("img");
+	image.setAttribute("src", "./" + scene.image);
+	image.setAttribute("width", scene.resolution[0]*scale + "px");
+	image.setAttribute("height", scene.resolution[1]*scale + "px");
+	scene_image.appendChild(image);
+};
+
+function dispRegions(){
+	var reg_section= document.getElementById("scene_regions");
+	var reg_title = document.createElement("div");
+	reg_title.setAttribute("class", "section_title");
+	reg_title.innerHTML = "ATTENTIONAL REGIONS";
+	reg_section.appendChild(reg_title);
+	
+	for(var i=0; i<scene.regions.length; i++){
+		var aReg = scene.regions[i];
+		var reg_div = document.createElement("div");
+		reg_div.id = i;
+		reg_div.setAttribute("class",  "reg");
+		reg_div.setAttribute("onclick", "expand_reg(this)");
+		reg_div.setAttribute("onmouseover", "highlight_area(reg2mask[this.id])");
+		reg_div.setAttribute("onmouseout", "dim_area(reg2mask[this.id])");
+		reg_section.appendChild(reg_div);
+		
+		var name = aReg.name;
+		name_div = document.createElement("div");
+		name_div.setAttribute("class", "reg_name");
+		name_div.innerHTML = name;
+		reg_div.appendChild(name_div);
+	};
+	
+	//Create img masks
+	create_masks()
+
+};
+
+function expand_reg(obj){
+	// Get region data
+	var reg_data = scene.regions[obj.id];
+	 
+	var reg_details = document.createElement("div");
+	reg_details.setAttribute("class", "reg_details");
+	obj.appendChild(reg_details);
+	
+	//Location & Size
+	var area_div = document.createElement("div");
+	reg_details.appendChild(area_div);
+	var area_data = "Loc: (" + reg_data.location.join(", ") + ") ; Size: (" + reg_data.size.join(", ")+ ")";
+	area_div.innerHTML = area_data;
+	//Saliency
+	var sal_div = document.createElement("div");
+	reg_details.appendChild(sal_div);
+	sal_div.innerHTML = "Saliency: "+ reg_data.saliency;
+	//Uncertainty
+	var uncert_div = document.createElement("div");
+	reg_details.appendChild(uncert_div);
+	uncert_div.innerHTML = "Uncertainty: " + reg_data.uncertainty;
+	//Schemas
+	expand_schemas(reg_details, reg_data.schemas);
+	//Perceived
+	var per_div = document.createElement("div");
+	reg_details.appendChild(per_div);
+	per_div.innerHTML = "Perceive: [" + reg_data.perceive.join(", ") + "]";
+	//Reset onclick
+	obj.setAttribute("onclick", "reduce_reg(this)");
+};
+
+function reduce_reg(obj){
+	var children = obj.children;
+	for(var i=0; i<children.length; i++){
+		if(children[i].className == "reg_details"){
+			obj.removeChild(children[i])
+			obj.setAttribute("onclick", "expand_reg(this)");
+			break;
+		};
+	};
+	
+};
+
+function expand_schemas(obj, schemas){
+	var reg_schema = document.createElement("div");
+	reg_schema.setAttribute("class", "reg_schema");
+	obj.appendChild(reg_schema);
+	
+	var feat_name = document.createElement("div");
+	reg_schema.appendChild(feat_name);
+	feat_name.innerHTML = "Percepetual schemas: ";
+	
+	var data = document.createElement("div");
+	data.setAttribute("class", "reg_data");
+	reg_schema.appendChild(data);
+	
+	for(var i=0; i<schemas.length; i++){
+		var per_schema = document.createElement("div");
+		per_schema.setAttribute("class", "per_schema");
+		data.appendChild(per_schema);
+		if(schemas[i].type == "OBJ"){
+			per_schema.innerHTML = schemas[i].name + " {" + "type: " + schemas[i].type + ", concept: " + schemas[i].concept + "}";
+		}
+		else if(schemas[i].type == "REL"){
+			per_schema.innerHTML = schemas[i].name + " {" + "type: " + schemas[i].type + ", " + schemas[i].from + " ----" + schemas[i].concept + "---> " + schemas[i].to + "}"; 
+		};
+		
+	};
+	
+	
+};
+var reg2mask = {}; //Stores correspondence table between reg id and mask id.
+var mask2reg = {}; //Stores correspondence table between reg id and mask id.
+
+function create_masks(){
+	var scene_pic = document.getElementById("scene_pic");
+	var img = document.getElementById("img");
+	var resolution = scene.resolution;
+	var img_rect = img.getBoundingClientRect();
+	var hfactor = ((img_rect.bottom - img_rect.top)/resolution[0]);
+	var wfactor = ((img_rect.right - img_rect.left)/resolution[1]);
+	
+	for(var i=0; i<scene.regions.length; i++){
+		var region = scene.regions[i];
+		var mask = document.createElement("div");
+		mask.setAttribute("class", "mask");
+		mask.setAttribute("id", "mask_" + i);
+		scene_pic.appendChild(mask);
+		reg2mask[i] = "mask_" + i; //Setting a correspondence table between reg id and mask id.
+		mask2reg["mask_" + i] = i;
+		
+		var loc = region.location;
+		var size = region.size;
+		mask.style.position = "absolute";
+		mask.style.top = img_rect.top + loc[0]*hfactor+ "px";
+		mask.style.left = img_rect.left +  loc[1]*wfactor + "px";
+		mask.style.width = size[1]*wfactor + "px";
+		mask.style.height = size[0]*hfactor + "px";
+		mask.setAttribute("onclick", "area_reg_expand(this, mask2reg[this.id])");
+		mask.setAttribute("onmouseover", "highlight_area(this.id)");
+		mask.setAttribute("onmouseout", "reduce_reg(document.getElementById(mask2reg[this.id]))");
+		mask.setAttribute("onmouseout", "dim_area(this.id)");
+	};
+};
+
+function highlight_area(id){
+	var myMask = document.getElementById(id);
+	myMask.setAttribute("class", "highlight_mask");
+	var myReg = document.getElementById(mask2reg[id]);
+	myReg.setAttribute("class", "highlight_reg");
+};
+
+function dim_area(id){
+var myMask = document.getElementById(id);
+	myMask.setAttribute("class", "mask");
+	var myReg = document.getElementById(mask2reg[id]);
+	myReg.setAttribute("class", "reg");
+};
+
+function area_reg_expand(obj, id){
+	reduce_reg(document.getElementById(id));
+	expand_reg(document.getElementById(id));
+	obj.setAttribute("onclick", "area_reg_reduce(this, mask2reg[this.id])");
+};
+
+function area_reg_reduce(obj, id){
+	reduce_reg(document.getElementById(id));
+	obj.setAttribute("onclick", "area_reg_expand(this, mask2reg[this.id])");
+};
+
+</script>
+
+</body>
+</html>
+

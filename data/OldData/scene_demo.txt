@@ -1,0 +1,72 @@
+
+#
+# TCG Scene: Woman-hit-man
+#
+# layout of the hitting event is given first
+#
+
+
+image: "woman_hits_man.jpg"
+resolution: 400 * 326
+
+
+# scene gist
+region GIST
+{
+	location: 216, 117 size: 150, 100
+	saliency: 100		# saliency doesn't matter
+	uncertainty: 0		# instantly perceived
+	
+	# layout
+	update { WOMAN = ENTITY, HIT = ACTION, MAN = ENTITY }
+	perceive { HIT_AGENT, HIT_PATIENT }
+}
+
+region MAN_AREA
+{
+	location: 164, 204 size: 80, 180
+	saliency: 100		# most salient region: possibly fixated first
+	uncertainty: 1
+		
+	# associated perceptual schema
+	object MAN { concept: MAN }
+	
+	perceive { MAN }
+}
+
+region HIT_AREA
+{
+	location: 213, 110 size: 60, 20
+	saliency: 90
+	uncertainty: 1
+	
+	object HIT { concept: HIT }
+	relation HIT_AGENT { concept: AGENT from: HIT to: WOMAN }
+	relation HIT_PATIENT { concept: PATIENT from: HIT to: MAN }
+	
+	perceive { HIT, HIT_AGENT, HIT_PATIENT }
+}
+
+region WOMAN_AREA
+{
+	location: 283, 205 size: 50, 150
+	saliency: 70
+	uncertainty: 1
+	
+	object WOMAN { concept: WOMAN }
+	
+	perceive { WOMAN }
+}
+
+region MAN_FACE_AREA
+{
+	location: 164, 204 size: 80, 180
+	saliency: 50
+	uncertainty: 1
+	
+	object HANDSOME { concept: HANDSOME }
+	relation HANDSOME_MODIFY { concept: MODIFY from: HANDSOME to: MAN }
+
+	perceive { HANDSOME, HANDSOME_MODIFY }
+}
+

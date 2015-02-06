@@ -1,0 +1,30 @@
+{ "grammar" : [
+				{
+					"name" : "CNJ_AND",
+					"class" : "S",
+					"SemFrame" : {
+							"nodes" : [	{"name" : "EVT1", "concept" : "ACTION+", "shared" : true, "head" : true}, 
+										{"name" : "EVT2", "concept" : "ACTION+", "shared" : true, "head" : true}],
+							"edges" : [	{"name" : "EVT1_EVT2", "concept" : "SUCCESSIVE", "from" : "EVT1", "to" : "EVT2"}]
+							},
+					"SynForm" : [{"name" : "S1", "type" : "SLOT", "class" : ["S"]},
+								{"name" : "S2", "type" : "PHON", "phon" : "and"},
+								{"name" : "S3", "type" : "Slot", "class" :["S"]}],
+					"SymLinks" : {"EVT1" : "S1", "EVT2" : "S2"}
+				},
+
+				{
+					"name" : "CNJ_WHILE",
+					"class" : "S",
+					"SemFrame" : {
+							"nodes" : [	{"name" : "EVT1", "concept" : "ACTION+", "shared" : true, "head" : true}, 
+										{"name" : "EVT2", "concept" : "ACTION+", "shared" : true, "head" : true}],
+							"edges" : [	{"name" : "EVT1_EVT2", "concept" : "CONCURRENT", "from" : "EVT1", "to" : "EVT2"}]
+							},
+					"SynForm" : [{"name" : "S1", "type" : "SLOT", "class" : ["S"]},
+								{"name" : "S2", "type" : "PHON", "phon" : "and"},
+								{"name" : "S3", "type" : "Slot", "class" :["S"]}],
+					"SymLinks" : {"EVT1" : "S1", "EVT2" : "S2"}
+				}
+			]
+}

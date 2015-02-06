@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body{
+	width: 600px;
+	font-family: consolas;
+}
+
+#grammar_size{
+	font-weight : bold;
+	font-size: 12pt;
+}
+
+.cxn {
+	color: black;
+	margin: 20px;
+	font-size:10pt;
+	background-color: #90EE90;
+}
+.cxn_name{
+	font-weight : bold;
+	font-size: 12pt;
+}
+
+.cxn_details{
+	margin-left: 10px;
+}
+
+.cxn_data{
+	margin-left: 10px;
+	background-color: #DDFFDD;
+}
+	
+</style>
+
+<html>
+<head>
+<title> TCG Constructions </title>
+<link rel="shortcut icon", href="TCG.ico">
+</head>
+<div id="title">
+<img src="TCG.ico" alt="TCG icon" style="width:50px;height:50px", align="left">
+<h1>Constructions</h1>
+</div>
+
+<body>
+<div id="grammar_size"></div>
+<div id="cxn_display"></div>
+
+<script>
+//My data
+var grammar = {};
+
+function AJAX_JSON_Req(url){
+	var AJAX_req = new XMLHttpRequest();
+	AJAX_req.open("GET", url, true);
+	AJAX_req.setRequestHeader("Content-type", "application/json");
+	
+	AJAX_req.onreadystatechange = function()
+	{	
+		if(AJAX_req.readyState == 4 && AJAX_req.status == 200)
+		{
+			var jsonData = JSON.parse( AJAX_req.responseText);
+			grammar = jsonData.grammar;
+			dispGrammar()
+			
+		}
+	}
+	AJAX_req.send()
+}
+
+AJAX_JSON_Req("./TCG_grammar.json");
+
+var size_section = document.getElementById("grammar_size");
+var disp_section = document.getElementById("cxn_display");
+
+function dispGrammar() {
+	size_section.innerHTML = "# of constructions: " + grammar.length;
+	for(var i=0; i<grammar.length; i++){
+		var name = grammar[i].name
+		
+		var cxn_div = document.createElement("div");
+		cxn_div.id = i;
+		cxn_div.setAttribute("class", "cxn");
+		cxn_div.setAttribute("onclick", "expand_cxn(this)");
+		
+		var cxn_name = document.createElement("div");
+		cxn_name.setAttribute("class", "cxn_name");
+		cxn_name.innerHTML = name + " (" + grammar[i].class + ")";
+		cxn_div.appendChild(cxn_name);
+		
+		disp_section.appendChild(cxn_div)
+	};
+};
+
+
+function expand_cxn(obj){
+	// Get data
+	var cxn_data = grammar[obj.id]
+	
+	var cxn_details = document.createElement("div");
+	cxn_details.setAttribute("class", "cxn_details");
+	obj.appendChild(cxn_details);
+	
+	//Class
+	var cxn_class = document.createElement("div");
+	cxn_class.setAttribute("class","cxn_class");
+	cxn_class.innerHTML  = "Class: " + cxn_data.class;
+	cxn_details.appendChild(cxn_class);
+	//Preference
+	var cxn_pref = document.createElement("div");
+	cxn_pref.setAttribute("class", "cxn_pref");
+	cxn_pref.innerHTML = "Preference: " + cxn_data.preference;
+	cxn_details.appendChild(cxn_pref);
+	//SemFrame
+	expand_SemFrame(cxn_details,cxn_data.SemFrame);
+	//SynForm
+	expand_SynForm(cxn_details, cxn_data.SynForm);
+	//SymLinks
+	expand_SymLinks(cxn_details, cxn_data.SymLinks);
+	
+	obj.setAttribute("onclick", "reduce_cxn(this)");
+};
+
+function reduce_cxn(obj){
+	var children = obj.childNodes;
+	for(var i=0; i<children.length; i++){
+		if(children[i].className == "cxn_details"){
+			obj.removeChild(children[i]);
+			obj.setAttribute("onclick", "expand_cxn(this)");
+			break;
+		}
+	}
+};
+
+function expand_SemFrame(obj,SemFrame){
+	var cxn_SemFrame = document.createElement("div");
+	cxn_SemFrame.setAttribute("class", "cxn_SemFrame");
+	obj.appendChild(cxn_SemFrame);
+	
+	var feat_name = document.createElement("div");
+	feat_name.innerHTML = "SemFrame:";
+	cxn_SemFrame.appendChild(feat_name);
+	
+	var data = document.createElement("div");
+	cxn_SemFrame.appendChild(data);
+	data.setAttribute("class", "cxn_data");
+	
+	var nodes = document.createElement("div");
+	nodes.setAttribute("class", "nodes");
+	data.appendChild(nodes);
+	
+	node_data = SemFrame.nodes;
+	for(var i=0; i<node_data.length; i++){
+		var node = document.createElement("div");
+		node.innerHTML = node_data[i].name + " {concept: " + node_data[i].concept + ", shared: " + node_data[i].shared + ", head: " + node_data[i].head + "}";
+		nodes.appendChild(node)
+	}
+	
+	var edges = document.createElement("div");
+	edges.setAttribute("class", "edges");
+	data.appendChild(edges);
+	
+	edge_data = SemFrame.edges;
+	for(var i=0; i<edge_data.length; i++){
+		var edge = document.createElement("div");
+		edge.innerHTML = edge_data[i].from + " ----" + edge_data[i].concept + "---> " + edge_data[i].to; 
+		edges.appendChild(edge)
+	}
+};
+
+function expand_SynForm(obj,SynForm){
+	var cxn_SynForm = document.createElement("div");
+	cxn_SynForm.setAttribute("class", "cxn_SynForm");
+	obj.appendChild(cxn_SynForm);
+	
+	var feat_name = document.createElement("div");
+	feat_name.innerHTML = "SynForm:";
+	cxn_SynForm.appendChild(feat_name);
+	
+	var data = document.createElement("div");
+	data.setAttribute("class", "cxn_data");
+	cxn_SynForm.appendChild(data);
+	
+	var form = [];
+	for(var i=0; i<SynForm.length; i++){
+		f = SynForm[i];
+		if(f.type == "SLOT"){
+			form.push("[" + f.classes.join() + "]");
+		}
+		else{
+			form.push(f.phon);
+		}
+	}
+	
+	data.innerHTML = form.join(" ");
+};
+
+function expand_SymLinks(obj, SymLinks){
+	var cxn_SymLinks = document.createElement("div");
+	cxn_SymLinks.setAttribute("class", "cxn_SymLinks");
+	obj.appendChild(cxn_SymLinks);
+	
+	var feat_name = document.createElement("div");
+	feat_name.innerHTML = "SymLinks:";
+	cxn_SymLinks.appendChild(feat_name);
+	
+	var data = document.createElement("div");
+	data.setAttribute("class", "cxn_data");
+	cxn_SymLinks.appendChild(data);
+	
+	var links = [];
+	for(var key in SymLinks){
+		links.push(key + "--->" + SymLinks[key]);
+	}
+	data.innerHTML = links.join(", ");
+};
+
+</script>
+
+</body>
+</html>
+

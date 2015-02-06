@@ -1,0 +1,177 @@
+
+Template Construction Grammar (TCG) Simulator v1.0
+
+Victor Barres (barres@usc.edu) May 14. 2014
+USC Brain Project and  Neuroscience Graduate Program
+University of Southern California (USC)
+[PYTHON reimplementation of c++ code:
+	Template Construction Grammar (TCG) Simulator v2.5
+	Jinyong Lee (jinyongl@usc.edu), June 23. 2012
+	USC Brain Project, Computer Science Department
+	University of Southern California (USC)]
+
+Loading Initialization File 'TCG.ini' ...
+Loading Semantic Network 'data\TCG_semantics.txt'...
+Loading TCG Grammar 'data\TCG_grammar.txt'...
+Loading TCG Scene 'data\scene_incremental.txt'...
+
+Initializing Simulator...
+- Max Simulation Time : 20
+- Premature Production : True
+- Utterance Continuity : True
+- Verbal Guidance : True
+- Threshold of Utterance : Time = 1, CXNs = infinite, Syllables = infinite
+
+Beginning Simulation...
+================================================================================
+ Simulation Time: 1
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  WOMAN_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 2
+================================================================================
+> Current Attention
+  WOMAN_AREA (perception done)
+
+> Perceived Regions
+  WOMAN_AREA
+
+> Schema Instances
+[!@] SemRep-N WOMAN_0
+[!@] Construction EXIST_S_1 covering WOMAN_0 for 'there is' [WOMAN_2]
+[!@] Construction WOMAN_2 covering WOMAN_0 for 'woman'
+
+> Construction Structures
+[*] 138: EXIST_S_1 'there is' [WOMAN_2 'woman']
+
+
+> Produced Utterance
+'there is woman'
+
+> Next Attention
+  TALK_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 3
+================================================================================
+> Current Attention
+  TALK_AREA (perception done)
+
+> Perceived Regions
+  TALK_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ @] Construction EXIST_S_1 covering WOMAN_0 for 'there is' [REL_SVO_WHO_10]
+[ @] Construction WOMAN_2 covering WOMAN_0 for 'woman'
+[!@] SemRep-N TALK_3
+[!@] SemRep-R AGENT_4 from TALK_3 to WOMAN_0
+[!@] SemRep-R PATIENT_5 from TALK_3 to HUMAN_6
+[!O] SemRep-N HUMAN_6
+[!X] Construction SVO_7 covering WOMAN_0 HUMAN_6 TALK_3 AGENT_4 PATIENT_5 for [WOMAN_2] [TALK_12] [ ]
+[!X] Construction PAS_SVO_8 covering WOMAN_0 HUMAN_6 TALK_3 AGENT_4 PATIENT_5 for [ ] 'is' [TALK_12] '-ed by' [WOMAN_2]
+[!O] Construction EXIST_S_9 covering HUMAN_6 for 'there is' [REL_PAS_SVO_WHO_11]
+[!@] Construction REL_SVO_WHO_10 covering WOMAN_0 HUMAN_6 TALK_3 AGENT_4 PATIENT_5 for [WOMAN_2] 'who' [TALK_12] [ ]
+[!X] Construction REL_PAS_SVO_WHO_11 covering WOMAN_0 HUMAN_6 TALK_3 AGENT_4 PATIENT_5 for [ ] 'who is' [TALK_12] '-ed by' [WOMAN_2]
+[!@] Construction TALK_12 covering TALK_3 for 'talk to'
+
+> Competition traces
+  SVO_7 (339) eliminated PAS_SVO_8 (283)
+  REL_SVO_WHO_10 (629) eliminated SVO_7 (339)
+  SVO_7 (339) eliminated REL_PAS_SVO_WHO_11 (323)
+
+> Construction Structures
+[X] 339: SVO_7 [WOMAN_2 'woman'] [TALK_12 'talk to'] [ ]
+[X] 283: PAS_SVO_8 [ ] 'is' [TALK_12 'talk to'] '-ed by' [WOMAN_2 'woman']
+[*] 629: EXIST_S_1 'there is' [REL_SVO_WHO_10 [WOMAN_2 'woman'] 'who' [TALK_12 'talk to'] [ ]]
+[X] 323: EXIST_S_9 'there is' [REL_PAS_SVO_WHO_11 [ ] 'who is' [TALK_12 'talk to'] '-ed by' [WOMAN_2 'woman']]
+
+
+> Produced Utterance
+'(there is woman) who talk to...'
+
+> Next Attention
+  PEOPLE_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 4
+================================================================================
+> Current Attention
+  PEOPLE_AREA (perception done)
+
+> Perceived Regions
+  PEOPLE_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ @] Construction EXIST_S_1 covering WOMAN_0 for 'there is' [REL_SVO_WHO_10]
+[ @] Construction WOMAN_2 covering WOMAN_0 for 'woman'
+[ @] SemRep-N TALK_3
+[ @] SemRep-R AGENT_4 from TALK_3 to WOMAN_0
+[ @] SemRep-R PATIENT_5 from TALK_3 to PEOPLE_6
+[!@] SemRep-N PEOPLE_6
+[ O] Construction EXIST_S_9 covering PEOPLE_6 for 'there is' [REL_PAS_SVO_WHO_17]
+[ @] Construction REL_SVO_WHO_10 covering WOMAN_0 PEOPLE_6 TALK_3 AGENT_4 PATIENT_5 for [WOMAN_2] 'who' [TALK_12] [PEOPLE_18]
+[ @] Construction TALK_12 covering TALK_3 for 'talk to'
+[!X] Construction SVO_13 covering WOMAN_0 PEOPLE_6 TALK_3 AGENT_4 PATIENT_5 for [WOMAN_2] [TALK_12] [PEOPLE_18]
+[!X] Construction PAS_SVO_14 covering WOMAN_0 PEOPLE_6 TALK_3 AGENT_4 PATIENT_5 for [PEOPLE_18] 'is' [TALK_12] '-ed by' [WOMAN_2]
+[!X] Construction REL_PAS_SVO_WHO_17 covering WOMAN_0 PEOPLE_6 TALK_3 AGENT_4 PATIENT_5 for [PEOPLE_18] 'who is' [TALK_12] '-ed by' [WOMAN_2]
+[!@] Construction PEOPLE_18 covering PEOPLE_6 for 'people'
+
+> Competition traces
+  REL_SVO_WHO_10 (1223) eliminated SVO_13 (333)
+  REL_SVO_WHO_10 (1223) eliminated PAS_SVO_14 (277)
+  REL_SVO_WHO_10 (1223) eliminated REL_PAS_SVO_WHO_17 (317)
+
+> Construction Structures
+[ ] 137: EXIST_S_9 'there is' [PEOPLE_18 'people']
+[X] 333: SVO_13 [WOMAN_2 'woman'] [TALK_12 'talk to'] [PEOPLE_18 'people']
+[X] 277: PAS_SVO_14 [PEOPLE_18 'people'] 'is' [TALK_12 'talk to'] '-ed by' [WOMAN_2 'woman']
+[*] 1223: EXIST_S_1 'there is' [REL_SVO_WHO_10 [WOMAN_2 'woman'] 'who' [TALK_12 'talk to'] [PEOPLE_18 'people']]
+[X] 317: EXIST_S_9 'there is' [REL_PAS_SVO_WHO_17 [PEOPLE_18 'people'] 'who is' [TALK_12 'talk to'] '-ed by' [WOMAN_2 'woman']]
+
+
+> Produced Utterance
+'(there is woman who talk to) people'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 5
+================================================================================
+> Current Attention
+  None
+
+> Schema Instances
+[ x] SemRep-N WOMAN_0
+[ x] Construction EXIST_S_1 covering WOMAN_0 for 'there is' [ ]
+[ x] Construction WOMAN_2 covering WOMAN_0 for 'woman'
+[ x] SemRep-N TALK_3
+[ x] SemRep-R AGENT_4 from TALK_3 to WOMAN_0
+[ x] SemRep-R PATIENT_5 from TALK_3 to PEOPLE_6
+[ x] SemRep-N PEOPLE_6
+[ O] Construction EXIST_S_9 covering PEOPLE_6 for 'there is' [ ]
+[ x] Construction REL_SVO_WHO_10 covering WOMAN_0 PEOPLE_6 TALK_3 AGENT_4 PATIENT_5 for [ ] 'who' [ ] [ ]
+[ x] Construction TALK_12 covering TALK_3 for 'talk to'
+[ x] Construction PEOPLE_18 covering PEOPLE_6 for 'people'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 6
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  None
+
+
+Simulation complete: inactivity termination.

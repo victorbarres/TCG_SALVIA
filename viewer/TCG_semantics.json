@@ -1,0 +1,111 @@
+
+{
+	"SEM_RELATIONS" : 
+	{
+		"MODIFY" : {},
+		"THEMATIC" :
+		{
+			"AGENT" : {},
+			"PATIENT" : {}
+		},
+		"TEMPORAL" :
+		{
+			"SUCCESSIVE" :{},
+			"CONCURRENT" : {}
+		},
+		"SPATIAL" : 
+		{ 
+			"IN" : {} 
+		}
+	},
+
+	"CONCEPTUAL_KNOWLEDGE" : 
+	{
+		"ENTITY" : 
+		{
+			"OBJECT" : 
+			{
+				"HUMAN" :
+				{
+					"MAN" : {},
+					"BOY" : {}, 
+					"WOMAN" : {}, 
+					"GIRL" : {},
+					"PEOPLE" : {}
+				},
+				"ITEM" : 
+				{
+					"CLOTHING" : 
+					{
+						"DRESS" : {},
+						"TSHIRT" : {}
+					}
+				},
+				"ANIMAL" : 
+				{
+					"MOUSE" :{},
+					"TURTLE" : {}
+				}
+			},
+			"PLACE" :
+			{
+				"BOXINGRING" : {},
+				"PARK" : {}
+			}
+		},
+
+		"ANIMATE" : 
+		{ 
+			"HUMAN" : {},
+			"ANIMAL" : {} 
+		},
+
+		"MALE" : 
+		{ 
+			"MAN" : {},
+			"BOY" : {}
+		},
+
+		"FEMALE"  : 
+		{ 
+			"WOMAN" : {},
+			"GIRL" : {} 
+		},
+		"ACTION" : 
+		{
+			"TRANSITIVE" :
+			{
+				"SQUIRT" : {},
+				"TALK" : {},
+				"HIT" : {},
+				"KICK" : {},
+				"WEAR" : {}
+			},
+			"INTRANSITIVE" :
+			{
+				"LAUGH" : {},
+				"WATCH" : {}
+			}
+		},
+		"PROPERTY" :
+		{
+			"COLOR" :
+			{
+				"BLACK" : {},
+				"BLUE" : {},
+				"GREEN" : {}
+			},
+			"SIZE" :
+			{
+				"SMALL" : {},
+				"BIG" : {}
+			},		
+			"APPEARANCE" :
+			{
+				"PRETTY" : {},
+				"HANDSOME" : {}
+			}
+		}
+	}		
+}
+

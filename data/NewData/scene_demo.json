@@ -1,0 +1,60 @@
+{ "scene" : {
+	"image": "woman_hits_man.jpg",
+	"resolution": [400, 326],
+	"regions" : [
+					{
+						"name" : "GIST",
+						"location" : [216,117],
+						"size" : [150,100],
+						"saliency" : 100,
+						"uncertainty" :0,
+									
+						"perceive" : ["HIT_AGENT", "HIT_PATIENT"],
+						"update" : {"WOMAN" : "ENTITY", "HIT" : "ACTION", "MAN" : "ENTITY"}
+					},
+					{
+						"name" : "MAN_AREA",
+						"location" : [164,204],
+						"size" : [80,180],
+						"saliency" : 100,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "MAN", "type" : "OBJ", "concept" : "MAN"}],
+									
+						"perceive" : ["MAN"]
+					},
+					{
+						"name" : "HIT_AREA",
+						"location" : [213,110],
+						"size" : [60,20],
+						"saliency" : 90,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "HIT", "type" : "OBJ", "concept" : "HIT"},
+									{"name" : "HIT_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "HIT", "to" : "WOMAN"},
+									{"name" : "HIT_PATIENT", "type" : "REL", "concept" : "PATIENT", "from" : "HIT", "to" : "MAN"}],
+									
+						"perceive" : ["HIT", "HIT_AGENT", "HIT_PATIENT"]
+					},
+					{
+						"name" : "WOMAN_AREA",
+						"location" : [283,205],
+						"size" : [50,150],
+						"saliency" : 70,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "WOMAN", "type" : "OBJ", "concept" : "WOMAN"}],
+									
+						"perceive" : ["WOMAN"]
+					},
+					{
+						"name" : "MAN_FACE_AREA",
+						"location" : [164,204],
+						"size" : [80,180],
+						"saliency" : 50,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "HANDSOME", "type" : "OBJ", "concept" : "HANDOME"},
+									{"name" : "HANDSOME_MODIFY", "type" : "REL", "concept" : "MODIFY", "from" : "HANDOME", "to" : "MAN"}],
+									
+						"perceive" : ["HANDSOME", "HANDSOME_MODIFY"]
+					}
+				]
+		}
+}

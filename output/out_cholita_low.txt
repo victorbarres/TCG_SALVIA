@@ -1,0 +1,455 @@
+
+Template Construction Grammar (TCG) Simulator v1.0
+
+Victor Barres (barres@usc.edu) May 14. 2014
+USC Brain Project and  Neuroscience Graduate Program
+University of Southern California (USC)
+[PYTHON reimplementation of c++ code:
+	Template Construction Grammar (TCG) Simulator v2.5
+	Jinyong Lee (jinyongl@usc.edu), June 23. 2012
+	USC Brain Project, Computer Science Department
+	University of Southern California (USC)]
+
+Loading Initialization File 'TCG.ini' ...
+Loading Semantic Network 'data\TCG_semantics.txt'...
+Loading TCG Grammar 'data\TCG_grammar.txt'...
+Loading TCG Scene 'data\scene_cholita.txt'...
+
+Initializing Simulator...
+- Max Simulation Time : 20
+- Premature Production : True
+- Utterance Continuity : True
+- Verbal Guidance : True
+- Threshold of Utterance : Time = 1, CXNs = infinite, Syllables = infinite
+
+Beginning Simulation...
+================================================================================
+ Simulation Time: 1
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  LEFT_WOMAN_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 2
+================================================================================
+> Current Attention
+  LEFT_WOMAN_AREA (perception done)
+
+> Perceived Regions
+  LEFT_WOMAN_AREA
+
+> Schema Instances
+[!@] SemRep-N WOMAN_0
+[!@] SemRep-N WEAR_1
+[!@] SemRep-N DRESS_2
+[!@] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[!@] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[!@] Construction SVO_5 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [WOMAN_11] [WEAR_10] [DRESS_12]
+[!X] Construction PAS_SVO_6 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [DRESS_12] 'is' [WEAR_10] '-ed by' [WOMAN_11]
+[!O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [REL_SVO_WHO_9]
+[!O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [DRESS_12]
+[!X] Construction REL_SVO_WHO_9 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [WOMAN_11] 'who' [WEAR_10] [DRESS_12]
+[!@] Construction WEAR_10 covering WEAR_1 for 'wear'
+[!@] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[!@] Construction DRESS_12 covering DRESS_2 for 'dress'
+
+> Competition traces
+  SVO_5 (536) eliminated PAS_SVO_6 (480)
+  SVO_5 (536) eliminated REL_SVO_WHO_9 (526)
+
+> Construction Structures
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_8 'there is' [DRESS_12 'dress']
+[*] 536: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [DRESS_12 'dress']
+[X] 480: PAS_SVO_6 [DRESS_12 'dress'] 'is' [WEAR_10 'wear'] '-ed by' [WOMAN_11 'woman']
+[X] 526: EXIST_S_7 'there is' [REL_SVO_WHO_9 [WOMAN_11 'woman'] 'who' [WEAR_10 'wear'] [DRESS_12 'dress']]
+
+
+> Produced Utterance
+'woman wear dress'
+
+> Next Attention
+  LEFT_DRESS_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 3
+================================================================================
+> Current Attention
+  LEFT_DRESS_AREA (perception done)
+
+> Perceived Regions
+  LEFT_DRESS_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ @] SemRep-N WEAR_1
+[ @] SemRep-N DRESS_2
+[ @] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ @] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ @] Construction SVO_5 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [WOMAN_11] [WEAR_10] [REL_SPA_WHICH_16]
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [IN_COLOR_18]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ADJ_NOUN_17]
+[ @] Construction WEAR_10 covering WEAR_1 for 'wear'
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ @] Construction DRESS_12 covering DRESS_2 for 'dress'
+[!@] SemRep-N GREEN_13
+[!@] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[!X] Construction SPA_15 covering DRESS_2 GREEN_13 MODIFY_14 for [DRESS_12] 'is' [GREEN_19]
+[!@] Construction REL_SPA_WHICH_16 covering DRESS_2 GREEN_13 MODIFY_14 for [DRESS_12] 'which is' [GREEN_19]
+[!X] Construction ADJ_NOUN_17 covering DRESS_2 GREEN_13 MODIFY_14 for [GREEN_19] [DRESS_12]
+[!X] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[!@] Construction GREEN_19 covering GREEN_13 for 'green'
+
+> Competition traces
+  SVO_5 (1324) eliminated IN_COLOR_18 (631)
+  REL_SPA_WHICH_16 (1324) eliminated SPA_15 (238)
+  SPA_15 (238) eliminated ADJ_NOUN_17 (233)
+
+> Construction Structures
+[X] 238: SPA_15 [DRESS_12 'dress'] 'is' [GREEN_19 'green']
+[X] 631: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[ ] 226: EXIST_S_8 'there is' [REL_SPA_WHICH_16 [DRESS_12 'dress'] 'which is' [GREEN_19 'green']]
+[X] 233: EXIST_S_8 'there is' [ADJ_NOUN_17 [GREEN_19 'green'] [DRESS_12 'dress']]
+[*] 1324: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [REL_SPA_WHICH_16 [DRESS_12 'dress'] 'which is' [GREEN_19 'green']]
+[X] 131: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [ADJ_NOUN_17 [GREEN_19 'green'] [DRESS_12 'dress']]
+
+
+> Produced Utterance
+'(woman wear dress) which is green'
+
+> Next Attention
+  KICK_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 4
+================================================================================
+> Current Attention
+  KICK_AREA (perception done)
+
+> Perceived Regions
+  KICK_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ x] SemRep-N WEAR_1
+[ x] SemRep-N DRESS_2
+[ x] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ x] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ x] Construction SVO_5 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [REL_SVO_WHO_27] [WEAR_10] [DRESS_12]
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [REL_SVO_WHO_27]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ x] Construction WEAR_10 covering WEAR_1 for 'wear'
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ x] Construction DRESS_12 covering DRESS_2 for 'dress'
+[ x] SemRep-N GREEN_13
+[ x] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ x] Construction REL_SPA_WHICH_16 covering DRESS_2 GREEN_13 MODIFY_14 for [DRESS_12] 'which is' [GREEN_19]
+[ x] Construction GREEN_19 covering GREEN_13 for 'green'
+[!@] SemRep-N KICK_20
+[!@] SemRep-R PATIENT_21 from KICK_20 to HUMAN_23
+[!@] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[!O] SemRep-N HUMAN_23
+[!@] Construction SVO_24 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [WOMAN_11] [KICK_29] [ ]
+[!X] Construction PAS_SVO_25 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [ ] 'is' [KICK_29] '-ed by' [WOMAN_11]
+[!O] Construction EXIST_S_26 covering HUMAN_23 for 'there is' [REL_PAS_SVO_WHO_28]
+[!X] Construction REL_SVO_WHO_27 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [WOMAN_11] 'who' [KICK_29] [ ]
+[!X] Construction REL_PAS_SVO_WHO_28 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [ ] 'who is' [KICK_29] '-ed by' [WOMAN_11]
+[!@] Construction KICK_29 covering KICK_20 for 'kick'
+
+> Competition traces
+  SVO_24 (341) eliminated PAS_SVO_25 (285)
+  SVO_24 (341) eliminated REL_SVO_WHO_27 (331)
+  SVO_24 (341) eliminated REL_PAS_SVO_WHO_28 (325)
+
+> Construction Structures
+[*] 341: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [ ]
+[X] 285: PAS_SVO_25 [ ] 'is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']
+[X] 331: EXIST_S_7 'there is' [REL_SVO_WHO_27 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [ ]]
+[X] 325: EXIST_S_26 'there is' [REL_PAS_SVO_WHO_28 [ ] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']]
+[X] 329: SVO_5 [REL_SVO_WHO_27 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [ ]] [WEAR_10 'wear'] [DRESS_12 'dress']
+[X] 17: SVO_5 [REL_SVO_WHO_27 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [ ]] [WEAR_10 'wear'] [REL_SPA_WHICH_16 [DRESS_12 'dress'] 'which is' [GREEN_19 'green']]
+
+
+> Produced Utterance
+'woman kick...'
+
+> Next Attention
+  RIGHT_WOMAN_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 5
+================================================================================
+> Current Attention
+  RIGHT_WOMAN_AREA (perception done)
+
+> Perceived Regions
+  RIGHT_WOMAN_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [REL_SVO_WHO_40]
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ @] SemRep-N KICK_20
+[ @] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ @] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[!@] SemRep-N WOMAN_23
+[ @] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [WOMAN_11] [KICK_29] [REL_SVO_WHO_41]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [REL_SVO_WHO_41]
+[ @] Construction KICK_29 covering KICK_20 for 'kick'
+[!@] SemRep-N WEAR_30
+[!@] SemRep-N DRESS_31
+[!@] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[!@] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[!X] Construction SVO_35 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [REL_PAS_SVO_WHO_42] [WEAR_43] [DRESS_45]
+[!X] Construction PAS_SVO_36 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [REL_SVO_WHO_41] 'is' [KICK_29] '-ed by' [WOMAN_11]
+[!X] Construction PAS_SVO_37 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [DRESS_45] 'is' [WEAR_43] '-ed by' [REL_PAS_SVO_WHO_42]
+[!O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [DRESS_45]
+[!X] Construction REL_SVO_WHO_40 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [WOMAN_11] 'who' [KICK_29] [REL_SVO_WHO_41]
+[!@] Construction REL_SVO_WHO_41 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [WOMAN_44] 'who' [WEAR_43] [DRESS_45]
+[!X] Construction REL_PAS_SVO_WHO_42 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [WOMAN_44] 'who is' [KICK_29] '-ed by' [WOMAN_11]
+[!@] Construction WEAR_43 covering WEAR_30 for 'wear'
+[!@] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[!@] Construction DRESS_45 covering DRESS_31 for 'dress'
+
+> Competition traces
+  SVO_24 (1424) eliminated PAS_SVO_36 (668)
+  SVO_24 (1424) eliminated REL_SVO_WHO_40 (714)
+  SVO_24 (1424) eliminated REL_PAS_SVO_WHO_42 (718)
+  SVO_35 (718) eliminated PAS_SVO_37 (662)
+  REL_SVO_WHO_41 (1424) eliminated SVO_35 (718)
+
+> Construction Structures
+[ ] 138: EXIST_S_26 'there is' [WOMAN_44 'woman']
+[ ] 138: EXIST_S_39 'there is' [DRESS_45 'dress']
+[ ] 1036: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']
+[X] 280: PAS_SVO_36 [WOMAN_44 'woman'] 'is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']
+[X] 536: SVO_35 [WOMAN_44 'woman'] [WEAR_43 'wear'] [DRESS_45 'dress']
+[X] 480: PAS_SVO_37 [DRESS_45 'dress'] 'is' [WEAR_43 'wear'] '-ed by' [WOMAN_44 'woman']
+[X] 326: EXIST_S_7 'there is' [REL_SVO_WHO_40 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [WOMAN_44 'woman']]
+[X] 320: EXIST_S_26 'there is' [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']]
+[ ] 526: EXIST_S_26 'there is' [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[*] 1424: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[X] 668: PAS_SVO_36 [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']] 'is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']
+[X] 718: SVO_35 [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']] [WEAR_43 'wear'] [DRESS_45 'dress']
+[X] 662: PAS_SVO_37 [DRESS_45 'dress'] 'is' [WEAR_43 'wear'] '-ed by' [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']]
+[X] 714: EXIST_S_7 'there is' [REL_SVO_WHO_40 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]]
+
+
+> Produced Utterance
+'(woman kick) woman who wear dress'
+
+> Next Attention
+  RIGHT_DRESS_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 6
+================================================================================
+> Current Attention
+  RIGHT_DRESS_AREA (perception done)
+
+> Perceived Regions
+  RIGHT_DRESS_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [ ]
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ @] SemRep-N KICK_20
+[ @] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ @] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ @] SemRep-N WOMAN_23
+[ @] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [WOMAN_11] [KICK_29] [REL_SVO_WHO_41]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [IN_COLOR_51]
+[ @] Construction KICK_29 covering KICK_20 for 'kick'
+[ @] SemRep-N WEAR_30
+[ @] SemRep-N DRESS_31
+[ @] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ @] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ADJ_NOUN_50]
+[ @] Construction REL_SVO_WHO_41 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [WOMAN_44] 'who' [WEAR_43] [REL_SPA_WHICH_49]
+[ @] Construction WEAR_43 covering WEAR_30 for 'wear'
+[ @] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ @] Construction DRESS_45 covering DRESS_31 for 'dress'
+[!@] SemRep-N BLUE_46
+[!@] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[!X] Construction SPA_48 covering DRESS_31 BLUE_46 MODIFY_47 for [DRESS_45] 'is' [BLUE_52]
+[!@] Construction REL_SPA_WHICH_49 covering DRESS_31 BLUE_46 MODIFY_47 for [DRESS_45] 'which is' [BLUE_52]
+[!X] Construction ADJ_NOUN_50 covering DRESS_31 BLUE_46 MODIFY_47 for [BLUE_52] [DRESS_45]
+[!X] Construction IN_COLOR_51 covering WOMAN_23 WEAR_30 DRESS_31 BLUE_46 AGENT_32 PATIENT_33 MODIFY_47 for [WOMAN_44] 'in' [BLUE_52]
+[!@] Construction BLUE_52 covering BLUE_46 for 'blue'
+
+> Competition traces
+  REL_SVO_WHO_41 (2313) eliminated IN_COLOR_51 (632)
+  REL_SPA_WHICH_49 (2313) eliminated SPA_48 (239)
+  SPA_48 (239) eliminated ADJ_NOUN_50 (234)
+
+> Construction Structures
+[X] 239: SPA_48 [DRESS_45 'dress'] 'is' [BLUE_52 'blue']
+[X] 632: EXIST_S_26 'there is' [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[ ] 227: EXIST_S_39 'there is' [REL_SPA_WHICH_49 [DRESS_45 'dress'] 'which is' [BLUE_52 'blue']]
+[X] 234: EXIST_S_39 'there is' [ADJ_NOUN_50 [BLUE_52 'blue'] [DRESS_45 'dress']]
+[X] 530: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[ ] 115: EXIST_S_26 'there is' [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [REL_SPA_WHICH_49 [DRESS_45 'dress'] 'which is' [BLUE_52 'blue']]]
+[X] 122: EXIST_S_26 'there is' [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [ADJ_NOUN_50 [BLUE_52 'blue'] [DRESS_45 'dress']]]
+[*] 2313: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [REL_SPA_WHICH_49 [DRESS_45 'dress'] 'which is' [BLUE_52 'blue']]]
+[X] -80: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [ADJ_NOUN_50 [BLUE_52 'blue'] [DRESS_45 'dress']]]
+
+
+> Produced Utterance
+'(woman kick woman who wear dress) which is blue'
+
+> Next Attention
+  BOXINGRING_AREA (uncertainty left: 2)
+
+================================================================================
+ Simulation Time: 7
+================================================================================
+> Current Attention
+  BOXINGRING_AREA (uncertainty left: 1)
+
+> Schema Instances
+[ x] SemRep-N WOMAN_0
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [ ]
+[ x] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ x] SemRep-N KICK_20
+[ x] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ x] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ x] SemRep-N WOMAN_23
+[ x] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [ ] [ ] [ ]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [ ]
+[ x] Construction KICK_29 covering KICK_20 for 'kick'
+[ x] SemRep-N WEAR_30
+[ x] SemRep-N DRESS_31
+[ x] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ x] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ ]
+[ x] Construction REL_SVO_WHO_41 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [ ] 'who' [ ] [ ]
+[ x] Construction WEAR_43 covering WEAR_30 for 'wear'
+[ x] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ x] Construction DRESS_45 covering DRESS_31 for 'dress'
+[ x] SemRep-N BLUE_46
+[ x] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[ x] Construction REL_SPA_WHICH_49 covering DRESS_31 BLUE_46 MODIFY_47 for [ ] 'which is' [ ]
+[ x] Construction BLUE_52 covering BLUE_46 for 'blue'
+
+> Next Attention
+  BOXINGRING_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 8
+================================================================================
+> Current Attention
+  BOXINGRING_AREA (perception done)
+
+> Perceived Regions
+  BOXINGRING_AREA
+
+> Schema Instances
+[!@] SemRep-N BOXINGRING_53
+[!X] SemRep-R IN_54 from ?? to BOXINGRING_53
+[!@] Construction THEME_S_55 covering BOXINGRING_53 for 'it is' [BOXINGRING_56]
+[!@] Construction BOXINGRING_56 covering BOXINGRING_53 for 'boxing ring'
+
+> Construction Structures
+[*] 136: THEME_S_55 'it is' [BOXINGRING_56 'boxing ring']
+
+
+> Produced Utterance
+'it is boxing ring'
+
+> Next Attention
+  PEOPLE_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 9
+================================================================================
+> Current Attention
+  PEOPLE_AREA (perception done)
+
+> Perceived Regions
+  PEOPLE_AREA
+
+> Schema Instances
+[ x] SemRep-N BOXINGRING_53
+[ x] Construction THEME_S_55 covering BOXINGRING_53 for 'it is' [ ]
+[ x] Construction BOXINGRING_56 covering BOXINGRING_53 for 'boxing ring'
+[!@] SemRep-N PEOPLE_57
+[!@] Construction EXIST_S_58 covering PEOPLE_57 for 'there is' [PEOPLE_59]
+[!@] Construction PEOPLE_59 covering PEOPLE_57 for 'people'
+
+> Construction Structures
+[*] 137: EXIST_S_58 'there is' [PEOPLE_59 'people']
+
+
+> Produced Utterance
+'there is people'
+
+> Next Attention
+  PEOPLE_FOCUS_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 10
+================================================================================
+> Current Attention
+  PEOPLE_FOCUS_AREA (perception done)
+
+> Perceived Regions
+  PEOPLE_FOCUS_AREA
+
+> Schema Instances
+[ @] SemRep-N PEOPLE_57
+[ @] Construction EXIST_S_58 covering PEOPLE_57 for 'there is' [REL_SV_WHO_64]
+[ @] Construction PEOPLE_59 covering PEOPLE_57 for 'people'
+[!@] SemRep-N WATCH_60
+[!@] SemRep-R AGENT_61 from WATCH_60 to PEOPLE_57
+[!X] SemRep-R CONCURRENT_62 from ?? to WATCH_60
+[!X] Construction SV_63 covering PEOPLE_57 WATCH_60 AGENT_61 for [PEOPLE_59] [WATCH_65]
+[!@] Construction REL_SV_WHO_64 covering PEOPLE_57 WATCH_60 AGENT_61 for [PEOPLE_59] 'who' [WATCH_65]
+[!@] Construction WATCH_65 covering WATCH_60 for 'watch'
+
+> Competition traces
+  REL_SV_WHO_64 (529) eliminated SV_63 (239)
+
+> Construction Structures
+[X] 239: SV_63 [PEOPLE_59 'people'] [WATCH_65 'watch']
+[*] 529: EXIST_S_58 'there is' [REL_SV_WHO_64 [PEOPLE_59 'people'] 'who' [WATCH_65 'watch']]
+
+
+> Produced Utterance
+'(there is people) who watch'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 11
+================================================================================
+> Current Attention
+  None
+
+> Schema Instances
+[ x] SemRep-N PEOPLE_57
+[ x] Construction EXIST_S_58 covering PEOPLE_57 for 'there is' [ ]
+[ x] Construction PEOPLE_59 covering PEOPLE_57 for 'people'
+[ x] SemRep-N WATCH_60
+[ x] SemRep-R AGENT_61 from WATCH_60 to PEOPLE_57
+[ x] Construction REL_SV_WHO_64 covering PEOPLE_57 WATCH_60 AGENT_61 for [ ] 'who' [ ]
+[ x] Construction WATCH_65 covering WATCH_60 for 'watch'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 12
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  None
+
+
+Simulation complete: inactivity termination.

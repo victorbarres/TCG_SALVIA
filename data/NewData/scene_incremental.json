@@ -1,0 +1,40 @@
+{ "scene" : {
+	"image": "none",
+	"resolution": [0, 0],
+	"regions" : [
+					{
+						"name" : "WOMAN_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 100,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "WOMAN", "type" : "OBJ", "concept" : "WOMAN"}],
+									
+						"perceive" : ["WOMAN"]
+					},
+					{
+						"name" : "TALK_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 70,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "TALK", "type" : "OBJ", "concept" : "TALK"},
+									{"name" : "TALK_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "KICK", "to" : "WOMAN"},
+									{"name" : "TALK_PATIENT", "type" : "REL", "concept" : "PATIENT", "from" : "KICK", "to" : "PEOPLE"}],
+									
+						"perceive" : ["TALK", "TALK_AGENT", "TALK_PATIENT"],
+						"update" : {"PEOPLE" : "HUMAN"}
+					},
+					{
+						"name" : "PEOPLE_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 50,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "PEOPLE", "type" : "OBJ", "concept" : "PEOPLE"}],
+									
+						"perceive" : ["PEOPLE"]
+					}
+				]
+		}
+}

@@ -1,0 +1,86 @@
+{ "scene" : {
+	"image": "none",
+	"resolution": [0, 0],
+	"regions" : [
+					{
+						"name" : "MAINEVENT",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 100,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "WOMAN", "type" : "OBJ", "concept" : "WOMAN"},
+									{"name" : "LAUGH", "type" : "OBJ", "concept" : "LAUGH"},
+									{"name" : "LAUGH_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "LAUGH", "to" : "WOMAN"},
+									{"name" : "BOY", "type" : "OBJ", "concept" : "BOY"},
+									{"name" : "WATCH", "type" : "OBJ", "concept" : "WATCH"},
+									{"name" : "WATCH_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "WATCH", "to" : "BOY"},
+									{"name" : "WHILE", "type" : "REL", "concept" : "CONCURRENT", "from" : "LAUGH", "to" : "WATCH"}],
+									
+						"perceive" : ["WOMAN", "LAUGH", "LAUGH_AGENT", "BOY", "WATCH", "WATCH_AGENT", "WHILE"]
+					}
+				]
+		}
+}
+#
+# TCG Scene: Test Scene
+#
+
+image: none
+resolution: 0 * 0
+
+
+region MAINEVENT
+{
+	location: 0, 0 size: 0, 0
+	saliency: 100
+	uncertainty: 1
+
+	object WOMAN { concept: WOMAN }
+	object LAUGH { concept: LAUGH }
+	relation LAUGH_AGENT { concept: AGENT from: LAUGH to: WOMAN }
+
+	object BOY { concept: BOY }
+	object WATCH { concept: WATCH }
+	relation WATCH_AGENT { concept: AGENT from: WATCH to: BOY }
+	
+	relation WHILE { concept: CONCURRENT from: LAUGH to: WATCH }
+	
+	perceive { WOMAN, LAUGH, LAUGH_AGENT }
+	perceive { BOY, WATCH, WATCH_AGENT }
+	perceive { WHILE }
+}
+
+#/
+
+region GIST
+{
+	location: 0, 0 size: 0, 0
+	saliency: 100
+	uncertainty: 0
+
+	update { WOMAN = ENTITY, KICK = ACTION, MAN = ENTITY }
+	perceive { KICK_AGENT, KICK_PATIENT }
+}
+
+region MAINEVENT
+{
+	location: 0, 0 size: 0, 0
+	saliency: 100
+	uncertainty: 1
+
+	object WOMAN { concept: WOMAN }
+	object KICK { concept: KICK }
+	object MAN { concept: MAN }
+	relation KICK_AGENT { concept: AGENT from: KICK to: WOMAN }
+	relation KICK_PATIENT { concept: PATIENT from: KICK to: MAN }
+
+	object HIT { concept: HIT }
+	object BOY { concept: BOY }
+	relation HIT_AGENT { concept: AGENT from: HIT to: WOMAN }
+	relation HIT_PATIENT { concept: PATIENT from: HIT to: BOY }
+	
+	perceive { WOMAN, KICK, MAN, KICK_AGENT, KICK_PATIENT }
+	perceive { HIT, BOY, HIT_AGENT, HIT_PATIENT }
+}
+
+/#

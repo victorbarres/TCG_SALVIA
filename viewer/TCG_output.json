@@ -1,0 +1,5042 @@
+{
+    "parameters": {
+        "max_simulation_time": 20,
+        "premature_production": true,
+        "utterance_continuity": true,
+        "utterance_threshold": {
+            "cxns": 1,
+            "syllables": 1,
+            "time": 1
+        },
+        "verbal_guidance": true
+    },
+    "states": [
+        {
+            "current_attention": {
+                "name": null,
+                "uncertainty": null
+            },
+            "grammaticalWM": {
+                "assemblages": [],
+                "competitions": [],
+                "cxn_inst": [],
+                "links": []
+            },
+            "next_attention": "LEFT_WOMAN_AREA",
+            "perceived_region": "",
+            "phonologicalWM": [],
+            "produced_utterance": "",
+            "semanticWM": {
+                "SRlinks": [],
+                "SRnodes": []
+            },
+            "time": 1
+        },
+        {
+            "current_attention": {
+                "name": "LEFT_WOMAN_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_6",
+                            "WOMAN_10"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "EXIST_S_6"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            }
+                        ],
+                        "suit": 138,
+                        "top": "EXIST_S_6",
+                        "tree": "EXIST_S_6 'there is' [WOMAN_10 'woman']",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_7",
+                            "DRESS_11"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "EXIST_S_7"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            }
+                        ],
+                        "suit": 138,
+                        "top": "EXIST_S_7",
+                        "tree": "EXIST_S_7 'there is' [DRESS_11 'dress']",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WEAR_9",
+                            "WOMAN_10",
+                            "SVO_5",
+                            "DRESS_11"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WEAR_9"
+                                }
+                            }
+                        ],
+                        "suit": 536,
+                        "top": "SVO_5",
+                        "tree": "SVO_5 [WOMAN_10 'woman'] [WEAR_9 'wear'] [DRESS_11 'dress']",
+                        "valid": true,
+                        "winner": true
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_6",
+                            "WEAR_9",
+                            "WOMAN_10",
+                            "REL_SVO_WHO_8",
+                            "DRESS_11"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_8"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_8"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_8"
+                                },
+                                "target": {
+                                    "id": "WEAR_9"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_6"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_8"
+                                }
+                            }
+                        ],
+                        "suit": 526,
+                        "top": "EXIST_S_6",
+                        "tree": "EXIST_S_6 'there is' [REL_SVO_WHO_8 [WOMAN_10 'woman'] 'who' [WEAR_9 'wear'] [DRESS_11 'dress']]",
+                        "valid": false,
+                        "winner": false
+                    }
+                ],
+                "competitions": [
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_8"
+                        }
+                    }
+                ],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_3",
+                                "PATIENT_4"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "DRESS_2",
+                                "WEAR_1"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "SVO_5",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "EXIST_S_6",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_2"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "EXIST_S_7",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_3",
+                                "PATIENT_4"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "DRESS_2",
+                                "WEAR_1"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_SVO_WHO_8",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WEAR_1"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "WEAR_9",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "WOMAN_10",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_2"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "DRESS_11",
+                        "old": true
+                    }
+                ],
+                "links": [
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WEAR_9"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_6"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_6"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_8"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_7"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_8"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_8"
+                        },
+                        "target": {
+                            "id": "WEAR_9"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_8"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    }
+                ]
+            },
+            "next_attention": "LEFT_DRESS_AREA",
+            "perceived_region": "LEFT_WOMAN_AREA",
+            "phonologicalWM": [
+                "woman",
+                "wear",
+                "dress"
+            ],
+            "produced_utterance": "woman wear dress",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "AGENT_3",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_1"
+                        },
+                        "target": {
+                            "id": "WOMAN_0"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "PATIENT_4",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_1"
+                        },
+                        "target": {
+                            "id": "DRESS_2"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "WOMAN_0",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "WEAR_1",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "DRESS_2",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 2
+        },
+        {
+            "current_attention": {
+                "name": "LEFT_DRESS_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "DRESS_11",
+                            "SPA_14",
+                            "GREEN_18"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SPA_14"
+                                },
+                                "target": {
+                                    "id": "GREEN_18"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SPA_14"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            }
+                        ],
+                        "suit": 238,
+                        "top": "SPA_14",
+                        "tree": "SPA_14 [DRESS_11 'dress'] 'is' [GREEN_18 'green']",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_6",
+                            "WOMAN_10",
+                            "IN_COLOR_17",
+                            "GREEN_18"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "IN_COLOR_17"
+                                },
+                                "target": {
+                                    "id": "GREEN_18"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "IN_COLOR_17"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_6"
+                                },
+                                "target": {
+                                    "id": "IN_COLOR_17"
+                                }
+                            }
+                        ],
+                        "suit": 631,
+                        "top": "EXIST_S_6",
+                        "tree": "EXIST_S_6 'there is' [IN_COLOR_17 [WOMAN_10 'woman'] 'in' [GREEN_18 'green']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_7",
+                            "DRESS_11",
+                            "REL_SPA_WHICH_15",
+                            "GREEN_18"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_15"
+                                },
+                                "target": {
+                                    "id": "GREEN_18"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_15"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_7"
+                                },
+                                "target": {
+                                    "id": "REL_SPA_WHICH_15"
+                                }
+                            }
+                        ],
+                        "suit": 226,
+                        "top": "EXIST_S_7",
+                        "tree": "EXIST_S_7 'there is' [REL_SPA_WHICH_15 [DRESS_11 'dress'] 'which is' [GREEN_18 'green']]",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_7",
+                            "DRESS_11",
+                            "ADJ_NOUN_16",
+                            "GREEN_18"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_16"
+                                },
+                                "target": {
+                                    "id": "GREEN_18"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_16"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_7"
+                                },
+                                "target": {
+                                    "id": "ADJ_NOUN_16"
+                                }
+                            }
+                        ],
+                        "suit": 233,
+                        "top": "EXIST_S_7",
+                        "tree": "EXIST_S_7 'there is' [ADJ_NOUN_16 [GREEN_18 'green'] [DRESS_11 'dress']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WEAR_9",
+                            "SVO_5",
+                            "WOMAN_10",
+                            "DRESS_11",
+                            "REL_SPA_WHICH_15",
+                            "GREEN_18"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WEAR_9"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_15"
+                                },
+                                "target": {
+                                    "id": "GREEN_18"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_15"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "REL_SPA_WHICH_15"
+                                }
+                            }
+                        ],
+                        "suit": 1324,
+                        "top": "SVO_5",
+                        "tree": "SVO_5 [WOMAN_10 'woman'] [WEAR_9 'wear'] [REL_SPA_WHICH_15 [DRESS_11 'dress'] 'which is' [GREEN_18 'green']]",
+                        "valid": true,
+                        "winner": true
+                    },
+                    {
+                        "cxn_inst": [
+                            "WEAR_9",
+                            "SVO_5",
+                            "WOMAN_10",
+                            "DRESS_11",
+                            "ADJ_NOUN_16",
+                            "GREEN_18"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WEAR_9"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_16"
+                                },
+                                "target": {
+                                    "id": "GREEN_18"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_16"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "ADJ_NOUN_16"
+                                }
+                            }
+                        ],
+                        "suit": 131,
+                        "top": "SVO_5",
+                        "tree": "SVO_5 [WOMAN_10 'woman'] [WEAR_9 'wear'] [ADJ_NOUN_16 [GREEN_18 'green'] [DRESS_11 'dress']]",
+                        "valid": false,
+                        "winner": false
+                    }
+                ],
+                "competitions": [
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "IN_COLOR_17"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_15"
+                        },
+                        "target": {
+                            "id": "SPA_14"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SPA_14"
+                        },
+                        "target": {
+                            "id": "ADJ_NOUN_16"
+                        }
+                    }
+                ],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_3",
+                                "PATIENT_4"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "DRESS_2",
+                                "WEAR_1"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "SVO_5",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_6",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_2"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_7",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WEAR_1"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WEAR_9",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WOMAN_10",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_2"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "DRESS_11",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_13"
+                            ],
+                            "SRnodes": [
+                                "DRESS_2",
+                                "GREEN_12"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "SPA_14",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_13"
+                            ],
+                            "SRnodes": [
+                                "DRESS_2",
+                                "GREEN_12"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_SPA_WHICH_15",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_13"
+                            ],
+                            "SRnodes": [
+                                "DRESS_2",
+                                "GREEN_12"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "ADJ_NOUN_16",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_3",
+                                "PATIENT_4",
+                                "MODIFY_13"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "WEAR_1",
+                                "DRESS_2",
+                                "GREEN_12"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "IN_COLOR_17",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "GREEN_12"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "GREEN_18",
+                        "old": true
+                    }
+                ],
+                "links": [
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WEAR_9"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WEAR_9"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "REL_SPA_WHICH_15"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "ADJ_NOUN_16"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_6"
+                        },
+                        "target": {
+                            "id": "IN_COLOR_17"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_7"
+                        },
+                        "target": {
+                            "id": "REL_SPA_WHICH_15"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_7"
+                        },
+                        "target": {
+                            "id": "ADJ_NOUN_16"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SPA_14"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SPA_14"
+                        },
+                        "target": {
+                            "id": "GREEN_18"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_15"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_15"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_15"
+                        },
+                        "target": {
+                            "id": "GREEN_18"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_15"
+                        },
+                        "target": {
+                            "id": "GREEN_18"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_16"
+                        },
+                        "target": {
+                            "id": "GREEN_18"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_16"
+                        },
+                        "target": {
+                            "id": "GREEN_18"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_16"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_16"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "IN_COLOR_17"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "IN_COLOR_17"
+                        },
+                        "target": {
+                            "id": "GREEN_18"
+                        }
+                    }
+                ]
+            },
+            "next_attention": "KICK_AREA",
+            "perceived_region": "LEFT_DRESS_AREA",
+            "phonologicalWM": [
+                "woman",
+                "wear",
+                "dress",
+                "which is",
+                "green"
+            ],
+            "produced_utterance": "(woman wear dress) which is green",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "AGENT_3",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_1"
+                        },
+                        "target": {
+                            "id": "WOMAN_0"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PATIENT_4",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_1"
+                        },
+                        "target": {
+                            "id": "DRESS_2"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "MODIFY_13",
+                        "old": true,
+                        "source": {
+                            "id": "GREEN_12"
+                        },
+                        "target": {
+                            "id": "DRESS_2"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WOMAN_0",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WEAR_1",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "DRESS_2",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "GREEN_12",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 3
+        },
+        {
+            "current_attention": {
+                "name": "KICK_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "WOMAN_10",
+                            "SVO_23",
+                            "KICK_27"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            }
+                        ],
+                        "suit": 341,
+                        "top": "SVO_23",
+                        "tree": "SVO_23 [WOMAN_10 'woman'] [KICK_27 'kick'] [ ]",
+                        "valid": true,
+                        "winner": true
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_6",
+                            "WOMAN_10",
+                            "REL_SVO_WHO_25",
+                            "KICK_27"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_25"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_25"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_6"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_25"
+                                }
+                            }
+                        ],
+                        "suit": 331,
+                        "top": "EXIST_S_6",
+                        "tree": "EXIST_S_6 'there is' [REL_SVO_WHO_25 [WOMAN_10 'woman'] 'who' [KICK_27 'kick'] [ ]]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_24",
+                            "WOMAN_10",
+                            "REL_PAS_SVO_WHO_26",
+                            "KICK_27"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_26"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_26"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_24"
+                                },
+                                "target": {
+                                    "id": "REL_PAS_SVO_WHO_26"
+                                }
+                            }
+                        ],
+                        "suit": 325,
+                        "top": "EXIST_S_24",
+                        "tree": "EXIST_S_24 'there is' [REL_PAS_SVO_WHO_26 [ ] 'who is' [KICK_27 'kick'] '-ed by' [WOMAN_10 'woman']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WEAR_9",
+                            "SVO_5",
+                            "DRESS_11",
+                            "WOMAN_10",
+                            "REL_SVO_WHO_25",
+                            "KICK_27"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WEAR_9"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_25"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_25"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_25"
+                                }
+                            }
+                        ],
+                        "suit": 329,
+                        "top": "SVO_5",
+                        "tree": "SVO_5 [REL_SVO_WHO_25 [WOMAN_10 'woman'] 'who' [KICK_27 'kick'] [ ]] [WEAR_9 'wear'] [DRESS_11 'dress']",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WOMAN_10",
+                            "REL_SVO_WHO_25",
+                            "KICK_27",
+                            "SVO_5",
+                            "WEAR_9",
+                            "DRESS_11",
+                            "REL_SPA_WHICH_15",
+                            "GREEN_18"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_25"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_25"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "WEAR_9"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_15"
+                                },
+                                "target": {
+                                    "id": "GREEN_18"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_15"
+                                },
+                                "target": {
+                                    "id": "DRESS_11"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "REL_SPA_WHICH_15"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_5"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_25"
+                                }
+                            }
+                        ],
+                        "suit": 17,
+                        "top": "SVO_5",
+                        "tree": "SVO_5 [REL_SVO_WHO_25 [WOMAN_10 'woman'] 'who' [KICK_27 'kick'] [ ]] [WEAR_9 'wear'] [REL_SPA_WHICH_15 [DRESS_11 'dress'] 'which is' [GREEN_18 'green']]",
+                        "valid": false,
+                        "winner": false
+                    }
+                ],
+                "competitions": [
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_25"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "REL_PAS_SVO_WHO_26"
+                        }
+                    }
+                ],
+                "cxn_inst": [
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_3",
+                                "PATIENT_4"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "DRESS_2",
+                                "WEAR_1"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "SVO_5",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_6",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_2"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_7",
+                        "old": false
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WEAR_1"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WEAR_9",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WOMAN_10",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_2"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "DRESS_11",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_13"
+                            ],
+                            "SRnodes": [
+                                "DRESS_2",
+                                "GREEN_12"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "REL_SPA_WHICH_15",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "GREEN_12"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "GREEN_18",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "HUMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "SVO_23",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "HUMAN_22"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "EXIST_S_24",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "HUMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_SVO_WHO_25",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "HUMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_PAS_SVO_WHO_26",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "KICK_27",
+                        "old": true
+                    }
+                ],
+                "links": [
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_25"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_25"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WEAR_9"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "WEAR_9"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_5"
+                        },
+                        "target": {
+                            "id": "REL_SPA_WHICH_15"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_6"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_25"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_15"
+                        },
+                        "target": {
+                            "id": "DRESS_11"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_15"
+                        },
+                        "target": {
+                            "id": "GREEN_18"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_24"
+                        },
+                        "target": {
+                            "id": "REL_PAS_SVO_WHO_26"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_25"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_25"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_25"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_25"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_25"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_25"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_26"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_26"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    }
+                ]
+            },
+            "next_attention": "RIGHT_WOMAN_AREA",
+            "perceived_region": "KICK_AREA",
+            "phonologicalWM": [
+                "woman",
+                "kick"
+            ],
+            "produced_utterance": "woman kick...",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "AGENT_3",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_1"
+                        },
+                        "target": {
+                            "id": "WOMAN_0"
+                        }
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PATIENT_4",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_1"
+                        },
+                        "target": {
+                            "id": "DRESS_2"
+                        }
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "MODIFY_13",
+                        "old": true,
+                        "source": {
+                            "id": "GREEN_12"
+                        },
+                        "target": {
+                            "id": "DRESS_2"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "AGENT_20",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "WOMAN_0"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "PATIENT_21",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "HUMAN_22"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WOMAN_0",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WEAR_1",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "DRESS_2",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "GREEN_12",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "KICK_19",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "HUMAN_22",
+                        "old": false
+                    }
+                ]
+            },
+            "time": 4
+        },
+        {
+            "current_attention": {
+                "name": "RIGHT_WOMAN_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_24",
+                            "WOMAN_40"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "EXIST_S_24"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            }
+                        ],
+                        "suit": 138,
+                        "top": "EXIST_S_24",
+                        "tree": "EXIST_S_24 'there is' [WOMAN_40 'woman']",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_35",
+                            "DRESS_41"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "EXIST_S_35"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            }
+                        ],
+                        "suit": 138,
+                        "top": "EXIST_S_35",
+                        "tree": "EXIST_S_35 'there is' [DRESS_41 'dress']",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WOMAN_10",
+                            "KICK_27",
+                            "SVO_23",
+                            "WOMAN_40"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            }
+                        ],
+                        "suit": 1036,
+                        "top": "SVO_23",
+                        "tree": "SVO_23 [WOMAN_10 'woman'] [KICK_27 'kick'] [WOMAN_40 'woman']",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WEAR_39",
+                            "WOMAN_40",
+                            "SVO_33",
+                            "DRESS_41"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_33"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_33"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_33"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            }
+                        ],
+                        "suit": 536,
+                        "top": "SVO_33",
+                        "tree": "SVO_33 [WOMAN_40 'woman'] [WEAR_39 'wear'] [DRESS_41 'dress']",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_6",
+                            "WOMAN_10",
+                            "KICK_27",
+                            "REL_SVO_WHO_36",
+                            "WOMAN_40"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_36"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_36"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_36"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_6"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_36"
+                                }
+                            }
+                        ],
+                        "suit": 326,
+                        "top": "EXIST_S_6",
+                        "tree": "EXIST_S_6 'there is' [REL_SVO_WHO_36 [WOMAN_10 'woman'] 'who' [KICK_27 'kick'] [WOMAN_40 'woman']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_24",
+                            "WOMAN_10",
+                            "KICK_27",
+                            "REL_PAS_SVO_WHO_38",
+                            "WOMAN_40"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_24"
+                                },
+                                "target": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                }
+                            }
+                        ],
+                        "suit": 320,
+                        "top": "EXIST_S_24",
+                        "tree": "EXIST_S_24 'there is' [REL_PAS_SVO_WHO_38 [WOMAN_40 'woman'] 'who is' [KICK_27 'kick'] '-ed by' [WOMAN_10 'woman']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_24",
+                            "WEAR_39",
+                            "WOMAN_40",
+                            "REL_SVO_WHO_37",
+                            "DRESS_41"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_24"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_37"
+                                }
+                            }
+                        ],
+                        "suit": 526,
+                        "top": "EXIST_S_24",
+                        "tree": "EXIST_S_24 'there is' [REL_SVO_WHO_37 [WOMAN_40 'woman'] 'who' [WEAR_39 'wear'] [DRESS_41 'dress']]",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WOMAN_10",
+                            "SVO_23",
+                            "KICK_27",
+                            "WEAR_39",
+                            "WOMAN_40",
+                            "REL_SVO_WHO_37",
+                            "DRESS_41"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_37"
+                                }
+                            }
+                        ],
+                        "suit": 1424,
+                        "top": "SVO_23",
+                        "tree": "SVO_23 [WOMAN_10 'woman'] [KICK_27 'kick'] [REL_SVO_WHO_37 [WOMAN_40 'woman'] 'who' [WEAR_39 'wear'] [DRESS_41 'dress']]",
+                        "valid": true,
+                        "winner": true
+                    },
+                    {
+                        "cxn_inst": [
+                            "WEAR_39",
+                            "SVO_33",
+                            "DRESS_41",
+                            "WOMAN_10",
+                            "KICK_27",
+                            "REL_PAS_SVO_WHO_38",
+                            "WOMAN_40"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_33"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_33"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_33"
+                                },
+                                "target": {
+                                    "id": "REL_PAS_SVO_WHO_38"
+                                }
+                            }
+                        ],
+                        "suit": 718,
+                        "top": "SVO_33",
+                        "tree": "SVO_33 [REL_PAS_SVO_WHO_38 [WOMAN_40 'woman'] 'who is' [KICK_27 'kick'] '-ed by' [WOMAN_10 'woman']] [WEAR_39 'wear'] [DRESS_41 'dress']",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_6",
+                            "WOMAN_10",
+                            "KICK_27",
+                            "REL_SVO_WHO_36",
+                            "WEAR_39",
+                            "WOMAN_40",
+                            "REL_SVO_WHO_37",
+                            "DRESS_41"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_36"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_36"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_36"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_37"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_6"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_36"
+                                }
+                            }
+                        ],
+                        "suit": 714,
+                        "top": "EXIST_S_6",
+                        "tree": "EXIST_S_6 'there is' [REL_SVO_WHO_36 [WOMAN_10 'woman'] 'who' [KICK_27 'kick'] [REL_SVO_WHO_37 [WOMAN_40 'woman'] 'who' [WEAR_39 'wear'] [DRESS_41 'dress']]]",
+                        "valid": false,
+                        "winner": false
+                    }
+                ],
+                "competitions": [
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_36"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "SVO_33"
+                        }
+                    }
+                ],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_6",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WOMAN_10",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "WOMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "SVO_23",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_22"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_24",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "KICK_27",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_30",
+                                "PATIENT_31"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_22",
+                                "DRESS_29",
+                                "WEAR_28"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "SVO_33",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_29"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "EXIST_S_35",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "WOMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_SVO_WHO_36",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_30",
+                                "PATIENT_31"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_22",
+                                "DRESS_29",
+                                "WEAR_28"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_SVO_WHO_37",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "WOMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_PAS_SVO_WHO_38",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WEAR_28"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "WEAR_39",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_22"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "WOMAN_40",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_29"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "DRESS_41",
+                        "old": true
+                    }
+                ],
+                "links": [
+                    {
+                        "source": {
+                            "id": "EXIST_S_6"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_36"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_6"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_36"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_37"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_24"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_24"
+                        },
+                        "target": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_24"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_37"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_33"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_33"
+                        },
+                        "target": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_33"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_33"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_33"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_33"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_35"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_36"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_36"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_36"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_36"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_36"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_36"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_37"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_PAS_SVO_WHO_38"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    }
+                ]
+            },
+            "next_attention": "RIGHT_DRESS_AREA",
+            "perceived_region": "RIGHT_WOMAN_AREA",
+            "phonologicalWM": [
+                "woman",
+                "kick",
+                "woman",
+                "who",
+                "wear",
+                "dress"
+            ],
+            "produced_utterance": "(woman kick) woman who wear dress",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "AGENT_20",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "WOMAN_0"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PATIENT_21",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "WOMAN_22"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "AGENT_30",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_28"
+                        },
+                        "target": {
+                            "id": "WOMAN_22"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "PATIENT_31",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_28"
+                        },
+                        "target": {
+                            "id": "DRESS_29"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WOMAN_0",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "KICK_19",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "WOMAN_22",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "WEAR_28",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "DRESS_29",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 5
+        },
+        {
+            "current_attention": {
+                "name": "RIGHT_DRESS_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "DRESS_41",
+                            "SPA_44",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SPA_44"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SPA_44"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            }
+                        ],
+                        "suit": 239,
+                        "top": "SPA_44",
+                        "tree": "SPA_44 [DRESS_41 'dress'] 'is' [BLUE_48 'blue']",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_24",
+                            "WOMAN_40",
+                            "IN_COLOR_47",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "IN_COLOR_47"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "IN_COLOR_47"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_24"
+                                },
+                                "target": {
+                                    "id": "IN_COLOR_47"
+                                }
+                            }
+                        ],
+                        "suit": 632,
+                        "top": "EXIST_S_24",
+                        "tree": "EXIST_S_24 'there is' [IN_COLOR_47 [WOMAN_40 'woman'] 'in' [BLUE_48 'blue']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_35",
+                            "DRESS_41",
+                            "REL_SPA_WHICH_45",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_45"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_45"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_35"
+                                },
+                                "target": {
+                                    "id": "REL_SPA_WHICH_45"
+                                }
+                            }
+                        ],
+                        "suit": 227,
+                        "top": "EXIST_S_35",
+                        "tree": "EXIST_S_35 'there is' [REL_SPA_WHICH_45 [DRESS_41 'dress'] 'which is' [BLUE_48 'blue']]",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_35",
+                            "DRESS_41",
+                            "ADJ_NOUN_46",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_46"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_46"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_35"
+                                },
+                                "target": {
+                                    "id": "ADJ_NOUN_46"
+                                }
+                            }
+                        ],
+                        "suit": 234,
+                        "top": "EXIST_S_35",
+                        "tree": "EXIST_S_35 'there is' [ADJ_NOUN_46 [BLUE_48 'blue'] [DRESS_41 'dress']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WOMAN_10",
+                            "SVO_23",
+                            "KICK_27",
+                            "WOMAN_40",
+                            "IN_COLOR_47",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "IN_COLOR_47"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "IN_COLOR_47"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "IN_COLOR_47"
+                                }
+                            }
+                        ],
+                        "suit": 530,
+                        "top": "SVO_23",
+                        "tree": "SVO_23 [WOMAN_10 'woman'] [KICK_27 'kick'] [IN_COLOR_47 [WOMAN_40 'woman'] 'in' [BLUE_48 'blue']]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_24",
+                            "WEAR_39",
+                            "REL_SVO_WHO_37",
+                            "WOMAN_40",
+                            "DRESS_41",
+                            "REL_SPA_WHICH_45",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_45"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_45"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "REL_SPA_WHICH_45"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_24"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_37"
+                                }
+                            }
+                        ],
+                        "suit": 115,
+                        "top": "EXIST_S_24",
+                        "tree": "EXIST_S_24 'there is' [REL_SVO_WHO_37 [WOMAN_40 'woman'] 'who' [WEAR_39 'wear'] [REL_SPA_WHICH_45 [DRESS_41 'dress'] 'which is' [BLUE_48 'blue']]]",
+                        "valid": true,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_24",
+                            "WEAR_39",
+                            "REL_SVO_WHO_37",
+                            "WOMAN_40",
+                            "DRESS_41",
+                            "ADJ_NOUN_46",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_46"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_46"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "ADJ_NOUN_46"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "EXIST_S_24"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_37"
+                                }
+                            }
+                        ],
+                        "suit": 122,
+                        "top": "EXIST_S_24",
+                        "tree": "EXIST_S_24 'there is' [REL_SVO_WHO_37 [WOMAN_40 'woman'] 'who' [WEAR_39 'wear'] [ADJ_NOUN_46 [BLUE_48 'blue'] [DRESS_41 'dress']]]",
+                        "valid": false,
+                        "winner": false
+                    },
+                    {
+                        "cxn_inst": [
+                            "WOMAN_10",
+                            "SVO_23",
+                            "KICK_27",
+                            "WEAR_39",
+                            "REL_SVO_WHO_37",
+                            "WOMAN_40",
+                            "DRESS_41",
+                            "REL_SPA_WHICH_45",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_45"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SPA_WHICH_45"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "REL_SPA_WHICH_45"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_37"
+                                }
+                            }
+                        ],
+                        "suit": 2313,
+                        "top": "SVO_23",
+                        "tree": "SVO_23 [WOMAN_10 'woman'] [KICK_27 'kick'] [REL_SVO_WHO_37 [WOMAN_40 'woman'] 'who' [WEAR_39 'wear'] [REL_SPA_WHICH_45 [DRESS_41 'dress'] 'which is' [BLUE_48 'blue']]]",
+                        "valid": true,
+                        "winner": true
+                    },
+                    {
+                        "cxn_inst": [
+                            "WOMAN_10",
+                            "SVO_23",
+                            "KICK_27",
+                            "WEAR_39",
+                            "REL_SVO_WHO_37",
+                            "WOMAN_40",
+                            "DRESS_41",
+                            "ADJ_NOUN_46",
+                            "BLUE_48"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "KICK_27"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "WOMAN_10"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WOMAN_40"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "WEAR_39"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_46"
+                                },
+                                "target": {
+                                    "id": "BLUE_48"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "ADJ_NOUN_46"
+                                },
+                                "target": {
+                                    "id": "DRESS_41"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "REL_SVO_WHO_37"
+                                },
+                                "target": {
+                                    "id": "ADJ_NOUN_46"
+                                }
+                            },
+                            {
+                                "source": {
+                                    "id": "SVO_23"
+                                },
+                                "target": {
+                                    "id": "REL_SVO_WHO_37"
+                                }
+                            }
+                        ],
+                        "suit": -80,
+                        "top": "SVO_23",
+                        "tree": "SVO_23 [WOMAN_10 'woman'] [KICK_27 'kick'] [REL_SVO_WHO_37 [WOMAN_40 'woman'] 'who' [WEAR_39 'wear'] [ADJ_NOUN_46 [BLUE_48 'blue'] [DRESS_41 'dress']]]",
+                        "valid": false,
+                        "winner": false
+                    }
+                ],
+                "competitions": [
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "IN_COLOR_47"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_45"
+                        },
+                        "target": {
+                            "id": "SPA_44"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SPA_44"
+                        },
+                        "target": {
+                            "id": "ADJ_NOUN_46"
+                        }
+                    }
+                ],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_6",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WOMAN_10",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "WOMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "SVO_23",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_22"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_24",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "KICK_27",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_29"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_35",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_30",
+                                "PATIENT_31"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_22",
+                                "DRESS_29",
+                                "WEAR_28"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "REL_SVO_WHO_37",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WEAR_28"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WEAR_39",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_22"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WOMAN_40",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_29"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "DRESS_41",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_43"
+                            ],
+                            "SRnodes": [
+                                "DRESS_29",
+                                "BLUE_42"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "SPA_44",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_43"
+                            ],
+                            "SRnodes": [
+                                "DRESS_29",
+                                "BLUE_42"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "REL_SPA_WHICH_45",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_43"
+                            ],
+                            "SRnodes": [
+                                "DRESS_29",
+                                "BLUE_42"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "ADJ_NOUN_46",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_30",
+                                "PATIENT_31",
+                                "MODIFY_43"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_22",
+                                "WEAR_28",
+                                "DRESS_29",
+                                "BLUE_42"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "IN_COLOR_47",
+                        "old": false
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "BLUE_42"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "BLUE_48",
+                        "old": true
+                    }
+                ],
+                "links": [
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "WOMAN_10"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "KICK_27"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "IN_COLOR_47"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_37"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SVO_23"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_37"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_24"
+                        },
+                        "target": {
+                            "id": "IN_COLOR_47"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_24"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_37"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_24"
+                        },
+                        "target": {
+                            "id": "REL_SVO_WHO_37"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_35"
+                        },
+                        "target": {
+                            "id": "REL_SPA_WHICH_45"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "EXIST_S_35"
+                        },
+                        "target": {
+                            "id": "ADJ_NOUN_46"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "WEAR_39"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "REL_SPA_WHICH_45"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "ADJ_NOUN_46"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "REL_SPA_WHICH_45"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SVO_WHO_37"
+                        },
+                        "target": {
+                            "id": "ADJ_NOUN_46"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SPA_44"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "SPA_44"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_45"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_45"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_45"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_45"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_45"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "REL_SPA_WHICH_45"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_46"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_46"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_46"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_46"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_46"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "ADJ_NOUN_46"
+                        },
+                        "target": {
+                            "id": "DRESS_41"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "IN_COLOR_47"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "IN_COLOR_47"
+                        },
+                        "target": {
+                            "id": "WOMAN_40"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "IN_COLOR_47"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    },
+                    {
+                        "source": {
+                            "id": "IN_COLOR_47"
+                        },
+                        "target": {
+                            "id": "BLUE_48"
+                        }
+                    }
+                ]
+            },
+            "next_attention": "BOXINGRING_AREA",
+            "perceived_region": "RIGHT_DRESS_AREA",
+            "phonologicalWM": [
+                "woman",
+                "kick",
+                "woman",
+                "who",
+                "wear",
+                "dress",
+                "which is",
+                "blue"
+            ],
+            "produced_utterance": "(woman kick woman who wear dress) which is blue",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "AGENT_20",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "WOMAN_0"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PATIENT_21",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "WOMAN_22"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "AGENT_30",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_28"
+                        },
+                        "target": {
+                            "id": "WOMAN_22"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PATIENT_31",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_28"
+                        },
+                        "target": {
+                            "id": "DRESS_29"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "MODIFY_43",
+                        "old": true,
+                        "source": {
+                            "id": "BLUE_42"
+                        },
+                        "target": {
+                            "id": "DRESS_29"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WOMAN_0",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "KICK_19",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WOMAN_22",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WEAR_28",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "DRESS_29",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "BLUE_42",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 6
+        },
+        {
+            "current_attention": {
+                "name": "BOXINGRING_AREA",
+                "uncertainty": 1
+            },
+            "grammaticalWM": {
+                "assemblages": [],
+                "competitions": [],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_6",
+                        "old": false
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_0"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WOMAN_10",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_20",
+                                "PATIENT_21"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_0",
+                                "WOMAN_22",
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "SVO_23",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_22"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_24",
+                        "old": false
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "KICK_19"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "KICK_27",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_29"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_35",
+                        "old": false
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "AGENT_30",
+                                "PATIENT_31"
+                            ],
+                            "SRnodes": [
+                                "WOMAN_22",
+                                "DRESS_29",
+                                "WEAR_28"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "REL_SVO_WHO_37",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WEAR_28"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WEAR_39",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WOMAN_22"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WOMAN_40",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "DRESS_29"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "DRESS_41",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [
+                                "MODIFY_43"
+                            ],
+                            "SRnodes": [
+                                "DRESS_29",
+                                "BLUE_42"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "REL_SPA_WHICH_45",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "BLUE_42"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "BLUE_48",
+                        "old": true
+                    }
+                ],
+                "links": []
+            },
+            "next_attention": "BOXINGRING_AREA",
+            "perceived_region": "",
+            "phonologicalWM": [],
+            "produced_utterance": "",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "AGENT_20",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "WOMAN_0"
+                        }
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PATIENT_21",
+                        "old": true,
+                        "source": {
+                            "id": "KICK_19"
+                        },
+                        "target": {
+                            "id": "WOMAN_22"
+                        }
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "AGENT_30",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_28"
+                        },
+                        "target": {
+                            "id": "WOMAN_22"
+                        }
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PATIENT_31",
+                        "old": true,
+                        "source": {
+                            "id": "WEAR_28"
+                        },
+                        "target": {
+                            "id": "DRESS_29"
+                        }
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "MODIFY_43",
+                        "old": true,
+                        "source": {
+                            "id": "BLUE_42"
+                        },
+                        "target": {
+                            "id": "DRESS_29"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WOMAN_0",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "KICK_19",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WOMAN_22",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WEAR_28",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "DRESS_29",
+                        "old": true
+                    },
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "BLUE_42",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 7
+        },
+        {
+            "current_attention": {
+                "name": "BOXINGRING_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "THEME_S_51",
+                            "BOXINGRING_52"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "THEME_S_51"
+                                },
+                                "target": {
+                                    "id": "BOXINGRING_52"
+                                }
+                            }
+                        ],
+                        "suit": 136,
+                        "top": "THEME_S_51",
+                        "tree": "THEME_S_51 'it is' [BOXINGRING_52 'boxing ring']",
+                        "valid": true,
+                        "winner": true
+                    }
+                ],
+                "competitions": [],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "BOXINGRING_49"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "THEME_S_51",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "BOXINGRING_49"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "BOXINGRING_52",
+                        "old": true
+                    }
+                ],
+                "links": [
+                    {
+                        "source": {
+                            "id": "THEME_S_51"
+                        },
+                        "target": {
+                            "id": "BOXINGRING_52"
+                        }
+                    }
+                ]
+            },
+            "next_attention": "PEOPLE_AREA",
+            "perceived_region": "BOXINGRING_AREA",
+            "phonologicalWM": [
+                "it is",
+                "boxing ring"
+            ],
+            "produced_utterance": "it is boxing ring",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": true,
+                        "alive": false,
+                        "fresh": true,
+                        "id": "IN_50",
+                        "old": false,
+                        "source": {
+                            "id": "??"
+                        },
+                        "target": {
+                            "id": "BOXINGRING_49"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "BOXINGRING_49",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 8
+        },
+        {
+            "current_attention": {
+                "name": "PEOPLE_AREA",
+                "uncertainty": 1
+            },
+            "grammaticalWM": {
+                "assemblages": [],
+                "competitions": [],
+                "cxn_inst": [
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "BOXINGRING_49"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "THEME_S_51",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "BOXINGRING_49"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "BOXINGRING_52",
+                        "old": true
+                    }
+                ],
+                "links": []
+            },
+            "next_attention": "PEOPLE_AREA",
+            "perceived_region": "",
+            "phonologicalWM": [],
+            "produced_utterance": "",
+            "semanticWM": {
+                "SRlinks": [],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "BOXINGRING_49",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 9
+        },
+        {
+            "current_attention": {
+                "name": "PEOPLE_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "EXIST_S_54",
+                            "PEOPLE_55"
+                        ],
+                        "links": [
+                            {
+                                "source": {
+                                    "id": "EXIST_S_54"
+                                },
+                                "target": {
+                                    "id": "PEOPLE_55"
+                                }
+                            }
+                        ],
+                        "suit": 137,
+                        "top": "EXIST_S_54",
+                        "tree": "EXIST_S_54 'there is' [PEOPLE_55 'people']",
+                        "valid": true,
+                        "winner": true
+                    }
+                ],
+                "competitions": [],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "PEOPLE_53"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "EXIST_S_54",
+                        "old": true
+                    },
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "PEOPLE_53"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "PEOPLE_55",
+                        "old": true
+                    }
+                ],
+                "links": [
+                    {
+                        "source": {
+                            "id": "EXIST_S_54"
+                        },
+                        "target": {
+                            "id": "PEOPLE_55"
+                        }
+                    }
+                ]
+            },
+            "next_attention": "PEOPLE_FOCUS_AREA",
+            "perceived_region": "PEOPLE_AREA",
+            "phonologicalWM": [
+                "there is",
+                "people"
+            ],
+            "produced_utterance": "there is people",
+            "semanticWM": {
+                "SRlinks": [],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "PEOPLE_53",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 10
+        },
+        {
+            "current_attention": {
+                "name": "PEOPLE_FOCUS_AREA",
+                "uncertainty": 1
+            },
+            "grammaticalWM": {
+                "assemblages": [],
+                "competitions": [],
+                "cxn_inst": [
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "PEOPLE_53"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "EXIST_S_54",
+                        "old": true
+                    },
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "PEOPLE_53"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "PEOPLE_55",
+                        "old": true
+                    }
+                ],
+                "links": []
+            },
+            "next_attention": "PEOPLE_FOCUS_AREA",
+            "perceived_region": "",
+            "phonologicalWM": [],
+            "produced_utterance": "",
+            "semanticWM": {
+                "SRlinks": [],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "PEOPLE_53",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 11
+        },
+        {
+            "current_attention": {
+                "name": "PEOPLE_FOCUS_AREA",
+                "uncertainty": -1
+            },
+            "grammaticalWM": {
+                "assemblages": [
+                    {
+                        "cxn_inst": [
+                            "WATCH_59"
+                        ],
+                        "links": [],
+                        "suit": 95,
+                        "top": "WATCH_59",
+                        "tree": "WATCH_59 'watch'",
+                        "valid": true,
+                        "winner": true
+                    }
+                ],
+                "competitions": [],
+                "cxn_inst": [
+                    {
+                        "active": true,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WATCH_56"
+                            ]
+                        },
+                        "fresh": true,
+                        "id": "WATCH_59",
+                        "old": true
+                    }
+                ],
+                "links": []
+            },
+            "next_attention": null,
+            "perceived_region": "PEOPLE_FOCUS_AREA",
+            "phonologicalWM": [
+                "watch"
+            ],
+            "produced_utterance": "watch",
+            "semanticWM": {
+                "SRlinks": [
+                    {
+                        "active": true,
+                        "alive": false,
+                        "fresh": true,
+                        "id": "AGENT_57",
+                        "old": false,
+                        "source": {
+                            "id": "WATCH_56"
+                        },
+                        "target": {
+                            "id": "??"
+                        }
+                    },
+                    {
+                        "active": true,
+                        "alive": false,
+                        "fresh": true,
+                        "id": "CONCURRENT_58",
+                        "old": false,
+                        "source": {
+                            "id": "??"
+                        },
+                        "target": {
+                            "id": "WATCH_56"
+                        }
+                    }
+                ],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": true,
+                        "alive": true,
+                        "fresh": true,
+                        "id": "WATCH_56",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 12
+        },
+        {
+            "current_attention": {
+                "name": null,
+                "uncertainty": null
+            },
+            "grammaticalWM": {
+                "assemblages": [],
+                "competitions": [],
+                "cxn_inst": [
+                    {
+                        "active": false,
+                        "alive": true,
+                        "covers": {
+                            "SRlinks": [],
+                            "SRnodes": [
+                                "WATCH_56"
+                            ]
+                        },
+                        "fresh": false,
+                        "id": "WATCH_59",
+                        "old": true
+                    }
+                ],
+                "links": []
+            },
+            "next_attention": null,
+            "perceived_region": "",
+            "phonologicalWM": [],
+            "produced_utterance": "",
+            "semanticWM": {
+                "SRlinks": [],
+                "SRnodes": [
+                    {
+                        "act": 50,
+                        "active": false,
+                        "alive": true,
+                        "fresh": false,
+                        "id": "WATCH_56",
+                        "old": true
+                    }
+                ]
+            },
+            "time": 13
+        },
+        {
+            "current_attention": {
+                "name": null,
+                "uncertainty": null
+            },
+            "grammaticalWM": {
+                "assemblages": [],
+                "competitions": [],
+                "cxn_inst": [],
+                "links": []
+            },
+            "next_attention": null,
+            "perceived_region": "",
+            "phonologicalWM": [],
+            "produced_utterance": "",
+            "semanticWM": {
+                "SRlinks": [],
+                "SRnodes": []
+            },
+            "time": 14
+        }
+    ]
+}

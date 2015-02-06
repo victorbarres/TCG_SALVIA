@@ -1,0 +1,219 @@
+
+Template Construction Grammar (TCG) Simulator v1.0
+
+Victor Barres (barres@usc.edu) May 14. 2014
+USC Brain Project and  Neuroscience Graduate Program
+University of Southern California (USC)
+[PYTHON reimplementation of c++ code:
+	Template Construction Grammar (TCG) Simulator v2.5
+	Jinyong Lee (jinyongl@usc.edu), June 23. 2012
+	USC Brain Project, Computer Science Department
+	University of Southern California (USC)]
+
+Loading Initialization File 'TCG.ini' ...
+Loading Semantic Network 'data\TCG_semantics.txt'...
+Loading TCG Grammar 'data\TCG_grammar.txt'...
+Loading TCG Scene 'data\scene_girlkickboy.txt'...
+
+Initializing Simulator...
+- Max Simulation Time : 20
+- Premature Production : True
+- Utterance Continuity : True
+- Verbal Guidance : True
+- Threshold of Utterance : Time = infinite, CXNs = infinite, Syllables = infinite
+
+Beginning Simulation...
+================================================================================
+ Simulation Time: 1
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  BOY_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 2
+================================================================================
+> Current Attention
+  BOY_AREA (perception done)
+
+> Perceived Regions
+  BOY_AREA
+
+> Schema Instances
+[!O] SemRep-N BOY_0
+[!O] Construction EXIST_S_1 covering BOY_0 for 'there is' [BOY_2]
+[!O] Construction BOY_2 covering BOY_0 for 'boy'
+
+> Construction Structures
+[ ] 140: EXIST_S_1 'there is' [BOY_2 'boy']
+
+
+> Next Attention
+  KICK_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 3
+================================================================================
+> Current Attention
+  KICK_AREA (perception done)
+
+> Perceived Regions
+  KICK_AREA
+
+> Schema Instances
+[ O] SemRep-N BOY_0
+[ O] Construction EXIST_S_1 covering BOY_0 for 'there is' [REL_PAS_SVO_WHO_11]
+[ O] Construction BOY_2 covering BOY_0 for 'boy'
+[!O] SemRep-N KICK_3
+[!O] SemRep-R PATIENT_4 from KICK_3 to BOY_0
+[!O] SemRep-R AGENT_5 from KICK_3 to HUMAN_6
+[!O] SemRep-N HUMAN_6
+[!O] Construction SVO_7 covering HUMAN_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [ ] [KICK_12] [BOY_2]
+[!X] Construction PAS_SVO_8 covering HUMAN_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [BOY_2] 'is' [KICK_12] '-ed by' [ ]
+[!O] Construction EXIST_S_9 covering HUMAN_6 for 'there is' [REL_SVO_WHO_10]
+[!X] Construction REL_SVO_WHO_10 covering HUMAN_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [ ] 'who' [KICK_12] [BOY_2]
+[!X] Construction REL_PAS_SVO_WHO_11 covering HUMAN_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [BOY_2] 'who is' [KICK_12] '-ed by' [ ]
+[!O] Construction KICK_12 covering KICK_3 for 'kick'
+
+> Competition traces
+  SVO_7 (443) eliminated PAS_SVO_8 (387)
+  SVO_7 (443) eliminated REL_SVO_WHO_10 (433)
+  SVO_7 (443) eliminated REL_PAS_SVO_WHO_11 (427)
+
+> Construction Structures
+[ ] 140: EXIST_S_1 'there is' [BOY_2 'boy']
+[ ] 443: SVO_7 [ ] [KICK_12 'kick'] [BOY_2 'boy']
+[X] 387: PAS_SVO_8 [BOY_2 'boy'] 'is' [KICK_12 'kick'] '-ed by' [ ]
+[X] 427: EXIST_S_1 'there is' [REL_PAS_SVO_WHO_11 [BOY_2 'boy'] 'who is' [KICK_12 'kick'] '-ed by' [ ]]
+[X] 433: EXIST_S_9 'there is' [REL_SVO_WHO_10 [ ] 'who' [KICK_12 'kick'] [BOY_2 'boy']]
+
+
+> Next Attention
+  GIRL_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 4
+================================================================================
+> Current Attention
+  GIRL_AREA (perception done)
+
+> Perceived Regions
+  GIRL_AREA
+
+> Schema Instances
+[ O] SemRep-N BOY_0
+[ O] Construction EXIST_S_1 covering BOY_0 for 'there is' [REL_PAS_SVO_WHO_17]
+[ O] Construction BOY_2 covering BOY_0 for 'boy'
+[ O] SemRep-N KICK_3
+[ O] SemRep-R PATIENT_4 from KICK_3 to BOY_0
+[ O] SemRep-R AGENT_5 from KICK_3 to GIRL_6
+[!O] SemRep-N GIRL_6
+[ O] Construction SVO_7 covering GIRL_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [GIRL_18] [KICK_12] [BOY_2]
+[ O] Construction EXIST_S_9 covering GIRL_6 for 'there is' [REL_SVO_WHO_16]
+[ O] Construction KICK_12 covering KICK_3 for 'kick'
+[!X] Construction PAS_SVO_14 covering GIRL_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [BOY_2] 'is' [KICK_12] '-ed by' [GIRL_18]
+[!X] Construction REL_SVO_WHO_16 covering GIRL_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [GIRL_18] 'who' [KICK_12] [BOY_2]
+[!X] Construction REL_PAS_SVO_WHO_17 covering GIRL_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [BOY_2] 'who is' [KICK_12] '-ed by' [GIRL_18]
+[!O] Construction GIRL_18 covering GIRL_6 for 'girl'
+
+> Competition traces
+  SVO_7 (539) eliminated PAS_SVO_14 (483)
+  SVO_7 (539) eliminated REL_SVO_WHO_16 (529)
+  SVO_7 (539) eliminated REL_PAS_SVO_WHO_17 (523)
+
+> Construction Structures
+[ ] 140: EXIST_S_1 'there is' [BOY_2 'boy']
+[ ] 139: EXIST_S_9 'there is' [GIRL_18 'girl']
+[ ] 539: SVO_7 [GIRL_18 'girl'] [KICK_12 'kick'] [BOY_2 'boy']
+[X] 483: PAS_SVO_14 [BOY_2 'boy'] 'is' [KICK_12 'kick'] '-ed by' [GIRL_18 'girl']
+[X] 523: EXIST_S_1 'there is' [REL_PAS_SVO_WHO_17 [BOY_2 'boy'] 'who is' [KICK_12 'kick'] '-ed by' [GIRL_18 'girl']]
+[X] 529: EXIST_S_9 'there is' [REL_SVO_WHO_16 [GIRL_18 'girl'] 'who' [KICK_12 'kick'] [BOY_2 'boy']]
+
+
+> Next Attention
+  GIRL_FACE_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 5
+================================================================================
+> Current Attention
+  GIRL_FACE_AREA (perception done)
+
+> Perceived Regions
+  GIRL_FACE_AREA
+
+> Schema Instances
+[ @] SemRep-N BOY_0
+[ O] Construction EXIST_S_1 covering BOY_0 for 'there is' [BOY_2]
+[ @] Construction BOY_2 covering BOY_0 for 'boy'
+[ @] SemRep-N KICK_3
+[ @] SemRep-R PATIENT_4 from KICK_3 to BOY_0
+[ @] SemRep-R AGENT_5 from KICK_3 to GIRL_6
+[ @] SemRep-N GIRL_6
+[ @] Construction SVO_7 covering GIRL_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [REL_SV_WHO_22] [KICK_12] [BOY_2]
+[ O] Construction EXIST_S_9 covering GIRL_6 for 'there is' [REL_SV_WHO_22]
+[ @] Construction KICK_12 covering KICK_3 for 'kick'
+[ @] Construction GIRL_18 covering GIRL_6 for 'girl'
+[!@] SemRep-N LAUGH_19
+[!@] SemRep-R AGENT_20 from LAUGH_19 to GIRL_6
+[!X] Construction SV_21 covering GIRL_6 LAUGH_19 AGENT_20 for [GIRL_18] [LAUGH_23]
+[!@] Construction REL_SV_WHO_22 covering GIRL_6 LAUGH_19 AGENT_20 for [GIRL_18] 'who' [LAUGH_23]
+[!@] Construction LAUGH_23 covering LAUGH_19 for 'laugh'
+
+> Competition traces
+  REL_SV_WHO_22 (731) eliminated SV_21 (341)
+
+> Construction Structures
+[ ] 140: EXIST_S_1 'there is' [BOY_2 'boy']
+[ ] 139: EXIST_S_9 'there is' [GIRL_18 'girl']
+[X] 341: SV_21 [GIRL_18 'girl'] [LAUGH_23 'laugh']
+[ ] 539: SVO_7 [GIRL_18 'girl'] [KICK_12 'kick'] [BOY_2 'boy']
+[ ] 331: EXIST_S_9 'there is' [REL_SV_WHO_22 [GIRL_18 'girl'] 'who' [LAUGH_23 'laugh']]
+[*] 731: SVO_7 [REL_SV_WHO_22 [GIRL_18 'girl'] 'who' [LAUGH_23 'laugh']] [KICK_12 'kick'] [BOY_2 'boy']
+
+
+> Produced Utterance
+'girl who laugh kick boy'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 6
+================================================================================
+> Current Attention
+  None
+
+> Schema Instances
+[ x] SemRep-N BOY_0
+[ O] Construction EXIST_S_1 covering BOY_0 for 'there is' [ ]
+[ x] Construction BOY_2 covering BOY_0 for 'boy'
+[ x] SemRep-N KICK_3
+[ x] SemRep-R PATIENT_4 from KICK_3 to BOY_0
+[ x] SemRep-R AGENT_5 from KICK_3 to GIRL_6
+[ x] SemRep-N GIRL_6
+[ x] Construction SVO_7 covering GIRL_6 BOY_0 KICK_3 AGENT_5 PATIENT_4 for [ ] [ ] [ ]
+[ O] Construction EXIST_S_9 covering GIRL_6 for 'there is' [ ]
+[ x] Construction KICK_12 covering KICK_3 for 'kick'
+[ x] Construction GIRL_18 covering GIRL_6 for 'girl'
+[ x] SemRep-N LAUGH_19
+[ x] SemRep-R AGENT_20 from LAUGH_19 to GIRL_6
+[ x] Construction REL_SV_WHO_22 covering GIRL_6 LAUGH_19 AGENT_20 for [ ] 'who' [ ]
+[ x] Construction LAUGH_23 covering LAUGH_19 for 'laugh'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 7
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  None
+
+
+Simulation complete: inactivity termination.

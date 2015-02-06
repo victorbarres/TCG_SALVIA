@@ -1,0 +1,260 @@
+
+Template Construction Grammar (TCG) Simulator v1.0
+
+Victor Barres (barres@usc.edu) May 14. 2014
+USC Brain Project and  Neuroscience Graduate Program
+University of Southern California (USC)
+[PYTHON reimplementation of c++ code:
+	Template Construction Grammar (TCG) Simulator v2.5
+	Jinyong Lee (jinyongl@usc.edu), June 23. 2012
+	USC Brain Project, Computer Science Department
+	University of Southern California (USC)]
+
+Loading Initialization File 'TCG.ini' ...
+Loading Semantic Network 'data\TCG_semantics.txt'...
+Loading TCG Grammar 'data\TCG_grammar.txt'...
+Loading TCG Scene 'data\scene_demo.txt'...
+
+Initializing Simulator...
+- Max Simulation Time : 20
+- Premature Production : True
+- Utterance Continuity : True
+- Verbal Guidance : True
+- Threshold of Utterance : Time = 1, CXNs = infinite, Syllables = infinite
+
+Beginning Simulation...
+================================================================================
+ Simulation Time: 1
+================================================================================
+> Current Attention
+  None
+
+> Perceived Regions
+  GIST
+
+> Schema Instances
+[!O] SemRep-N ENTITY_0
+[!O] SemRep-N ACTION_1
+[!O] SemRep-N ENTITY_2
+[!@] SemRep-R AGENT_3 from ACTION_1 to ENTITY_0
+[!@] SemRep-R PATIENT_4 from ACTION_1 to ENTITY_2
+[!@] Construction SVO_5 covering ENTITY_0 ENTITY_2 ACTION_1 AGENT_3 PATIENT_4 for [ ] [ ] [ ]
+[!X] Construction PAS_SVO_6 covering ENTITY_0 ENTITY_2 ACTION_1 AGENT_3 PATIENT_4 for [ ] 'is' [ ] '-ed by' [ ]
+
+> Competition traces
+  SVO_5 (250) eliminated PAS_SVO_6 (194)
+
+> Construction Structures
+[*] 250: SVO_5 [ ] [ ] [ ]
+[X] 194: PAS_SVO_6 [ ] 'is' [ ] '-ed by' [ ]
+
+
+> Produced Utterance
+'uh...'
+
+> Next Attention
+  WOMAN_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 2
+================================================================================
+> Current Attention
+  WOMAN_AREA (perception done)
+
+> Perceived Regions
+  WOMAN_AREA
+
+> Schema Instances
+[!@] SemRep-N WOMAN_0
+[ O] SemRep-N ACTION_1
+[ O] SemRep-N ENTITY_2
+[ @] SemRep-R AGENT_3 from ACTION_1 to WOMAN_0
+[ @] SemRep-R PATIENT_4 from ACTION_1 to ENTITY_2
+[ X] Construction SVO_5 covering WOMAN_0 ENTITY_2 ACTION_1 AGENT_3 PATIENT_4 for [WOMAN_11] [ ] [ ]
+[!X] Construction PAS_SVO_8 covering WOMAN_0 ENTITY_2 ACTION_1 AGENT_3 PATIENT_4 for [ ] 'is' [ ] '-ed by' [WOMAN_11]
+[!@] Construction EXIST_S_9 covering WOMAN_0 for 'there is' [REL_SVO_WHO_10]
+[!@] Construction REL_SVO_WHO_10 covering WOMAN_0 ENTITY_2 ACTION_1 AGENT_3 PATIENT_4 for [WOMAN_11] 'who' [ ] [ ]
+[!@] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+
+> Competition traces
+  PAS_SVO_8 (289) eliminated SVO_5 (245)
+  REL_SVO_WHO_10 (335) eliminated PAS_SVO_8 (289)
+
+> Construction Structures
+[X] 245: SVO_5 [WOMAN_11 'woman'] [ ] [ ]
+[X] 289: PAS_SVO_8 [ ] 'is' [ ] '-ed by' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_9 'there is' [WOMAN_11 'woman']
+[*] 335: EXIST_S_9 'there is' [REL_SVO_WHO_10 [WOMAN_11 'woman'] 'who' [ ] [ ]]
+
+
+> Produced Utterance
+'there is woman who...'
+
+> Next Attention
+  HIT_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 3
+================================================================================
+> Current Attention
+  HIT_AREA (perception done)
+
+> Perceived Regions
+  HIT_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[!@] SemRep-N HIT_1
+[ O] SemRep-N ENTITY_2
+[!@] SemRep-R AGENT_3 from HIT_1 to WOMAN_0
+[!@] SemRep-R PATIENT_4 from HIT_1 to ENTITY_2
+[ @] Construction EXIST_S_9 covering WOMAN_0 for 'there is' [REL_SVO_WHO_10]
+[ @] Construction REL_SVO_WHO_10 covering WOMAN_0 ENTITY_2 HIT_1 AGENT_3 PATIENT_4 for [WOMAN_11] 'who' [HIT_15] [ ]
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[!X] Construction SVO_12 covering WOMAN_0 ENTITY_2 HIT_1 AGENT_3 PATIENT_4 for [WOMAN_11] [HIT_15] [ ]
+[!X] Construction PAS_SVO_13 covering WOMAN_0 ENTITY_2 HIT_1 AGENT_3 PATIENT_4 for [ ] 'is' [HIT_15] '-ed by' [WOMAN_11]
+[!@] Construction HIT_15 covering HIT_1 for 'hit'
+
+> Competition traces
+  REL_SVO_WHO_10 (932) eliminated SVO_12 (342)
+  REL_SVO_WHO_10 (932) eliminated PAS_SVO_13 (286)
+
+> Construction Structures
+[X] 342: SVO_12 [WOMAN_11 'woman'] [HIT_15 'hit'] [ ]
+[X] 286: PAS_SVO_13 [ ] 'is' [HIT_15 'hit'] '-ed by' [WOMAN_11 'woman']
+[*] 932: EXIST_S_9 'there is' [REL_SVO_WHO_10 [WOMAN_11 'woman'] 'who' [HIT_15 'hit'] [ ]]
+
+
+> Produced Utterance
+'(there is woman who) hit...'
+
+> Next Attention
+  MAN_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 4
+================================================================================
+> Current Attention
+  MAN_AREA (perception done)
+
+> Perceived Regions
+  MAN_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ @] SemRep-N HIT_1
+[!@] SemRep-N MAN_2
+[ @] SemRep-R AGENT_3 from HIT_1 to WOMAN_0
+[ @] SemRep-R PATIENT_4 from HIT_1 to MAN_2
+[ @] Construction EXIST_S_9 covering WOMAN_0 for 'there is' [REL_SVO_WHO_10]
+[ @] Construction REL_SVO_WHO_10 covering WOMAN_0 MAN_2 HIT_1 AGENT_3 PATIENT_4 for [WOMAN_11] 'who' [HIT_15] [MAN_21]
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ @] Construction HIT_15 covering HIT_1 for 'hit'
+[!X] Construction SVO_16 covering WOMAN_0 MAN_2 HIT_1 AGENT_3 PATIENT_4 for [WOMAN_11] [HIT_15] [MAN_21]
+[!X] Construction PAS_SVO_17 covering WOMAN_0 MAN_2 HIT_1 AGENT_3 PATIENT_4 for [MAN_21] 'is' [HIT_15] '-ed by' [WOMAN_11]
+[!O] Construction EXIST_S_18 covering MAN_2 for 'there is' [REL_PAS_SVO_WHO_20]
+[!X] Construction REL_PAS_SVO_WHO_20 covering WOMAN_0 MAN_2 HIT_1 AGENT_3 PATIENT_4 for [MAN_21] 'who is' [HIT_15] '-ed by' [WOMAN_11]
+[!@] Construction MAN_21 covering MAN_2 for 'man'
+
+> Competition traces
+  REL_SVO_WHO_10 (1229) eliminated SVO_16 (339)
+  REL_SVO_WHO_10 (1229) eliminated PAS_SVO_17 (283)
+  REL_SVO_WHO_10 (1229) eliminated REL_PAS_SVO_WHO_20 (323)
+
+> Construction Structures
+[ ] 140: EXIST_S_18 'there is' [MAN_21 'man']
+[X] 339: SVO_16 [WOMAN_11 'woman'] [HIT_15 'hit'] [MAN_21 'man']
+[X] 283: PAS_SVO_17 [MAN_21 'man'] 'is' [HIT_15 'hit'] '-ed by' [WOMAN_11 'woman']
+[*] 1229: EXIST_S_9 'there is' [REL_SVO_WHO_10 [WOMAN_11 'woman'] 'who' [HIT_15 'hit'] [MAN_21 'man']]
+[X] 323: EXIST_S_18 'there is' [REL_PAS_SVO_WHO_20 [MAN_21 'man'] 'who is' [HIT_15 'hit'] '-ed by' [WOMAN_11 'woman']]
+
+
+> Produced Utterance
+'(there is woman who hit) man'
+
+> Next Attention
+  MAN_FACE_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 5
+================================================================================
+> Current Attention
+  MAN_FACE_AREA (perception done)
+
+> Perceived Regions
+  MAN_FACE_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ @] SemRep-N HIT_1
+[ @] SemRep-N MAN_2
+[ @] SemRep-R AGENT_3 from HIT_1 to WOMAN_0
+[ @] SemRep-R PATIENT_4 from HIT_1 to MAN_2
+[ @] Construction EXIST_S_9 covering WOMAN_0 for 'there is' [REL_SVO_WHO_10]
+[ @] Construction REL_SVO_WHO_10 covering WOMAN_0 MAN_2 HIT_1 AGENT_3 PATIENT_4 for [WOMAN_11] 'who' [HIT_15] [REL_SPA_WHO_25]
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ @] Construction HIT_15 covering HIT_1 for 'hit'
+[ O] Construction EXIST_S_18 covering MAN_2 for 'there is' [ADJ_NOUN_26]
+[ @] Construction MAN_21 covering MAN_2 for 'man'
+[!@] SemRep-N HANDSOME_22
+[!@] SemRep-R MODIFY_23 from HANDSOME_22 to MAN_2
+[!X] Construction SPA_24 covering MAN_2 HANDSOME_22 MODIFY_23 for [MAN_21] 'is' [HANDSOME_27]
+[!@] Construction REL_SPA_WHO_25 covering MAN_2 HANDSOME_22 MODIFY_23 for [MAN_21] 'who is' [HANDSOME_27]
+[!X] Construction ADJ_NOUN_26 covering MAN_2 HANDSOME_22 MODIFY_23 for [HANDSOME_27] [MAN_21]
+[!@] Construction HANDSOME_27 covering HANDSOME_22 for 'handsome'
+
+> Competition traces
+  REL_SPA_WHO_25 (1516) eliminated SPA_24 (237)
+  SPA_24 (237) eliminated ADJ_NOUN_26 (232)
+
+> Construction Structures
+[X] 237: SPA_24 [MAN_21 'man'] 'is' [HANDSOME_27 'handsome']
+[ ] 227: EXIST_S_18 'there is' [REL_SPA_WHO_25 [MAN_21 'man'] 'who is' [HANDSOME_27 'handsome']]
+[X] 232: EXIST_S_18 'there is' [ADJ_NOUN_26 [HANDSOME_27 'handsome'] [MAN_21 'man']]
+[*] 1516: EXIST_S_9 'there is' [REL_SVO_WHO_10 [WOMAN_11 'woman'] 'who' [HIT_15 'hit'] [REL_SPA_WHO_25 [MAN_21 'man'] 'who is' [HANDSOME_27 'handsome']]]
+[X] -79: EXIST_S_9 'there is' [REL_SVO_WHO_10 [WOMAN_11 'woman'] 'who' [HIT_15 'hit'] [ADJ_NOUN_26 [HANDSOME_27 'handsome'] [MAN_21 'man']]]
+
+
+> Produced Utterance
+'(there is woman who hit man) who is handsome'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 6
+================================================================================
+> Current Attention
+  None
+
+> Schema Instances
+[ x] SemRep-N WOMAN_0
+[ x] SemRep-N HIT_1
+[ x] SemRep-N MAN_2
+[ x] SemRep-R AGENT_3 from HIT_1 to WOMAN_0
+[ x] SemRep-R PATIENT_4 from HIT_1 to MAN_2
+[ x] Construction EXIST_S_9 covering WOMAN_0 for 'there is' [ ]
+[ x] Construction REL_SVO_WHO_10 covering WOMAN_0 MAN_2 HIT_1 AGENT_3 PATIENT_4 for [ ] 'who' [ ] [ ]
+[ x] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ x] Construction HIT_15 covering HIT_1 for 'hit'
+[ O] Construction EXIST_S_18 covering MAN_2 for 'there is' [ ]
+[ x] Construction MAN_21 covering MAN_2 for 'man'
+[ x] SemRep-N HANDSOME_22
+[ x] SemRep-R MODIFY_23 from HANDSOME_22 to MAN_2
+[ x] Construction REL_SPA_WHO_25 covering MAN_2 HANDSOME_22 MODIFY_23 for [ ] 'who is' [ ]
+[ x] Construction HANDSOME_27 covering HANDSOME_22 for 'handsome'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 7
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  None
+
+
+Simulation complete: inactivity termination.

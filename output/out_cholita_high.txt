@@ -1,0 +1,684 @@
+
+Template Construction Grammar (TCG) Simulator v1.0
+
+Victor Barres (barres@usc.edu) May 14. 2014
+USC Brain Project and  Neuroscience Graduate Program
+University of Southern California (USC)
+[PYTHON reimplementation of c++ code:
+	Template Construction Grammar (TCG) Simulator v2.5
+	Jinyong Lee (jinyongl@usc.edu), June 23. 2012
+	USC Brain Project, Computer Science Department
+	University of Southern California (USC)]
+
+Loading Initialization File 'TCG.ini' ...
+Loading Semantic Network 'data\TCG_semantics.txt'...
+Loading TCG Grammar 'data\TCG_grammar.txt'...
+Loading TCG Scene 'data\scene_cholita.txt'...
+
+Initializing Simulator...
+- Max Simulation Time : 20
+- Premature Production : True
+- Utterance Continuity : True
+- Verbal Guidance : True
+- Threshold of Utterance : Time = infinite, CXNs = infinite, Syllables = infinite
+
+Beginning Simulation...
+================================================================================
+ Simulation Time: 1
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  LEFT_WOMAN_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 2
+================================================================================
+> Current Attention
+  LEFT_WOMAN_AREA (perception done)
+
+> Perceived Regions
+  LEFT_WOMAN_AREA
+
+> Schema Instances
+[!O] SemRep-N WOMAN_0
+[!O] SemRep-N WEAR_1
+[!O] SemRep-N DRESS_2
+[!O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[!O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[!O] Construction SVO_5 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [WOMAN_11] [WEAR_10] [DRESS_12]
+[!X] Construction PAS_SVO_6 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [DRESS_12] 'is' [WEAR_10] '-ed by' [WOMAN_11]
+[!O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [REL_SVO_WHO_9]
+[!O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [DRESS_12]
+[!X] Construction REL_SVO_WHO_9 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [WOMAN_11] 'who' [WEAR_10] [DRESS_12]
+[!O] Construction WEAR_10 covering WEAR_1 for 'wear'
+[!O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[!O] Construction DRESS_12 covering DRESS_2 for 'dress'
+
+> Competition traces
+  SVO_5 (536) eliminated PAS_SVO_6 (480)
+  SVO_5 (536) eliminated REL_SVO_WHO_9 (526)
+
+> Construction Structures
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_8 'there is' [DRESS_12 'dress']
+[ ] 536: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [DRESS_12 'dress']
+[X] 480: PAS_SVO_6 [DRESS_12 'dress'] 'is' [WEAR_10 'wear'] '-ed by' [WOMAN_11 'woman']
+[X] 526: EXIST_S_7 'there is' [REL_SVO_WHO_9 [WOMAN_11 'woman'] 'who' [WEAR_10 'wear'] [DRESS_12 'dress']]
+
+
+> Next Attention
+  LEFT_DRESS_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 3
+================================================================================
+> Current Attention
+  LEFT_DRESS_AREA (perception done)
+
+> Perceived Regions
+  LEFT_DRESS_AREA
+
+> Schema Instances
+[ O] SemRep-N WOMAN_0
+[ O] SemRep-N WEAR_1
+[ O] SemRep-N DRESS_2
+[ O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction SVO_5 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [WOMAN_11] [WEAR_10] [ADJ_NOUN_17]
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [IN_COLOR_18]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ADJ_NOUN_17]
+[ O] Construction WEAR_10 covering WEAR_1 for 'wear'
+[ O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ O] Construction DRESS_12 covering DRESS_2 for 'dress'
+[!O] SemRep-N GREEN_13
+[!O] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[!X] Construction SPA_15 covering DRESS_2 GREEN_13 MODIFY_14 for [DRESS_12] 'is' [GREEN_19]
+[!X] Construction REL_SPA_WHICH_16 covering DRESS_2 GREEN_13 MODIFY_14 for [DRESS_12] 'which is' [GREEN_19]
+[!O] Construction ADJ_NOUN_17 covering DRESS_2 GREEN_13 MODIFY_14 for [GREEN_19] [DRESS_12]
+[!O] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[!O] Construction GREEN_19 covering GREEN_13 for 'green'
+
+> Competition traces
+  REL_SPA_WHICH_16 (724) eliminated SPA_15 (338)
+  ADJ_NOUN_17 (731) eliminated REL_SPA_WHICH_16 (724)
+
+> Construction Structures
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_8 'there is' [DRESS_12 'dress']
+[X] 338: SPA_15 [DRESS_12 'dress'] 'is' [GREEN_19 'green']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[X] 326: EXIST_S_8 'there is' [REL_SPA_WHICH_16 [DRESS_12 'dress'] 'which is' [GREEN_19 'green']]
+[ ] 333: EXIST_S_8 'there is' [ADJ_NOUN_17 [GREEN_19 'green'] [DRESS_12 'dress']]
+[ ] 536: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [DRESS_12 'dress']
+[X] 724: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [REL_SPA_WHICH_16 [DRESS_12 'dress'] 'which is' [GREEN_19 'green']]
+[ ] 731: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [ADJ_NOUN_17 [GREEN_19 'green'] [DRESS_12 'dress']]
+
+
+> Next Attention
+  KICK_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 4
+================================================================================
+> Current Attention
+  KICK_AREA (perception done)
+
+> Perceived Regions
+  KICK_AREA
+
+> Schema Instances
+[ O] SemRep-N WOMAN_0
+[ O] SemRep-N WEAR_1
+[ O] SemRep-N DRESS_2
+[ O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ X] Construction SVO_5 covering WOMAN_0 DRESS_2 WEAR_1 AGENT_3 PATIENT_4 for [REL_SVO_WHO_27] [WEAR_10] [ADJ_NOUN_17]
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [REL_SVO_WHO_27]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ADJ_NOUN_17]
+[ X] Construction WEAR_10 covering WEAR_1 for 'wear'
+[ O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ X] Construction DRESS_12 covering DRESS_2 for 'dress'
+[ O] SemRep-N GREEN_13
+[ O] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ X] Construction ADJ_NOUN_17 covering DRESS_2 GREEN_13 MODIFY_14 for [GREEN_19] [DRESS_12]
+[ O] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[ O] Construction GREEN_19 covering GREEN_13 for 'green'
+[!O] SemRep-N KICK_20
+[!O] SemRep-R PATIENT_21 from KICK_20 to HUMAN_23
+[!O] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[!O] SemRep-N HUMAN_23
+[!O] Construction SVO_24 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] [KICK_29] [ ]
+[!X] Construction PAS_SVO_25 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [ ] 'is' [KICK_29] '-ed by' [IN_COLOR_18]
+[!O] Construction EXIST_S_26 covering HUMAN_23 for 'there is' [REL_PAS_SVO_WHO_28]
+[!X] Construction REL_SVO_WHO_27 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] 'who' [KICK_29] [ ]
+[!X] Construction REL_PAS_SVO_WHO_28 covering WOMAN_0 HUMAN_23 KICK_20 AGENT_22 PATIENT_21 for [ ] 'who is' [KICK_29] '-ed by' [IN_COLOR_18]
+[!O] Construction KICK_29 covering KICK_20 for 'kick'
+
+> Competition traces
+  IN_COLOR_18 (1034) eliminated SVO_5 (1024)
+  IN_COLOR_18 (1034) eliminated WEAR_10 (1024)
+  IN_COLOR_18 (1034) eliminated DRESS_12 (1024)
+  IN_COLOR_18 (1034) eliminated ADJ_NOUN_17 (1024)
+  SVO_24 (1034) eliminated PAS_SVO_25 (978)
+  SVO_24 (1034) eliminated REL_SVO_WHO_27 (1024)
+  SVO_24 (1034) eliminated REL_PAS_SVO_WHO_28 (1018)
+
+> Construction Structures
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[X] 138: EXIST_S_8 'there is' [DRESS_12 'dress']
+[ ] 441: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [ ]
+[X] 385: PAS_SVO_25 [ ] 'is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[X] 431: EXIST_S_7 'there is' [REL_SVO_WHO_27 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [ ]]
+[X] 333: EXIST_S_8 'there is' [ADJ_NOUN_17 [GREEN_19 'green'] [DRESS_12 'dress']]
+[X] 536: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [DRESS_12 'dress']
+[X] 425: EXIST_S_26 'there is' [REL_PAS_SVO_WHO_28 [ ] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']]
+[ ] 1034: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [ ]
+[X] 978: PAS_SVO_25 [ ] 'is' [KICK_29 'kick'] '-ed by' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[X] 731: SVO_5 [WOMAN_11 'woman'] [WEAR_10 'wear'] [ADJ_NOUN_17 [GREEN_19 'green'] [DRESS_12 'dress']]
+[X] 829: SVO_5 [REL_SVO_WHO_27 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [ ]] [WEAR_10 'wear'] [DRESS_12 'dress']
+[X] 1024: EXIST_S_7 'there is' [REL_SVO_WHO_27 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] 'who' [KICK_29 'kick'] [ ]]
+[X] 1018: EXIST_S_26 'there is' [REL_PAS_SVO_WHO_28 [ ] 'who is' [KICK_29 'kick'] '-ed by' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]]
+[X] 1024: SVO_5 [REL_SVO_WHO_27 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [ ]] [WEAR_10 'wear'] [ADJ_NOUN_17 [GREEN_19 'green'] [DRESS_12 'dress']]
+
+
+> Next Attention
+  RIGHT_WOMAN_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 5
+================================================================================
+> Current Attention
+  RIGHT_WOMAN_AREA (perception done)
+
+> Perceived Regions
+  RIGHT_WOMAN_AREA
+
+> Schema Instances
+[ O] SemRep-N WOMAN_0
+[ O] SemRep-N WEAR_1
+[ O] SemRep-N DRESS_2
+[ O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [REL_SVO_WHO_40]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ O] SemRep-N GREEN_13
+[ O] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ O] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[ O] Construction GREEN_19 covering GREEN_13 for 'green'
+[ O] SemRep-N KICK_20
+[ O] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ O] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[!O] SemRep-N WOMAN_23
+[ O] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] [KICK_29] [REL_SVO_WHO_41]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [REL_PAS_SVO_WHO_42]
+[ O] Construction KICK_29 covering KICK_20 for 'kick'
+[!O] SemRep-N WEAR_30
+[!O] SemRep-N DRESS_31
+[!O] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[!O] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[!X] Construction SVO_35 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [REL_PAS_SVO_WHO_42] [WEAR_43] [DRESS_45]
+[!X] Construction PAS_SVO_36 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [REL_SVO_WHO_41] 'is' [KICK_29] '-ed by' [IN_COLOR_18]
+[!X] Construction PAS_SVO_37 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [DRESS_45] 'is' [WEAR_43] '-ed by' [REL_PAS_SVO_WHO_42]
+[!O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [DRESS_45]
+[!X] Construction REL_SVO_WHO_40 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] 'who' [KICK_29] [REL_SVO_WHO_41]
+[!O] Construction REL_SVO_WHO_41 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [WOMAN_44] 'who' [WEAR_43] [DRESS_45]
+[!X] Construction REL_PAS_SVO_WHO_42 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [WOMAN_44] 'who is' [KICK_29] '-ed by' [IN_COLOR_18]
+[!O] Construction WEAR_43 covering WEAR_30 for 'wear'
+[!O] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[!O] Construction DRESS_45 covering DRESS_31 for 'dress'
+
+> Competition traces
+  SVO_24 (1517) eliminated PAS_SVO_36 (1461)
+  SVO_24 (1517) eliminated REL_SVO_WHO_40 (1507)
+  SVO_24 (1517) eliminated REL_PAS_SVO_WHO_42 (1511)
+  SVO_35 (1511) eliminated PAS_SVO_37 (1455)
+  REL_SVO_WHO_41 (1517) eliminated SVO_35 (1511)
+
+> Construction Structures
+[ ] 43: EXIST_S_8 'there is' [ ]
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_26 'there is' [WOMAN_44 'woman']
+[ ] 138: EXIST_S_39 'there is' [DRESS_45 'dress']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[ ] 536: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']
+[X] 480: PAS_SVO_36 [WOMAN_44 'woman'] 'is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']
+[X] 536: SVO_35 [WOMAN_44 'woman'] [WEAR_43 'wear'] [DRESS_45 'dress']
+[X] 480: PAS_SVO_37 [DRESS_45 'dress'] 'is' [WEAR_43 'wear'] '-ed by' [WOMAN_44 'woman']
+[ ] 1129: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [WOMAN_44 'woman']
+[X] 1073: PAS_SVO_36 [WOMAN_44 'woman'] 'is' [KICK_29 'kick'] '-ed by' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[X] 526: EXIST_S_7 'there is' [REL_SVO_WHO_40 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [WOMAN_44 'woman']]
+[X] 1119: EXIST_S_7 'there is' [REL_SVO_WHO_40 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] 'who' [KICK_29 'kick'] [WOMAN_44 'woman']]
+[X] 520: EXIST_S_26 'there is' [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']]
+[ ] 526: EXIST_S_26 'there is' [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[X] 1113: EXIST_S_26 'there is' [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]]
+[ ] 924: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[X] 868: PAS_SVO_36 [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']] 'is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']
+[X] 918: SVO_35 [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']] [WEAR_43 'wear'] [DRESS_45 'dress']
+[X] 1511: SVO_35 [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]] [WEAR_43 'wear'] [DRESS_45 'dress']
+[X] 862: PAS_SVO_37 [DRESS_45 'dress'] 'is' [WEAR_43 'wear'] '-ed by' [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [WOMAN_11 'woman']]
+[X] 1455: PAS_SVO_37 [DRESS_45 'dress'] 'is' [WEAR_43 'wear'] '-ed by' [REL_PAS_SVO_WHO_42 [WOMAN_44 'woman'] 'who is' [KICK_29 'kick'] '-ed by' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]]
+[ ] 1517: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[X] 1461: PAS_SVO_36 [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']] 'is' [KICK_29 'kick'] '-ed by' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[X] 914: EXIST_S_7 'there is' [REL_SVO_WHO_40 [WOMAN_11 'woman'] 'who' [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]]
+[X] 1507: EXIST_S_7 'there is' [REL_SVO_WHO_40 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] 'who' [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]]
+
+
+> Next Attention
+  RIGHT_DRESS_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 6
+================================================================================
+> Current Attention
+  RIGHT_DRESS_AREA (perception done)
+
+> Perceived Regions
+  RIGHT_DRESS_AREA
+
+> Schema Instances
+[ O] SemRep-N WOMAN_0
+[ O] SemRep-N WEAR_1
+[ O] SemRep-N DRESS_2
+[ O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [IN_COLOR_18]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ O] SemRep-N GREEN_13
+[ O] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ O] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[ O] Construction GREEN_19 covering GREEN_13 for 'green'
+[ O] SemRep-N KICK_20
+[ O] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ O] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ O] SemRep-N WOMAN_23
+[ O] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] [KICK_29] [IN_COLOR_51]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [IN_COLOR_51]
+[ O] Construction KICK_29 covering KICK_20 for 'kick'
+[ O] SemRep-N WEAR_30
+[ O] SemRep-N DRESS_31
+[ O] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ O] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ADJ_NOUN_50]
+[ X] Construction REL_SVO_WHO_41 covering WOMAN_23 DRESS_31 WEAR_30 AGENT_32 PATIENT_33 for [WOMAN_44] 'who' [WEAR_43] [ADJ_NOUN_50]
+[ X] Construction WEAR_43 covering WEAR_30 for 'wear'
+[ O] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ X] Construction DRESS_45 covering DRESS_31 for 'dress'
+[!O] SemRep-N BLUE_46
+[!O] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[!X] Construction SPA_48 covering DRESS_31 BLUE_46 MODIFY_47 for [DRESS_45] 'is' [BLUE_52]
+[!X] Construction REL_SPA_WHICH_49 covering DRESS_31 BLUE_46 MODIFY_47 for [DRESS_45] 'which is' [BLUE_52]
+[!X] Construction ADJ_NOUN_50 covering DRESS_31 BLUE_46 MODIFY_47 for [BLUE_52] [DRESS_45]
+[!O] Construction IN_COLOR_51 covering WOMAN_23 WEAR_30 DRESS_31 BLUE_46 AGENT_32 PATIENT_33 MODIFY_47 for [WOMAN_44] 'in' [BLUE_52]
+[!O] Construction BLUE_52 covering BLUE_46 for 'blue'
+
+> Competition traces
+  IN_COLOR_51 (1723) eliminated REL_SVO_WHO_41 (1713)
+  IN_COLOR_51 (1723) eliminated WEAR_43 (1713)
+  IN_COLOR_51 (1723) eliminated DRESS_45 (1713)
+  REL_SPA_WHICH_49 (1706) eliminated SPA_48 (339)
+  ADJ_NOUN_50 (1713) eliminated REL_SPA_WHICH_49 (1706)
+  IN_COLOR_51 (1723) eliminated ADJ_NOUN_50 (1713)
+
+> Construction Structures
+[ ] 43: EXIST_S_8 'there is' [ ]
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_26 'there is' [WOMAN_44 'woman']
+[X] 138: EXIST_S_39 'there is' [DRESS_45 'dress']
+[X] 339: SPA_48 [DRESS_45 'dress'] 'is' [BLUE_52 'blue']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[ ] 536: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']
+[ ] 732: EXIST_S_26 'there is' [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[X] 327: EXIST_S_39 'there is' [REL_SPA_WHICH_49 [DRESS_45 'dress'] 'which is' [BLUE_52 'blue']]
+[X] 334: EXIST_S_39 'there is' [ADJ_NOUN_50 [BLUE_52 'blue'] [DRESS_45 'dress']]
+[ ] 1129: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [WOMAN_44 'woman']
+[ ] 1130: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[X] 526: EXIST_S_26 'there is' [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[X] 715: EXIST_S_26 'there is' [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [REL_SPA_WHICH_49 [DRESS_45 'dress'] 'which is' [BLUE_52 'blue']]]
+[X] 722: EXIST_S_26 'there is' [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [ADJ_NOUN_50 [BLUE_52 'blue'] [DRESS_45 'dress']]]
+[ ] 1723: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[X] 924: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[X] 1113: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [REL_SPA_WHICH_49 [DRESS_45 'dress'] 'which is' [BLUE_52 'blue']]]
+[X] 1120: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [ADJ_NOUN_50 [BLUE_52 'blue'] [DRESS_45 'dress']]]
+[X] 1517: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [DRESS_45 'dress']]
+[X] 1706: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [REL_SPA_WHICH_49 [DRESS_45 'dress'] 'which is' [BLUE_52 'blue']]]
+[X] 1713: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [REL_SVO_WHO_41 [WOMAN_44 'woman'] 'who' [WEAR_43 'wear'] [ADJ_NOUN_50 [BLUE_52 'blue'] [DRESS_45 'dress']]]
+
+
+> Next Attention
+  BOXINGRING_AREA (uncertainty left: 2)
+
+================================================================================
+ Simulation Time: 7
+================================================================================
+> Current Attention
+  BOXINGRING_AREA (uncertainty left: 1)
+
+> Schema Instances
+[ O] SemRep-N WOMAN_0
+[ O] SemRep-N WEAR_1
+[ O] SemRep-N DRESS_2
+[ O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [IN_COLOR_18]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ O] SemRep-N GREEN_13
+[ O] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ O] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[ O] Construction GREEN_19 covering GREEN_13 for 'green'
+[ O] SemRep-N KICK_20
+[ O] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ O] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ O] SemRep-N WOMAN_23
+[ O] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] [KICK_29] [IN_COLOR_51]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [IN_COLOR_51]
+[ O] Construction KICK_29 covering KICK_20 for 'kick'
+[ O] SemRep-N WEAR_30
+[ O] SemRep-N DRESS_31
+[ O] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ O] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ ]
+[ O] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ O] SemRep-N BLUE_46
+[ O] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[ O] Construction IN_COLOR_51 covering WOMAN_23 WEAR_30 DRESS_31 BLUE_46 AGENT_32 PATIENT_33 MODIFY_47 for [WOMAN_44] 'in' [BLUE_52]
+[ O] Construction BLUE_52 covering BLUE_46 for 'blue'
+
+> Construction Structures
+[ ] 43: EXIST_S_8 'there is' [ ]
+[ ] 43: EXIST_S_39 'there is' [ ]
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_26 'there is' [WOMAN_44 'woman']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[ ] 536: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']
+[ ] 732: EXIST_S_26 'there is' [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[ ] 1129: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [WOMAN_44 'woman']
+[ ] 1130: SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[ ] 1723: SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+
+
+> Next Attention
+  BOXINGRING_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 8
+================================================================================
+> Current Attention
+  BOXINGRING_AREA (perception done)
+
+> Perceived Regions
+  BOXINGRING_AREA
+
+> Schema Instances
+[ O] SemRep-N WOMAN_0
+[ O] SemRep-N WEAR_1
+[ O] SemRep-N DRESS_2
+[ O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [IN_COLOR_18]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ O] SemRep-N GREEN_13
+[ O] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ O] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[ O] Construction GREEN_19 covering GREEN_13 for 'green'
+[ O] SemRep-N KICK_20
+[ O] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ O] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ O] SemRep-N WOMAN_23
+[ O] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] [KICK_29] [IN_COLOR_51]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [IN_COLOR_51]
+[ O] Construction KICK_29 covering KICK_20 for 'kick'
+[ O] SemRep-N WEAR_30
+[ O] SemRep-N DRESS_31
+[ O] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ O] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ ]
+[ O] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ O] SemRep-N BLUE_46
+[ O] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[ O] Construction IN_COLOR_51 covering WOMAN_23 WEAR_30 DRESS_31 BLUE_46 AGENT_32 PATIENT_33 MODIFY_47 for [WOMAN_44] 'in' [BLUE_52]
+[ O] Construction BLUE_52 covering BLUE_46 for 'blue'
+[!O] SemRep-N BOXINGRING_53
+[!O] SemRep-R IN_54 from KICK_20 to BOXINGRING_53
+[!O] Construction THEME_S_55 covering BOXINGRING_53 for 'it is' [BOXINGRING_57]
+[!O] Construction PP_IN_56 covering KICK_20 IN_54 BOXINGRING_53 for [SVO_24] 'in' [BOXINGRING_57]
+[!O] Construction BOXINGRING_57 covering BOXINGRING_53 for 'boxing ring'
+
+> Construction Structures
+[ ] 43: EXIST_S_8 'there is' [ ]
+[ ] 43: EXIST_S_39 'there is' [ ]
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_26 'there is' [WOMAN_44 'woman']
+[ ] 136: THEME_S_55 'it is' [BOXINGRING_57 'boxing ring']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[ ] 732: EXIST_S_26 'there is' [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[ ] 774: PP_IN_56 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']] 'in' [BOXINGRING_57 'boxing ring']
+[ ] 1367: PP_IN_56 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [WOMAN_44 'woman']] 'in' [BOXINGRING_57 'boxing ring']
+[ ] 1368: PP_IN_56 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'in' [BOXINGRING_57 'boxing ring']
+[ ] 1961: PP_IN_56 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'in' [BOXINGRING_57 'boxing ring']
+
+
+> Next Attention
+  PEOPLE_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 9
+================================================================================
+> Current Attention
+  PEOPLE_AREA (perception done)
+
+> Perceived Regions
+  PEOPLE_AREA
+
+> Schema Instances
+[ O] SemRep-N WOMAN_0
+[ O] SemRep-N WEAR_1
+[ O] SemRep-N DRESS_2
+[ O] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ O] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [IN_COLOR_18]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ O] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ O] SemRep-N GREEN_13
+[ O] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ O] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[ O] Construction GREEN_19 covering GREEN_13 for 'green'
+[ O] SemRep-N KICK_20
+[ O] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ O] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ O] SemRep-N WOMAN_23
+[ O] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] [KICK_29] [IN_COLOR_51]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [IN_COLOR_51]
+[ O] Construction KICK_29 covering KICK_20 for 'kick'
+[ O] SemRep-N WEAR_30
+[ O] SemRep-N DRESS_31
+[ O] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ O] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ ]
+[ O] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ O] SemRep-N BLUE_46
+[ O] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[ O] Construction IN_COLOR_51 covering WOMAN_23 WEAR_30 DRESS_31 BLUE_46 AGENT_32 PATIENT_33 MODIFY_47 for [WOMAN_44] 'in' [BLUE_52]
+[ O] Construction BLUE_52 covering BLUE_46 for 'blue'
+[ O] SemRep-N BOXINGRING_53
+[ O] SemRep-R IN_54 from KICK_20 to BOXINGRING_53
+[ O] Construction THEME_S_55 covering BOXINGRING_53 for 'it is' [BOXINGRING_57]
+[ O] Construction PP_IN_56 covering KICK_20 IN_54 BOXINGRING_53 for [SVO_24] 'in' [BOXINGRING_57]
+[ O] Construction BOXINGRING_57 covering BOXINGRING_53 for 'boxing ring'
+[!O] SemRep-N PEOPLE_58
+[!O] Construction EXIST_S_59 covering PEOPLE_58 for 'there is' [PEOPLE_60]
+[!O] Construction PEOPLE_60 covering PEOPLE_58 for 'people'
+
+> Construction Structures
+[ ] 43: EXIST_S_8 'there is' [ ]
+[ ] 43: EXIST_S_39 'there is' [ ]
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_26 'there is' [WOMAN_44 'woman']
+[ ] 136: THEME_S_55 'it is' [BOXINGRING_57 'boxing ring']
+[ ] 137: EXIST_S_59 'there is' [PEOPLE_60 'people']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[ ] 732: EXIST_S_26 'there is' [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[ ] 774: PP_IN_56 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']] 'in' [BOXINGRING_57 'boxing ring']
+[ ] 1367: PP_IN_56 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [WOMAN_44 'woman']] 'in' [BOXINGRING_57 'boxing ring']
+[ ] 1368: PP_IN_56 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'in' [BOXINGRING_57 'boxing ring']
+[ ] 1961: PP_IN_56 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'in' [BOXINGRING_57 'boxing ring']
+
+
+> Next Attention
+  PEOPLE_FOCUS_AREA (uncertainty left: 1)
+
+================================================================================
+ Simulation Time: 10
+================================================================================
+> Current Attention
+  PEOPLE_FOCUS_AREA (perception done)
+
+> Perceived Regions
+  PEOPLE_FOCUS_AREA
+
+> Schema Instances
+[ @] SemRep-N WOMAN_0
+[ @] SemRep-N WEAR_1
+[ @] SemRep-N DRESS_2
+[ @] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ @] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [IN_COLOR_18]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ @] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ @] SemRep-N GREEN_13
+[ @] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ @] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [WOMAN_11] 'in' [GREEN_19]
+[ @] Construction GREEN_19 covering GREEN_13 for 'green'
+[ @] SemRep-N KICK_20
+[ @] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ @] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ @] SemRep-N WOMAN_23
+[ @] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [IN_COLOR_18] [KICK_29] [IN_COLOR_51]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [IN_COLOR_51]
+[ @] Construction KICK_29 covering KICK_20 for 'kick'
+[ @] SemRep-N WEAR_30
+[ @] SemRep-N DRESS_31
+[ @] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ @] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ ]
+[ @] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ @] SemRep-N BLUE_46
+[ @] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[ @] Construction IN_COLOR_51 covering WOMAN_23 WEAR_30 DRESS_31 BLUE_46 AGENT_32 PATIENT_33 MODIFY_47 for [WOMAN_44] 'in' [BLUE_52]
+[ @] Construction BLUE_52 covering BLUE_46 for 'blue'
+[ @] SemRep-N BOXINGRING_53
+[ @] SemRep-R IN_54 from KICK_20 to BOXINGRING_53
+[ O] Construction THEME_S_55 covering BOXINGRING_53 for 'it is' [BOXINGRING_57]
+[ @] Construction PP_IN_56 covering KICK_20 IN_54 BOXINGRING_53 for [SVO_24] 'in' [BOXINGRING_57]
+[ @] Construction BOXINGRING_57 covering BOXINGRING_53 for 'boxing ring'
+[ @] SemRep-N PEOPLE_58
+[ O] Construction EXIST_S_59 covering PEOPLE_58 for 'there is' [REL_SV_WHO_66]
+[ @] Construction PEOPLE_60 covering PEOPLE_58 for 'people'
+[!@] SemRep-N WATCH_61
+[!@] SemRep-R AGENT_62 from WATCH_61 to PEOPLE_58
+[!@] SemRep-R CONCURRENT_63 from KICK_20 to WATCH_61
+[!@] Construction CNJ_WHILE_64 covering KICK_20 WATCH_61 CONCURRENT_63 for [PP_IN_56] 'while' [SV_65]
+[!@] Construction SV_65 covering PEOPLE_58 WATCH_61 AGENT_62 for [PEOPLE_60] [WATCH_67]
+[!X] Construction REL_SV_WHO_66 covering PEOPLE_58 WATCH_61 AGENT_62 for [PEOPLE_60] 'who' [WATCH_67]
+[!@] Construction WATCH_67 covering WATCH_61 for 'watch'
+
+> Competition traces
+  SV_65 (2395) eliminated REL_SV_WHO_66 (329)
+
+> Construction Structures
+[ ] 43: EXIST_S_8 'there is' [ ]
+[ ] 43: EXIST_S_39 'there is' [ ]
+[ ] 138: EXIST_S_7 'there is' [WOMAN_11 'woman']
+[ ] 138: EXIST_S_26 'there is' [WOMAN_44 'woman']
+[ ] 136: THEME_S_55 'it is' [BOXINGRING_57 'boxing ring']
+[ ] 137: EXIST_S_59 'there is' [PEOPLE_60 'people']
+[ ] 731: EXIST_S_7 'there is' [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']]
+[ ] 732: EXIST_S_26 'there is' [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]
+[X] 329: EXIST_S_59 'there is' [REL_SV_WHO_66 [PEOPLE_60 'people'] 'who' [WATCH_67 'watch']]
+[ ] 970: CNJ_WHILE_64 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+[ ] 1563: CNJ_WHILE_64 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [WOMAN_44 'woman']] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+[ ] 1564: CNJ_WHILE_64 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+[ ] 1208: CNJ_WHILE_64 [PP_IN_56 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [WOMAN_44 'woman']] 'in' [BOXINGRING_57 'boxing ring']] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+[ ] 1801: CNJ_WHILE_64 [PP_IN_56 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [WOMAN_44 'woman']] 'in' [BOXINGRING_57 'boxing ring']] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+[ ] 1802: CNJ_WHILE_64 [PP_IN_56 [SVO_24 [WOMAN_11 'woman'] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'in' [BOXINGRING_57 'boxing ring']] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+[ ] 2157: CNJ_WHILE_64 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+[*] 2395: CNJ_WHILE_64 [PP_IN_56 [SVO_24 [IN_COLOR_18 [WOMAN_11 'woman'] 'in' [GREEN_19 'green']] [KICK_29 'kick'] [IN_COLOR_51 [WOMAN_44 'woman'] 'in' [BLUE_52 'blue']]] 'in' [BOXINGRING_57 'boxing ring']] 'while' [SV_65 [PEOPLE_60 'people'] [WATCH_67 'watch']]
+
+
+> Produced Utterance
+'woman in green kick woman in blue in boxing ring while people watch'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 11
+================================================================================
+> Current Attention
+  None
+
+> Schema Instances
+[ x] SemRep-N WOMAN_0
+[ x] SemRep-N WEAR_1
+[ x] SemRep-N DRESS_2
+[ x] SemRep-R AGENT_3 from WEAR_1 to WOMAN_0
+[ x] SemRep-R PATIENT_4 from WEAR_1 to DRESS_2
+[ O] Construction EXIST_S_7 covering WOMAN_0 for 'there is' [ ]
+[ O] Construction EXIST_S_8 covering DRESS_2 for 'there is' [ ]
+[ x] Construction WOMAN_11 covering WOMAN_0 for 'woman'
+[ x] SemRep-N GREEN_13
+[ x] SemRep-R MODIFY_14 from GREEN_13 to DRESS_2
+[ x] Construction IN_COLOR_18 covering WOMAN_0 WEAR_1 DRESS_2 GREEN_13 AGENT_3 PATIENT_4 MODIFY_14 for [ ] 'in' [ ]
+[ x] Construction GREEN_19 covering GREEN_13 for 'green'
+[ x] SemRep-N KICK_20
+[ x] SemRep-R PATIENT_21 from KICK_20 to WOMAN_23
+[ x] SemRep-R AGENT_22 from KICK_20 to WOMAN_0
+[ x] SemRep-N WOMAN_23
+[ x] Construction SVO_24 covering WOMAN_0 WOMAN_23 KICK_20 AGENT_22 PATIENT_21 for [ ] [ ] [ ]
+[ O] Construction EXIST_S_26 covering WOMAN_23 for 'there is' [ ]
+[ x] Construction KICK_29 covering KICK_20 for 'kick'
+[ x] SemRep-N WEAR_30
+[ x] SemRep-N DRESS_31
+[ x] SemRep-R AGENT_32 from WEAR_30 to WOMAN_23
+[ x] SemRep-R PATIENT_33 from WEAR_30 to DRESS_31
+[ O] Construction EXIST_S_39 covering DRESS_31 for 'there is' [ ]
+[ x] Construction WOMAN_44 covering WOMAN_23 for 'woman'
+[ x] SemRep-N BLUE_46
+[ x] SemRep-R MODIFY_47 from BLUE_46 to DRESS_31
+[ x] Construction IN_COLOR_51 covering WOMAN_23 WEAR_30 DRESS_31 BLUE_46 AGENT_32 PATIENT_33 MODIFY_47 for [ ] 'in' [ ]
+[ x] Construction BLUE_52 covering BLUE_46 for 'blue'
+[ x] SemRep-N BOXINGRING_53
+[ x] SemRep-R IN_54 from KICK_20 to BOXINGRING_53
+[ O] Construction THEME_S_55 covering BOXINGRING_53 for 'it is' [ ]
+[ x] Construction PP_IN_56 covering KICK_20 IN_54 BOXINGRING_53 for [ ] 'in' [ ]
+[ x] Construction BOXINGRING_57 covering BOXINGRING_53 for 'boxing ring'
+[ x] SemRep-N PEOPLE_58
+[ O] Construction EXIST_S_59 covering PEOPLE_58 for 'there is' [ ]
+[ x] Construction PEOPLE_60 covering PEOPLE_58 for 'people'
+[ x] SemRep-N WATCH_61
+[ x] SemRep-R AGENT_62 from WATCH_61 to PEOPLE_58
+[ x] SemRep-R CONCURRENT_63 from KICK_20 to WATCH_61
+[ x] Construction CNJ_WHILE_64 covering KICK_20 WATCH_61 CONCURRENT_63 for [ ] 'while' [ ]
+[ x] Construction SV_65 covering PEOPLE_58 WATCH_61 AGENT_62 for [ ] [ ]
+[ x] Construction WATCH_67 covering WATCH_61 for 'watch'
+
+> Next Attention
+  None
+
+================================================================================
+ Simulation Time: 12
+================================================================================
+> Current Attention
+  None
+
+> Next Attention
+  None
+
+
+Simulation complete: inactivity termination.

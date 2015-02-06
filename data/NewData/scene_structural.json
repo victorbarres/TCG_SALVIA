@@ -1,0 +1,49 @@
+{ "scene" : {
+	"image": "none",
+	"resolution": [0, 0],
+	"regions" : [
+					{
+						"name" : "GIST",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 0,
+						"uncertainty" :0,
+						
+						"perceive" : ["SQUIRT_AGENT", "SQUIRT_PATIENT"],
+						"update" :  {"MOUSE" : "OBJECT", "TURTLE" : "OBJECT", "SQUIRT" : "ACTION"}
+					},
+					{
+						"name" : "TURTLE_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 100,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "TURTLE", "type" : "OBJ", "concept" : "TURTLE"}],
+									
+						"perceive" : ["TURTLE"]
+					}
+					{
+						"name" : "SQUIRT_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 70,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "SQUIRT", "type" : "OBJ", "concept" : "SQUIRT"},
+									{"name" : "SQUIRT_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "SQUIRT", "to" : "MOUSE"},
+									{"name" : "SQUIRT_PATIENT", "type" : "REL", "concept" : "PATIENT", "from" : "SQUIRT", "to" : "TURTLE"}],
+									
+						"perceive" : ["SQUIRT", "SQUIRT_AGENT", "SQUIRT_PATIENT"],
+					},
+					{
+						"name" : "MOUSE_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 50,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "MOUSE", "type" : "OBJ", "concept" : "MOUSE"}],
+									
+						"perceive" : ["MOUSE"]
+					}
+				]
+		}
+}

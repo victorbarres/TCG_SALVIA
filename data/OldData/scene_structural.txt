@@ -1,0 +1,56 @@
+
+#
+# TCG Scene: structural strategy
+#
+# Kuchinsky's example of easy event with difficult objects
+#
+
+
+image: none
+resolution: 0 * 0
+
+
+region GIST
+{
+	location: 0, 0 size: 0, 0
+	saliency: 0
+	uncertainty: 0		# instantly perceived
+	
+	update { MOUSE = OBJECT, TURTLE = OBJECT, SQUIRT = ACTION }
+	perceive { SQUIRT_AGENT, SQUIRT_PATIENT }
+}
+
+region TURTLE_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 100		# cued object
+	uncertainty: 1
+
+	object TURTLE { concept: TURTLE }
+	
+	perceive { TURTLE }
+}
+
+region SQUIRT_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 70
+	uncertainty: 1
+	
+	object SQUIRT { concept: SQUIRT }
+	relation SQUIRT_AGENT { concept: AGENT from: SQUIRT to: MOUSE }
+	relation SQUIRT_PATIENT { concept: PATIENT from: SQUIRT to: TURTLE }
+	
+	perceive { SQUIRT, SQUIRT_AGENT, SQUIRT_PATIENT }
+}
+
+region MOUSE_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 50
+	uncertainty: 1
+	
+	object MOUSE { concept: MOUSE }
+	
+	perceive { MOUSE }
+}

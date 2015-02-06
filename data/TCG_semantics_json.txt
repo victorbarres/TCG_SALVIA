@@ -1,0 +1,138 @@
+
+#
+# TCG Semantic Network definition
+#
+
+
+#############################################################
+# relation-related semantics
+#############################################################
+
+{
+	"RELATIONS" : 
+	{
+		"MODIFY" : {},
+		"THEMATIC" :
+		{
+			"AGENT" : {},
+			"PATIENT" : {}
+		},
+		"TEMPORAL" :
+		{
+			"SUCCESSIVE" :{},
+			"CONCURRENT" : {}
+		},
+		"SPATIAL" : 
+		{ 
+			"IN" : {} 
+		}
+	}
+}
+
+#############################################################
+# object-related semantics
+#############################################################
+
+{
+	"ENTITY" : 
+	{
+		"OBJECT" : 
+		{
+			"HUMAN" :
+			{
+				"MAN" : {},
+				"BOY" : {}, 
+				"WOMAN" : {}, 
+				"GIRL" : {},
+				"PEOPLE" : {}
+			},
+			"ITEM" : 
+			{
+				"CLOTHING" : 
+				{
+					"DRESS" : {},
+					"TSHIRT" : {}
+				}
+			},
+			"ANIMAL" : 
+			{
+				"MOUSE" :{},
+				"TURTLE" : {}
+			}
+		},
+		"PLACE" :
+		{
+			"BOXINGRING" : {},
+			"PARK" : {}
+		}
+	},
+
+	"ANIMATE" : 
+	{ 
+		"HUMAN" : {},
+		"ANIMAL" : {} 
+	},
+
+	"MALE" : 
+	{ 
+		"MAN" : {},
+		"BOY" : {}
+	},
+
+	"FEMALE"  : 
+	{ 
+		"WOMAN" : {},
+		"GIRL" : {} 
+	}
+}
+
+#############################################################
+# action-related semantics
+#############################################################
+{
+	"ACTION" : 
+	{
+		"TRANSITIVE" :
+		{
+			"SQUIRT" : {},
+			"TALK" : {},
+			"HIT" : {},
+			"KICK" : {},
+			"WEAR" : {}
+		},
+		"INTRANSITIVE" :
+		{
+			"LAUGH" : {},
+			"WATCH" : {}
+		}
+	}
+}
+
+
+#############################################################
+# property-related semantics
+#############################################################
+
+{
+	"PROPERTY" :
+	{
+		"COLOR" :
+		{
+			"BLACK" : {},
+			"BLUE" : {},
+			"GREEN" : {}
+		},
+		"SIZE" :
+		{
+			"SMALL" : {},
+			"BIG" : {}
+		},		
+		"APPEARANCE" :
+		{
+			"PRETTY" : {},
+			"HANDSOME" : {}
+		}
+	}
+}		
+
+

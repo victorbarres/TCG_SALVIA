@@ -1,0 +1,73 @@
+
+#
+# TCG Scene: Woman-hit-man
+#
+# the famous "pretty woman in blue hit man" example
+#
+
+image: "woman_hits_man.jpg"
+resolution: 400 * 326
+
+region WOMAN_AREA
+{
+	location: 283, 205 size: 50, 150
+	saliency: 100
+	uncertainty: 1
+	
+	object WOMAN { concept: WOMAN }
+	
+	perceive { WOMAN }
+}
+
+region HIT_AREA
+{
+	location: 213, 110 size: 60, 20
+	saliency: 90
+	uncertainty: 1
+	
+	object MAN { concept: MAN }
+	object HIT { concept: HIT }
+	relation HIT_AGENT { concept: AGENT from: HIT to: WOMAN }
+	relation HIT_PATIENT { concept: PATIENT from: HIT to: MAN }
+	
+	perceive { HIT, MAN, HIT_AGENT, HIT_PATIENT }
+}
+
+region WOMAN_FACE_AREA
+{
+	location: 283, 205 size: 50, 150
+	saliency: 70
+	uncertainty: 1
+	
+	object PRETTY { concept: PRETTY }
+	relation PRETTY_MODIFY { concept: MODIFY from: PRETTY to: WOMAN }
+	
+	perceive { PRETTY, PRETTY_MODIFY }
+}
+
+region DRESS_AREA
+{
+	location: 283, 205 size: 50, 150
+	saliency: 50
+	uncertainty: 1
+
+	object DRESS { concept: DRESS }
+	object WEAR { concept: WEAR }
+	relation WEAR_AGENT { concept: AGENT from: WEAR to: WOMAN }
+	relation WEAR_PATIENT { concept: PATIENT from: WEAR to: DRESS }
+
+	perceive { WEAR, DRESS, WEAR_AGENT, WEAR_PATIENT }
+}
+
+region DRESS_FOCUS_AREA
+{
+	location: 283, 205 size: 50, 150
+	saliency: 40
+	uncertainty: 1
+
+	object BLUE { concept: BLUE }
+	relation BLUE_MODIFY { concept: MODIFY from: BLUE to: DRESS }
+
+	perceive { BLUE, BLUE_MODIFY }
+}
+

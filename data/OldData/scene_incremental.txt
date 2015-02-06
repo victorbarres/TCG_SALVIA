@@ -1,0 +1,47 @@
+
+#
+# TCG Scene: incremental strategy
+#
+# Kuchinsky's example of difficult event and easy objects
+#
+
+
+image: none
+resolution: 0 * 0
+
+
+region WOMAN_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 100		# cued object
+	uncertainty: 1
+
+	object WOMAN { concept: WOMAN }
+	
+	perceive { WOMAN }
+}
+
+region TALK_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 70
+	uncertainty: 1
+	
+	object TALK { concept: TALK }
+	relation TALK_AGENT { concept: AGENT from: TALK to: WOMAN }
+	relation TALK_PATIENT { concept: PATIENT from: TALK to: PEOPLE }
+	
+	perceive { TALK, TALK_AGENT, TALK_PATIENT }
+	update { PEOPLE = HUMAN }
+}
+
+region PEOPLE_AREA
+{
+	location: 0, 0 size: 0, 0
+	saliency: 50
+	uncertainty: 1
+	
+	object PEOPLE { concept: PEOPLE }
+	
+	perceive { PEOPLE }
+}

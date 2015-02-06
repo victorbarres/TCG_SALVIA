@@ -1,0 +1,35 @@
+{ "scene" : {
+	"image": "none",
+	"resolution": [0, 0],
+	"regions" : [
+					{
+						"name" : "GIST",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 100,
+						"uncertainty" :0,
+									
+						"perceive" : ["KICK_AGENT", "KICK_PATIENT"],
+						"update" : {"WOMAN" : "ENTITY", "KICK" : "ACTION", "MAN" : "ENTITY"}
+					},
+					{
+						"name" : "MAINEVENT",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 100,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "WOMAN", "type" : "OBJ", "concept" : "WOMAN"},
+									{"name" : "KICK", "type" : "OBJ", "concept" : "LAUGH"},
+									{"name" : "MAN", "type" : "OBJ", "concept" : "MAN"},
+									{"name" : "KICK_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "KICK", "to" : "WOMAN"},
+									{"name" : "KICK_PATIENT", "type" : "REL", "concept" : "PATIENT", "from" : "KICK", "to" : "MAN"},
+									{"name" : "BOY", "type" : "OBJ", "concept" : "BOY"},
+									{"name" : "HIT", "type" : "OBJ", "concept" : "HIT"},
+									{"name" : "HIT_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "HIT", "to" : "WOMAN"},
+									{"name" : "HIT_PATIENT", "type" : "REL", "concept" : "PATIENT", "from" : "HIT", "to" : "BOY"}],
+									
+						"perceive" : ["WOMAN", "KICK", "MAN", "KICK_AGENT", "KICK_PATIENT", "BOY", "HIT", "HIT_AGENT", "HIT_PATIENT"]
+					}
+				]
+		}
+}

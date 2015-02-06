@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body{
+	width: 1000px;
+	font-family: consolas;
+}
+
+#text_viewer{
+	white-space: pre-wrap;
+}
+</style>
+
+<html>
+<head>
+<title> TCG Text Viewer </title>
+<link rel="shortcut icon", href="TCG.ico">
+</head>
+
+<body>
+<div id="title">
+<img src="TCG.ico", alt="TCG icon", style="width:50px;height:50px", align="left">
+<h1>Text Viewer</h1>
+</div>
+
+<div>
+<div id="grammar", class="model_inputs">
+<a href="./TCGCxNViewer_v0.html" target="popup" onclick="window.open('./TCGCxNViewer_v0.html','Grammar Viewer')"> View constructions </a>
+</div>
+
+<div id="scene_input", class="model_inputs">
+<a href="./TCGSceneViewer_v0.1.html" target="popup" onclick="window.open('./TCGSceneViewer_v0.html', 'Scene Viewer')"> View input scene </a>
+</div>
+
+<div id="concept_knowledge", class="model_inputs">
+<a href="./TCGConceptViewer_v0.1.html" target="popup" onclick="window.open('./TCGConceptViewer_v0.1.html', 'Concept Viewer')"> View conceptual knowledge </a>
+</div>
+</div>
+<div>
+<a href="./TCGViewer_v0.6.html">TCG viewer</a>
+</div>
+
+<div id="text_viewer"></div>
+
+<script>
+// Load and display text data
+function AJAX_JSON_Req(url){
+	var AJAX_req = new XMLHttpRequest();
+	AJAX_req.open("GET", url, true);
+	//AJAX_req.setRequestHeader("Content-type", "text/html");
+
+	AJAX_req.onreadystatechange = function()
+	{
+		if(AJAX_req.readyState == 4 && AJAX_req.status == 200)
+		{
+			document.getElementById("text_viewer").innerHTML = AJAX_req.responseText;
+		}
+	};
+	AJAX_req.send();
+	
+};
+
+AJAX_JSON_Req("./TCG_output.txt");
+</script>
+
+</body>
+</html>

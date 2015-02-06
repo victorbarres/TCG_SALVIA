@@ -1,0 +1,51 @@
+{ "scene" : {
+	"image": "none",
+	"resolution": [0, 0],
+	"regions" : [
+					{
+						"name" : "BOY_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 100,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "BOY", "type" : "OBJ", "concept" : "BOY"}],
+									
+						"perceive" : ["BOY"]
+					},
+					{
+						"name" : "KICK_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 90,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "KICK", "type" : "OBJ", "concept" : "KICK"},
+									{"name" : "KICK_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "KICK", "to" : "GIRL"},
+									{"name" : "KICK_PATIENT", "type" : "REL", "concept" : "PATIENT", "from" : "KICK", "to" : "BOY"}],
+									
+						"perceive" : ["KICK", "KICK_AGENT", "KICK_PATIENT"],
+						"update" : {"GIRL" : "HUMAN"}
+					},
+					{
+						"name" : "GIRL_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 70,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "GIRL", "type" : "OBJ", "concept" : "GIRL"}],
+									
+						"perceive" : ["GIRL"]
+					},
+					{
+						"name" : "GIRL_FACE_AREA",
+						"location" : [0,0],
+						"size" : [0,0],
+						"saliency" : 40,
+						"uncertainty" :1,
+						"schemas" : [{"name" : "LAUGH", "type" : "OBJ", "concept" : "LAUGH"},
+									{"name" : "LAUGH_AGENT", "type" : "REL", "concept" : "AGENT", "from" : "LAUGH", "to" : "GIRL"}],
+									
+						"perceive" : ["LAUGH", "LAUGH_AGENT"]
+					}
+				]
+		}
+}

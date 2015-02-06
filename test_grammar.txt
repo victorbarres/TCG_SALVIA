@@ -1,0 +1,96 @@
+
+#
+# TCG Construction Vocabulary
+#
+
+
+#############################################################
+# sentence structures
+#############################################################
+
+construction CNJ_AND
+{
+	class: S
+	
+	node EVT1 { concept: ACTION+ shared head }
+	node EVT2 { concept: ACTION+ shared head }
+	relation EVT1_EVT2 { concept: SUCCESSIVE from: EVT1 to: EVT2 }
+
+	[EVT1: S] 'and' [EVT2: S]
+}
+
+construction CNJ_WHILE
+{
+	class: S
+
+	node EVT1 { concept: ACTION+ shared head }
+	node EVT2 { concept: ACTION+ shared head }
+	relation EVT1_EVT2 { concept: CONCURRENT from: EVT1 to: EVT2 }
+
+	[EVT1: S] 'while' [EVT2: S]
+}
+
+construction SVO
+{
+	class: S
+	preference: 1	# sentential structure preference
+
+	node SUBJ { concept: ENTITY+ shared head }
+	node OBJ { concept: ENTITY+ shared }
+	node ACT { concept: ACTION+ shared head }
+	relation ACT_SUBJ { concept: AGENT from: ACT to: SUBJ }
+	relation ACT_OBJ { concept: PATIENT from: ACT to: OBJ }
+
+	[SUBJ: NC NP N] [ACT: VP V] [OBJ: NC NP N]
+}
+
+
+
+#############################################################
+# complex constructions
+#############################################################
+
+construction REL_SVO_WHO
+{
+	class: NC
+
+	node SUBJ { concept: HUMAN+ shared head }
+	node OBJ { concept: ENTITY+ shared }
+	node ACTION { concept: ACTION+ shared }
+	relation ACTION_SUBJ { concept: AGENT from: ACTION to: SUBJ }
+	relation ACTION_OBJ { concept: PATIENT from: ACTION to: OBJ }
+
+	[SUBJ: NP N] 'who' [ACTION: VP V] [OBJ: NC NP N]
+}
+
+
+construction IN_COLOR
+{
+	class: NP
+	
+	node HUMAN { concept: HUMAN+ shared head }
+	node WEAR { concept: WEAR }
+	node CLOTH { concept: CLOTHING+ }
+	node COLOR { concept: COLOR+ shared }
+	relation HUMAN_WEAR { concept: AGENT from: WEAR to: HUMAN }
+	relation CLOTH_WEAR { concept: PATIENT from: WEAR to: CLOTH }
+	relation COLOR_CLOTH { concept: MODIFY from: COLOR to: CLOTH }
+	
+	[HUMAN: NP N] 'in' [COLOR: A]
+}
+
+#############################################################
+# lexicons
+#############################################################
+
+# verbs
+construction HIT		{ class: V node NODE { concept: HIT head } 'hit' }
+
+
+# adjectives
+construction BLUE 		{ class: A node NODE { concept: BLUE head } 'blue' }
+construction BIG 		{ class: A node NODE { concept: BIG head } 'big' }
+
+# nouns
+construction WOMAN		{ class: N node NODE { concept: WOMAN head } 'woman' }
+construction MAN		{ class: N node NODE { concept: MAN head } 'man' }
