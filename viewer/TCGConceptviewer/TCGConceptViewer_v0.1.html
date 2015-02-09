@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body{
+	width: 5000px;
+	font-family: consolas;
+}
+
+#cpt_net{
+	border: 1px solid;
+	border-radius: 5px;
+}
+
+.node{
+  stroke: #fff;
+  stroke-width: 1.5px;
+  fill: coral;
+}
+
+.link{
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+.node_text{
+	font-size: 12px;
+	fill: black;
+}
+
+.level{
+	margin: 10px
+}
+
+.concept{
+	background-color: WhiteSmoke;
+	float: left;
+	margin: 10px;
+	font-weight: bold;
+	border: 1px solid;
+}
+
+.name{
+	text-align: center;
+}
+
+</style>
+
+<html>
+<head>
+<title> TCG WK </title>
+<link rel="shortcut icon", href="../TCG.ico">
+</head>
+<div id="title">
+<img src="../TCG.ico" alt="TCG icon" style="width:50px;height:50px", align="left">
+<h1>Conceptual Knowledge</h1>
+</div>
+
+<body>
+<div id="display_d3_net">
+<p><b>Graph View</b></p>
+</div>
+<div id="display">
+<p><b>Box View</b></p>
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="./js/d3/d3.min.js"></script>
+
+<script>
+var width = 1200;
+var height = 700;
+
+//Set up d3.js force field network.
+var viewer = d3.select("#display_d3_net");
+
+var svg = viewer.append("svg")
+	.attr("id", "cpt_net")
+	.attr("width", width)
+	.attr("height", height);
+
+//defining arrow marker
+svg.append("defs").selectAll("marker")
+		.data(["arrow"])
+	.enter().append("marker")
+		.attr("id", function(d) {return d;})
+		.attr("viewBox", "0 -5 10 10")
+		.attr("refX", 20)
+		.attr("refY", 0)
+		.attr("markerWidth", 6)
+		.attr("markerHeight", 6)
+		.attr("orient", "auto")
+	.append("path")
+		.attr("d", "M0,-5L10,0L0,5");
+	
+// Create force fields
+var force = d3.layout.force()
+	.charge(-400)
+	.linkDistance(50)
+	.size([width,height]);
+
+function AJAX_JSON_Req(url){
+	var AJAX_req = new XMLHttpRequest();
+	AJAX_req.open("GET", url, true);
+	AJAX_req.setRequestHeader("Content-type", "application/json");
+	
+	AJAX_req.onreadystatechange = function()
+	{	
+		if(AJAX_req.readyState == 4 && AJAX_req.status == 200)
+		{
+			var jsonData = JSON.parse( AJAX_req.responseText);
+			var concepts = jsonData["CONCEPTUAL_KNOWLEDGE"];
+			disp_knowledge(concepts, document.getElementById("display"),0);
+			
+			var graph = {};
+			create_graph(concepts, graph,"");
+			var data = get_d3_data(graph);
+			disp_graph(data);
+		}
+	}
+	AJAX_req.send()
+}
+
+AJAX_JSON_Req("../TCG_semantics.json");
+
+function disp_knowledge(concepts, element, level){
+	var new_level = document.createElement("div");
+	new_level.setAttribute("class", "level");
+	element.appendChild(new_level);
+	for(var key in concepts){
+		var new_concept = document.createElement("div");
+		new_concept.setAttribute("class", "concept");
+		new_level.appendChild(new_concept);
+		var new_name = document.createElement("div");
+		new_name.setAttribute("class", "name");
+		var color = [255, Math.round(255*level/5), Math.round(255*level/10)];
+		new_name.style.backgroundColor = "rgb("+color.join(",")+")";
+		new_name.innerHTML = key;
+		new_concept.appendChild(new_name);
+		disp_knowledge(concepts[key],new_concept, level+1);
+	};
+	
+};
+
+function create_graph(data,graph,parent){
+	for(var key in data){
+		if(!(key in graph)){
+			graph[key] = [];
+		}
+		if(parent != ""){
+			graph[key].push(parent);
+		}
+		create_graph(data[key],graph,key);
+	}
+}
+
+function get_d3_data(graph){
+	var nodes_arr = Object.keys(graph);
+	var links = [];
+	for(var i=0; i<nodes_arr.length; i++){
+		var target = nodes_arr[i];
+		var sources = graph[target];
+		for(var j=0; j<sources.length; j++){
+			var prt_idx = nodes_arr.indexOf(sources[j])
+			var new_link = {"source" : i , "target" : prt_idx};
+			links.push(new_link);
+		}
+	}
+	var nodes = [];
+	for(var i=0; i<nodes_arr.length; i++){
+		var new_node = {"name" : nodes_arr[i]};
+		nodes.push(new_node);
+	}
+	var data = {"nodes" : nodes, "links" : links}
+	return data
+}
+
+function disp_graph(data){
+	force
+		.nodes(data.nodes)
+		.links(data.links)
+		.on("tick", tick)
+		.start();
+		
+	// Create linear scale
+	var nodeScale = d3.scale.linear()
+		.domain([0,100])
+		.range([0,20]);
+	
+	// Create concept nodes
+	var cpt_nodes = svg.selectAll(".node")
+		.data(force.nodes());
+	cpt_nodes.enter().append("circle")
+		.attr("class", "node")
+		.attr("r", 10)
+		.call(force.drag);
+	cpt_nodes.exit().remove();
+	
+	// Create links
+	var cpt_links = svg.selectAll(".link")
+		.data(force.links());
+	cpt_links.enter().append("line")
+		.attr("class", "link")
+		.attr("marker-end", "url(#arrow)");
+	cpt_links.exit().remove();
+	
+	// Create text
+	var cpt_texts = svg.selectAll(".node_text")
+		.data(force.nodes());
+	cpt_texts.enter().append("text")
+		.attr("class", "node_text")
+		.text(function(d) {return d.name;});	
+	cpt_texts.exit().remove();
+	
+	// Update force field
+	function tick() {
+		cpt_nodes
+			.attr("cx", function(d) {return d.x;})
+			.attr("cy", function(d) {return d.y;});
+		
+		cpt_links
+			.attr("x1", function(d) {return d.source.x})
+			.attr("y1", function(d) {return d.source.y})
+			.attr("x2", function(d) {return d.target.x})
+			.attr("y2", function(d) {return d.target.y});
+		
+		cpt_texts
+			.attr("x", function(d) {return d.x})
+			.attr("y", function(d) {return d.y})
+			.attr("dx", 10);
+		
+	};
+}
+
+</script>
+
+</body>
+</html>
+

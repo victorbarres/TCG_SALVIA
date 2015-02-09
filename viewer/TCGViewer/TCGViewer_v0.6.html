@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body{
+	width: 3000px;
+	font-family: consolas;
+}
+
+#sim_param{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#time{
+	margin-left: 10px;
+	margin-top: 10px;
+}
+
+#focus{
+	margin-left: 10px;
+	margin-top: 10px;
+}
+
+#scene{
+	margin-top: 10px;
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+#scene_pic{
+	margin-left: 10px;
+	float:left;
+}
+
+#vis_wm_div{
+	margin-left: 10px;
+	border: 2px solid;
+    border-radius: 10px;
+	float:left;
+}
+
+.mask{
+	position: absolute;
+	background-color: blue;
+	opacity: 0.1;
+	border-radius: 100px;
+}
+
+.highlight_mask{
+	background-color:blue;
+	opacity: 0.5;
+	border-radius: 100px;
+}
+
+#working_memories{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#sem_wm_div{
+	float: left;
+	margin-left: 10px;
+	border: 2px solid;
+    border-radius: 10px;
+}
+
+.link {
+	stroke-width: 2;
+	stroke: black;
+	stroke-opacity: 0.6;
+}
+
+.node {
+	stroke: black;
+	stroke-width: 2;
+	stroke-opacity: .5;
+}
+
+.node.alive_false {
+	fill: #999999;
+}
+
+.node.fresh_true.alive_true {
+	fill: #EE9090;
+}
+
+.node.fresh_false.alive_true {
+	fill: #EECCCC;
+}
+
+.node.old_true {
+	fill: #EECCCC;
+	stroke: red;
+}
+
+.node.alive_true.active_false {
+	fill: #FFFFFF;
+	stroke: black;
+}
+
+.node.highlight {
+	fill: red;
+}
+
+.node_text {
+	fill: black;
+	font-size: 12px;
+}
+
+.edge_text {
+	fill: black;
+	font-size: 10px;
+}
+
+#gram_wm_div{
+	float: left;
+	margin-left: 10px;
+	border: 2px solid;
+    border-radius: 10px;
+}
+
+.cxn_link {
+	stroke-width: 2;
+	stroke: black;
+	stroke-opacity: 0.6;
+}
+
+.cxn_link.cooperation{
+	stroke-width: 2;
+	stroke: black;
+	stroke-opacity: 0.6;
+}
+
+.cxn_link.competition{
+	stroke-width: 4;
+	stroke: red;
+	stroke-dasharray: 2,2;
+}
+
+.cxn_link.hide{
+	stroke-opacity: 0.2;
+}
+
+.cxn_node {
+	stroke: black;
+	stroke-width: 2;
+	stroke-opacity: .5;
+}
+
+.cxn_node.alive_false {
+	fill: #999999;
+}
+
+.cxn_node.fresh_true.alive_true {
+	fill: #90EE90;
+}
+
+.cxn_node.fresh_false.alive_true {
+	fill: #CCEECC;
+}
+
+.cxn_node.old_true {
+	fill: #CCEECC;
+	stroke: red;
+}
+
+.cxn_node.alive_true.active_false {
+	fill: #FFFFFF;
+	stroke: black;
+}
+
+.cxn_node.highlight {
+	fill: red;
+}
+
+.cxn_node.hide{
+	stroke-opacity: 0;
+	opacity: 0.2;
+}
+
+.cxn_text {
+	fill: black;
+	font-size: 12px;
+}
+
+.cxn_text.hide {
+	opacity: 0.2;
+}
+
+#output{
+	float: left;
+	margin-left: 10px;
+}
+
+#phonWM{
+	border: 2px solid;
+    border-radius: 10px;
+	position: relative;
+}
+#phonWM_title{
+	font-size: 14px;
+	font-weight: bold;
+}
+
+#phonWM_content{
+	font-size: 12px;
+	font-weight: normal;
+}
+
+#utterance{
+	margin-top: 10px;
+	border: 2px solid;
+    border-radius: 10px;
+	position: relative;
+}
+
+#utter_title{
+	font-size: 14px;
+	font-weight: bold;
+}
+
+#utter_content{
+	font-size: 12px;
+	font-weight: normal;
+	fill: red;
+}
+
+#assemblages{
+	float: left;
+	margin-left: 10px;
+}
+
+.an_assemblage{
+	font-size: 11px;
+}
+
+.an_assemblage.winner{
+	color: red;
+}
+
+.an_assemblage.valid{
+	color: green;
+}
+
+.an_assemblage.invalid{
+	color: black;
+}
+</style>
+
+<html>
+<head>
+<title> TCG Viewer </title>
+<link rel="shortcut icon", href="../TCG.ico">
+</head>
+
+<body>
+<div id="title">
+<img src="../TCG.ico", alt="TCG icon", style="width:50px;height:50px", align="left">
+<h1>Viewer</h1>
+</div>
+
+<div id="links">
+<div id="grammar", class="model_inputs">
+<a href="./TCGCxNViewer_v0.1.html" target="popup" onclick="window.open('../TCGCxNViewer/','Grammar Viewer')"> View constructions </a>
+</div>
+
+<div id="scene_input", class="model_inputs">
+<a href="./TCGSceneViewer_v0.1.html" target="popup" onclick="window.open('../TCGSceneViewer/', 'Scene Viewer')"> View input scene </a>
+</div>
+
+<div id="concept_knowledge", class="model_inputs">
+<a href="./TCGConceptViewer_v0.1.html" target="popup" onclick="window.open('../TCGConceptViewer/', 'Concept Viewer')"> View conceptual knowledge </a>
+</div>
+<div id="change_view">
+<a href="../TCGViewerText/">Simple text viewer</a>
+</div>
+</div>
+
+<div id="sim_param"></div>
+
+<div id="scene_name"></div>
+
+<div id="control"></div>
+
+<div id="viewer">
+<div id="time"></div>
+<div id="focus"></div>
+<div id="scene"></div>
+<div id="working_memories"></div>
+</div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="./js/d3/d3.min.js"></script>
+<script>
+var width=400,
+	height=300;
+
+// Set up viewer element with scene image and SemRep visualizer (svg)
+var scene = d3.select("#scene");
+
+var img = scene.append("div")
+	.attr("id", "scene_pic")
+	.append("img")
+		.attr("id", "img")
+		.attr("width", width)
+		.attr("height", height);
+
+var vis_wm = scene.append("div")
+	.attr("id", "vis_wm_div");
+	
+var svg_vis = vis_wm.append("svg")
+	.attr("id", "vis_wm")
+	.attr("width", width)
+	.attr("height", height);
+
+svg_vis.append("text")
+	.attr("id", "visWM_title")
+	.style("font-size", 14)
+	.style("font-weight", "bold")
+	.attr("x", 20)
+	.attr("y", 20)
+	.text("Visual WM");
+		
+var wm = d3.select("#working_memories")
+
+var sem_wm = wm.append("div")
+	.attr("id", "sem_wm_div");
+	
+var svg_sem = sem_wm.append("svg")
+	.attr("id", "sem_wm")
+	.attr("width", width)
+	.attr("height", height);
+
+svg_sem.append("text")
+	.attr("id", "SR_title")
+	.style("font-size", 14)
+	.style("font-weight", "bold")
+	.attr("x", 20)
+	.attr("y", 20)
+	.text("Semantic WM");
+
+var gram_wm = wm.append("div")
+	.attr("id", "gram_wm_div");
+	
+var svg_gram = gram_wm.append("svg")
+	.attr("id", "gram_wm")
+	.attr("width", width)
+	.attr("height", height);
+
+svg_gram.append("text")
+	.attr("id", "gWM_title")
+	.style("font-size", 14)
+	.style("font-weight", "bold")
+	.attr("x", 20)
+	.attr("y", 20)
+	.text("Grammatical WM");
+	
+//defining arrow marker for svg elements
+svg_sem.append("defs").selectAll("marker")
+		.data(["arrow"])
+	.enter().append("marker")
+		.attr("id", function(d) {return d;})
+		.attr("viewBox", "0 -5 10 10")
+		.attr("refX", 10)
+		.attr("refY", 0)
+		.attr("markerWidth", 3)
+		.attr("markerHeight", 3)
+		.attr("orient", "auto")
+	.append("path")
+		.attr("d", "M0,-5L10,0L0,5");
+		
+svg_gram.append("defs").selectAll("marker")
+		.data(["arrow"])
+	.enter().append("marker")
+		.attr("id", function(d) {return d;})
+		.attr("viewBox", "0 -5 10 10")
+		.attr("refX", 10)
+		.attr("refY", 0)
+		.attr("markerWidth", 3)
+		.attr("markerHeight", 3)
+		.attr("orient", "auto")
+	.append("path")
+		.attr("d", "M0,-5L10,0L0,5");
+		
+var output = wm.append("div")
+	.attr("id", "output");
+
+var phonWM_div = output.append("div")
+	.attr("id", "phonWM")
+	
+var phonWM = phonWM_div.append("svg")
+	.attr("width", width)
+	.attr("height", height/3);
+phonWM.append("text")
+		.attr("id", "phonWM_title")
+		.attr("x", 10)
+		.attr("y", 20)
+		.text("Phonological WM");
+phonWM.append("text")
+	.attr("id", "phonWM_content")
+	.attr("x", 10)
+	.attr("y", 40)
+	.text("");
+
+var utter_div  = output.append("div")
+	.attr("id", "utterance");
+var utter = utter_div.append("svg")
+	.attr("width", width)
+	.attr("height", height/3);
+utter.append("text")
+		.attr("id", "utter_title")
+		.attr("x", 10)
+		.attr("y", 20)
+		.text("Utterance");
+utter.append("text")
+	.attr("id", "utter_content")
+	.attr("x", 10)
+	.attr("y", 40)
+	.text("");
+	
+var assemblages= wm.append("div")
+	.attr("id", "assemblages")
+	.text("Construction assemblages:");
+	
+/////////////SCENE////////////////
+// Scene data variables
+var step = 0;
+var sub_state = 0; // 0 nothing updated, 1 attention  updated, 2 SemWM  updated, 3 gramWM n updated, 4 phonWM updated, 5 utter updated.
+var scene = {};
+
+// Load and display scene data
+function AJAX_JSON_Req(url){
+	var AJAX_req = new XMLHttpRequest();
+	AJAX_req.open("GET", url, true);
+	AJAX_req.setRequestHeader("Content-type", "application/json");
+	
+	AJAX_req.onreadystatechange = function()
+	{
+		if(AJAX_req.readyState == 4 && AJAX_req.status == 200)
+		{
+			var jsonData = JSON.parse(AJAX_req.responseText);
+			scene = jsonData.scene;
+			dispSceneImage();
+		}
+	};
+	AJAX_req.send()
+}
+
+function dispSceneImage(){
+	var scene_img = document.getElementById("img");
+	scene_img.setAttribute("src", "../" + scene.image);
+	var scene_name = document.getElementById("scene_name");
+	var name = document.createElement("p");
+	name.innerHTML = "Scene name: " + scene.image;
+	scene_name.appendChild(name);
+}
+
+AJAX_JSON_Req("../TCG_scene.json");
+
+function create_masks(){
+	var scene_pic = document.getElementById("scene_pic");
+	var img = document.getElementById("img");
+	var resolution = scene.resolution;
+	var img_rect = img.getBoundingClientRect();
+	var hfactor = ((img_rect.bottom - img_rect.top)/resolution[0]);
+	var wfactor = ((img_rect.right - img_rect.left)/resolution[1]);
+	
+	for(var i=0; i<scene.regions.length; i++){
+		var region = scene.regions[i];
+		var mask = document.createElement("div");
+		mask.setAttribute("class", "mask");
+		mask.setAttribute("id", scene.regions[i].name);
+		scene_pic.appendChild(mask);
+		
+		var loc = region.location;
+		var size = region.size;
+		mask.style.position = "absolute";
+		mask.style.top = img_rect.top + loc[0]*hfactor + "px";
+		mask.style.left = img_rect.left +  loc[1]*wfactor + "px";
+		mask.style.width = size[1]*wfactor + "px";
+		mask.style.height = size[0]*hfactor + "px";
+	};
+};
+////////////////////////////////////////
+////////////Working Memories////////////
+////////////////////////////////////////	
+// Set up control buttons
+var control = d3.select("#control");
+control
+	.append("button")
+		.attr("type", "button")
+		.attr("onclick", "restart()")
+		.text("restart");
+
+control
+	.append("button")
+		.attr("type", "button")
+		.attr("onclick", "prev_t()")
+		.text("t - 1");
+		
+control
+	.append("button")
+		.attr("type", "button")
+		.attr("onclick", "nextStep()")
+		.text("next state");
+		
+control
+	.append("button")
+		.attr("type", "button")
+		.attr("onclick", "next_t()")
+		.text("t + 1");
+
+control
+	.append("button")
+		.attr("type", "button")
+		.attr("id", "play")
+		.attr("onclick", "start_play()")
+		.text("play");
+	
+// Create force fields
+var force = d3.layout.force()
+	.charge(-400)
+	.linkDistance(50)
+	.size([width,height]);
+
+var force_cxn = d3.layout.force()
+	.charge(-400)
+	.linkDistance(50)
+	.size([width,height]);
+
+// State data variables
+var step = 0;
+var is_pause = false;
+var speed = 500;
+var data = {};
+var SemRep = {nodes:[], links:[]};
+var gramWM = {nodes:[], links:[]}
+
+//Load state data
+d3.json("../TCG_output.json", function(jsonData) {
+	data = jsonData;
+	disp_param();
+	updateState(step, sub_state);
+	create_masks();
+	});
+
+//Display simulation parameters
+function disp_param(){
+	var sim_param = document.getElementById("sim_param");
+	for(var key in data.parameters){
+		var new_div = document.createElement("div");
+		if(key != "utterance_threshold"){
+			new_div.innerHTML = key + ": " + data.parameters[key];
+		}
+		else{
+			var val = [];
+			for(var key2 in data.parameters[key]){
+			val.push(key2 + "=" + data.parameters[key][key2]);
+			}
+			new_div.innerHTML = key + " [" + val.join(", ") + "]";
+		}
+		sim_param.appendChild(new_div);
+	};
+};
+
+//Update state
+function updateState(n){
+	updateTime(n);
+	switch(n){
+	case 0:
+		updateFocus();
+		break;
+	case 1:
+		updateSemRep();
+		break;
+	case 2:
+		updateGramWM();
+		updateAssemblages();
+		break;
+	case 3:
+		updatePhonWM();
+		break;
+	case 4:
+		updateUtter();
+		break;
+	case -1:
+		updateFocus();
+		updateSemRep();
+		updateGramWM();
+		updateAssemblages();
+		updatePhonWM();
+		updateUtter();
+		sub_state = 4;
+	};
+};
+
+///// Update SemRep graph /////
+function updateSemRep() {
+	updateGraph(force, data.states[step].semanticWM.SRnodes, data.states[step].semanticWM.SRlinks, SemRep)	
+	SemRep_visUpdate();
+};
+
+//Update SemRep Visualization
+function SemRep_visUpdate(){
+	force
+		.on("tick", tick)
+		.start();
+	
+	// Create linear scale
+	var nodeScale = d3.scale.linear()
+		.domain([0,100])
+		.range([0,20]);
+	
+	var svg = d3.select("#sem_wm");
+	
+	// Create nodes
+	var SRnode = svg.selectAll(".node")
+		.data(force.nodes());
+		
+	SRnode
+		.attr("class", function(d) {return "node " + "fresh_" + d.fresh + " alive_" + d.alive + " old_" + d.old + " active_" + d.active}) //For some reason I need to update this due to the removal of nodes...
+		.attr("id", function(d) {return d.id});
+	SRnode.enter().append("circle")
+		.attr("id", function(d) {return d.id})
+		.attr("class", function(d) {return "node " + "fresh_" + d.fresh + " alive_" + d.alive + " old_" + d.old + " active_" + d.active})
+		//.attr("r", 2)
+		.attr("r", function (d) {return nodeScale(d.act);})
+		.call(force.drag);
+	SRnode.exit().remove();
+	
+	// Create links
+	var SRlink = svg.selectAll(".link")
+		.data(force.links());
+	SRlink.enter().append("line")
+		.attr("class", "link")
+		.attr("marker-end", "url(#arrow)");
+	SRlink.exit().remove();
+	
+	// Create node text
+	var node_text = svg.selectAll(".node_text")
+		.data(force.nodes());
+	node_text
+		.text(function(d) {return d.id;}); //For some reason I need to update this due to the removal of nodes...
+	node_text.enter().append("text")
+		.attr("class", "node_text")
+		.text(function(d) {return d.id;});	
+	node_text.exit().remove();
+	
+	// Create edge text
+	var edge_text = svg.selectAll(".edge_text")
+		.data(force.links());
+	edge_text
+		.text(function(d) {return d.id;}); //For some reason I need to update this due to the removal of nodes...
+	edge_text.enter().append("text")
+		.attr("class", "edge_text")
+		.text(function(d) {return d.id;});	
+	edge_text.exit().remove();
+
+	// Update force field
+	function tick() {
+		SRnode
+			.attr("cx", function(d) {return d.x;})
+			.attr("cy", function(d) {return d.y;});
+		
+		SRlink
+			.attr("x1", function(d) {return d.source.x})
+			.attr("y1", function(d) {return d.source.y})
+			.attr("x2", function(d) {return d.target.x})
+			.attr("y2", function(d) {return d.target.y});
+		
+		node_text
+			.attr("x", function(d) {return d.x})
+			.attr("y", function(d) {return d.y})
+			.attr("dx", 10);
+			
+		edge_text
+			.attr("x", function(d) {return (d.source.x + d.target.x)/2.0})
+			.attr("y", function(d) {return (d.source.y + d.target.y)/2.0})
+			.attr("dx", 2);
+		
+	};
+};
+
+////// Update GramWM //////
+function updateGramWM() {
+	var nodes = data.states[step].grammaticalWM.cxn_inst; //cxn instances
+	var coop_links = data.states[step].grammaticalWM.links; // cooperation links
+	for(var i=0; i<coop_links.length; i++){
+		coop_links[i]["type"] = "cooperation";
+	}
+	var comp_links = data.states[step].grammaticalWM.competitions; // competition links
+	for(var i=0; i<comp_links.length; i++){
+		comp_links[i]["type"] = "competition";
+	}
+	var links = coop_links.concat(comp_links);
+	updateGraph(force_cxn, nodes, links, gramWM);
+	gramWM_visUpdate();
+};
+
+//Update gramWM Visualization
+function gramWM_visUpdate(){
+	force_cxn
+		.on("tick", tick)
+		.start();
+	
+	// Create linear scale
+	var nodeScale = d3.scale.linear()
+		.domain([0,100])
+		.range([0,20]);
+	
+	var svg = d3.select("#gram_wm");
+	
+	// Create nodes
+	var node = svg.selectAll(".cxn_node")
+		.data(force_cxn.nodes());
+		
+	node
+		.attr("class", function(d) {return "cxn_node " + "fresh_" + d.fresh + " alive_" + d.alive + " old_" + d.old + " active_" + d.active}) //For some reason I need to update this due to the removal of nodes...
+		.attr("id", function(d) {return d.id})
+	node.enter().append("circle")
+		.attr("id", function(d) {return d.id})
+		.attr("class", function(d) {return "cxn_node " + "fresh_" + d.fresh + " alive_" + d.alive + " old_" + d.old + " active_" + d.active})
+		.attr("r", 10)
+		.attr("onmouseover", "show_cover(this)")
+		.attr("onmouseout", "hide_cover()")
+		//.attr("r", function (d) {return nodeScale(d.act);})
+		.call(force_cxn.drag);
+	node.exit().remove();
+	
+	// Create links
+	var link = svg.selectAll(".cxn_link")
+		.data(force_cxn.links());
+	link.attr("class", function(d) {return "cxn_link " + d.type;}) //For some reason I need to update this due to the removal of nodes...
+		.attr("id", function(d) {return d.source.id + "_" + d.target.id})
+		.attr("marker-end", "url(#arrow)");
+	link.enter().append("line")
+		.attr("class", function(d) {return "cxn_link " + d.type;}) //Differentiates between cooperation and competition links.
+		.attr("id", function(d) {return d.source.id + "_" + d.target.id})
+		.attr("marker-end", "url(#arrow)");
+	link.exit().remove();
+	
+	// Create text
+	var text = svg.selectAll(".cxn_text")
+		.data(force_cxn.nodes());
+	text
+		.text(function(d) {return d.id;}) //For some reason I need to update this due to the removal of nodes...
+		.attr("id", function(d) {return "cxn_text_" + d.id})
+		.attr("class", "cxn_text")
+	text.enter().append("text")
+		.attr("class", "cxn_text")
+		.attr("id", function(d) {return "cxn_text_" + d.id})
+		.text(function(d) {return d.id;});	
+	text.exit().remove();
+
+	// Update force field
+	function tick() {
+		node
+			.attr("cx", function(d) {return d.x;})
+			.attr("cy", function(d) {return d.y;});
+		
+		link
+			.attr("x1", function(d) {return d.source.x})
+			.attr("y1", function(d) {return d.source.y})
+			.attr("x2", function(d) {return d.target.x})
+			.attr("y2", function(d) {return d.target.y});
+		
+		text
+			.attr("x", function(d) {return d.x})
+			.attr("y", function(d) {return d.y})
+			.attr("dx", 10);
+		
+	};
+};
+///////////////////////////////////
+///// Graph updating functions/////
+///////////////////////////////////
+function updateGraph(myForce, nodes, links, graph) {
+	graph.nodes = nodes;
+	graph.links = links;
+	
+	//Add new nodes to graph
+	for(var i=0; i<graph.nodes.length; i++){
+		idx = findNodeIdx(myForce.nodes(), graph.nodes[i].id);
+		if (idx == -1){
+			myForce.nodes().push(JSON.parse(JSON.stringify(graph.nodes[i]))); // Pass deep copy of the object.
+		};
+	};
+	//Remove old nodes from graph
+	for(var i=0; i<myForce.nodes().length; i++){
+		idx = findNodeIdx(graph.nodes, myForce.nodes()[i].id);
+		if (idx == -1){
+			myForce.nodes().splice(i,1);
+			i--;
+		};
+	};
+	
+	// Update other node fields if necessary
+	for(var i=0; i<myForce.nodes().length; i++){
+		idx =  findNodeIdx(graph.nodes, myForce.nodes()[i].id);
+		for(var key in graph.nodes[idx]){
+			if(key != "target" && key != "source"){
+				myForce.nodes()[i][key] = graph.nodes[idx][key];
+			}
+		}
+	};
+	
+	//Add new links to graph
+	for(var i=0; i<graph.links.length; i++){
+		var sourceId = graph.links[i].source.id,
+			targetId = graph.links[i].target.id;
+		
+		var linkIdx = findLinkIdx(myForce.links(), sourceId, targetId);
+		if(linkIdx == -1){
+			var sourceIdx = findNodeIdx(myForce.nodes(),sourceId);
+			var targetIdx = findNodeIdx(myForce.nodes(),targetId);
+		
+			if (sourceIdx != -1 && targetIdx != -1){
+				var new_link = JSON.parse(JSON.stringify(graph.links[i])); // Pass deep copy of the object.
+				new_link.source = myForce.nodes()[sourceIdx];
+				new_link.target = myForce.nodes()[targetIdx];
+				myForce.links().push(new_link);
+			};
+		};
+	};
+	
+	
+	//Remove old links from graph
+	for(var i=0; i<myForce.links().length; i++){
+		var sourceId = myForce.links()[i].source.id,
+			targetId = myForce.links()[i].target.id;
+		
+		linkIdx = findLinkIdx(graph.links, sourceId, targetId);
+		if(linkIdx == -1){
+			myForce.links().splice(i,1);
+			i--;
+		};
+	};
+};
+
+function findNodeIdx(nodeArr, id){
+	for(var i=0; i<nodeArr.length; i++){
+		if(nodeArr[i].id == id){
+			return i;
+		};
+	};
+	return -1;
+};
+
+function findLinkIdx(linkArr, sourceId, targetId){
+	for (var i=0; i<linkArr.length; i++){
+		if (linkArr[i].source.id == sourceId && linkArr[i].target.id == targetId){
+		return i;
+		};
+	};
+	return -1;
+}
+
+///// Update visual attention /////
+// Update current time and step
+function updateTime(n){
+	var time = document.getElementById("time");
+	var current_time = "t: " + step;
+	switch(n){
+		case 0:
+			current_time += " -> Deploy attention.";
+			break;
+		case 1:
+			current_time += " -> Perceive region.";
+			break;
+		case 2:
+			current_time += " -> Invoke and process constructions.";
+			break;
+		case 3:
+			current_time += " -> Update phonologicalWM.";
+			break;
+		case 4:
+			current_time += " -> Generate utterance.";
+			break;
+	}
+	time.innerHTML = current_time;
+	updateWMTime();
+}
+
+
+////// Update time in WM //////
+function updateWMTime() {
+	d3.select("#SR_title")
+		.text("Semantic WM (t" + step +")");
+	
+	d3.select("#gWM_title")
+		.text("Grammatical WM (t" + step +")");
+		
+	d3.select("#phonWM_title")
+		.text("Phonological WM (t" + step +")");
+		
+	d3.select("#utter_title")
+		.text("Utterance (t" + step +")");
+};
+
+
+// Update focus of attention display on scene image.
+function updateFocus(){
+	var highlight_masks = document.getElementsByClassName("highlight_mask");
+	for(var i=0; i<highlight_masks.length; i++){
+		highlight_masks[i].setAttribute("class", "mask");
+	};
+	var masks = document.getElementsByClassName("mask");
+	var region_name = data.states[step].current_attention.name;
+	for(var i=0; i<masks.length; i++){
+		if(masks[i].id == region_name){
+			masks[i].setAttribute("class", "highlight_mask");
+		}
+		else{
+			masks[i].setAttribute("class", "mask");
+		}
+	}
+	
+	var focus = document.getElementById("focus");
+	// get saliency
+	var saliency = 0;
+	for(var i=0; i<scene["regions"].length; i++){
+		if(scene["regions"][i]["name"] == region_name){
+			saliency = scene["regions"][i]["saliency"];
+			break;
+		}
+	}
+	focus.innerHTML = "Current focus: " + region_name + " (saliency: " + saliency + ", uncertainty: " + data.states[step].current_attention.uncertainty + ")";
+}
+
+////// Update phonWM //////
+function updatePhonWM() {
+	var phon = data.states[step].phonologicalWM;
+	d3.select("#phonWM_content")
+		.text("["+ phon.join(", ")+"]");
+};
+
+////// Update utterance //////
+function updateUtter() {
+	var utterance = data.states[step].produced_utterance;
+	d3.select("#utter_content")
+		.text(utterance);
+};
+
+////// Update assemblages //////
+function updateAssemblages() {
+	d3.selectAll(".an_assemblage").remove();
+	
+	var assemblages = data.states[step].grammaticalWM.assemblages;
+	var assemblages_div  = d3.select("#assemblages");
+	for(var i=0; i< assemblages.length; i++){
+		var aClass = "";
+		if(assemblages[i].winner){
+			aClass = "an_assemblage winner";
+		}
+		else if(assemblages[i].valid){
+			aClass = "an_assemblage valid";
+		}
+		else{
+			aClass = "an_assemblage invalid";
+		}
+		assemblages_div.append("div")
+			.attr("id", "assemblage_" + i)
+			.attr("class", aClass)
+			.text("Assemblage_" + i + " ("+ assemblages[i].suit + "): " + assemblages[i].tree)
+			.attr("onmouseover", "show_assemblage("+i+")")
+			.attr("onmouseout", "hide_assemblage()");
+	}
+};
+
+////// Callback functions //////
+function next_t() {
+	if (step < (data.states.length - 1)) {
+		step += 1;
+		updateState(-1);
+	};
+};
+
+function prev_t() {
+	if (step > 0) {
+		step -= 1;
+		updateState(-1);
+	};
+};
+function nextStep() {
+	if(sub_state<4){
+		sub_state += 1;
+		updateState(sub_state);
+	}
+	else{
+		if(step < (data.states.length - 1)){
+			step += 1;
+			sub_state = 0;
+			updateState(sub_state);
+		};
+	};
+};
+
+function restart() {
+	step = 0;
+	sub_state = 0;
+	updateTime(sub_state);
+	updateFocus();
+	updateSemRep();
+	updateGramWM();
+	updateAssemblages();
+	updatePhonWM();
+	updateUtter();
+	d3.select("#play")
+		.attr("onclick", "start_play()")
+		.text("play");
+	pause();
+};
+
+function start_play(){
+	is_pause = false;
+	d3.select("#play")
+		.attr("onclick", "pause()")
+		.text("pause");
+	play();
+};
+
+function play(){
+	if(step <= (data.states.length - 1) && is_pause == false){
+		nextStep();
+		setTimeout(function(){play()}, speed);
+	};
+};
+
+function pause(){
+	is_pause = true;
+	d3.select("#play")
+		.attr("onclick", "start_play()")
+		.text("play");
+};
+
+
+function show_cover(element){
+	var idx = findNodeIdx(gramWM.nodes,element.id);
+	var covers = gramWM.nodes[idx].covers;
+	for(var i=0; i<covers.SRnodes.length; i++){
+		var node = document.getElementById(covers.SRnodes[i]);
+		node.setAttribute("class", "node " + " highlight");
+	};
+};
+
+function hide_cover(){
+	SemRep_visUpdate();
+};
+
+function show_assemblage2(idx){
+	d3.selectAll(".cxn_node")
+		.attr("class", "cxn_node hide");
+	d3.selectAll(".cxn_link")
+		.attr("class", "cxn_link hide")
+		.attr("marker-end", "none");
+	d3.selectAll(".cxn_text")
+		.attr("class", "cxn_text hide");
+		
+	var node_list = data.states[step].grammaticalWM.assemblages[idx].cxn_inst;
+	for(var i=0; i<node_list.length; i++){
+		for(var j=i; j<node_list.length; j++){
+			var cxn_node1 = document.getElementById(node_list[i]);
+			var idx2 = findNodeIdx(gramWM.nodes, cxn_node1.id);
+			cxn_node1.setAttribute("class", "cxn_node " + "fresh_" + gramWM.nodes[idx2].fresh + " alive_" + gramWM.nodes[idx2].alive + " old_" + gramWM.nodes[idx2].old + " active_" + gramWM.nodes[idx2].active);
+			var cxn_text1 = document.getElementById("cxn_text_" + cxn_node1.id);
+			cxn_text1.setAttribute("class", "cxn_text");
+			show_cover(cxn_node1);
+			var cxn_node2 = document.getElementById(node_list[j]);
+			link = document.getElementById(cxn_node1.id+"_"+cxn_node2.id);
+			if(link){
+				link.setAttribute("class", "cxn_link cooperation");
+				link.setAttribute("marker-end", "url(#arrow)");
+			};
+			link = document.getElementById(cxn_node2.id+"_"+cxn_node1.id);
+			if(link){
+				link.setAttribute("class", "cxn_link cooperation");
+				link.setAttribute("marker-end", "url(#arrow)");
+			};
+		}
+	}
+}
+
+function show_assemblage(idx){
+	d3.selectAll(".cxn_node")
+		.attr("class", "cxn_node hide");
+	d3.selectAll(".cxn_link")
+		.attr("class", "cxn_link hide")
+		.attr("marker-end", "none");
+	d3.selectAll(".cxn_text")
+		.attr("class", "cxn_text hide");
+		
+	var node_list = data.states[step].grammaticalWM.assemblages[idx].cxn_inst;
+	for(var i=0; i<node_list.length; i++){
+		var cxn_node = document.getElementById(node_list[i]);
+		var idx2 = findNodeIdx(gramWM.nodes, cxn_node.id);
+		cxn_node.setAttribute("class", "cxn_node " + "fresh_" + gramWM.nodes[idx2].fresh + " alive_" + gramWM.nodes[idx2].alive + " old_" + gramWM.nodes[idx2].old + " active_" + gramWM.nodes[idx2].active);
+		var cxn_text = document.getElementById("cxn_text_" + cxn_node.id);
+		cxn_text.setAttribute("class", "cxn_text");
+		show_cover(cxn_node);
+	};
+	
+	var top_inst = document.getElementById(data.states[step].grammaticalWM.assemblages[idx].top);
+	top_inst.setAttribute("class", "cxn_node highlight");
+	
+	var link_list = data.states[step].grammaticalWM.assemblages[idx].links;
+	for(var i=0; i<link_list.length; i++){
+		var link = document.getElementById(link_list[i].source.id+"_"+link_list[i].target.id);
+		link.setAttribute("class", "cxn_link cooperation");
+		link.setAttribute("marker-end", "url(#arrow)");
+	}
+}
+
+function hide_assemblage(){
+	gramWM_visUpdate();
+	SemRep_visUpdate();
+};
+</script>
+
+</body>
+</html>
