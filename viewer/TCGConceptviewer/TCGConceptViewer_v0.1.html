@@ -1,54 +1,11 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-body{
-	width: 5000px;
-	font-family: consolas;
-}
-
-#cpt_net{
-	border: 1px solid;
-	border-radius: 5px;
-}
-
-.node{
-  stroke: #fff;
-  stroke-width: 1.5px;
-  fill: coral;
-}
-
-.link{
-  stroke: #999;
-  stroke-opacity: .6;
-}
-
-.node_text{
-	font-size: 12px;
-	fill: black;
-}
-
-.level{
-	margin: 10px
-}
-
-.concept{
-	background-color: WhiteSmoke;
-	float: left;
-	margin: 10px;
-	font-weight: bold;
-	border: 1px solid;
-}
-
-.name{
-	text-align: center;
-}
-
-</style>
 
 <html>
 <head>
 <title> TCG WK </title>
 <link rel="shortcut icon", href="../TCG.ico">
+<link rel="stylesheet" href="./TCGConceptViewer.css" type="text/css">
 </head>
 <div id="title">
 <img src="../TCG.ico" alt="TCG icon" style="width:50px;height:50px", align="left">
@@ -64,7 +21,7 @@ body{
 </div>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="./js/d3/d3.min.js"></script>
+<script src="../js/d3/d3.min.js"></script>
 
 <script>
 var width = 1200;

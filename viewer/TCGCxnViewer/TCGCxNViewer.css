@@ -1,0 +1,29 @@
+body{
+	width: 600px;
+	font-family: consolas;
+}
+
+#grammar_size{
+	font-weight : bold;
+	font-size: 12pt;
+}
+
+.cxn {
+	color: black;
+	margin: 20px;
+	font-size:10pt;
+	background-color: #90EE90;
+}
+.cxn_name{
+	font-weight : bold;
+	font-size: 12pt;
+}
+
+.cxn_details{
+	margin-left: 10px;
+}
+
+.cxn_data{
+	margin-left: 10px;
+	background-color: #DDFFDD;
+}

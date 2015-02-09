@@ -1,0 +1,61 @@
+#title{
+	height: 50px;
+	font-family: consolas;
+}
+
+#scene_pic{
+	width: 600px;
+	border: 1px;
+	float: left;
+}
+
+#scene_regions{
+	width: 600px;
+	border: 10px;
+	margin-left: 10px;
+	float: left;
+}
+
+.section_title{
+	font-weight: bold;
+	font-size: 12pt;
+}
+
+.reg{
+	margin: 20px;
+	font-size:10pt;
+	background-color: #9090EE;
+}
+
+.highlight_reg{
+	margin: 20px;
+	font-size:10pt;
+	background-color: #5050EE;
+}
+
+.reg_name{
+	font-weight: bold;
+}
+
+.reg_details{
+	margin-left: 10px;	
+}
+
+.reg_data{
+	margin-left: 10px;
+	background-color: #DDDDFF;
+}
+
+.mask{
+	position: absolute;
+	background-color: blue;
+	opacity: 0.2;
+	border-radius: 100px;
+}
+
+.highlight_mask{
+	position: absolute;
+	background-color:  blue;
+	opacity: 0.4;
+	border-radius: 100px;
+}
