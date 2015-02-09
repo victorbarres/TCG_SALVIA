@@ -12,21 +12,16 @@ import sys
 
 import json
 
-import loader_json as LDJS
+import loader as LD
 import simulator as SIM
 import instance as INST
 import construction as CXN
 
-TCG_ABOUT = "Template Construction Grammar (TCG) Simulator v1.0\n\
+TCG_ABOUT = "Template Construction Grammar (TCG) Simulator v1.1\n\
 \n\
 Victor Barres (barres@usc.edu) May 14. 2014\n\
 USC Brain Project and  Neuroscience Graduate Program\n\
-University of Southern California (USC)\n\
-[PYTHON reimplementation of C++ code:\n\
-\tTemplate Construction Grammar (TCG) Simulator v2.5\n\
-\tJinyong Lee (jinyongl@usc.edu), June 23. 2012\n\
-\tUSC Brain Project, Computer Science Department\n\
-\tUniversity of Southern California (USC)]\n"
+University of Southern California (USC)\n"
 
 
 def print_inst_status(sc_inst):
@@ -336,13 +331,13 @@ def load_init_file(file_name, sim):
     
     okay = False
     p += "Loading Semantic Network '%s'...\n" % fields['semantics file']
-    mySemNet = LDJS.load_SemNet(fields['semantics file'])
+    mySemNet = LD.load_SemNet(fields['semantics file'])
     if mySemNet:
         p += "Loading TCG Grammar '%s'...\n" % fields['grammar file']
-        myGrammar = LDJS.load_grammar(fields['grammar file'])
+        myGrammar = LD.load_grammar(fields['grammar file'])
         if myGrammar:
             p += "Loading TCG Scene '%s'...\n" % fields['scene file']
-            myScene = LDJS.load_scene(fields['scene file'])
+            myScene = LD.load_scene(fields['scene file'])
             if myScene:
                 okay = True
     

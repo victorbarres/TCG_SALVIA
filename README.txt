@@ -19,3 +19,8 @@ Main changes:
 	The viewer runs in the browser.
 	To see output of computation: localhost:8080
 
+#############
+### TO DO ###
+
+- Make sure all the scenes are available in json format.
+
