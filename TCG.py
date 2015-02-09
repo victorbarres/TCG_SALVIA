@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue May 13 15:02:26 2014
+Created on Tue Oct 08 2014
 
 @author: Victor Barres
 
-Define main() function and output printing functions for TCG1.0
+Define main() function and output printing functions for TCG1.1
+Adds a JSON output that can interface with the TCG_viewer.
+Use the JSON formatted inputs.
 """
 import sys
 
-import loader as LD
+import json
+
+import loader_json as LDJS
 import simulator as SIM
 import instance as INST
 import construction as CXN
@@ -141,15 +145,24 @@ def print_region(rgn):
 
 def print_current_state(sim):
     """
-    Print the current simulator state.
+    Print and saves the current simulator state.
     """
+    json_data = {}
     p = ''
+    
     p += ''.join(["=" for i in range(80)]) + "\n"
     p += " Simulation Time: %i\n" % sim.time
     p += ''.join(["=" for i in range(80)]) + "\n"
     
+    json_data['time'] = sim.time
+    
     p += "> Current Attention\n"
     p += "  %s\n" % print_region(sim.atten)
+    
+    if(sim.atten):
+        json_data['current_attention'] = {'name':sim.atten.name, 'uncertainty':sim.atten.uncertainty}
+    else:
+        json_data['current_attention'] = {'name':None, 'uncertainty':None}
     
     if len(sim.per_regions) > 0:
         p += "> Perceived Regions\n"
@@ -160,6 +173,15 @@ def print_current_state(sim):
             p += rgn.name
         p += "\n\n"
     
+    json_data['perceived_region'] = " ".join([rgn.name for rgn in sim.per_regions])
+    
+    json_data['semanticWM'] = {}
+    json_data['semanticWM']['SRnodes'] = []
+    json_data['semanticWM']['SRlinks'] = []
+    json_data['grammaticalWM'] = {}
+    json_data['grammaticalWM']['cxn_inst'] = []
+    json_data['grammaticalWM']['links'] = []
+    
     if len(sim.instances) > 0:
         p += "> Schema Instances\n"
         for sc_inst in sim.instances:
@@ -168,21 +190,29 @@ def print_current_state(sim):
             if sc_inst.type == INST.SCHEMA_INST.NODE:
                 p += "SemRep-N "
                 p += "%s\n" % print_semrep_inst(sc_inst)
+                
+                json_data['semanticWM']['SRnodes'].append({'id':print_semrep_inst(sc_inst), "act": 50, 'fresh':sc_inst.fresh, 'alive':sc_inst.alive, 'active':sc_inst.activation>0, 'old':sc_inst.old}) # The current version does not incorporate the difference between object, action, and attribute nodes
             
             elif sc_inst.type == INST.SCHEMA_INST.RELATION:
+                new_rel = {'id':print_semrep_inst(sc_inst), 'source':{'id':''}, 'target':{'id':''}, 'fresh':sc_inst.fresh, 'alive':sc_inst.alive, 'active':sc_inst.activation>0, 'old':sc_inst.old}
                 p += "SemRep-R "
                 p += print_semrep_inst(sc_inst)
                 p += " from "
                 if sc_inst.pFrom:
                     p += print_semrep_inst(sc_inst.pFrom)
+                    new_rel['source']['id'] = print_semrep_inst(sc_inst.pFrom)
                 else:
                     p += "??"
+                    new_rel['source']['id'] = "??"
                 p += " to "
                 if sc_inst.pTo:
                     p += print_semrep_inst(sc_inst.pTo)
+                    new_rel['target']['id'] = print_semrep_inst(sc_inst.pTo)
                 else:
                     p += "??"
+                    new_rel['target']['id'] = "??"
                 p += "\n"
+                json_data['semanticWM']['SRlinks'].append(new_rel)
             
             elif sc_inst.type == INST.SCHEMA_INST.CONSTRUCTION:
                 p += "Construction "
@@ -192,16 +222,38 @@ def print_current_state(sim):
                     p += print_semrep_inst(sc_inst.covers[i])
                     p += " "
                 p += "for %s\n" % print_cxn_struct(sc_inst.cxn_struct, sc_inst, False)
-            
-        p += "\n"
+                
+                covered_nodes = [print_semrep_inst(sc_inst.covers[i]) for i in range(len(sc_inst.covers)) if sc_inst.covers[i].type == INST.SCHEMA_INST.NODE]
+                covered_links = [print_semrep_inst(sc_inst.covers[i]) for i in range(len(sc_inst.covers)) if sc_inst.covers[i].type == INST.SCHEMA_INST.RELATION]                
+                
+                json_data['grammaticalWM']['cxn_inst'].append({'id':print_cxn_inst(sc_inst), 'covers':{'SRnodes':covered_nodes, 'SRlinks':covered_links}, 'fresh':sc_inst.fresh, 'alive':sc_inst.alive, 'active':sc_inst.activation>0, 'old':sc_inst.old})
+                                
+                cxn_str_list = [cxn_str for cxn_str in sim.cxn_strs if cxn_str.check_membership(cxn=sc_inst)]
+                for i in range(len(sc_inst.base_cxn.SynForm)):
+                    TpSynElem = sc_inst.base_cxn.SynForm[i]
+                    for cxn_str in cxn_str_list:
+                        if TpSynElem.type == CXN.TP_ELEM.SLOT:
+                            if cxn_str:
+                                child = cxn_str.get_child(sc_inst, i)
+                            else:
+                                child = None                    
+                            if child:
+                                    json_data['grammaticalWM']['links'].append({'source':{'id':print_cxn_inst(sc_inst)}, 'target':{'id':print_cxn_inst(child)}})
+            p += "\n"
+    
+    json_data['grammaticalWM']['competitions'] = []
     
     if len(sim.comp_traces) > 0:
         p += "> Competition traces\n"
         for comp_tr in sim.comp_traces:
             p += "  %s (%i) " % (print_cxn_inst(comp_tr.winner), comp_tr.winSuit)
             p += "eliminated %s (%i)\n" % (print_cxn_inst(comp_tr.loser), comp_tr.losSuit)
+            
+            json_data['grammaticalWM']['competitions'].append({'source':{'id':print_cxn_inst(comp_tr.winner)} , 'target':{'id':print_cxn_inst(comp_tr.loser)}})
         
         p += "\n"
+    
+    json_data['grammaticalWM']['assemblages'] = []    
     
     if len(sim.cxn_strs) > 0:
         p += "> Construction Structures\n"
@@ -209,15 +261,26 @@ def print_current_state(sim):
             p += print_struct_status(cxn_str, sim.rd_str)
             p += print_cxn_struct(cxn_str, cxn_str.top, True)
             p += "\n"
+            
+            json_data['grammaticalWM']['assemblages'].append({'suit':cxn_str.suitability, 'cxn_inst':[print_cxn_inst(inst) for inst in cxn_str.insts], 'links':[{'source':{'id':print_cxn_inst(str_link.parent)}, 'target':{'id':print_cxn_inst(str_link.child)}} for str_link in cxn_str.links], 'top': print_cxn_inst(cxn_str.top), 'tree':print_cxn_struct(cxn_str, cxn_str.top, True), 'valid':cxn_str.valid, 'winner':(sim.rd_str.compare(cxn_str) == 3)})
+            
         p += "\n"
+    
+    json_data['phonologicalWM'] = [phon.phonetics for phon in sim.rd_phons]
+    json_data['produced_utterance'] = sim.utter    
     
     if len(sim.utter) > 0:
         p += "> Produced Utterance\n"
         p += "'%s'\n\n" % sim.utter
-        
+     
+    if(sim.next_atten):
+        json_data['next_attention'] = sim.next_atten.name
+    else:
+        json_data['next_attention'] = None
+    
     p += "> Next Attention\n"
     p += "  %s\n" % print_region(sim.next_atten)
-    return p
+    return (p, json_data)
 
 def load_init_file(file_name, sim):
     """
@@ -228,6 +291,8 @@ def load_init_file(file_name, sim):
         - sim (SIMULATOR): simulator to initialize.
     """
     p = ''
+    json_data = {}
+    
     p += "Loading Initialization File '%s' ...\n" % file_name
     
     try:
@@ -269,17 +334,15 @@ def load_init_file(file_name, sim):
         p += "\nInput file name missing.\n"
         return (False, p)
     
-    lod = LD.LOADER()
-    
     okay = False
     p += "Loading Semantic Network '%s'...\n" % fields['semantics file']
-    mySemNet = lod.load_SemNet(fields['semantics file'])
+    mySemNet = LDJS.load_SemNet(fields['semantics file'])
     if mySemNet:
         p += "Loading TCG Grammar '%s'...\n" % fields['grammar file']
-        myGrammar = lod.load_grammar(fields['grammar file'])
+        myGrammar = LDJS.load_grammar(fields['grammar file'])
         if myGrammar:
             p += "Loading TCG Scene '%s'...\n" % fields['scene file']
-            myScene = lod.load_scene(fields['scene file'])
+            myScene = LDJS.load_scene(fields['scene file'])
             if myScene:
                 okay = True
     
@@ -300,14 +363,18 @@ def load_init_file(file_name, sim):
         verb_guide = bool(int(fields['verbal guidance']))
     except:
         p += "\nInvalid simulator parameter.\n"
-        return (False, p)
+        return (False, p, json_data)
     
     sim.initialize(myGrammar, myScene, mySemNet, max_time, thresh_time, thresh_cxn, thresh_syll, prem_prod, utter_cont, verb_guide)
-                   
+      
     p += "- Max Simulation Time : %i\n" % sim.max_time
+    json_data['max_simulation_time'] = sim.max_time
     p += "- Premature Production : %s\n" % sim.prema_prod
+    json_data['premature_production'] = sim.prema_prod
     p += "- Utterance Continuity : %s\n" % sim.utter_cont
+    json_data['utterance_continuity'] = sim.utter_cont
     p += "- Verbal Guidance : %s\n" % sim.verb_guide
+    json_data['verbal_guidance'] = sim.verb_guide
     p += "- Threshold of Utterance : "
     t = ['', '', '']
     i = 0
@@ -319,14 +386,40 @@ def load_init_file(file_name, sim):
         
         i +=1
     p += "Time = %s, CXNs = %s, Syllables = %s\n" % (t[0], t[1], t[2])
+    json_data['utterance_threshold'] = {'time':sim.thresh_time, 'cxns':sim.thresh_cxn, 'syllables':sim.thresh_syll}
     
-    return (True, p)
+    return (True, p, json_data)
+    
+def viewer_setup():
+    """
+    Setting up server at port PORT serving the viewer folder and opens default browswer to "http://localhost:PORT"
+    """
+    import os
+    import SimpleHTTPServer
+    import SocketServer
+    
+    import webbrowser
+   
+    curdir = os.getcwd()
+    os.chdir(curdir  + "/viewer/")
+
+    PORT = 8080
+
+    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+
+    httpd = SocketServer.TCPServer(("", PORT), Handler)
+
+    print "serving at port", PORT
+    webbrowser.open_new("http://localhost:" + str(PORT))
+    httpd.serve_forever()
 
 def main():
     """
     Run simulation
     """
     p = ''
+    json_data = {}
+    
     p += "\n%s\n" % TCG_ABOUT
     if len(sys.argv) != 2:
         p += "Usage: python TCG.py [file.ini]\n"
@@ -339,16 +432,19 @@ def main():
     load_res = load_init_file(sys.argv[1], mySim)
     print load_res[1]
     p += load_res[1]
+    json_data['parameters'] = load_res[2]
     flag = load_res[0]
     if not(flag):
         return p
     
     # Simulation
     p += "\nBeginning Simulation...\n"
+    json_data['states'] = []
     while (mySim.proceed(verbose = False)):
         state_report = print_current_state(mySim)
-        print state_report
-        p += state_report
+        print state_report[0]
+        p += state_report[0]
+        json_data['states'].append(state_report[1])
     
     p += "\nSimulation complete: "
     if mySim.time < mySim.max_time:
@@ -357,11 +453,14 @@ def main():
         p += "max time reached."
     p += "\n"
     
-    return p
+    return (p, json_data)
     
+############################################################################### 
 if __name__=='__main__':
     out = main()
-#    f = open('output.txt', 'w')
-#    f.write(out)
-#    f.close()
-
+    with open('viewer\TCG_output.txt', 'w') as f:
+        f.write(out[0])
+    with open('viewer\TCG_output.json', 'wb') as fp:
+        json.dump(out[1],fp, sort_keys=True, indent=4, separators=(',', ': '))
+    
+    viewer_setup()
