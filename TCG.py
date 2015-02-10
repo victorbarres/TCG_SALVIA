@@ -387,7 +387,7 @@ def load_init_file(file_name, sim):
     
 def viewer_setup():
     """
-    Setting up server at port PORT serving the viewer folder and opens default browswer to "http://localhost:PORT"
+    Setting up server at port PORT serving the viewer folder and opens default browser to "http://localhost:PORT"
     """
     import os
     import SimpleHTTPServer
@@ -453,9 +453,9 @@ def main():
 ############################################################################### 
 if __name__=='__main__':
     out = main()
-    with open('viewer\TCG_output.txt', 'w') as f:
+    with open('viewer\tmp\TCG_output.txt', 'w') as f:
         f.write(out[0])
-    with open('viewer\TCG_output.json', 'wb') as fp:
+    with open('viewer\tmp\TCG_output.json', 'wb') as fp:
         json.dump(out[1],fp, sort_keys=True, indent=4, separators=(',', ': '))
     
     viewer_setup()

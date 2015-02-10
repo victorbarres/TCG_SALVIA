@@ -18,6 +18,7 @@
 
 <script>
 //My data
+data_folder = "../tmp/"
 var grammar = {};
 
 function AJAX_JSON_Req(url){
@@ -38,7 +39,7 @@ function AJAX_JSON_Req(url){
 	AJAX_req.send()
 }
 
-AJAX_JSON_Req("../TCG_grammar.json");
+AJAX_JSON_Req(data_folder + "TCG_grammar.json");
 
 var size_section = document.getElementById("grammar_size");
 var disp_section = document.getElementById("cxn_display");

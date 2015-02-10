@@ -21,6 +21,7 @@
 <script>
 
 //My data
+data_folder = "../tmp/"
 var scene= {};
 var scale = 0;
 
@@ -44,7 +45,7 @@ function AJAX_JSON_Req(url){
 	AJAX_req.send()
 }
 
-AJAX_JSON_Req("../TCG_scene.json");
+AJAX_JSON_Req(data_folder + "TCG_scene.json");
 
 function dispSceneImage(){
 	var scene_div = document.getElementById("scene_pic");
@@ -58,7 +59,7 @@ function dispSceneImage(){
 	scene_image.setAttribute("id", "img");
 	scene_div.appendChild(scene_image);
 	var image = document.createElement("img");
-	image.setAttribute("src", "../" + scene.image);
+	image.setAttribute("src", data_folder + scene.image);
 	image.setAttribute("width", scene.resolution[0]*scale + "px");
 	image.setAttribute("height", scene.resolution[1]*scale + "px");
 	scene_image.appendChild(image);

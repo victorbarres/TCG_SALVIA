@@ -1,5 +1,5 @@
 { "scene" : {
-	"image": "woman_hits_man.jpg",
+	"image": "none",
 	"resolution": [400, 326],
 	"regions" : [
 					{
@@ -50,7 +50,7 @@
 						"size" : [80,180],
 						"saliency" : 50,
 						"uncertainty" :1,
-						"schemas" : [{"name" : "HANDSOME", "type" : "OBJ", "concept" : "HANDOME"},
+						"schemas" : [{"name" : "HANDSOME", "type" : "OBJ", "concept" : "HANDSOME"},
 									{"name" : "HANDSOME_MODIFY", "type" : "REL", "concept" : "MODIFY", "from" : "HANDOME", "to" : "MAN"}],
 									
 						"perceive" : ["HANDSOME", "HANDSOME_MODIFY"]

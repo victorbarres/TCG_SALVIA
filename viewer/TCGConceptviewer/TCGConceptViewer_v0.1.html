@@ -24,6 +24,7 @@
 <script src="../js/d3/d3.min.js"></script>
 
 <script>
+data_folder = "../tmp/"
 var width = 1200;
 var height = 700;
 
@@ -77,7 +78,7 @@ function AJAX_JSON_Req(url){
 	AJAX_req.send()
 }
 
-AJAX_JSON_Req("../TCG_semantics.json");
+AJAX_JSON_Req(data_folder + "TCG_semantics.json");
 
 function disp_knowledge(concepts, element, level){
 	var new_level = document.createElement("div");

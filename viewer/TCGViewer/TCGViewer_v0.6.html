@@ -16,15 +16,15 @@
 
 <div id="links">
 <div id="grammar", class="model_inputs">
-<a href="./TCGCxNViewer_v0.1.html" target="popup" onclick="window.open('../TCGCxNViewer/','Grammar Viewer')"> View constructions </a>
+<a href="../TCGCxNViewer/" target="popup" onclick="window.open('../TCGCxNViewer/','Grammar Viewer')"> View constructions </a>
 </div>
 
 <div id="scene_input", class="model_inputs">
-<a href="./TCGSceneViewer_v0.1.html" target="popup" onclick="window.open('../TCGSceneViewer/', 'Scene Viewer')"> View input scene </a>
+<a href="../TCGSceneViewer/" target="popup" onclick="window.open('../TCGSceneViewer/', 'Scene Viewer')"> View input scene </a>
 </div>
 
 <div id="concept_knowledge", class="model_inputs">
-<a href="./TCGConceptViewer_v0.1.html" target="popup" onclick="window.open('../TCGConceptViewer/', 'Concept Viewer')"> View conceptual knowledge </a>
+<a href="../TCGConceptViewer/" target="popup" onclick="window.open('../TCGConceptViewer/', 'Concept Viewer')"> View conceptual knowledge </a>
 </div>
 <div id="change_view">
 <a href="../TCGViewerText/">Simple text viewer</a>
@@ -47,6 +47,7 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="../js/d3/d3.min.js"></script>
 <script>
+data_folder = "../tmp/"
 var width=400,
 	height=300;
 
@@ -203,14 +204,14 @@ function AJAX_JSON_Req(url){
 
 function dispSceneImage(){
 	var scene_img = document.getElementById("img");
-	scene_img.setAttribute("src", "../" + scene.image);
+	scene_img.setAttribute("src", data_folder + scene.image);
 	var scene_name = document.getElementById("scene_name");
 	var name = document.createElement("p");
 	name.innerHTML = "Scene name: " + scene.image;
 	scene_name.appendChild(name);
 }
 
-AJAX_JSON_Req("../TCG_scene.json");
+AJAX_JSON_Req(data_folder + "TCG_scene.json");
 
 function create_masks(){
 	var scene_pic = document.getElementById("scene_pic");
@@ -292,7 +293,7 @@ var SemRep = {nodes:[], links:[]};
 var gramWM = {nodes:[], links:[]}
 
 //Load state data
-d3.json("../TCG_output.json", function(jsonData) {
+d3.json(data_folder + "TCG_output.json", function(jsonData) {
 	data = jsonData;
 	disp_param();
 	updateState(step, sub_state);

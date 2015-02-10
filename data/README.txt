@@ -16,6 +16,7 @@ TCG GRAMMAR:
 	SymLinks are clearly defined as a set of relations between nodes and slots (partial function).
 
 3. JSON validation schema for constructions defined in "cxn_schema.json"
+	TO DO -> FINISH VALIDATION SCHEMAS!
 
 4. The phon feature of a PHON SynForm element of a construction might be better defined as an ARRAY of PHONEMES or SYLLABLES 
 	so that the length of an utterance can be easily captured.

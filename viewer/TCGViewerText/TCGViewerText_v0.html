@@ -16,15 +16,15 @@
 
 <div>
 <div id="grammar", class="model_inputs">
-<a href="./TCGCxNViewer_v0.html" target="popup" onclick="window.open('../TCGCxNViewer/','Grammar Viewer')"> View constructions </a>
+<a href="../TCGCxNViewer/" target="popup" onclick="window.open('../TCGCxNViewer/','Grammar Viewer')"> View constructions </a>
 </div>
 
 <div id="scene_input", class="model_inputs">
-<a href="./TCGSceneViewer_v0.1.html" target="popup" onclick="window.open('../TCGSceneViewer/', 'Scene Viewer')"> View input scene </a>
+<a href="../TCGSceneViewer/" target="popup" onclick="window.open('../TCGSceneViewer/', 'Scene Viewer')"> View input scene </a>
 </div>
 
 <div id="concept_knowledge", class="model_inputs">
-<a href="./TCGConceptViewer_v0.1.html" target="popup" onclick="window.open('../TCGConceptViewer/', 'Concept Viewer')"> View conceptual knowledge </a>
+<a href="../TCGConceptViewer/" target="popup" onclick="window.open('../TCGConceptViewer/', 'Concept Viewer')"> View conceptual knowledge </a>
 </div>
 </div>
 <div>
@@ -34,6 +34,7 @@
 <div id="text_viewer"></div>
 
 <script>
+data_folder = "../tmp/"
 // Load and display text data
 function AJAX_JSON_Req(url){
 	var AJAX_req = new XMLHttpRequest();
@@ -51,7 +52,7 @@ function AJAX_JSON_Req(url){
 	
 };
 
-AJAX_JSON_Req("../TCG_output.txt");
+AJAX_JSON_Req(data_folder + "TCG_output.txt");
 </script>
 
 </body>
