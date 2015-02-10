@@ -1,4 +1,9 @@
 {
+    "inputs": {
+        "grammar_file": "data\\grammars\\TCG_grammar.json",
+        "scene_file": "data\\scenes\\scene_cholita.json",
+        "semantics_file": "data\\semantics\\TCG_semantics.json"
+    },
     "parameters": {
         "max_simulation_time": 20,
         "premature_production": true,

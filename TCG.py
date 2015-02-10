@@ -286,8 +286,9 @@ def load_init_file(file_name, sim):
         - sim (SIMULATOR): simulator to initialize.
     """
     p = ''
-    json_data = {}
-    
+    json_data_inputs = {}
+    json_data_param = {}
+	
     p += "Loading Initialization File '%s' ...\n" % file_name
     
     try:
@@ -345,6 +346,10 @@ def load_init_file(file_name, sim):
         p += "LOADER ERROR"
         return (False, p)
     
+    json_data_inputs['semantics_file'] = fields['semantics file']
+    json_data_inputs['grammar_file'] = fields['grammar file']
+    json_data_inputs['scene_file'] = fields['scene file']
+	
     # Initialize simulator
     p += "\nInitializing Simulator...\n"
     
@@ -358,18 +363,18 @@ def load_init_file(file_name, sim):
         verb_guide = bool(int(fields['verbal guidance']))
     except:
         p += "\nInvalid simulator parameter.\n"
-        return (False, p, json_data)
+        return (False, p, json_data_inputs, json_data_param)
     
     sim.initialize(myGrammar, myScene, mySemNet, max_time, thresh_time, thresh_cxn, thresh_syll, prem_prod, utter_cont, verb_guide)
       
     p += "- Max Simulation Time : %i\n" % sim.max_time
-    json_data['max_simulation_time'] = sim.max_time
+    json_data_param['max_simulation_time'] = sim.max_time
     p += "- Premature Production : %s\n" % sim.prema_prod
-    json_data['premature_production'] = sim.prema_prod
+    json_data_param['premature_production'] = sim.prema_prod
     p += "- Utterance Continuity : %s\n" % sim.utter_cont
-    json_data['utterance_continuity'] = sim.utter_cont
+    json_data_param['utterance_continuity'] = sim.utter_cont
     p += "- Verbal Guidance : %s\n" % sim.verb_guide
-    json_data['verbal_guidance'] = sim.verb_guide
+    json_data_param['verbal_guidance'] = sim.verb_guide
     p += "- Threshold of Utterance : "
     t = ['', '', '']
     i = 0
@@ -381,9 +386,9 @@ def load_init_file(file_name, sim):
         
         i +=1
     p += "Time = %s, CXNs = %s, Syllables = %s\n" % (t[0], t[1], t[2])
-    json_data['utterance_threshold'] = {'time':sim.thresh_time, 'cxns':sim.thresh_cxn, 'syllables':sim.thresh_syll}
+    json_data_param['utterance_threshold'] = {'time':sim.thresh_time, 'cxns':sim.thresh_cxn, 'syllables':sim.thresh_syll}
     
-    return (True, p, json_data)
+    return (True, p, json_data_inputs, json_data_param)
     
 def viewer_setup():
     """
@@ -427,7 +432,8 @@ def main():
     load_res = load_init_file(sys.argv[1], mySim)
     print load_res[1]
     p += load_res[1]
-    json_data['parameters'] = load_res[2]
+    json_data['inputs'] = load_res[2]
+    json_data['parameters'] = load_res[3]
     flag = load_res[0]
     if not(flag):
         return p
@@ -452,10 +458,28 @@ def main():
     
 ############################################################################### 
 if __name__=='__main__':
+    import shutil
+    
+    data_dir = "./data/"
     out = main()
-    with open('viewer\tmp\TCG_output.txt', 'w') as f:
+    
+    tmp_dir = "./viewer/tmp/"
+    
+    #Copying input files in viewer temp directory
+    shutil.copyfile(out[1]['inputs']['grammar_file'], tmp_dir + "TCG_grammar.json")
+    shutil.copyfile(out[1]['inputs']['semantics_file'], tmp_dir + "TCG_semantics.json")
+    shutil.copyfile(out[1]['inputs']['scene_file'], tmp_dir + "TCG_scene.json")
+    
+    #Copying scene image in viewer temp directory
+    with open(tmp_dir + "TCG_scene.json", 'r') as f:
+        scene_data = json.load(f)
+    img_name = scene_data['scene']['image']
+    shutil.copyfile(data_dir + "scenes/pics/" + img_name, tmp_dir + img_name)
+
+    # Saving outputs
+    with open(tmp_dir + "TCG_output.txt", 'w') as f:
         f.write(out[0])
-    with open('viewer\tmp\TCG_output.json', 'wb') as fp:
-        json.dump(out[1],fp, sort_keys=True, indent=4, separators=(',', ': '))
+    with open(tmp_dir + "TCG_output.json", 'wb') as f:
+        json.dump(out[1],f, sort_keys=True, indent=4, separators=(',', ': '))
     
     viewer_setup()
