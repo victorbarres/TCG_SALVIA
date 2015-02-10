@@ -458,13 +458,41 @@ def main():
     
 ############################################################################### 
 if __name__=='__main__':
-    import shutil
+    import os, shutil
+    from datetime import datetime
     
     data_dir = "./data/"
-    out = main()
-    
+    output_root = "./output/"
     tmp_dir = "./viewer/tmp/"
     
+    out = main()
+    
+    #########################
+    ### Saving to outputs ###
+    #########################
+    #Copying input files in output directory
+    now = datetime.now()
+    output_folder = output_root + now.strftime("%Y-%m-%d(%Hh-%Mm-%Ss)") + "/"
+    os.mkdir(output_folder)
+    shutil.copyfile(out[1]['inputs']['grammar_file'], output_folder + "TCG_grammar.json")
+    shutil.copyfile(out[1]['inputs']['semantics_file'], output_folder + "TCG_semantics.json")
+    shutil.copyfile(out[1]['inputs']['scene_file'], output_folder + "TCG_scene.json")
+    
+    #Copying scene image in output directory
+    with open(output_folder + "/TCG_scene.json", 'r') as f:
+        scene_data = json.load(f)
+    img_name = scene_data['scene']['image']
+    shutil.copyfile(data_dir + "scenes/pics/" + img_name, output_folder + img_name)
+    
+    # Saving simulation outputs in output directory
+    with open(output_folder + "TCG_output.txt", 'w') as f:
+        f.write(out[0])
+    with open(output_folder + "TCG_output.json", 'wb') as f:
+        json.dump(out[1],f, sort_keys=True, indent=4, separators=(',', ': '))
+    
+    ############################
+    ### Saving to viewer tmp ###
+    ############################
     #Copying input files in viewer temp directory
     shutil.copyfile(out[1]['inputs']['grammar_file'], tmp_dir + "TCG_grammar.json")
     shutil.copyfile(out[1]['inputs']['semantics_file'], tmp_dir + "TCG_semantics.json")
@@ -476,7 +504,7 @@ if __name__=='__main__':
     img_name = scene_data['scene']['image']
     shutil.copyfile(data_dir + "scenes/pics/" + img_name, tmp_dir + img_name)
 
-    # Saving outputs
+    # Saving simulation outputs in viewer temp directory
     with open(tmp_dir + "TCG_output.txt", 'w') as f:
         f.write(out[0])
     with open(tmp_dir + "TCG_output.json", 'wb') as f:
