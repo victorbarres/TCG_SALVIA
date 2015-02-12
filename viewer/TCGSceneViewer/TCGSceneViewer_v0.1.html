@@ -36,7 +36,7 @@ function AJAX_JSON_Req(url){
 		{
 			var jsonData = JSON.parse( AJAX_req.responseText);
 			scene = jsonData.scene;
-			scale = 600/scene.resolution[1];
+			scale = 600/scene.resolution[0];
 			dispSceneImage();
 			dispRegions();
 			
@@ -60,8 +60,8 @@ function dispSceneImage(){
 	scene_div.appendChild(scene_image);
 	var image = document.createElement("img");
 	image.setAttribute("src", data_folder + scene.image);
-	image.setAttribute("height", scene.resolution[0]*scale + "px");
-	image.setAttribute("width", scene.resolution[1]*scale + "px");
+	image.setAttribute("width", scene.resolution[0]*scale + "px");
+	image.setAttribute("height", scene.resolution[1]*scale + "px");
 	scene_image.appendChild(image);
 };
 
@@ -173,8 +173,8 @@ function create_masks(){
 	var img = document.getElementById("img");
 	var resolution = scene.resolution;
 	var img_rect = img.getBoundingClientRect();
-	var hfactor = ((img_rect.bottom - img_rect.top)/resolution[0]);
-	var wfactor = ((img_rect.right - img_rect.left)/resolution[1]);
+	var wfactor = ((img_rect.right - img_rect.left)/resolution[0]);
+	var hfactor = ((img_rect.bottom - img_rect.top)/resolution[1]);
 	
 	for(var i=0; i<scene.regions.length; i++){
 		var region = scene.regions[i];
@@ -190,8 +190,8 @@ function create_masks(){
 		mask.style.position = "absolute";
 		mask.style.top = img_rect.top + loc[0]*hfactor+ "px";
 		mask.style.left = img_rect.left +  loc[1]*wfactor + "px";
-		mask.style.height = size[0]*hfactor + "px";
-		mask.style.width = size[1]*wfactor + "px";
+		mask.style.width = size[0]*wfactor + "px";
+		mask.style.height = size[1]*hfactor + "px";
 		mask.setAttribute("onclick", "area_reg_expand(this, mask2reg[this.id])");
 		mask.setAttribute("onmouseover", "highlight_area(this.id)");
 		mask.setAttribute("onmouseout", "reduce_reg(document.getElementById(mask2reg[this.id]))");
