@@ -218,8 +218,8 @@ function create_masks(){
 	var img = document.getElementById("img");
 	var resolution = scene.resolution;
 	var img_rect = img.getBoundingClientRect();
-	var hfactor = ((img_rect.bottom - img_rect.top)/resolution[0]);
-	var wfactor = ((img_rect.right - img_rect.left)/resolution[1]);
+	var wfactor = ((img_rect.right - img_rect.left)/resolution[0]);
+	var hfactor = ((img_rect.bottom - img_rect.top)/resolution[1]);
 	
 	for(var i=0; i<scene.regions.length; i++){
 		var region = scene.regions[i];
@@ -233,8 +233,8 @@ function create_masks(){
 		mask.style.position = "absolute";
 		mask.style.top = img_rect.top + loc[0]*hfactor + "px";
 		mask.style.left = img_rect.left +  loc[1]*wfactor + "px";
-		mask.style.width = size[1]*wfactor + "px";
-		mask.style.height = size[0]*hfactor + "px";
+		mask.style.width = size[0]*wfactor + "px";
+		mask.style.height = size[1]*hfactor + "px";
 	};
 };
 ////////////////////////////////////////

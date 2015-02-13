@@ -460,10 +460,11 @@ def main():
 if __name__=='__main__':
     import os, shutil
     from datetime import datetime
+    from viewer import TCG_VIEWER
     
     data_dir = "./data/"
     output_root = "./output/"
-    tmp_dir = "./viewer/tmp/"
+    viewer_dir = "./viewer/"
     
     out = main()
     
@@ -490,24 +491,8 @@ if __name__=='__main__':
     with open(output_folder + "TCG_output.json", 'wb') as f:
         json.dump(out[1],f, sort_keys=True, indent=4, separators=(',', ': '))
 
-    ############################
-    ### Saving to viewer tmp ###
-    ############################
-    #Copying input files in viewer temp directory
-    shutil.copyfile(out[1]['inputs']['grammar_file'], tmp_dir + "TCG_grammar.json")
-    shutil.copyfile(out[1]['inputs']['semantics_file'], tmp_dir + "TCG_semantics.json")
-    shutil.copyfile(out[1]['inputs']['scene_file'], tmp_dir + "TCG_scene.json")
-    
-    #Copying scene image in viewer temp directory
-    with open(tmp_dir + "TCG_scene.json", 'r') as f:
-        scene_data = json.load(f)
-    img_name = scene_data['scene']['image']
-    shutil.copyfile(data_dir + "scenes/pics/" + img_name, tmp_dir + img_name)
-
-    # Saving simulation outputs in viewer temp directory
-    with open(tmp_dir + "TCG_output.txt", 'w') as f:
-        f.write(out[0])
-    with open(tmp_dir + "TCG_output.json", 'wb') as f:
-        json.dump(out[1],f, sort_keys=True, indent=4, separators=(',', ': '))
-    
-    viewer_setup()
+    ######################################
+    ### Setting up and starting viewer ###
+    ######################################
+    my_viewer = TCG_VIEWER(output_folder, PORT=8080, viewer_path=viewer_dir)
+    my_viewer.start_viewer()

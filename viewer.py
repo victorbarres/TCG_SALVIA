@@ -16,6 +16,7 @@ class TCG_VIEWER:
         self.server_port = PORT
         self.viewer_path = viewer_path
         self.data_path = data_path
+        self.tmp = "tmp/"
     
     def start_viewer(self):
         """
@@ -48,6 +49,7 @@ class TCG_VIEWER:
         
     def _load_data(self):
         import shutil
-        shutil.copytree(self.data_path, self.viewer_path + "tmp/")
+        shutil.rmtree(self.viewer_path + self.tmp)
+        shutil.copytree(self.data_path, self.viewer_path + self.tmp)
     
         
