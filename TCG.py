@@ -489,7 +489,7 @@ if __name__=='__main__':
         f.write(out[0])
     with open(output_folder + "TCG_output.json", 'wb') as f:
         json.dump(out[1],f, sort_keys=True, indent=4, separators=(',', ': '))
-    
+
     ############################
     ### Saving to viewer tmp ###
     ############################
