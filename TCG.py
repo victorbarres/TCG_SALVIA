@@ -389,29 +389,6 @@ def load_init_file(file_name, sim):
     json_data_param['utterance_threshold'] = {'time':sim.thresh_time, 'cxns':sim.thresh_cxn, 'syllables':sim.thresh_syll}
     
     return (True, p, json_data_inputs, json_data_param)
-    
-def viewer_setup():
-    """
-    Setting up server at port PORT serving the viewer folder and opens default browser to "http://localhost:PORT"
-    """
-    import os
-    import SimpleHTTPServer
-    import SocketServer
-    
-    import webbrowser
-   
-    curdir = os.getcwd()
-    os.chdir(curdir  + "/viewer/")
-
-    PORT = 8080
-
-    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-
-    httpd = SocketServer.TCPServer(("", PORT), Handler)
-
-    print "serving at port", PORT
-    webbrowser.open_new("http://localhost:" + str(PORT))
-    httpd.serve_forever()
 
 def main():
     """
@@ -472,8 +449,14 @@ if __name__=='__main__':
     ### Saving to outputs ###
     #########################
     #Copying input files in output directory
-    now = datetime.now()
-    output_folder = output_root + now.strftime("%Y-%m-%d(%Hh-%Mm-%Ss)") + "/"
+    
+    filename = raw_input('Enter a file name: ')
+    if filename == '':
+        now = datetime.now()
+        output_folder = output_root + now.strftime("%Y-%m-%d(%Hh-%Mm-%Ss)") + "/"
+    else:
+        output_folder = output_root + filename + '/'
+        
     os.mkdir(output_folder)
     shutil.copyfile(out[1]['inputs']['grammar_file'], output_folder + "TCG_grammar.json")
     shutil.copyfile(out[1]['inputs']['semantics_file'], output_folder + "TCG_semantics.json")
