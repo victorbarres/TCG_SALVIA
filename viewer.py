@@ -63,13 +63,17 @@ class TCG_VIEWER:
             shutil.rmtree(self.viewer_path + self.tmp)
         print os.getcwd()
         shutil.copytree(self.data_path, self.viewer_path + self.tmp)
-        self._create_cxn_svgs()
+        self._create_cxn_imgs()
     
-    def _create_cxn_svgs(self):
-        import os, shutil        
+    def _create_cxn_imgs(self):
+        import os, shutil
+        import subprocess        
         import json
-        from graphviz import Digraph
-
+        import pydot
+        
+        prog = 'dot'
+        file_type = 'svg'
+        
         cxn_folder = self.viewer_path + self.tmp + 'cxn/'        
         
         if os.path.exists(cxn_folder):
@@ -83,15 +87,43 @@ class TCG_VIEWER:
         
         grammar = json_data['grammar']
         for cxn in grammar:
-            dot = Digraph(comment=cxn['name'])
-            for node in cxn['SemFrame']['nodes']:
-                dot.node(node['name'], node['concept'])
-            for edge in cxn['SemFrame']['edges']:
-                dot.edge(edge['from'], edge['to'], label=edge['concept'])
-            dot.format = 'svg'
-            file_name = cxn_folder + cxn['name'] + '.gv'
-            dot.render(file_name, view=False)
+            dot_cxn = pydot.Dot(graph_type = 'digraph')
             
+            cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame')
+            for node in cxn['SemFrame']['nodes']:
+                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept']))
+            for edge in cxn['SemFrame']['edges']:
+                cluster_SemFrame.add_edge(pydot.Edge(edge['from'], edge['to'], label=edge['concept']))
+            
+            dot_cxn.add_subgraph(cluster_SemFrame)
+            
+            cluster_SynForm = pydot.Cluster('SynForm', label='SynForm')
+            pre_form = None
+            for form in cxn['SynForm']:
+                if form['type'] == "SLOT":
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label ="[" +  ", ".join(form['classes']) +"]", shape="box"))
+                elif form['type'] == 'PHON':
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label = form['phon'], shape="box"))
+                if not(pre_form):
+                    pre_form = form['name']
+                else:
+                    cluster_SynForm.add_edge(pydot.Edge(form['name'], pre_form, label='next'))
+                    pre_form = form["name"]
+            
+            dot_cxn.add_subgraph(cluster_SynForm)
+            
+            for k in cxn['SymLinks'].keys():
+                dot_cxn.add_edge(pydot.Edge(k, cxn['SymLinks'][k], color='red', dir='none'))
+            
+            file_name = cxn_folder + cxn['name'] + ".gv"
+            dot_cxn.write(file_name)
+            
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cxn_dots = os.listdir(cxn_folder)
+        for cxn_file in cxn_dots:
+            cmd = "%s -T%s %s > %s.%s" %(prog, file_type, cxn_folder + cxn_file, cxn_folder + cxn_file, file_type)
+            subprocess.call(cmd, shell=True)
+                
 ###############################################################################
 if __name__ == '__main__':
     import os

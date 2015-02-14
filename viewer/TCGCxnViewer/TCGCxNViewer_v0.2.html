@@ -78,17 +78,23 @@ function expand_cxn(obj){
 	cxn_class.setAttribute("class","cxn_class");
 	cxn_class.innerHTML  = "Class: " + cxn_data.class;
 	cxn_details.appendChild(cxn_class);
+	
 	//Preference
 	var cxn_pref = document.createElement("div");
 	cxn_pref.setAttribute("class", "cxn_pref");
 	cxn_pref.innerHTML = "Preference: " + cxn_data.preference;
 	cxn_details.appendChild(cxn_pref);
-	//SemFrame
-	expand_SemFrame(cxn_details,cxn_data.name, cxn_data.SemFrame);
-	//SynForm
-	expand_SynForm(cxn_details, cxn_data.SynForm);
-	//SymLinks
-	expand_SymLinks(cxn_details, cxn_data.SymLinks);
+	
+	//Data	
+	var data = document.createElement("div");
+	cxn_details.appendChild(data);
+	data.setAttribute("class", "cxn_data");
+	
+	cxn_img_path = data_folder + cxn_subfolder + cxn_data['name'] + '.gv.svg'
+	var cxn_img = document.createElement("img")
+	data.appendChild(cxn_img)
+	cxn_img.setAttribute("class", "cxn_img")
+	cxn_img.setAttribute("src", cxn_img_path)
 	
 	obj.setAttribute("onclick", "reduce_cxn(this)");
 };
@@ -125,52 +131,7 @@ function expand_SemFrame(obj, cxn_name, SemFrame){
 	cxn_img.setAttribute("src", cxn_img_path)
 };
 
-function expand_SynForm(obj,SynForm){
-	var cxn_SynForm = document.createElement("div");
-	cxn_SynForm.setAttribute("class", "cxn_SynForm");
-	obj.appendChild(cxn_SynForm);
-	
-	var feat_name = document.createElement("div");
-	feat_name.innerHTML = "SynForm:";
-	cxn_SynForm.appendChild(feat_name);
-	
-	var data = document.createElement("div");
-	data.setAttribute("class", "cxn_data");
-	cxn_SynForm.appendChild(data);
-	
-	var form = [];
-	for(var i=0; i<SynForm.length; i++){
-		f = SynForm[i];
-		if(f.type == "SLOT"){
-			form.push("[" + f.classes.join() + "]");
-		}
-		else{
-			form.push(f.phon);
-		}
-	}
-	
-	data.innerHTML = form.join(" ");
-};
 
-function expand_SymLinks(obj, SymLinks){
-	var cxn_SymLinks = document.createElement("div");
-	cxn_SymLinks.setAttribute("class", "cxn_SymLinks");
-	obj.appendChild(cxn_SymLinks);
-	
-	var feat_name = document.createElement("div");
-	feat_name.innerHTML = "SymLinks:";
-	cxn_SymLinks.appendChild(feat_name);
-	
-	var data = document.createElement("div");
-	data.setAttribute("class", "cxn_data");
-	cxn_SymLinks.appendChild(data);
-	
-	var links = [];
-	for(var key in SymLinks){
-		links.push(key + "--->" + SymLinks[key]);
-	}
-	data.innerHTML = links.join(", ");
-};
 
 </script>
 

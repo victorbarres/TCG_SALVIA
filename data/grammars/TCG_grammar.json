@@ -292,7 +292,7 @@
 	"name" : "HIT",
 	"class" : "V",
 	"SemFrame" : {
-				"nodes" : [{"name" : "NODE", "concept" : "HIT", "shared" : false, "head" : true}],
+				"nodes" : [{"name" : "N1", "concept" : "HIT", "shared" : false, "head" : true}],
 				"edges" : []
 				},
 	"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "hit"}],
@@ -303,7 +303,7 @@
 		"name" : "KICK",
 		"class" : "V",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "KICK", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "KICK", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "kick"}],
@@ -314,7 +314,7 @@
 		"name" : "WEAR",
 		"class" : "V",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "WEAR", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "WEAR", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "wear"}],
@@ -325,7 +325,7 @@
 		"name" : "LAUGH",
 		"class" : "V",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "LAUGH", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "LAUGH", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "laugh"}],
@@ -336,7 +336,7 @@
 		"name" : "WATCH",
 		"class" : "V",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "WATCH", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "WATCH", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "watch"}],
@@ -347,7 +347,7 @@
 		"name" : "TALK",
 		"class" : "V",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "TALK", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "TALK", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "talk to"}],
@@ -358,7 +358,7 @@
 		"name" : "SQUIRT",
 		"class" : "V",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "SQUIRT", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "SQUIRT", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "squirt at"}],
@@ -369,7 +369,7 @@
 		"name" : "BLUE",
 		"class" : "A",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "BLUE", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "BLUE", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "blue"}],
@@ -380,7 +380,7 @@
 		"name" : "BLACK",
 		"class" : "A",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "BLACK", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "BLACK", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "black"}],
@@ -391,7 +391,7 @@
 		"name" : "GREEN",
 		"class" : "A",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "GREEN", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "GREEN", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "green"}],
@@ -402,7 +402,7 @@
 		"name" : "SMALL",
 		"class" : "A",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "SMALL", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "SMALL", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "small"}],
@@ -413,7 +413,7 @@
 		"name" : "BIG",
 		"class" : "A",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "BIG", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "BIG", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "big"}],
@@ -424,7 +424,7 @@
 		"name" : "HANDSOME",
 		"class" : "A",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "HANDSOME", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "HANDSOME", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "handsome"}],
@@ -435,7 +435,7 @@
 		"name" : "PRETTY",
 		"class" : "A",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "PRETTY", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "PRETTY", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "pretty"}],
@@ -446,7 +446,7 @@
 		"name" : "WOMAN",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "WOMAN", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "WOMAN", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "woman"}],
@@ -457,7 +457,7 @@
 		"name" : "MAN",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "MAN", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "MAN", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "man"}],
@@ -468,7 +468,7 @@
 		"name" : "GIRL",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "GIRL", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "GIRL", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "girl"}],
@@ -478,7 +478,7 @@
 		"name" : "BOY",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "BOY", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "BOY", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boy"}],
@@ -489,7 +489,7 @@
 		"name" : "PEOPLE",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "PEOPLE", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "PEOPLE", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "people"}],
@@ -500,7 +500,7 @@
 		"name" : "MOUSE",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "MOUSE", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "MOUSE", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "mouse"}],
@@ -511,7 +511,7 @@
 		"name" : "TURTLE",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "TURTLE", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "TURTLE", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "turtle"}],
@@ -522,7 +522,7 @@
 		"name" : "DRESS",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "DRESS", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "DRESS", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "dress"}],
@@ -533,7 +533,7 @@
 		"name" : "TSHIRT",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "TSHIRT", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "TSHIRT", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "t-shirt"}],
@@ -544,7 +544,7 @@
 		"name" : "BOXINGRING",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "BOXINGRING", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "BOXINGRING", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boxing ring"}],
@@ -555,7 +555,7 @@
 		"name" : "PARK",
 		"class" : "N",
 		"SemFrame" : {
-					"nodes" : [{"name" : "NODE", "concept" : "PARK", "shared" : false, "head" : true}],
+					"nodes" : [{"name" : "N1", "concept" : "PARK", "shared" : false, "head" : true}],
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "park"}],
