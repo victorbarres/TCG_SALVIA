@@ -52,7 +52,7 @@ function dispGrammar() {
 		
 		var cxn_div = document.createElement("div");
 		cxn_div.id = i;
-		cxn_div.setAttribute("class", "cxn");
+		cxn_div.setAttribute("class", "cxn reduce");
 		cxn_div.setAttribute("onclick", "expand_cxn(this)");
 		
 		var cxn_name = document.createElement("div");
@@ -68,6 +68,7 @@ function dispGrammar() {
 function expand_cxn(obj){
 	// Get data
 	var cxn_data = grammar[obj.id]
+	obj.setAttribute("class", "cxn expand");
 	
 	var cxn_details = document.createElement("div");
 	cxn_details.setAttribute("class", "cxn_details");
@@ -100,6 +101,7 @@ function expand_cxn(obj){
 };
 
 function reduce_cxn(obj){
+	obj.setAttribute("class", "cxn reduce");
 	var children = obj.childNodes;
 	for(var i=0; i<children.length; i++){
 		if(children[i].className == "cxn_details"){

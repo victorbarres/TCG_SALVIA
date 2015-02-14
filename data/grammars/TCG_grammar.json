@@ -55,7 +55,7 @@
 			"nodes"  : [{"name" : "SUBJ", "concept" : "ENTITY+", "shared" : true, "head" : false},
 						{"name" : "OBJ", "concept" : "ENTITY+", "shared" : true, "head" : true },
 						{"name" : "ACT", "concept" : "ACTION+", "shared" : true, "head" : true }],
-			"edges" : [{"name" : "ACT_SUBJ", "concept" : "AGENT", "from" : "ACT", "to" : "SUJ"},
+			"edges" : [{"name" : "ACT_SUBJ", "concept" : "AGENT", "from" : "ACT", "to" : "SUBJ"},
 						{"name" : "ACT_OBJ", "concept" : "PATIENT", "from" : "ACT", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NC", "NP", "N"]},

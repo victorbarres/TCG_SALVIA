@@ -88,32 +88,37 @@ class TCG_VIEWER:
         grammar = json_data['grammar']
         for cxn in grammar:
             dot_cxn = pydot.Dot(graph_type = 'digraph')
+            dot_cxn.set_rankdir('LR')
+            dot_cxn.set_fontname('consolas')
+
             
             cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame')
+            cluster_SemFrame.set_bgcolor('lightcoral')
             for node in cxn['SemFrame']['nodes']:
-                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept']))
+                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept'], style='filled', fillcolor='white'))
             for edge in cxn['SemFrame']['edges']:
                 cluster_SemFrame.add_edge(pydot.Edge(edge['from'], edge['to'], label=edge['concept']))
             
             dot_cxn.add_subgraph(cluster_SemFrame)
             
             cluster_SynForm = pydot.Cluster('SynForm', label='SynForm')
+            cluster_SynForm.set_bgcolor('lightblue')
             pre_form = None
             for form in cxn['SynForm']:
                 if form['type'] == "SLOT":
-                    cluster_SynForm.add_node(pydot.Node(form['name'], label ="[" +  ", ".join(form['classes']) +"]", shape="box"))
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label ="[" +  ", ".join(form['classes']) +"]", shape="box", style='filled', fillcolor='white'))
                 elif form['type'] == 'PHON':
-                    cluster_SynForm.add_node(pydot.Node(form['name'], label = form['phon'], shape="box"))
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label = form['phon'], shape="box", style='filled', fillcolor='white'))
                 if not(pre_form):
                     pre_form = form['name']
                 else:
-                    cluster_SynForm.add_edge(pydot.Edge(form['name'], pre_form, label='next'))
+                    cluster_SynForm.add_edge(pydot.Edge(pre_form, form['name'], label='next'))
                     pre_form = form["name"]
             
             dot_cxn.add_subgraph(cluster_SynForm)
             
             for k in cxn['SymLinks'].keys():
-                dot_cxn.add_edge(pydot.Edge(k, cxn['SymLinks'][k], color='red', dir='none'))
+                dot_cxn.add_edge(pydot.Edge(k, cxn['SymLinks'][k], color='red', dir='none', penwidth='1'))
             
             file_name = cxn_folder + cxn['name'] + ".gv"
             dot_cxn.write(file_name)

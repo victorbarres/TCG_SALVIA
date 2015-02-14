@@ -12,7 +12,7 @@ body{
 	color: black;
 	margin: 20px;
 	font-size:10pt;
-	background-color: white;
+	background-color: #90EE90;
 	border: 2px solid;
     border-radius: 15px;
 	padding: 0.5em;
@@ -32,4 +32,5 @@ body{
 
 .cxn_data{
 	margin-left: 10px;
+	background-color: #DDFFDD;
 }
