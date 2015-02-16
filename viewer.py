@@ -58,6 +58,9 @@ class TCG_VIEWER:
         httpd.serve_forever()
         
     def _load_data(self):
+        """
+        Copies and creates all the required data in viewer/tmp directory.
+        """
         import os, shutil
         if os.path.exists(self.viewer_path + self.tmp):
             shutil.rmtree(self.viewer_path + self.tmp)
@@ -66,6 +69,10 @@ class TCG_VIEWER:
         self._create_cxn_imgs()
     
     def _create_cxn_imgs(self):
+        """
+        Create graph images for all the constructions.
+        Uses graphviz with pydot implementation.
+        """
         import os, shutil
         import subprocess        
         import json
@@ -95,7 +102,11 @@ class TCG_VIEWER:
             cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame')
             cluster_SemFrame.set_bgcolor('lightcoral')
             for node in cxn['SemFrame']['nodes']:
-                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept'], style='filled', fillcolor='white'))
+                if node['head'] == True:
+                    node_shape = 'doublecircle'
+                else:
+                    node_shape = 'circle'
+                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept'], color='black', shape=node_shape, style='filled', fillcolor='white'))
             for edge in cxn['SemFrame']['edges']:
                 cluster_SemFrame.add_edge(pydot.Edge(edge['from'], edge['to'], label=edge['concept']))
             
