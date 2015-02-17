@@ -180,8 +180,10 @@ utter.append("text")
 var assemblages= wm.append("div")
 	.attr("id", "assemblages")
 	.text("Construction assemblages:");
-	
-/////////////SCENE////////////////
+
+///////////////	
+//// SCENE ////
+///////////////
 // Scene data variables
 var step = 0;
 var sub_state = 0; // 0 nothing updated, 1 attention  updated, 2 SemWM  updated, 3 gramWM n updated, 4 phonWM updated, 5 utter updated.
@@ -240,9 +242,9 @@ function create_masks(){
 		mask.style.height = size[1]*hfactor + "px";
 	};
 };
-////////////////////////////////////////
-////////////Working Memories////////////
-////////////////////////////////////////	
+////////////////////////
+////Working Memories////
+////////////////////////	
 // Set up control buttons
 var control = d3.select("#control");
 control
@@ -491,12 +493,11 @@ function gramWM_visUpdate(){
 	node.enter().append("svg:rect")
 		.attr("id", function(d) {return d.id})
 		.attr("class", function(d) {return "cxn_node " + "fresh_" + d.fresh + " alive_" + d.alive + " old_" + d.old + " active_" + d.active})
-		//.attr("r", 10)
 		.attr("width", 40)
 		.attr("height", 10)
 		.attr("onmouseover", "cxn_hover_in(this)")
 		.attr("onmouseout", "cxn_hover_out()")
-		//.attr("r", function (d) {return nodeScale(d.act);})
+		//.attr("r", function (d) {return nodeScale(d.act);}) // Superceded now that the cxn is not a circle anymore.
 		.call(force_cxn.drag);
 	node.exit().remove();
 	
@@ -528,8 +529,6 @@ function gramWM_visUpdate(){
 	// Update force field
 	function tick() {
 		node
-			//.attr("cx", function(d) {return d.x;})
-			//.attr("cy", function(d) {return d.y;});
 			.attr("x", function(d) {return d.x;})
 			.attr("y", function(d) {return d.y;});
 		
