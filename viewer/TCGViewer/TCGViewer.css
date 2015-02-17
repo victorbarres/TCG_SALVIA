@@ -184,6 +184,13 @@ body{
 	opacity: 0.2;
 }
 
+#cxn_img{
+	position: fixed;
+	width: 20%;
+	height: 25%;
+	opacity: 0.9;
+}
+
 #output{
 	float: left;
 	margin-left: 10px;

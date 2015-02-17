@@ -47,7 +47,10 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="../js/d3/d3.min.js"></script>
 <script>
-data_folder = "../tmp/"
+
+var data_folder = "../tmp/";
+var cxn_folder  = "cxn/";
+var cxn_extension = ".gv.svg";
 var width=400,
 	height=300;
 
@@ -300,7 +303,9 @@ d3.json(data_folder + "TCG_output.json", function(jsonData) {
 	create_masks();
 	});
 
-//Display simulation parameters
+/**
+*Display simulation parameters
+*/
 function disp_param(){
 	var sim_param = document.getElementById("sim_param");
 	for(var key in data.parameters){
@@ -319,7 +324,9 @@ function disp_param(){
 	};
 };
 
-//Update state
+/**
+*Update state
+*/
 function updateState(n){
 	updateTime(n);
 	switch(n){
@@ -350,13 +357,17 @@ function updateState(n){
 	};
 };
 
-///// Update SemRep graph /////
+/////////////////////////////
+//// Update SemRep graph ////
+/////////////////////////////
 function updateSemRep() {
 	updateGraph(force, data.states[step].semanticWM.SRnodes, data.states[step].semanticWM.SRlinks, SemRep)	
 	SemRep_visUpdate();
 };
 
-//Update SemRep Visualization
+/**
+*Update SemRep Visualization
+*/
 function SemRep_visUpdate(){
 	force
 		.on("tick", tick)
@@ -437,7 +448,9 @@ function SemRep_visUpdate(){
 	};
 };
 
-////// Update GramWM //////
+///////////////////////
+//// Update GramWM ////
+///////////////////////
 function updateGramWM() {
 	var nodes = data.states[step].grammaticalWM.cxn_inst; //cxn instances
 	var coop_links = data.states[step].grammaticalWM.links; // cooperation links
@@ -453,7 +466,9 @@ function updateGramWM() {
 	gramWM_visUpdate();
 };
 
-//Update gramWM Visualization
+/**
+*Update gramWM Visualization
+*/
 function gramWM_visUpdate(){
 	force_cxn
 		.on("tick", tick)
@@ -477,8 +492,8 @@ function gramWM_visUpdate(){
 		.attr("id", function(d) {return d.id})
 		.attr("class", function(d) {return "cxn_node " + "fresh_" + d.fresh + " alive_" + d.alive + " old_" + d.old + " active_" + d.active})
 		.attr("r", 10)
-		.attr("onmouseover", "show_cover(this)")
-		.attr("onmouseout", "hide_cover()")
+		.attr("onmouseover", "cxn_hover_in(this)")
+		.attr("onmouseout", "cxn_hover_out()")
 		//.attr("r", function (d) {return nodeScale(d.act);})
 		.call(force_cxn.drag);
 	node.exit().remove();
@@ -527,9 +542,10 @@ function gramWM_visUpdate(){
 		
 	};
 };
-///////////////////////////////////
-///// Graph updating functions/////
-///////////////////////////////////
+
+//////////////////////////////////
+//// Graph updating functions ////
+//////////////////////////////////
 function updateGraph(myForce, nodes, links, graph) {
 	graph.nodes = nodes;
 	graph.links = links;
@@ -610,9 +626,13 @@ function findLinkIdx(linkArr, sourceId, targetId){
 	};
 	return -1;
 }
+/////////////////////////////////
+//// Update visual attention ////
+/////////////////////////////////
 
-///// Update visual attention /////
-// Update current time and step
+/**
+*Update current time and step
+*/
 function updateTime(n){
 	var time = document.getElementById("time");
 	var current_time = "t: " + step;
@@ -637,8 +657,9 @@ function updateTime(n){
 	updateWMTime();
 }
 
-
-////// Update time in WM //////
+/** 
+*Update time in WM 
+*/
 function updateWMTime() {
 	d3.select("#SR_title")
 		.text("Semantic WM (t" + step +")");
@@ -654,7 +675,9 @@ function updateWMTime() {
 };
 
 
-// Update focus of attention display on scene image.
+/**
+*Update focus of attention display on scene image.
+*/
 function updateFocus(){
 	var highlight_masks = document.getElementsByClassName("highlight_mask");
 	for(var i=0; i<highlight_masks.length; i++){
@@ -683,21 +706,27 @@ function updateFocus(){
 	focus.innerHTML = "Current focus: " + region_name + " (saliency: " + saliency + ", uncertainty: " + data.states[step].current_attention.uncertainty + ")";
 }
 
-////// Update phonWM //////
+/**
+*Update phonWM*
+*/
 function updatePhonWM() {
 	var phon = data.states[step].phonologicalWM;
 	d3.select("#phonWM_content")
 		.text("["+ phon.join(", ")+"]");
 };
 
-////// Update utterance //////
+/**
+*Update utterance
+*/
 function updateUtter() {
 	var utterance = data.states[step].produced_utterance;
 	d3.select("#utter_content")
 		.text(utterance);
 };
 
-////// Update assemblages //////
+/**
+*Update assemblages
+*/
 function updateAssemblages() {
 	d3.selectAll(".an_assemblage").remove();
 	
@@ -723,7 +752,9 @@ function updateAssemblages() {
 	}
 };
 
-////// Callback functions //////
+////////////////////////////
+//// Callback functions ////
+////////////////////////////
 function next_t() {
 	if (step < (data.states.length - 1)) {
 		step += 1;
@@ -789,6 +820,15 @@ function pause(){
 		.text("play");
 };
 
+function cxn_hover_in(element){
+	show_cover(element);
+	show_cxn(element);
+};
+
+function cxn_hover_out(){
+	hide_cover();
+	hide_cxn();
+};
 
 function show_cover(element){
 	var idx = findNodeIdx(gramWM.nodes,element.id);
@@ -801,6 +841,37 @@ function show_cover(element){
 
 function hide_cover(){
 	SemRep_visUpdate();
+};
+
+function show_cxn(element){
+	var cxn_img = document.getElementById("cxn_img");
+	if(cxn_img){
+		hide_cxn();
+	}
+	var idx = findNodeIdx(gramWM.nodes,element.id);
+	var cxn_inst_name = gramWM.nodes[idx].id;
+	var re = /_/g;
+	var i = 0;
+	while ((match = re.exec(cxn_inst_name)) != null) {
+		i = match.index; // Get the position of the last "_" in the construction id (e.g. "PAS_SVO_12" -> 7)
+	};
+	var cxn_name = cxn_inst_name.substring(0,i);
+	var cxn_path = data_folder + cxn_folder + cxn_name + cxn_extension;
+	var rect = document.getElementById("vis_wm_div").getBoundingClientRect();
+	var cxn_img = document.createElement("img");
+	cxn_img.setAttribute("src", cxn_path);
+	cxn_img.setAttribute("id", "cxn_img");
+	cxn_img.style.left = rect.right + "px";
+	cxn_img.style.top = rect.top + "px";
+	console.log(rect.left);
+	
+	var viewer_div = document.getElementById("viewer");
+	viewer_div.appendChild(cxn_img);
+};
+
+function hide_cxn(){
+	var cxn_img = document.getElementById("cxn_img");
+	cxn_img.remove();
 };
 
 function show_assemblage2(idx){
