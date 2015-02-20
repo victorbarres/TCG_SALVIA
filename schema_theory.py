@@ -6,7 +6,9 @@ Created on Wed Feb 18 14:14:08 2015
 
 Defines the based schema theory classes
 """
-
+##################################
+### Schemas (Functional units) ###
+##################################
 class SCHEMA:
     """
     Schema (base class)
@@ -16,7 +18,7 @@ class SCHEMA:
         - name (str): schema name
         - LTM (LTM): Associated long term memory.
         - content (): Procedural or semantic content of the schema.
-        - init_act (int): Initial activation value.
+        - init_act (float): Initial activation value.
     """
     ID_next = 0 # Global schema ID counter
     
@@ -89,6 +91,14 @@ class SCHEMA_INST:
         self.set_activation(schema.init_act)
         self.set_alive(True)
         self.set_ports()
+    
+    def get_inputs(self):
+        """
+        """
+    
+    def send_outputs(self):
+        """
+        """
 
         
 class LTM:
@@ -179,11 +189,73 @@ class F_LINK:
     
     Data:
         - WM (WM): Associated long term memory
-        - from (SCHEMA_INST)
-        - port_from ()
-        - to (SCHEMA_INST)
-        - port_to ()
+        - port_in ([{"schema_inst":SCHEMA_INST, "port":port_id}])
+        - port_out ([{"schema_inst":SCHEMA_INST, "port":port_id}])
         - weight (float)
+    """
+    
+    def __init__(self):
+        """
+        """
+    
+    def read_inputs(self):
+        """
+        """
+    
+    def send_outputs(self):
+        """
+        """
+    
+############################    
+### Brain system classes ###
+############################   
+class SYSTEM:
+    """
+    Defines a whole brain system
+    Data:
+        - name (str):
+        - modules ([MODULES]):
+        - connections ([CONNECT]):
+    """
+    def __init__(self,name):
+        self.name = name
+        self.modules = []
+        self.connections = []
+    
+    def add_modules(self, modules):
+        """
+        Add all the modules in "modules" ([MODULES]) in the system.
+        """
+        self.modules += modules
+        
+    def add_connections(self, connections):
+        """
+        Add all the connections in "connections" ([CONNECT]) in the system.
+        """
+        self.connections += connections
+    
+class MODULE:
+    """
+    Should not be with defined with the schema theory classes?
+    A module could be an LTM or a WM or made of submodules?
+    A module should be linked to brain regions? (possibly a set of brain regions?)
+    Data:
+        - id (int): Unique id
+        - name (str): Module name
+        - function (WM, LTM)
+        - in_ports ([int]):
+        - out_ports ([int]):
+        - brain_regions([str]):
+    """
+    
+
+class CONNECT:
+    """
+    Data:
+        - port_in ([{"module":MODULE, "port":port_id}]):
+        - port_out ([{"module":MODULE, "port":port_id}]):
+        - weight (float):
+        - delay (float):
     """
           
     
