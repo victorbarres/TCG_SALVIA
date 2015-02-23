@@ -29,6 +29,9 @@ class SCHEMA:
         self.LTM = LTM
         self.content = content
         self.init_act = init_act
+    
+    def set_name(self, name):
+        self.name = name
 
     def set_init(self, init_act):
         self.init_act = init_act
@@ -38,9 +41,6 @@ class SCHEMA:
     
     def set_LTM(self, LTM):
         self.LTM = LTM
-    
-    def set_name(self, name):
-        self.name = name
         
 class SCHEMA_INST:
     """
@@ -99,7 +99,6 @@ class SCHEMA_INST:
     def send_outputs(self):
         """
         """
-
         
 class LTM:
     """
@@ -189,14 +188,39 @@ class F_LINK:
     
     Data:
         - WM (WM): Associated long term memory
-        - port_in ([{"schema_inst":SCHEMA_INST, "port":port_id}])
-        - port_out ([{"schema_inst":SCHEMA_INST, "port":port_id}])
+        - port_in ({"schema_inst":SCHEMA_INST, "port":port_id})
+        - port_out ({"schema_inst":SCHEMA_INST, "port":port_id})
         - weight (float)
     """
     
     def __init__(self):
         """
         """
+        self.WM = None
+        self.port_in = {"module":None, "port":None}
+        self.port_out = {"module":None, "port":None}
+        self.weight = 0
+    
+    def set_WM(self, WM):
+        """
+        """
+    
+    def set_port_in(self, module, port_id):
+        """
+        """
+        self.port_in["module"] = module
+        self.port_in["port"] = port_id
+        
+    def set_port_out(self, module, port_id):
+        """
+        """
+        self.port_out["module"] = module
+        self.port_out["port"] = port_id
+    
+    def set_weight(self, weight):
+        """
+        """
+        self.weight = weight
     
     def read_inputs(self):
         """
@@ -233,6 +257,10 @@ class SYSTEM:
         Add all the connections in "connections" ([CONNECT]) in the system.
         """
         self.connections += connections
+        
+    def update(self):
+        """
+        """
     
 class MODULE:
     """
@@ -247,16 +275,65 @@ class MODULE:
         - out_ports ([int]):
         - brain_regions([str]):
     """
+    ID_next = 0
+    PO_next = 0
+    PI_next = 0
+    def __init__(self, name, function = None, brain_regions = []):
+        self.id = MODULE.ID_next
+        MODULE.ID_next +=1
+        self.name = name
+        self.function = function
+        self.in_ports = []
+        self.out_ports = []
+        self.brain_regions = brain_regions
     
+    def set_function(self, function):
+        """
+        """
+        self.function = function
+    
+    def add_port(self,port_type, port_name):
+        """
+        """
 
 class CONNECT:
     """
     Data:
-        - port_in ([{"module":MODULE, "port":port_id}]):
-        - port_out ([{"module":MODULE, "port":port_id}]):
+        - port_in ({"module":MODULE, "port":port_id}):
+        - port_out ({"module":MODULE, "port":port_id}):
         - weight (float):
         - delay (float):
     """
+    
+    def __init__(self):
+        """
+        """
+        self.port_in = {"module":None, "port":None}
+        self.port_out = {"module":None, "port":None}
+        self.weight = 0
+        self.delay = 0
+    
+    def set_port_in(self, module, port_id):
+        """
+        """
+        self.port_in["module"] = module
+        self.port_in["port"] = port_id
+        
+    def set_port_out(self, module, port_id):
+        """
+        """
+        self.port_out["module"] = module
+        self.port_out["port"] = port_id
+    
+    def set_weight(self, weight):
+        """
+        """
+        self.weight = weight
+    
+    def set_delay(self, delay):
+        """
+        """
+        self.delay = delay
           
     
     
