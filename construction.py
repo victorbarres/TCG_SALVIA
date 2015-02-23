@@ -9,6 +9,7 @@ The Template Classes define all the basic template elements that are used to bui
 """
 ########################
 ### Template Classes ###
+########################
 
 class TP_ELEM:
     """
@@ -122,7 +123,8 @@ class TP_SYMLINKS(TP_ELEM):
         
 ############################    
 ### Construction classes ###
-
+############################
+        
 class CXN:
     """
     Grammatical construction.
@@ -139,8 +141,8 @@ class CXN:
         self.name = ''
         self.clss = ''
         self.preference = 0 # construction preference
-        self.SemFrame = TP_SEMFRAME() # Sem-Frame
-        self.SynForm = TP_SYNFORM() # Syn_Form
+        self.SemFrame = TP_SEMFRAME() # Semantic frame
+        self.SynForm = TP_SYNFORM() # Syntactic form
         self.SymLinks = TP_SYMLINKS() # Symbolic links
     
     def find_sem_elem(self, name):
@@ -157,6 +159,8 @@ class CXN:
         Add sem_elem (TP_SEM_ELEM) to the SemFrame.
         If sem_elem is a NODE, it is added to SemFrame.nodes.
         If sem_elem is a RELATION, it is added to SemFrame.edges.
+        
+        OPTION: MAKE SURE THAT THE CONCEPTS DO BELONG TO THE CONCEPTUAL KNOWLEDGE, ELSE RETURN AN ERROR.
         """
         # Check for duplicate
         if self.find_sem_elem(sem_elem.name):
@@ -244,7 +248,8 @@ class CXN:
         
 ####################################
 ### Grammar: set of construtions ###
-
+####################################
+        
 class GRAMMAR:
     """
     Grammar defined as a set of constructions ("constructicon")
@@ -307,7 +312,6 @@ class GRAMMAR:
         else:
             print cxn
         
-
 ###############################################################################
 
 if __name__=='__main__':
