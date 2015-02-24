@@ -129,9 +129,7 @@ class LTM:
         self.schemas.append(schema)
     
     def add_connection(self, from_schema, to_schema, weight):
-        self.connections.append({'from':from_schema, 'to':to_schema, 'weight':weight})
-    
-        
+        self.connections.append({'from':from_schema, 'to':to_schema, 'weight':weight})        
 
 class WM:
     """
@@ -174,8 +172,13 @@ class WM:
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
         
-    def add_f_link(self, from_s_inst, to_s_inst, weight):
-        return None
+    def add_f_link(self, from_s_inst, from_port, to_s_inst, to_port, weight):
+        new_f_link = F_LINK()
+        new_f_link.set_WM(self)
+        new_f_link.set_port_in(from_s_inst, from_port)
+        new_f_link.set_port_out(to_s_inst, to_port)
+        new_f_link.set_weight(weight)
+        self.f_links.append(new_f_link)
         
     def remove_f_link(self,from_s_inst, to_s_inst):
         return None
@@ -189,7 +192,7 @@ class F_LINK:
     Stores the currently active schema instances and the functional links through which they enter in cooperative computation.
     
     Data:
-        - WM (WM): Associated long term memory
+        - WM (WM): Associated working memory
         - port_in ({"schema_inst":SCHEMA_INST, "port":port_id})
         - port_out ({"schema_inst":SCHEMA_INST, "port":port_id})
         - weight (float)
@@ -199,38 +202,48 @@ class F_LINK:
         """
         """
         self.WM = None
-        self.port_in = {"module":None, "port":None}
-        self.port_out = {"module":None, "port":None}
+        self.port_in = {"instance":None, "port":None, "value":None}
+        self.port_out = {"instance":None, "port":None, "value":None}
         self.weight = 0
     
     def set_WM(self, WM):
         """
+        Links the f-link to the associated working memory
         """
+        self.WM = WM
     
-    def set_port_in(self, module, port_id):
+    def set_port_in(self, instance, port_id):
         """
+        Sets up the origin of the f-link to the (instance, port_id)
         """
-        self.port_in["module"] = module
+        self.port_in["instance"] = instance
         self.port_in["port"] = port_id
         
-    def set_port_out(self, module, port_id):
+    def set_port_out(self, instance, port_id):
         """
+        Sets up the target of the f-link to the (instance, port_id)
         """
-        self.port_out["module"] = module
+        self.port_out["instance"] = instance
         self.port_out["port"] = port_id
     
     def set_weight(self, weight):
         """
+        Sets up the weight of the f-link.
         """
         self.weight = weight
     
     def read_inputs(self):
         """
+        Gathers inputs and sets up the input values (self.port_in['value'])
+        The input port value is equal to the output port value of the instance it is connected to.
         """
+        return
     
     def send_outputs(self):
         """
+        Defines the output port value (self.port_out['value'])
         """
+        return
 
 class ASSEMBLAGE:
     """
@@ -239,6 +252,18 @@ class ASSEMBLAGE:
     def __init__(self):
         self.f_links = []
         self.activation = 0
+    
+    def add_f_link(self, f_link):
+        """
+        Add an flink f_link (F_LINK) to the assemblage.
+        """
+        self.f_links.append(f_link)
+    
+    def update_activation(self):
+        """
+        Update the activation of the assemblage.
+        """
+        return
           
     
     

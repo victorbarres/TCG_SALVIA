@@ -36,6 +36,7 @@ class SYSTEM:
         
     def update(self):
         """
+        Each class that inherit from this base class need to define its update procedure.
         """
     
 class MODULE:
