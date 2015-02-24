@@ -40,7 +40,7 @@ def json_read(file_name, path='./'):
 
 ###########################################################################
 ### Private object reading functions ###
-def read_semrel( atype, supMeaning, sem_net, aSemantics):
+def read_semrel(atype, supMeaning, sem_net, aSemantics):
     
     for meaning in aSemantics:
         # Create new semantic relation
@@ -97,7 +97,7 @@ def read_rel(new_cxn, aRel, name_table):
     if not(pFrom and pTo):
         return False
     
-    # Update constructoin and name table
+    # Update construction and name table
     new_cxn.add_sem_elem(new_rel)
     name_table['SemNames'][new_rel.name] = new_rel
     name_table['SemEdges'][new_rel.name] = (pFrom, pTo)

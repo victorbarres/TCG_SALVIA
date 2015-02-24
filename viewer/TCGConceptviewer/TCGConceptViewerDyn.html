@@ -13,23 +13,22 @@
 </div>
 
 <body>
-<div id="display_d3_net">
-<p><b>Graph View</b></p>
-</div>
+<p><a href='./TCGConceptViewerStatic.html'>Static graph view</a></p>
+<p><a href='./TCGConceptViewerBox.html'>Box view</a></p>
 <div id="display">
-<p><b>Box View</b></p>
+<p><b>Graph View</b></p>
 </div>
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="../js/d3/d3.min.js"></script>
 
 <script>
-data_folder = "../tmp/"
+var data_folder = "../tmp/";
 var width = 1200;
 var height = 700;
 
 //Set up d3.js force field network.
-var viewer = d3.select("#display_d3_net");
+var viewer = d3.select("#display");
 
 var svg = viewer.append("svg")
 	.attr("id", "cpt_net")
@@ -67,7 +66,6 @@ function AJAX_JSON_Req(url){
 		{
 			var jsonData = JSON.parse( AJAX_req.responseText);
 			var concepts = jsonData["CONCEPTUAL_KNOWLEDGE"];
-			disp_knowledge(concepts, document.getElementById("display"),0);
 			
 			var graph = {};
 			create_graph(concepts, graph,"");
@@ -79,25 +77,6 @@ function AJAX_JSON_Req(url){
 }
 
 AJAX_JSON_Req(data_folder + "TCG_semantics.json");
-
-function disp_knowledge(concepts, element, level){
-	var new_level = document.createElement("div");
-	new_level.setAttribute("class", "level");
-	element.appendChild(new_level);
-	for(var key in concepts){
-		var new_concept = document.createElement("div");
-		new_concept.setAttribute("class", "concept");
-		new_level.appendChild(new_concept);
-		var new_name = document.createElement("div");
-		new_name.setAttribute("class", "name");
-		var color = [255, Math.round(255*level/5), Math.round(255*level/10)];
-		new_name.style.backgroundColor = "rgb("+color.join(",")+")";
-		new_name.innerHTML = key;
-		new_concept.appendChild(new_name);
-		disp_knowledge(concepts[key],new_concept, level+1);
-	};
-	
-};
 
 function create_graph(data,graph,parent){
 	for(var key in data){
@@ -188,7 +167,6 @@ function disp_graph(data){
 		
 	};
 }
-
 </script>
 
 </body>

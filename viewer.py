@@ -67,6 +67,7 @@ class TCG_VIEWER:
         print os.getcwd()
         shutil.copytree(self.data_path, self.viewer_path + self.tmp)
         self._create_cxn_imgs()
+        self._create_concept_img()
     
     def _create_cxn_imgs(self):
         """
@@ -139,6 +140,62 @@ class TCG_VIEWER:
         for cxn_file in cxn_dots:
             cmd = "%s -T%s %s > %s.%s" %(prog, file_type, cxn_folder + cxn_file, cxn_folder + cxn_file, file_type)
             subprocess.call(cmd, shell=True)
+    
+    def _create_concept_img(self):
+        """
+        Create graph image for the conceptual knowledge.
+        Uses graphviz with pydot implementation.
+        """
+        import os, shutil
+        import subprocess        
+        import json
+        import pydot
+        
+        prog = 'dot'
+        file_type = 'svg'
+        
+        sem_folder = self.viewer_path + self.tmp + 'sem/'        
+        
+        if os.path.exists(sem_folder):
+            shutil.rmtree(sem_folder)
+        
+        os.mkdir(sem_folder)
+        
+        sem_file = 'TCG_semantics.json'
+        with open(self.viewer_path + self.tmp + sem_file, 'r') as f:
+            json_data = json.load(f)
+        
+        sem = json_data
+        edge_type = 'is_a'
+        dot_sem = pydot.Dot(graph_type='digraph')
+        dot_sem.set_rankdir('BT')
+        dot_sem.set_fontname('consolas')
+        color = 'black'
+        node_shape = 'box'
+        style = 'filled'
+        fill_color = 'white'
+        
+        def _add_semrel(sup_node, sem_data, dot_sem):
+            for concept in sem_data:
+                dot_sem.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color))
+                if sup_node != None:
+                    dot_sem.add_edge(pydot.Edge(concept, sup_node, label=edge_type))
+                
+                _add_semrel(concept, sem_data[concept], dot_sem)
+        
+        _add_semrel(None, sem, dot_sem)
+        
+        file_name = sem_folder + 'TCG_semantics' + ".gv"
+        dot_sem.write(file_name)
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        
+        
+
+        
+        
+        
                 
 ###############################################################################
 if __name__ == '__main__':
