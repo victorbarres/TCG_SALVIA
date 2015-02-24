@@ -114,13 +114,12 @@ class TP_SYNFORM(TP_ELEM):
 
 class TP_SYMLINKS(TP_ELEM):
     """
-    SymLinks construction template element
+    SymLinks construction template element.
     """
     def __init__(self):
         TP_ELEM.__init__(self)
         self.SL = {}
-        
-        
+           
 ############################    
 ### Construction classes ###
 ############################
@@ -202,49 +201,50 @@ class CXN:
             return False
         self.SymLinks[node] = slot
         return True
-        
-    def __str__(self): # To rewrite
-        p = ''
-        p += "name: %s\n" % self.name
-        p += "class: %s\n" % self.clss
-        p += "preference: %i\n" % self.preference
-        p += "SEM-FRAME:\n"
-        for s in self.SemFrame:
-            p += "\tname: %s\n" % s.name
-            if s.type == TP_ELEM.NODE:
-                p += "\ttype: node\n"
-            elif s.type == TP_ELEM.RELATION:
-                p += "\ttype: relation\n"
-            else:
-                p += "\ttype: %s\n" % s.type
-            p += "\tconcept: %s\n" % s.concept.meaning
-            p += "\tshared: %s\n" % s.shared
-            p += "\thead: %s\n" % s.head
-            if s.type == TP_ELEM.NODE:
-                if s.linked_slot == None:
-                    p += "\tlinked slot order: None\n"
-                else:
-                    p += "\tlinked slot order: %i\n" % s.linked_slot.order 
-            if s.type == TP_ELEM.RELATION:
-                p += "\tfrom: %s\n" % s.pFrom.name
-                p += "\tto: %s\n" % s.pTo.name
-            if self.SemFrame.index(s)!=(len(self.SemFrame)-1):
-                p += '\n'
-        p += "SYN-FORM:\n"
-        for s in self.SynForm:
-            p += "\torder: %i\n" % s.order
-            if s.type == TP_ELEM.SLOT:
-                p += "\ttype: slot\n"
-                p += "\tlinked_node: %s\n" % s.linked_SemElem.name
-                p += "\tclasses: [%s]\n" % ' '.join(s.cxn_classes)
-            if s.type == TP_ELEM.PHONETICS:
-                p += "\ttype: phonetics\n"
-                p += "\tphon: %s\n" % s.phonetics
-                p += "\tnum_syllables: %i\n" % s.num_syllables
-            if self.SynForm.index(s)!=(len(self.SynForm)-1):
-                p += '\n'
-        
-        return p
+    
+    
+#    def __str__(self): # To rewrite
+#        p = ''
+#        p += "name: %s\n" % self.name
+#        p += "class: %s\n" % self.clss
+#        p += "preference: %i\n" % self.preference
+#        p += "SEM-FRAME:\n"
+#        for s in self.SemFrame:
+#            p += "\tname: %s\n" % s.name
+#            if s.type == TP_ELEM.NODE:
+#                p += "\ttype: node\n"
+#            elif s.type == TP_ELEM.RELATION:
+#                p += "\ttype: relation\n"
+#            else:
+#                p += "\ttype: %s\n" % s.type
+#            p += "\tconcept: %s\n" % s.concept.meaning
+#            p += "\tshared: %s\n" % s.shared
+#            p += "\thead: %s\n" % s.head
+#            if s.type == TP_ELEM.NODE:
+#                if s.linked_slot == None:
+#                    p += "\tlinked slot order: None\n"
+#                else:
+#                    p += "\tlinked slot order: %i\n" % s.linked_slot.order 
+#            if s.type == TP_ELEM.RELATION:
+#                p += "\tfrom: %s\n" % s.pFrom.name
+#                p += "\tto: %s\n" % s.pTo.name
+#            if self.SemFrame.index(s)!=(len(self.SemFrame)-1):
+#                p += '\n'
+#        p += "SYN-FORM:\n"
+#        for s in self.SynForm:
+#            p += "\torder: %i\n" % s.order
+#            if s.type == TP_ELEM.SLOT:
+#                p += "\ttype: slot\n"
+#                p += "\tlinked_node: %s\n" % s.linked_SemElem.name
+#                p += "\tclasses: [%s]\n" % ' '.join(s.cxn_classes)
+#            if s.type == TP_ELEM.PHONETICS:
+#                p += "\ttype: phonetics\n"
+#                p += "\tphon: %s\n" % s.phonetics
+#                p += "\tnum_syllables: %i\n" % s.num_syllables
+#            if self.SynForm.index(s)!=(len(self.SynForm)-1):
+#                p += '\n'
+#        
+#        return p
         
 ####################################
 ### Grammar: set of construtions ###
