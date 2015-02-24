@@ -145,6 +145,8 @@ class WM:
         - f-links ([F_LINK]):
         - time_constant (int):
         - prune_threshold (int):
+        
+        - assemblages ????
     """
     
     def __init__(self, name):
@@ -229,7 +231,15 @@ class F_LINK:
     def send_outputs(self):
         """
         """
-    
+
+class ASSEMBLAGE:
+    """
+    Defines a schema instance assemablage.
+    """
+    def __init__(self):
+        self.f_links = []
+        self.activation = 0
+        
 ############################    
 ### Brain system classes ###
 ############################   
