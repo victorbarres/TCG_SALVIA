@@ -172,16 +172,46 @@ class WM:
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
         
-    def add_f_link(self, from_s_inst, from_port, to_s_inst, to_port, weight):
+    def add_f_link(self, from_inst, from_port, to_inst, to_port, weight):
         new_f_link = F_LINK()
         new_f_link.set_WM(self)
-        new_f_link.set_port_in(from_s_inst, from_port)
-        new_f_link.set_port_out(to_s_inst, to_port)
+        new_f_link.set_port_in(from_inst, from_port)
+        new_f_link.set_port_out(to_inst, to_port)
         new_f_link.set_weight(weight)
         self.f_links.append(new_f_link)
+    
+    def find_f_links(self,from_inst='any', to_inst='any', from_port='any', to_port='any'):
+        """
+        Returns a list of f_links that match the criteria.
+        By default, it returns al the f-links (no criteria specified)
+        """
+        results = []
+        for flink in self.f_links:
+            match = True
+            if from_inst!='any' and (flink.port_in['instance']!=from_inst):
+                match = False
+            if to_inst!='any' and (flink.port_out['instance']!=to_inst):
+                match = False
+            if from_port!='any' and (flink.port_in['port']!=from_port):
+                match = False
+            if to_port !='any' and (flink.port_out['port']!=to_port):
+                match = False
+            
+            if match:
+                results.append(flink)
+                
+        return results
+                   
+    def remove_f_links(self,from_inst, to_inst, from_port='any', to_port='any'):
+        """
+        Remove the f_links from working memory that satisfy the criteria.
+        """
+        f_links = self.find_f_links(from_inst=from_inst, to_inst=to_inst, from_port=from_port, to_port=to_port)
+        for f_link in f_links:
+            self.f_links.remove(f_link)
         
-    def remove_f_link(self,from_s_inst, to_s_inst):
-        return None
+        # -> Might require to redo the assemblages!
+        
         
     def update(self):
         return
@@ -193,8 +223,8 @@ class F_LINK:
     
     Data:
         - WM (WM): Associated working memory
-        - port_in ({"schema_inst":SCHEMA_INST, "port":port_id})
-        - port_out ({"schema_inst":SCHEMA_INST, "port":port_id})
+        - port_in ({"schema_inst":SCHEMA_INST, "port":port_id, "value":value})
+        - port_out ({"schema_inst":SCHEMA_INST, "port":port_id, "value":value})
         - weight (float)
     """
     

@@ -47,13 +47,13 @@ class MODULE:
         - id (int): Unique id
         - name (str): Module name
         - function (WM, LTM)
-        - in_ports ([int]):
-        - out_ports ([int]):
+        - in_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
+        - out_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
         - brain_regions([str]):
     """
     ID_next = 0
-    PO_next = 0
     PI_next = 0
+    PO_next = 0
     def __init__(self, name, function = None, brain_regions = []):
         self.id = MODULE.ID_next
         MODULE.ID_next +=1
@@ -70,7 +70,20 @@ class MODULE:
     
     def add_port(self,port_type, port_name):
         """
+        Adds a new port to the module. Port_type (str) ['in' or 'out'], port_name (str).
         """
+        if port_type == 'in':
+            new_port = {'id':MODULE.PI_next, 'name':port_name, 'value':None}
+            MODULE.PI_next +=1
+            self.in_ports.append(new_port)
+            return True
+        elif port_type == 'out':
+            new_port = {'id':MODULE.PO_next, 'name':port_name, 'value':None}
+            MODULE.PO_next +=1
+            self.out_ports.append(new_port)
+            return True
+        else:
+            return False
 
 class CONNECT:
     """
