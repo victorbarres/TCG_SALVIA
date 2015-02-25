@@ -4,67 +4,154 @@ Created on Mon May 05 12:07:09 2014
 
 @author: Victor Barres
 
-Define visual scene structure related classes for TCG1.0
+Defines visual scene structure related classes for TCG.
 """
-###############################################################################
+from schema_theory import SCHEMA
+
+##########################
 ### Perceptual schemas ###
 
-class SCHEMA:
+class AREA:
+    """
+    Simply defines an area in the visual input
+    """
+    def __init__(self, x=0, y=0, w=0, h=0):
+        """
+        Areas are defined as boxes.
+        It is assumed that the coordiate are defined with origin at the top left corner of the scene. x axis: vertical down, y axis: horizong toward left.
+        x, y coordiate of top-left corner
+        w = width
+        h = height
+        """
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+    
+    def hull(area1, area2):
+        """
+        Class method
+        Returns the smallest area containing area1 and area2 (~ convex hull)
+        """
+        merge_area = AREA()
+        merge_area.x = min(area1.x, area2.x)
+        merge_area.y = min(area1.y, area2.y)
+        merge_area.w = max(area1.y + area1.w, area2.y + area2.w) - merge_area.y
+        merge_area.h = max(area1.x + area1.h, area2.x + area2.h) - merge_area.x
+        
+        return merge_area
+        
+
+class PERCEPT_SCHEMA(SCHEMA):
     """
     Perceptual schema
     
     Data:
-        - type (INT): Schema type (UNDEFINED, OBJECT or RELATION).
-        - name (STRING): Schema name.
-        - concept (CONCEPT): Concept associated with the schema.
-        - region (REGION): Region of the visual scene associated with the schema.
+        - SCHEMA data:
+                    - id (int): Unique id
+                    - name (str): schema name
+                    - LTM (LTM): Associated long term memory.
+                    - content (): Procedural or semantic content of the schema.
+                    - init_act (float): Initial activation value.
+        - type (INT): Schema type (UNDEFINED, OBJECT, RELATION, ACTION).
+        - content of schema is defines as: 'feature' and 'area'
+            'features' contains the perceptual features
+            'area' (AREA) defines the area of the scene associated with this perceptual schema.
     """
     # Schema types
     UNDEFINED = 0
     OBJECT = 1
-    RELATION = 2
+    ACTION = 2
+    QUALITY = 3
+    SPATIAL_REL = 4
+    ACTION_REL = 5
+    QUALITY_REL = 6
+    TEMP_REL = 7
     
     def __init__(self):
-        self.type = SCHEMA.UNDEFINED
-        self.name = ''
-        self.concept = None
-        self.region = None
+        SCHEMA.__init__(self)
+        self.type = PERCEPT_SCHEMA.UNDEFINED
+        self.set_content({'features':None, 'area':None})
+    
+    def set_features(self, features):
+        self.content['features'] = features
+    
+    def set_area(self, an_area):
+        self.content['area'] = an_area
 
-class SC_OBJECT(SCHEMA):
+class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA):
+    """
+    Defines relation perceptual schemas.
+    """
+    def __init__(self):
+        PERCEPT_SCHEMA.__init__(self)
+        self.pFrom = None
+        self.pTo = None
+    
+    def set_area(self):
+        """
+        The area of relation schemas is defines as the hull of the schemas they link.
+        """
+        if not(self.pFrom) or not(self.pTo):
+            return False
+        self.area = AREA.hull(self.pFrom.content['area'], self.pTo.content['area'])
+
+class PERCEPT_OBJECT(PERCEPT_SCHEMA):
     """
     Object schema
     """
     def __init__(self):
-        SCHEMA.__init__(self)
-        self.type = SCHEMA.OBJECT
-    
-    def __str__(self):
-        p = ''
-        p += 'name: %s\n' % self.name
-        p += 'type: perceptual object\n'
-        p += 'concept: %s\n' % self.concept.name
-        p += 'region: %s\n' % self.region.name
-        return p
+        PERCEPT_SCHEMA.__init__(self)
+        self.type = PERCEPT_SCHEMA.OBJECT
 
-class SC_REL(SCHEMA):
+class PERCEPT_ACTION(PERCEPT_SCHEMA):
     """
-    Relation schema. Define relation (edge) between two object schemas (SC_OBJECT) pFrom and pTo.
+    Action schema. Define relation (edge) between two object schemas (SC_OBJECT) pFrom and pTo.
     """
     def __init__(self):
-        SCHEMA.__init__(self)
-        self.type = SCHEMA.RELATION
-        self.pFrom = None
-        self.pTo = None
-    
-    def __str__(self):
-        p = ''
-        p += 'name: %s\n' % self.name
-        p += 'type: perceptual relation\n'
-        p += 'concept: %s\n' % self.concept.name
-        p += 'from: %s\n' % self.pFrom.name
-        p += 'to: %s\n' % self.pTo.name
-        p += 'region: %s\n' % self.region.name
-        return p
+        PERCEPT_SCHEMA.__init__(self)
+        self.type = PERCEPT_SCHEMA.ACTION
+
+class PERCEPT_QUALITY(PERCEPT_SCHEMA):
+    """
+    Quality schema.
+    """
+    def __init__(self):
+        PERCEPT_SCHEMA.__init__(self)
+        self.type = PERCEPT_SCHEMA.QUALITY
+
+class PERCEPT_SPATIAL_REL(PERCEPT_SCHEMA_REL):
+    """
+    Spatial relation schema. Define relation (edge) between two object schemas (PERCEPT_OBJECT) pFrom and pTo.
+    """
+    def __init__(self):
+        PERCEPT_SCHEMA_REL.__init__(self)
+        self.type = PERCEPT_SCHEMA.SPATIAL_REL
+        
+class PERCEPT_ACTION_REL(PERCEPT_SCHEMA_REL):
+    """
+    Action relation schema. Define relation (edge) between an action schemas (PERCEPT_ACTION) pFrom and and object schema (PERCEPT_OBJECT) pTo.
+    """
+    def __init__(self):
+        PERCEPT_SCHEMA_REL.__init__(self)
+        self.type = PERCEPT_SCHEMA.ACTION_REL
+        
+class PERCEPT_QUALITY_REL(PERCEPT_SCHEMA_REL):
+    """
+    Quality relation schema. Define relation (edge) between a quality schemas (PERCEPT_QUALITY) pFrom and another percept schema (PERCEPT_SCHEMA) pTo.
+    """
+    def __init__(self):
+        PERCEPT_SCHEMA_REL.__init__(self)
+        self.type = PERCEPT_SCHEMA.QUALITY_REL
+
+class PERCEPT_TEMP_REL(PERCEPT_SCHEMA_REL):
+    """
+    Temporal relation schema. Define relation (edge) between two action schemas (PERCEPT_ACTION) pFrom and pTo.
+    """
+    def __init__(self):
+        PERCEPT_SCHEMA_REL.__init__(self)
+        self.type = PERCEPT_SCHEMA.TEMP_REL
+        
 ###############################################################################
 ### Perceptual process ###
 
