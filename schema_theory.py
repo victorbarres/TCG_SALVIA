@@ -53,6 +53,8 @@ class SCHEMA_INST:
         - in_ports ([int]):
         - out_ports ([int]):
         - alive (bool): status flag
+        
+        - Maybe add trace, what triggered the instantiation.
     """
     ID_next = 0 # Global schema instance ID counter
     
