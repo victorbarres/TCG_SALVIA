@@ -10,35 +10,38 @@ from schema_theory import SCHEMA
 
 ##########################
 ### Perceptual schemas ###
-
+##########################
 class AREA:
     """
     Simply defines an area in the visual input
     """
-    def __init__(self, x=0, y=0, w=0, h=0):
+    def __init__(self, x=0, y=0, w=0, h=0, saliency=0):
         """
         Areas are defined as boxes.
         It is assumed that the coordiate are defined with origin at the top left corner of the scene. x axis: vertical down, y axis: horizong toward left.
         x, y coordiate of top-left corner
         w = width
         h = height
+        saliency = Bottom-up saliency of the area.
         """
         self.x = x
         self.y = y
         self.w = w
         self.h = h
+        self.saliency = saliency
     
     def hull(area1, area2):
         """
         Class method
         Returns the smallest area containing area1 and area2 (~ convex hull)
+        Right now the saliency is defined as the max of both saliency values... NOT SURE IT IS A GOOD WAY OF DOING THIS!
         """
         merge_area = AREA()
         merge_area.x = min(area1.x, area2.x)
         merge_area.y = min(area1.y, area2.y)
         merge_area.w = max(area1.y + area1.w, area2.y + area2.w) - merge_area.y
         merge_area.h = max(area1.x + area1.h, area2.x + area2.h) - merge_area.x
-        
+        merge_area.saliency = max(area1.saliency + area2.saliency) # THIS MIGHT NOT BE A GOOD IDEA!
         return merge_area
         
 
@@ -55,8 +58,8 @@ class PERCEPT_SCHEMA(SCHEMA):
                     - init_act (float): Initial activation value.
         - type (INT): Schema type (UNDEFINED, OBJECT, RELATION, ACTION).
         - content of schema is defines as: 'feature' and 'area'
-            'features' contains the perceptual features
-            'area' (AREA) defines the area of the scene associated with this perceptual schema.
+            'features' (): contains the perceptual features
+            'area' (AREA): defines the area of the scene associated with this perceptual schema.
     """
     # Schema types
     UNDEFINED = 0
@@ -71,30 +74,28 @@ class PERCEPT_SCHEMA(SCHEMA):
     def __init__(self):
         SCHEMA.__init__(self)
         self.type = PERCEPT_SCHEMA.UNDEFINED
-        self.set_content({'features':None, 'area':None})
+        self.set_content({'features':None, 'area':None, 'saliency':None})
     
     def set_features(self, features):
         self.content['features'] = features
     
     def set_area(self, an_area):
         self.content['area'] = an_area
-
-class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA):
-    """
-    Defines relation perceptual schemas.
-    """
-    def __init__(self):
-        PERCEPT_SCHEMA.__init__(self)
-        self.pFrom = None
-        self.pTo = None
     
-    def set_area(self):
-        """
-        The area of relation schemas is defines as the hull of the schemas they link.
-        """
-        if not(self.pFrom) or not(self.pTo):
-            return False
-        self.area = AREA.hull(self.pFrom.content['area'], self.pTo.content['area'])
+    ### -> Set the initial activation
+#    def set_saliency(self, saliency=None):
+#        """
+#        Sets the saliency to saliency (FLOAT). If no saliency is provided, by default, sets saliency of perceptual schema equal to the bottom-up saliency 
+#        value of the area it is associated with.
+#        """
+#        if saliency:
+#            self.content['saliency'] = saliency
+#            return True
+#        elif self.area:
+#            self.content['saliency'] = self.content['area'].saliency
+#            return True
+#        else:
+#            return False
 
 class PERCEPT_OBJECT(PERCEPT_SCHEMA):
     """
@@ -119,6 +120,23 @@ class PERCEPT_QUALITY(PERCEPT_SCHEMA):
     def __init__(self):
         PERCEPT_SCHEMA.__init__(self)
         self.type = PERCEPT_SCHEMA.QUALITY
+
+class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMAS BY DEFAULT AS FROM and To (A VARIABLE! (unbound), eg. something is red). Think about that....
+    """
+    Defines relation perceptual schemas.
+    """
+    def __init__(self):
+        PERCEPT_SCHEMA.__init__(self)
+        self.set_content({'features':None, 'area':None, 'saliency':None, 'from':None, 'to':None})
+    
+    def set_area(self):
+        """
+        The area of relation schemas is defines as the hull of the schemas they link.
+        """
+        if not(self.content['from']) or not(self.content['to']):
+            return False
+        self.area = AREA.hull(self.content['from'].content['area'], self.content['to'].content['area'])
+        return True
 
 class PERCEPT_SPATIAL_REL(PERCEPT_SCHEMA_REL):
     """
@@ -152,9 +170,9 @@ class PERCEPT_TEMP_REL(PERCEPT_SCHEMA_REL):
         PERCEPT_SCHEMA_REL.__init__(self)
         self.type = PERCEPT_SCHEMA.TEMP_REL
         
-###############################################################################
+##########################
 ### Perceptual process ###
-
+##########################
 class PERCEPT:
     """
     Schema perception.
@@ -211,21 +229,73 @@ class REGION:
         self.uncertainty = 0
         
         self.percepts = []
-    
-    def __str__(self):
-        p = ''
-        p += 'name: %s\n' % self.name
-        p += 'type: visual scene region\n'
-        p += 'location: (%i, %i)\n' %(self.x, self.y)
-        p += 'size: (%i, %i)\n' %(self.w, self.h)
-        p += 'saliency: %i\n' % self.saliency
-        p += 'uncertainty: %i\n' % self.uncertainty
-        p += 'percepts:\n'
-        for per in self.percepts:
-            p += ''.join(['\t' + s + '\n' for s in str(per).splitlines()]) + '\n'
-        return p
-###############################################################################
+####################
 ### Visual scene ###
+####################    
+class SUB_SCENE:
+    """
+    A subscene represents a structured perceptual units.
+    It is defined as a graph of perceptual schemas.
+    
+    Data:
+        - name (str): sub-scene name
+        - nodes ([PERCEPT_SCHEMA (except PERCEPT_SCHEMA_REL)]): the nodes of the graph. ## THOSE SHOULD BE SCHEMA INSTANCES!!! AND SAME BELOW!!
+        - edges ([PERCEPT_SCHEMA_REL]): the edges of the graph.
+        - area (AREA): The area associated with the sub-scenes -> Defined as the hull of the areas associated with all the subscenes perceptual schemas.
+        - anchor (PERCEPT_SCHEMA): The perceptual anchor of the subscene.
+        - uncertainty (INT): How uncertain is the perception of this region.
+        - saliency (FLOAT):  Perceptual saliency of subscene
+    """
+    NEXT_ID = 0
+    def __init__(self, name=''):
+        self.id = SUB_SCENE.NEXT_ID
+        SUB_SCENE.NEXT_ID +=1
+        self.name = name
+        self.nodes = []
+        self.edges = []
+        self.area = None
+        self.anchor = None
+        self.uncertainty = 0
+        self.saliency = 0
+    
+    def add_per_schema(self, per_schema):
+        """
+        Adds a percetual schema to the sub_scenes.
+        If the perceptual schema is a relation schemas, it is added to edges. Else it is added to nodes.
+        """
+        # Check duplication
+        if self.find_schema(per_schema.name):
+            return False
+        if isinstance(per_schema, PERCEPT_SCHEMA_REL):
+            self.edges.append(per_schema)
+            self.update_area()
+            return True
+        else:
+            self.nodes.append(per_schema)
+            self.update_area()
+            return True
+        
+        return False
+    
+    def set_anchor(self, per_schema):
+        self.anchor = per_schema
+    
+    def find_schema(self, name):
+        for per_schema in self.nodes + self.edges:
+            if per_schema.name == name:
+                return per_schema
+        return None
+            
+    def update_area(self):
+        per_schemas = self.nodes + self.edges
+        if len(per_schemas) == 0:
+            self.area = None
+            return False
+        self.area = self.per_schemas[0].content['area']
+        for per_schema in per_schemas[1:]:
+            self.area = AREA.hull(self.area, per_schema.content['area'])
+        
+        self.saliency = self.area.saliency
 
 class SCENE:
     """
@@ -233,15 +303,17 @@ class SCENE:
     
     Data:
         - width, height (INT): Scene resolution
+        - subscenes ([SUB_SCENE]): List of all subscenes associated with the scene.
         - schemas ([SCHEMA]): List of perceptual schemas associated with the scene.
-        - regions ([REGION]): List of regions associated with the scene.
+        - focus_regions ([{'area':AREA, 'subscene': SUBSCENE}]): Look-up table linking areas to subscenes.
     """
     
     def __init__(self):
         self.width = 0
         self.height = 0
+        self.subscenes = []
         self.schemas = []
-        self.regions = []
+        self.focus_regions = []
     
     
     def clear(self):
@@ -250,8 +322,9 @@ class SCENE:
         """
         self.width = 0
         self.height = 0
+        self.subscenes = []
         self.schemas = []
-        self.regions = []
+        self.focus_regions = []
 
     def find_schema(self, name):
         """
@@ -262,59 +335,34 @@ class SCENE:
                 return s
         return None
         
-    def find_region(self, name):
+    def find_subscene(self, name):
         """
-        Find region with name 'name' (STR) in scene.
+        Find subscene with name 'name' (STR) in scene.
         """
-        for r in self.regions:
-            if r.name == name:
-                return r
+        for ss in self.subscenes:
+            if ss.name == name:
+                return ss
         return None
     
-    def add_schema(self, schema):
+    def add_subscene(self, ss):
         """
-        Add schema (SCHEMA) to scene if no duplication.
+        Add subscene ss (SUB_SCENE) to scene if no duplication.
         """
         # Check validity
-        if(not(schema) or schema.name == ''):
+        if(not(ss) or ss.name == ''):
             return False
         
         # Check duplication
-        if self.find_schema(schema.name):
+        if self.find_subscene(ss.name):
             return False
         
         # Add new schema
-        self.schemas.append(schema)
+        self.subscenes.append(ss)
+        self.focus_regions.append({'area':ss.area, 'subscene':ss})
+        for schema in ss.nodes + ss.edges:
+            if not(self.find_schema(schema.name)):
+                self.schemas.append(schema)
         return True
-        
-    def add_region(self, region):
-        """
-        Add region (REGION) to scene if no duplication.
-        """
-        # Check validity
-        if(not(region) or region.name == ''):
-            return False
-        
-        # Check duplication
-        if self.find_region(region.name):
-            return False
-        
-        # Add new region
-        self.regions.append(region)
-        return True
-        
-    def __str__(self):
-        p = ''
-        p += "### VISUAL SCENE ###\n\n"
-        p += "width: %i , height: %i\n\n" %(self.width, self.height)
-        p += "REGIONS (num=%i):\n\n" % (len(self.regions))
-        for r in self.regions:
-            p += str(r) + '\n'
-        p += "PERCEPTUAL SCHEMAS (num=%i):\n\n" % (len(self.schemas))
-        for s in self.schemas:
-            p += str(s) + '\n'
-        return p
-            
 
 ###############################################################################
 
