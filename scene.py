@@ -6,7 +6,7 @@ Created on Mon May 05 12:07:09 2014
 
 Defines visual scene structure related classes for TCG.
 """
-from schema_theory import SCHEMA
+from schema_theory import SCHEMA, SCHEMA_INST
 
 ##########################
 ### Perceptual schemas ###
@@ -41,7 +41,7 @@ class AREA:
         merge_area.y = min(area1.y, area2.y)
         merge_area.w = max(area1.y + area1.w, area2.y + area2.w) - merge_area.y
         merge_area.h = max(area1.x + area1.h, area2.x + area2.h) - merge_area.x
-        merge_area.saliency = max(area1.saliency + area2.saliency) # THIS MIGHT NOT BE A GOOD IDEA!
+        merge_area.saliency = max(area1.saliency + area2.saliency) # THIS MIGHT NOT BE A GOOD IDEA!!
         return merge_area
         
 
@@ -169,6 +169,26 @@ class PERCEPT_TEMP_REL(PERCEPT_SCHEMA_REL):
     def __init__(self):
         PERCEPT_SCHEMA_REL.__init__(self)
         self.type = PERCEPT_SCHEMA.TEMP_REL
+    
+class PERCEPT_SCHEMA_INST(SCHEMA_INST):
+    """
+    Perceptual schema instance.
+    Data:
+        SCHEMA_INST:
+            - id (int): Unique id
+            - activation (float): Current activation value of schema instance
+            - schema (PERCEPT_SCHEMA):
+            - in_ports ([int]):
+            - out_ports ([int]):
+            - alive (bool): status flag
+            - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
+        
+    Notes:
+        For now, those schema instances are not used to form assemablages -> so no use for ports... 
+        Trace is left empty, one can think that in a more realistic preceptual model, perceptual schemas would be instantiated on the basis of other perceptual schemas (See VISION model)
+    """
+    def __init__(self):
+        SCHEMA_INST.__init__(self)
         
 ##########################
 ### Perceptual process ###
@@ -239,10 +259,10 @@ class SUB_SCENE:
     
     Data:
         - name (str): sub-scene name
-        - nodes ([PERCEPT_SCHEMA (except PERCEPT_SCHEMA_REL)]): the nodes of the graph. ## THOSE SHOULD BE SCHEMA INSTANCES!!! AND SAME BELOW!!
-        - edges ([PERCEPT_SCHEMA_REL]): the edges of the graph.
-        - area (AREA): The area associated with the sub-scenes -> Defined as the hull of the areas associated with all the subscenes perceptual schemas.
-        - anchor (PERCEPT_SCHEMA): The perceptual anchor of the subscene.
+        - nodes ([PERCEPT_SCHEMA_INST]): the nodes of the graph. Has to be an instance of a perceptual schema that is not a relation
+        - edges ([PERCEPT_SCHEMA_INST]): the edges of the graph. Has to be an instance of a perceptual schema that is  a relation.
+        - area (AREA): The area associated with the sub-scenes -> Defined as the hull of the areas associated with all the subscenes perceptual schema instances.
+        - anchor (PERCEPT_SCHEMA_INST): The perceptual anchor of the subscene. Should not be a relation.
         - uncertainty (INT): How uncertain is the perception of this region.
         - saliency (FLOAT):  Perceptual saliency of subscene
     """
@@ -258,42 +278,42 @@ class SUB_SCENE:
         self.uncertainty = 0
         self.saliency = 0
     
-    def add_per_schema(self, per_schema):
+    def add_per_schema(self, schema_inst):
         """
         Adds a percetual schema to the sub_scenes.
-        If the perceptual schema is a relation schemas, it is added to edges. Else it is added to nodes.
+        If the perceptual schema instantiates a relation schemas, it is added to edges. Else it is added to nodes.
         """
         # Check duplication
-        if self.find_schema(per_schema.name):
+        if self.find_schema(schema_inst.schema.name):
             return False
-        if isinstance(per_schema, PERCEPT_SCHEMA_REL):
-            self.edges.append(per_schema)
+        if isinstance(schema_inst.schema, PERCEPT_SCHEMA_REL):
+            self.edges.append(schema_inst)
             self.update_area()
             return True
         else:
-            self.nodes.append(per_schema)
+            self.nodes.append(schema_inst)
             self.update_area()
             return True
         
         return False
     
-    def set_anchor(self, per_schema):
-        self.anchor = per_schema
+    def set_anchor(self, schema_inst):
+        self.anchor = schema_inst
     
     def find_schema(self, name):
-        for per_schema in self.nodes + self.edges:
-            if per_schema.name == name:
-                return per_schema
+        for schema_inst in self.nodes + self.edges:
+            if schema_inst.schema.name == name:
+                return schema_inst
         return None
             
     def update_area(self):
-        per_schemas = self.nodes + self.edges
-        if len(per_schemas) == 0:
+        schema_insts = self.nodes + self.edges
+        if len(schema_insts) == 0:
             self.area = None
             return False
-        self.area = self.per_schemas[0].content['area']
-        for per_schema in per_schemas[1:]:
-            self.area = AREA.hull(self.area, per_schema.content['area'])
+        self.area = self.schema_insts[0].schema.content['area']
+        for schema_inst in schema_insts[1:]:
+            self.area = AREA.hull(self.area, schema_inst.schema.content['area'])
         
         self.saliency = self.area.saliency
 
@@ -304,7 +324,7 @@ class SCENE:
     Data:
         - width, height (INT): Scene resolution
         - subscenes ([SUB_SCENE]): List of all subscenes associated with the scene.
-        - schemas ([SCHEMA]): List of perceptual schemas associated with the scene.
+        - schemas ([SCHEMA_INST]): List of perceptual schemas instances associated with the scene.
         - focus_regions ([{'area':AREA, 'subscene': SUBSCENE}]): Look-up table linking areas to subscenes.
     """
     
@@ -331,7 +351,7 @@ class SCENE:
         Find schema with name 'name' (STR) in scene.
         """
         for s in self.schemas:
-            if s.name == name:
+            if s.schema.name == name:
                 return s
         return None
         
@@ -359,9 +379,9 @@ class SCENE:
         # Add new schema
         self.subscenes.append(ss)
         self.focus_regions.append({'area':ss.area, 'subscene':ss})
-        for schema in ss.nodes + ss.edges:
-            if not(self.find_schema(schema.name)):
-                self.schemas.append(schema)
+        for schema_inst in ss.nodes + ss.edges:
+            if not(self.find_schema(schema_inst.schema.name)):
+                self.schemas.append(schema_inst)
         return True
 
 ###############################################################################

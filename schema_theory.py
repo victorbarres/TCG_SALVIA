@@ -53,8 +53,7 @@ class SCHEMA_INST:
         - in_ports ([int]):
         - out_ports ([int]):
         - alive (bool): status flag
-        
-        - Maybe add trace, what triggered the instantiation.
+        - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
     """
     ID_next = 0 # Global schema instance ID counter
     
@@ -64,6 +63,7 @@ class SCHEMA_INST:
         self.activation = 0
         self.schema = None         
         self.alive = False
+        self.trace = None
         
     def set_activation(self, act):
         """
@@ -83,15 +83,22 @@ class SCHEMA_INST:
         """
         self.alive = bool_val
     
+    def set_trace(self, a_trace):
+        """
+        Set trace value to a_trace.
+        """
+        self.trace = a_trace
+    
     def set_ports(self):
         return
     
-    def instantiate(self, schema):
+    def instantiate(self, schema, trace):
         """
         """
         self.set_schema(schema)
         self.set_activation(schema.init_act)
         self.set_alive(True)
+        self.set_trace(trace)
         self.set_ports()
     
     def get_inputs(self):
