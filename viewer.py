@@ -67,7 +67,9 @@ class TCG_VIEWER:
         print os.getcwd()
         shutil.copytree(self.data_path, self.viewer_path + self.tmp)
         self._create_cxn_imgs()
-        self._create_concept_img()
+        dot_cpt = self._create_concept_img()
+        dot_sem= self._create_semrels_img()
+        self.self._create_conceptualizer_img(dot_cpt, dot_sem)
     
     def _create_cxn_imgs(self):
         """
@@ -154,6 +156,58 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
+        cpt_folder = self.viewer_path + self.tmp + 'cpt/'        
+        
+        if os.path.exists(cpt_folder):
+            shutil.rmtree(cpt_folder)
+        
+        os.mkdir(cpt_folder)
+        
+        cpt_file = 'TCG_semantics.json'
+        with open(self.viewer_path + self.tmp + cpt_file, 'r') as f:
+            json_data = json.load(f)
+        
+        cpt = json_data['CONCEPTUAL_KNOWLEDGE']
+        edge_type = 'is_a'
+        dot_cpt = pydot.Dot(graph_type='digraph')
+        dot_cpt.set_rankdir('BT')
+        dot_cpt.set_fontname('consolas')
+        color = 'black'
+        node_shape = 'box'
+        style = 'filled'
+        fill_color = 'white'
+        
+        def _add_rel(sup_node, cpt_data, dot_cpt):
+            for concept in cpt_data:
+                dot_cpt.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color))
+                if sup_node != None:
+                    dot_cpt.add_edge(pydot.Edge(concept, sup_node, label=edge_type))
+                
+                _add_rel(concept, cpt_data[concept], dot_cpt)
+        
+        _add_rel(None, cpt, dot_cpt)
+        
+        file_name = cpt_folder + 'TCG_concepts' + ".gv"
+        dot_cpt.write(file_name)
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        
+        return dot_cpt
+    
+    def _create_semrels_img(self):
+        """
+        Create graph image for the semantic relations knowledge.
+        Uses graphviz with pydot implementation.
+        """
+        import os, shutil
+        import subprocess        
+        import json
+        import pydot
+        
+        prog = 'dot'
+        file_type = 'svg'
+        
         sem_folder = self.viewer_path + self.tmp + 'sem/'        
         
         if os.path.exists(sem_folder):
@@ -165,7 +219,7 @@ class TCG_VIEWER:
         with open(self.viewer_path + self.tmp + sem_file, 'r') as f:
             json_data = json.load(f)
         
-        sem = json_data
+        sem = json_data['SEM_RELATIONS']
         edge_type = 'is_a'
         dot_sem = pydot.Dot(graph_type='digraph')
         dot_sem.set_rankdir('BT')
@@ -175,28 +229,128 @@ class TCG_VIEWER:
         style = 'filled'
         fill_color = 'white'
         
-        def _add_semrel(sup_node, sem_data, dot_sem):
+        def _add_rel(sup_node, sem_data, dot_sem):
             for concept in sem_data:
                 dot_sem.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color))
                 if sup_node != None:
                     dot_sem.add_edge(pydot.Edge(concept, sup_node, label=edge_type))
                 
-                _add_semrel(concept, sem_data[concept], dot_sem)
+                _add_rel(concept, sem_data[concept], dot_sem)
         
-        _add_semrel(None, sem, dot_sem)
+        _add_rel(None, sem, dot_sem)
         
-        file_name = sem_folder + 'TCG_semantics' + ".gv"
+        file_name = sem_folder + 'TCG_semrels' + ".gv"
         dot_sem.write(file_name)
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         
+        return dot_sem
+    
+    def _create_percept_img(self):
+        """
+        Create graph image for the percetual knowledge.
+        Uses graphviz with pydot implementation.
+        """
+        import os, shutil
+        import subprocess        
+        import json
+        import pydot
         
-
+        prog = 'dot'
+        file_type = 'svg'
         
+        per_folder = self.viewer_path + self.tmp + 'per/'        
         
+        if os.path.exists(per_folder):
+            shutil.rmtree(per_folder)
         
+        os.mkdir(per_folder)
+        
+        per_file = 'TCG_semantics.json'
+        with open(self.viewer_path + self.tmp + per_file, 'r') as f:
+            json_data = json.load(f)
+        
+        per = json_data['PERCEPTUAL_KNOWLEDGE']
+        edge_type = 'is_a'
+        dot_per = pydot.Dot(graph_type='digraph')
+        dot_per.set_rankdir('BT')
+        dot_per.set_fontname('consolas')
+        color = 'black'
+        node_shape = 'box'
+        style = 'filled'
+        fill_color = 'white'
+        
+        def _add_rel(sup_node, per_data, dot_per):
+            for concept in per_data:
+                dot_per.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color))
+                if sup_node != None and sup_node != 'FEATURE':
+                    dot_per.add_edge(pydot.Edge(concept, sup_node, label=edge_type))
                 
+                _add_rel(concept, per_data[concept], dot_per)
+        
+        _add_rel(None, per, dot_per)
+        
+        file_name = per_folder + 'TCG_percepts' + ".gv"
+        dot_per.write(file_name)
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        
+        return dot_per
+    
+    def _create_conceptualizer_img(self, dot_cpt, dot_sem, dot_per):
+        """
+        Create graph image for the conceputalizer.
+        Uses graphviz with pydot implementation.
+        """
+        import os, shutil
+        import subprocess        
+        import json
+        import pydot
+        
+        prog = 'dot'
+        file_type = 'svg'
+        
+        czer_folder = self.viewer_path + self.tmp + 'conceptualizer/'        
+        
+        if os.path.exists(czer_folder):
+            shutil.rmtree(czer_folder)
+        
+        os.mkdir(czer_folder)
+        
+        czer_file = 'TCG_conceptualizer.json'
+        with open(self.viewer_path + self.tmp + czer_file, 'r') as f:
+            json_data = json.load(f)
+        
+        czer = json_data['CONCEPTUALIZATIONS']
+        dot_czer = pydot.Dot(graph_type = 'digraph')
+        dot_czer.set_rankdir('LR')
+        dot_czer.set_fontname('consolas')
+        color = 'red'
+        
+        cluster_concepts = pydot.Cluster('concepts', label='concepts')
+        cluster_concepts.add_subgraph(dot_cpt)
+        
+        cluster_semrels = pydot.Cluster('semrels', label='semrels')
+        cluster_semrels.add_subgraph(dot_sem)
+        
+        cluster_percepts = pydot.Cluster('percepts', label='percepts')
+        cluster_percepts.add_subgraph(dot_per)
+        
+        dot_czer.add_subgraph(cluster_concepts)
+        dot_czer.add_subgraph(cluster_semrels)
+        dot_czer.add_subgraph(cluster_percepts)
+        
+        for target in czer:
+            for source in czer[target]['TOKENS']:
+                dot_czer.add_edge(pydot.Edge(source, target, color=color))
+        
+        file_name = czer_folder + 'TCG_conceptualizer' + ".gv"
+        dot_czer.write(file_name)
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
 ###############################################################################
 if __name__ == '__main__':
     import os

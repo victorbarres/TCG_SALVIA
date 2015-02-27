@@ -105,8 +105,8 @@
 				"HANDSOME" : {}
 			}
 		}
-	}
-
+	},
+	
 	"PERCEPTUAL_KNOWLEDGE" :
 	{
 		"OBJECT":
@@ -178,7 +178,7 @@
 					"R4_WEARER" : {},
 					"R5_KICKER" : {},
 					"R6_LAUGHER" : {},
-					"R7_WATCHER" : ,
+					"R7_WATCHER" : {},
 					"R8_SQUIRTEE" : {},
 					"R9_HEARER" : {},
 					"R10_HITEE" : {},

@@ -5,6 +5,9 @@ Created on Mon May 05 12:07:09 2014
 @author: Victor Barres
 
 Defines visual scene structure related classes for TCG.
+
+
+HOW DO I DEAL WITH UPDATES??
 """
 from schema_theory import SCHEMA, SCHEMA_INST
 
@@ -211,7 +214,7 @@ class PERCEPT:
     def __init__(self):
         self.schema = None
         self.concept = None
-        self.replace_concept = False
+        self.replace_concept = False 
         
     
     def __str__(self):
