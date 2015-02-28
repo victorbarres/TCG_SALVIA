@@ -69,7 +69,8 @@ class TCG_VIEWER:
         self._create_cxn_imgs()
         dot_cpt = self._create_concept_img()
         dot_sem= self._create_semrels_img()
-        self.self._create_conceptualizer_img(dot_cpt, dot_sem)
+        dot_per = self._create_percept_img()
+        self._create_conceptualizer_img(dot_cpt, dot_sem, dot_per)
     
     def _create_cxn_imgs(self):
         """
@@ -96,6 +97,11 @@ class TCG_VIEWER:
             json_data = json.load(f)
         
         grammar = json_data['grammar']
+        
+        font_size = '10'
+        style = 'filled'
+        fill_color = 'white'
+        
         for cxn in grammar:
             dot_cxn = pydot.Dot(graph_type = 'digraph')
             dot_cxn.set_rankdir('LR')
@@ -109,7 +115,7 @@ class TCG_VIEWER:
                     node_shape = 'doublecircle'
                 else:
                     node_shape = 'circle'
-                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept'], color='black', shape=node_shape, style='filled', fillcolor='white'))
+                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept'], color='black', shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
             for edge in cxn['SemFrame']['edges']:
                 cluster_SemFrame.add_edge(pydot.Edge(edge['from'], edge['to'], label=edge['concept']))
             
@@ -120,9 +126,9 @@ class TCG_VIEWER:
             pre_form = None
             for form in cxn['SynForm']:
                 if form['type'] == "SLOT":
-                    cluster_SynForm.add_node(pydot.Node(form['name'], label ="[" +  ", ".join(form['classes']) +"]", shape="box", style='filled', fillcolor='white'))
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label ="[" +  ", ".join(form['classes']) +"]", shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
                 elif form['type'] == 'PHON':
-                    cluster_SynForm.add_node(pydot.Node(form['name'], label = form['phon'], shape="box", style='filled', fillcolor='white'))
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label = form['phon'], shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
                 if not(pre_form):
                     pre_form = form['name']
                 else:
@@ -172,6 +178,7 @@ class TCG_VIEWER:
         dot_cpt = pydot.Dot(graph_type='digraph')
         dot_cpt.set_rankdir('BT')
         dot_cpt.set_fontname('consolas')
+        font_size = '10'
         color = 'black'
         node_shape = 'box'
         style = 'filled'
@@ -179,13 +186,13 @@ class TCG_VIEWER:
         
         def _add_rel(sup_node, cpt_data, dot_cpt):
             for concept in cpt_data:
-                dot_cpt.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color))
+                dot_cpt.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
                 if sup_node != None:
-                    dot_cpt.add_edge(pydot.Edge(concept, sup_node, label=edge_type))
+                    dot_cpt.add_edge(pydot.Edge(concept, sup_node, label=edge_type, fontsize=font_size))
                 
                 _add_rel(concept, cpt_data[concept], dot_cpt)
         
-        _add_rel(None, cpt, dot_cpt)
+        _add_rel('CONCEPTUAL_KNOWLEDGE', cpt, dot_cpt)
         
         file_name = cpt_folder + 'TCG_concepts' + ".gv"
         dot_cpt.write(file_name)
@@ -224,6 +231,7 @@ class TCG_VIEWER:
         dot_sem = pydot.Dot(graph_type='digraph')
         dot_sem.set_rankdir('BT')
         dot_sem.set_fontname('consolas')
+        font_size = '10'
         color = 'black'
         node_shape = 'box'
         style = 'filled'
@@ -231,13 +239,13 @@ class TCG_VIEWER:
         
         def _add_rel(sup_node, sem_data, dot_sem):
             for concept in sem_data:
-                dot_sem.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color))
+                dot_sem.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
                 if sup_node != None:
-                    dot_sem.add_edge(pydot.Edge(concept, sup_node, label=edge_type))
+                    dot_sem.add_edge(pydot.Edge(concept, sup_node, label=edge_type, fontsize=font_size))
                 
                 _add_rel(concept, sem_data[concept], dot_sem)
         
-        _add_rel(None, sem, dot_sem)
+        _add_rel('SEMANTIC_RELATIONS', sem, dot_sem)
         
         file_name = sem_folder + 'TCG_semrels' + ".gv"
         dot_sem.write(file_name)
@@ -276,20 +284,25 @@ class TCG_VIEWER:
         dot_per = pydot.Dot(graph_type='digraph')
         dot_per.set_rankdir('BT')
         dot_per.set_fontname('consolas')
+        font_size = '10'
         color = 'black'
         node_shape = 'box'
         style = 'filled'
         fill_color = 'white'
+        id_next = [0] # Just so that it's pass by name and not by value...
         
-        def _add_rel(sup_node, per_data, dot_per):
+        def _add_rel(sup_node, sup_id, per_data, dot_per, id_next):
             for concept in per_data:
-                dot_per.add_node(pydot.Node(concept, label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color))
-                if sup_node != None and sup_node != 'FEATURE':
-                    dot_per.add_edge(pydot.Edge(concept, sup_node, label=edge_type))
-                
-                _add_rel(concept, per_data[concept], dot_per)
+                if concept!= 'FEATURE':  
+                    concept_id = id_next[0]
+                    id_next[0] +=1
+                    dot_per.add_node(pydot.Node(str(concept_id), label=concept, color=color, shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
+                    if sup_node != None:
+                        dot_per.add_edge(pydot.Edge(str(concept_id), str(sup_id), label=edge_type, fontsize=font_size))
+                    
+                    _add_rel(concept, concept_id, per_data[concept], dot_per, id_next)
         
-        _add_rel(None, per, dot_per)
+        _add_rel('PERCEPTUAL_KNOWLEDGE', 0, per, dot_per, id_next)
         
         file_name = per_folder + 'TCG_percepts' + ".gv"
         dot_per.write(file_name)

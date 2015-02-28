@@ -106,7 +106,7 @@
 			}
 		}
 	},
-	
+
 	"PERCEPTUAL_KNOWLEDGE" :
 	{
 		"OBJECT":
@@ -126,7 +126,7 @@
 				"O10_TSHIRT" : {"FEATURE":{"FEATURE_VECTOR":[]}},
 				"O11_BOXINGRING" : {"FEATURE":{"FEATURE_VECTOR":[]}},
 				"O12_PARK" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O13_PEOPLE" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O13_PEOPLE" : {"FEATURE":{"FEATURE_VECTOR":[]}}
 			}
 		},
 		"ACTION":
