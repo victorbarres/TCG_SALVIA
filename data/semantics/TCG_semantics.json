@@ -1,4 +1,3 @@
-
 {
 	"SEM_RELATIONS" : 
 	{
@@ -92,8 +91,10 @@
 			"COLOR" :
 			{
 				"BLACK" : {},
+				"WHITE" : {},
 				"BLUE" : {},
-				"GREEN" : {}
+				"GREEN" : {},
+				"RED" : {}
 			},
 			"SIZE" :
 			{
@@ -106,6 +107,116 @@
 				"HANDSOME" : {}
 			}
 		}
-	}		
+	},
+
+	"PERCEPTUAL_KNOWLEDGE" :
+	{
+		"OBJECT":
+		{
+			"FEATURE": {"FEATURE_VECTOR":"VECTOR"},
+			"TOKENS":
+			{
+				"O1_MAN" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O2_BOY" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O3_WOMAN" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O4_GIRL" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O5_HUMAN" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O6_ANIMAL" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O7_MOUSE" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O8_TURTLE" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O9_DRESS" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O10_TSHIRT" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O11_BOXINGRING" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O12_PARK" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"O13_PEOPLE" : {"FEATURE":{"FEATURE_VECTOR":[]}}
+			}
+		},
+		"ACTION":
+		{
+			"FEATURE": {"FEATURE_VECTOR":"VECTOR"},
+			"TOKENS":
+			{
+				"A1_SQUIRT" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"A2_TALK" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"A3_HIT" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"A4_WEAR" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"A5_KICK" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"A6_LAUGH" : {"FEATURE":{"FEATURE_VECTOR":[]}},
+				"A7_WATCH" : {"FEATURE":{"FEATURE_VECTOR":[]}}
+			}
+		},
+		"QUALITY":
+		{
+			"COLOR":
+			{
+				"FEATURE":{"R":"Int", "G":"Int", "B":"Int"},
+				"TOKENS":
+				{
+					"Q1_RED" : {"FEATURE":{"R":255, "G":0, "B":0}},
+					"Q2_BLUE" : {"FEATURE":{"R":0, "G":0, "B":255}},
+					"Q3_GREEN" : {"FEATURE":{"R":0, "G":255, "B":0}},
+					"Q6_BLACK" : {"FEATURE":{"R":0, "G":0, "B":0}},
+					"Q7_WHITE" : {"FEATURE":{"R":255, "G":255, "B":255}}
+				}
+			},
+			"SIZE":
+			{	
+				"FEATURE":{"W":"Int", "H":"Int"},
+				"TOKENS":
+				{
+					"Q4_SMALL" : {"FEATURE":{"W":20, "H":20}},
+					"Q5_BIG" : {"FEATURE":{"W":120, "H":100}}
+				}
+			}
+		},
+		"RELATION":
+		{
+			"ACTION_REL":
+			{
+				"FEATURE": {},
+				"TOKENS":
+				{
+					"R1_SQUIRTER" : {},
+					"R2_TALKER" : {},
+					"R3_HITER" : {},
+					"R4_WEARER" : {},
+					"R5_KICKER" : {},
+					"R6_LAUGHER" : {},
+					"R7_WATCHER" : {},
+					"R8_SQUIRTEE" : {},
+					"R9_HEARER" : {},
+					"R10_HITEE" : {},
+					"R11_WEAREE" : {},
+					"R12_KICKEE" : {},
+					"R13_WATCHEE" : {}
+				}
+			},
+			"SPATIAL_REL":
+			{
+				"FEATURE" : {},
+				"TOKENS":
+				{
+					"R8_CONTAIN" : {}
+				}
+			},
+			"QUALITY_REL":
+			{
+				"FEATURE" : {},
+				"TOKENS":
+				{
+					"R9_HAS_PARAM" : {}
+				}
+			},
+			"TEMP_REL":
+			{
+				"FEATURE" : {"T_SOURCE":"Time", "T_TARGET":"Time"},
+				"TOKENS":
+				{
+					"R11_CONCURRENT" : {},
+					"R12_SUCCESSIVE" : {}
+				}
+			}
+		}
+	}
 }
 
