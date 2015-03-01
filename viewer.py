@@ -69,8 +69,8 @@ class TCG_VIEWER:
         self._create_cxn_imgs()
         dot_cpt = self._create_concept_img()
         dot_sem= self._create_semrels_img()
-        dot_per = self._create_percept_img()
-        self._create_conceptualizer_img(dot_cpt, dot_sem, dot_per)
+        self._create_percept_img()
+        self._create_conceptualizer_img(dot_cpt, dot_sem)
     
     def _create_cxn_imgs(self):
         """
@@ -312,7 +312,7 @@ class TCG_VIEWER:
         
         return dot_per
     
-    def _create_conceptualizer_img(self, dot_cpt, dot_sem, dot_per):
+    def _create_conceptualizer_img(self, dot_cpt, dot_sem):
         """
         Create graph image for the conceputalizer.
         Uses graphviz with pydot implementation.
@@ -325,7 +325,7 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
-        czer_folder = self.viewer_path + self.tmp + 'conceptualizer/'        
+        czer_folder = self.viewer_path + self.tmp + 'czer/'        
         
         if os.path.exists(czer_folder):
             shutil.rmtree(czer_folder)
@@ -338,32 +338,53 @@ class TCG_VIEWER:
         
         czer = json_data['CONCEPTUALIZATIONS']
         dot_czer = pydot.Dot(graph_type = 'digraph')
-        dot_czer.set_rankdir('LR')
+        dot_czer.set_rankdir('BT')
         dot_czer.set_fontname('consolas')
-        color = 'red'
+        font_size = '10'
+        color = 'black'
+        node_shape = 'box'
+        style = 'filled'
+        fill_color = 'white'
+        edge_color = 'red'
+        
+        def _create_subgraph(graph):
+            sbg = pydot.Subgraph('')
+            for node in graph.get_nodes():
+                sbg.add_node(node)
+            for edge in graph.get_edges():
+                sbg.add_edge(edge)
+            return sbg
         
         cluster_concepts = pydot.Cluster('concepts', label='concepts')
-        cluster_concepts.add_subgraph(dot_cpt)
+        cpt_sbg = _create_subgraph(dot_cpt)
+        cluster_concepts.add_subgraph(cpt_sbg)
         
         cluster_semrels = pydot.Cluster('semrels', label='semrels')
-        cluster_semrels.add_subgraph(dot_sem)
+        sem_sbg = _create_subgraph(dot_sem)
+        cluster_semrels.add_subgraph(sem_sbg)
         
+        abstract_sbg = pydot.Subgraph()
+        abstract_sbg.add_subgraph(cluster_concepts)
+        abstract_sbg.add_subgraph(cluster_semrels)
+        
+        cluster_abstract = pydot.Cluster('abstract_knowlege', label='abstract_knowledge')
+        cluster_abstract.add_subgraph(abstract_sbg)
         cluster_percepts = pydot.Cluster('percepts', label='percepts')
-        cluster_percepts.add_subgraph(dot_per)
         
-        dot_czer.add_subgraph(cluster_concepts)
-        dot_czer.add_subgraph(cluster_semrels)
+        dot_czer.add_subgraph(cluster_abstract)
         dot_czer.add_subgraph(cluster_percepts)
         
         for target in czer:
             for source in czer[target]['TOKENS']:
-                dot_czer.add_edge(pydot.Edge(source, target, color=color))
+                cluster_percepts.add_node(pydot.Node(source, label=source, color=color, shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
+                dot_czer.add_edge(pydot.Edge(source, target, color=edge_color))
         
         file_name = czer_folder + 'TCG_conceptualizer' + ".gv"
         dot_czer.write(file_name)
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
+            
 ###############################################################################
 if __name__ == '__main__':
     import os

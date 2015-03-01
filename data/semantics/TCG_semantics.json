@@ -91,8 +91,10 @@
 			"COLOR" :
 			{
 				"BLACK" : {},
+				"WHITE" : {},
 				"BLUE" : {},
-				"GREEN" : {}
+				"GREEN" : {},
+				"RED" : {}
 			},
 			"SIZE" :
 			{
@@ -152,7 +154,9 @@
 				{
 					"Q1_RED" : {"FEATURE":{"R":255, "G":0, "B":0}},
 					"Q2_BLUE" : {"FEATURE":{"R":0, "G":0, "B":255}},
-					"Q3_GREEN" : {"FEATURE":{"R":0, "G":255, "B":0}}
+					"Q3_GREEN" : {"FEATURE":{"R":0, "G":255, "B":0}},
+					"Q6_BLACK" : {"FEATURE":{"R":0, "G":0, "B":0}},
+					"Q7_WHITE" : {"FEATURE":{"R":255, "G":255, "B":255}}
 				}
 			},
 			"SIZE":
