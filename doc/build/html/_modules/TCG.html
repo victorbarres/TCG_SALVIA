@@ -1,0 +1,573 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TCG &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for TCG</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Oct 08 2014</span>
+
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Define main() function and output printing functions for TCG1.1</span>
+<span class="sd">Adds a JSON output that can interface with the TCG_viewer.</span>
+<span class="sd">Use the JSON formatted inputs.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">import</span> <span class="nn">loader</span> <span class="kn">as</span> <span class="nn">LD</span>
+<span class="kn">import</span> <span class="nn">simulator</span> <span class="kn">as</span> <span class="nn">SIM</span>
+<span class="kn">import</span> <span class="nn">instance</span> <span class="kn">as</span> <span class="nn">INST</span>
+<span class="kn">import</span> <span class="nn">construction</span> <span class="kn">as</span> <span class="nn">CXN</span>
+
+<span class="n">TCG_ABOUT</span> <span class="o">=</span> <span class="s">&quot;Template Construction Grammar (TCG) Simulator v1.1</span><span class="se">\n\</span>
+<span class="se">\n\</span>
+<span class="s">Victor Barres (barres@usc.edu) May 14. 2014</span><span class="se">\n\</span>
+<span class="s">USC Brain Project and  Neuroscience Graduate Program</span><span class="se">\n\</span>
+<span class="s">University of Southern California (USC)</span><span class="se">\n</span><span class="s">&quot;</span>
+
+
+<div class="viewcode-block" id="print_inst_status"><a class="viewcode-back" href="../code.html#TCG.print_inst_status">[docs]</a><span class="k">def</span> <span class="nf">print_inst_status</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print status of schema instance</span>
+<span class="sd">        ! = Fresh, the instance was just invoked.</span>
+<span class="sd">        X = Dead, the instance will be pruned out of the working memory next time step.</span>
+<span class="sd">        x = Alive instance with activation &lt; 0</span>
+<span class="sd">        O = Alive instance with activation &gt; 0 and not Old (Basic status of active instances)</span>
+<span class="sd">        @ = Alive instance with activation &gt; 0 and Old -&gt; The Old flag means that the instance has already been used for read-out.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;[&quot;</span>
+    <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">fresh</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;!&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">alive</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;X&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">activation</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">old</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;@&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;O&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span><span class="s">&quot;x&quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;] &quot;</span>
+    <span class="k">return</span> <span class="n">p</span>
+</div>
+<div class="viewcode-block" id="print_struct_status"><a class="viewcode-back" href="../code.html#TCG.print_struct_status">[docs]</a><span class="k">def</span> <span class="nf">print_struct_status</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">,</span> <span class="n">rd_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print status of construction structure (cxn_str) with respect to the structure that is used for read out (rd_str)</span>
+<span class="sd">        * = This is the cxn_str used for production</span>
+<span class="sd">        X = The structure is not Valid (contains dead instances).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;[&#39;</span>
+    <span class="k">if</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">valid</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rd_str</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;*&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;X&quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;] &quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cxn_str</span><span class="o">.</span><span class="n">suitability</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span>
+    <span class="k">return</span> <span class="n">p</span>
+</div>
+<div class="viewcode-block" id="print_semrep_inst"><a class="viewcode-back" href="../code.html#TCG.print_semrep_inst">[docs]</a><span class="k">def</span> <span class="nf">print_semrep_inst</span><span class="p">(</span><span class="n">sr_inst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print SemRep instance as MEANINING_ID</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="c">#    p += str(sr_inst.schema.name)</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sr_inst</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">meaning</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sr_inst</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span>
+    </div>
+<div class="viewcode-block" id="print_cxn_inst"><a class="viewcode-back" href="../code.html#TCG.print_cxn_inst">[docs]</a><span class="k">def</span> <span class="nf">print_cxn_inst</span><span class="p">(</span><span class="n">cxn_inst</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print construction instance as BASE-CXN-NAME_ID</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cxn_inst</span><span class="o">.</span><span class="n">base_cxn</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cxn_inst</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">p</span>
+    </div>
+<div class="viewcode-block" id="print_cxn_struct"><a class="viewcode-back" href="../code.html#TCG.print_cxn_struct">[docs]</a><span class="k">def</span> <span class="nf">print_cxn_struct</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">,</span> <span class="n">cxn_inst</span><span class="p">,</span> <span class="n">recursive</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print construction structure (cxn_str) starting from a given construction instance (cxn_inst) (usually Top instance).</span>
+<span class="sd">    If recursive = True, recursively print sub-structures.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>    
+    <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">cxn_inst</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cxn_inst</span><span class="o">.</span><span class="n">base_cxn</span><span class="o">.</span><span class="n">SynForm</span><span class="p">)):</span>
+        <span class="n">TpSynElem</span> <span class="o">=</span> <span class="n">cxn_inst</span><span class="o">.</span><span class="n">base_cxn</span><span class="o">.</span><span class="n">SynForm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">TpSynElem</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">CXN</span><span class="o">.</span><span class="n">TP_ELEM</span><span class="o">.</span><span class="n">SLOT</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">TpSynElem</span><span class="o">.</span><span class="n">phonetics</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;[&quot;</span>
+            <span class="k">if</span> <span class="n">cxn_str</span><span class="p">:</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">get_child</span><span class="p">(</span><span class="n">cxn_inst</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">child</span> <span class="o">=</span> <span class="bp">None</span>
+            
+            <span class="k">if</span> <span class="n">child</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="n">print_cxn_struct</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">recursive</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span>  <span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;]&quot;</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cxn_inst</span><span class="o">.</span><span class="n">base_cxn</span><span class="o">.</span><span class="n">SynForm</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+    
+    <span class="k">return</span> <span class="n">p</span>
+    </div>
+<div class="viewcode-block" id="print_region"><a class="viewcode-back" href="../code.html#TCG.print_region">[docs]</a><span class="k">def</span> <span class="nf">print_region</span><span class="p">(</span><span class="n">rgn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print regions (rgn) including the amount of uncertainty left.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">rgn</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="n">rgn</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">rgn</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; (uncertainty left: </span><span class="si">%i</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">rgn</span><span class="o">.</span><span class="n">uncertainty</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; (perception done)&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;None&quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="k">return</span> <span class="n">p</span>
+</div>
+<div class="viewcode-block" id="print_current_state"><a class="viewcode-back" href="../code.html#TCG.print_current_state">[docs]</a><span class="k">def</span> <span class="nf">print_current_state</span><span class="p">(</span><span class="n">sim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Print and saves the current simulator state.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">json_data</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;=&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">80</span><span class="p">)])</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; Simulation Time: </span><span class="si">%i</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sim</span><span class="o">.</span><span class="n">time</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;=&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">80</span><span class="p">)])</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">time</span>
+    
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&gt; Current Attention</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;  </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">print_region</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">atten</span><span class="p">)</span>
+    
+    <span class="k">if</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">atten</span><span class="p">):</span>
+        <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;current_attention&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="n">sim</span><span class="o">.</span><span class="n">atten</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;uncertainty&#39;</span><span class="p">:</span><span class="n">sim</span><span class="o">.</span><span class="n">atten</span><span class="o">.</span><span class="n">uncertainty</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;current_attention&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="bp">None</span><span class="p">,</span> <span class="s">&#39;uncertainty&#39;</span><span class="p">:</span><span class="bp">None</span><span class="p">}</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">per_regions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&gt; Perceived Regions</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;  &quot;</span>
+        <span class="k">for</span> <span class="n">rgn</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">per_regions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sim</span><span class="o">.</span><span class="n">per_regions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">rgn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;, &quot;</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="n">rgn</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span>
+    
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;perceived_region&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">rgn</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">rgn</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">per_regions</span><span class="p">])</span>
+    
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;semanticWM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;semanticWM&#39;</span><span class="p">][</span><span class="s">&#39;SRnodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;semanticWM&#39;</span><span class="p">][</span><span class="s">&#39;SRlinks&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;cxn_inst&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;links&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">instances</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&gt; Schema Instances</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">for</span> <span class="n">sc_inst</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="n">print_inst_status</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">INST</span><span class="o">.</span><span class="n">SCHEMA_INST</span><span class="o">.</span><span class="n">NODE</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;SemRep-N &quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">)</span>
+                
+                <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;semanticWM&#39;</span><span class="p">][</span><span class="s">&#39;SRnodes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">),</span> <span class="s">&quot;act&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s">&#39;fresh&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">fresh</span><span class="p">,</span> <span class="s">&#39;alive&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">alive</span><span class="p">,</span> <span class="s">&#39;active&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">activation</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;old&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">old</span><span class="p">})</span> <span class="c"># The current version does not incorporate the difference between object, action, and attribute nodes</span>
+            
+            <span class="k">elif</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">INST</span><span class="o">.</span><span class="n">SCHEMA_INST</span><span class="o">.</span><span class="n">RELATION</span><span class="p">:</span>
+                <span class="n">new_rel</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">),</span> <span class="s">&#39;source&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">},</span> <span class="s">&#39;target&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">},</span> <span class="s">&#39;fresh&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">fresh</span><span class="p">,</span> <span class="s">&#39;alive&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">alive</span><span class="p">,</span> <span class="s">&#39;active&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">activation</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;old&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">old</span><span class="p">}</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;SemRep-R &quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">)</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; from &quot;</span>
+                <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">pFrom</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">pFrom</span><span class="p">)</span>
+                    <span class="n">new_rel</span><span class="p">[</span><span class="s">&#39;source&#39;</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">pFrom</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;??&quot;</span>
+                    <span class="n">new_rel</span><span class="p">[</span><span class="s">&#39;source&#39;</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;??&quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; to &quot;</span>
+                <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">pTo</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">pTo</span><span class="p">)</span>
+                    <span class="n">new_rel</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">pTo</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;??&quot;</span>
+                    <span class="n">new_rel</span><span class="p">[</span><span class="s">&#39;target&#39;</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;??&quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+                <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;semanticWM&#39;</span><span class="p">][</span><span class="s">&#39;SRlinks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_rel</span><span class="p">)</span>
+            
+            <span class="k">elif</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">INST</span><span class="o">.</span><span class="n">SCHEMA_INST</span><span class="o">.</span><span class="n">CONSTRUCTION</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;Construction &quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">)</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; covering &quot;</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">)):</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot; &quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;for </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">print_cxn_struct</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">cxn_struct</span><span class="p">,</span> <span class="n">sc_inst</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+                
+                <span class="n">covered_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">))</span> <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">INST</span><span class="o">.</span><span class="n">SCHEMA_INST</span><span class="o">.</span><span class="n">NODE</span><span class="p">]</span>
+                <span class="n">covered_links</span> <span class="o">=</span> <span class="p">[</span><span class="n">print_semrep_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">))</span> <span class="k">if</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">covers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">INST</span><span class="o">.</span><span class="n">SCHEMA_INST</span><span class="o">.</span><span class="n">RELATION</span><span class="p">]</span>                
+                
+                <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;cxn_inst&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">),</span> <span class="s">&#39;covers&#39;</span><span class="p">:{</span><span class="s">&#39;SRnodes&#39;</span><span class="p">:</span><span class="n">covered_nodes</span><span class="p">,</span> <span class="s">&#39;SRlinks&#39;</span><span class="p">:</span><span class="n">covered_links</span><span class="p">},</span> <span class="s">&#39;fresh&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">fresh</span><span class="p">,</span> <span class="s">&#39;alive&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">alive</span><span class="p">,</span> <span class="s">&#39;active&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">activation</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="s">&#39;old&#39;</span><span class="p">:</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">old</span><span class="p">})</span>
+                                
+                <span class="n">cxn_str_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">cxn_str</span> <span class="k">for</span> <span class="n">cxn_str</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">cxn_strs</span> <span class="k">if</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">check_membership</span><span class="p">(</span><span class="n">cxn</span><span class="o">=</span><span class="n">sc_inst</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sc_inst</span><span class="o">.</span><span class="n">base_cxn</span><span class="o">.</span><span class="n">SynForm</span><span class="p">)):</span>
+                    <span class="n">TpSynElem</span> <span class="o">=</span> <span class="n">sc_inst</span><span class="o">.</span><span class="n">base_cxn</span><span class="o">.</span><span class="n">SynForm</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">cxn_str</span> <span class="ow">in</span> <span class="n">cxn_str_list</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">TpSynElem</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">CXN</span><span class="o">.</span><span class="n">TP_ELEM</span><span class="o">.</span><span class="n">SLOT</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">cxn_str</span><span class="p">:</span>
+                                <span class="n">child</span> <span class="o">=</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">get_child</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">child</span> <span class="o">=</span> <span class="bp">None</span>                    
+                            <span class="k">if</span> <span class="n">child</span><span class="p">:</span>
+                                    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;links&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;source&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">sc_inst</span><span class="p">)},</span> <span class="s">&#39;target&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">child</span><span class="p">)}})</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;competitions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">comp_traces</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&gt; Competition traces</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">for</span> <span class="n">comp_tr</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">comp_traces</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;  </span><span class="si">%s</span><span class="s"> (</span><span class="si">%i</span><span class="s">) &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">comp_tr</span><span class="o">.</span><span class="n">winner</span><span class="p">),</span> <span class="n">comp_tr</span><span class="o">.</span><span class="n">winSuit</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;eliminated </span><span class="si">%s</span><span class="s"> (</span><span class="si">%i</span><span class="s">)</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">comp_tr</span><span class="o">.</span><span class="n">loser</span><span class="p">),</span> <span class="n">comp_tr</span><span class="o">.</span><span class="n">losSuit</span><span class="p">)</span>
+            
+            <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;competitions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;source&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">comp_tr</span><span class="o">.</span><span class="n">winner</span><span class="p">)}</span> <span class="p">,</span> <span class="s">&#39;target&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">comp_tr</span><span class="o">.</span><span class="n">loser</span><span class="p">)}})</span>
+        
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;assemblages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>    
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">cxn_strs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&gt; Construction Structures</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">for</span> <span class="n">cxn_str</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">cxn_strs</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="n">print_struct_status</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">rd_str</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="n">print_cxn_struct</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">,</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">top</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+            
+            <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammaticalWM&#39;</span><span class="p">][</span><span class="s">&#39;assemblages&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;suit&#39;</span><span class="p">:</span><span class="n">cxn_str</span><span class="o">.</span><span class="n">suitability</span><span class="p">,</span> <span class="s">&#39;cxn_inst&#39;</span><span class="p">:[</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span> <span class="k">for</span> <span class="n">inst</span> <span class="ow">in</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">insts</span><span class="p">],</span> <span class="s">&#39;links&#39;</span><span class="p">:[{</span><span class="s">&#39;source&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">str_link</span><span class="o">.</span><span class="n">parent</span><span class="p">)},</span> <span class="s">&#39;target&#39;</span><span class="p">:{</span><span class="s">&#39;id&#39;</span><span class="p">:</span><span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">str_link</span><span class="o">.</span><span class="n">child</span><span class="p">)}}</span> <span class="k">for</span> <span class="n">str_link</span> <span class="ow">in</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">links</span><span class="p">],</span> <span class="s">&#39;top&#39;</span><span class="p">:</span> <span class="n">print_cxn_inst</span><span class="p">(</span><span class="n">cxn_str</span><span class="o">.</span><span class="n">top</span><span class="p">),</span> <span class="s">&#39;tree&#39;</span><span class="p">:</span><span class="n">print_cxn_struct</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">,</span> <span class="n">cxn_str</span><span class="o">.</span><span class="n">top</span><span class="p">,</span> <span class="bp">True</span><span class="p">),</span> <span class="s">&#39;valid&#39;</span><span class="p">:</span><span class="n">cxn_str</span><span class="o">.</span><span class="n">valid</span><span class="p">,</span> <span class="s">&#39;winner&#39;</span><span class="p">:(</span><span class="n">sim</span><span class="o">.</span><span class="n">rd_str</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">cxn_str</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)})</span>
+            
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;phonologicalWM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">phon</span><span class="o">.</span><span class="n">phonetics</span> <span class="k">for</span> <span class="n">phon</span> <span class="ow">in</span> <span class="n">sim</span><span class="o">.</span><span class="n">rd_phons</span><span class="p">]</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;produced_utterance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">utter</span>    
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">utter</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&gt; Produced Utterance</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sim</span><span class="o">.</span><span class="n">utter</span>
+     
+    <span class="k">if</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">next_atten</span><span class="p">):</span>
+        <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;next_attention&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">next_atten</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;next_attention&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+    
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;&gt; Next Attention</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;  </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">print_region</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">next_atten</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">json_data</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="load_init_file"><a class="viewcode-back" href="../code.html#TCG.load_init_file">[docs]</a><span class="k">def</span> <span class="nf">load_init_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load intialization file and initialize simulator (sim).</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        - file_name (STR): initialization file name (.ini file)</span>
+<span class="sd">        - sim (SIMULATOR): simulator to initialize.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">json_data_inputs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">json_data_param</span> <span class="o">=</span> <span class="p">{}</span>
+	
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;Loading Initialization File &#39;</span><span class="si">%s</span><span class="s">&#39; ...</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">file_name</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Failed to open file &#39;</span><span class="si">%s</span><span class="s">&#39;.</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">file_name</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    
+    <span class="n">f_content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">f_data</span> <span class="o">=</span> <span class="n">f_content</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;semantics file&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;grammar file&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;scene file&#39;</span><span class="p">:</span><span class="s">&#39;&#39;</span><span class="p">,</span> 
+              <span class="s">&#39;threshold time&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;threshold constructions&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> 
+              <span class="s">&#39;threshold syllables&#39;</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;premature production&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span>
+              <span class="s">&#39;utterance continuity&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;verbal guidance&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;max time&#39;</span><span class="p">:</span><span class="mi">100</span><span class="p">}</span>
+
+    <span class="n">comment_sign</span> <span class="o">=</span> <span class="s">&#39;#&#39;</span>
+    
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f_data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">comment_sign</span><span class="p">:</span>
+            <span class="k">continue</span>
+        
+        <span class="n">line_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)]</span>
+        
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line_data</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Invalid command line: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">line</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        
+        <span class="n">key_word</span> <span class="o">=</span> <span class="n">line_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">default_value</span> <span class="o">=</span> <span class="n">fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key_word</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">default_value</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Invalid command line: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">line</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        
+        <span class="n">fields</span><span class="p">[</span><span class="n">key_word</span><span class="p">]</span> <span class="o">=</span> <span class="n">line_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;semantics file&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;grammar file&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;scene file&#39;</span><span class="p">]):</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Input file name missing.</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    
+    <span class="n">okay</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;Loading Semantic Network &#39;</span><span class="si">%s</span><span class="s">&#39;...</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;semantics file&#39;</span><span class="p">]</span>
+    <span class="n">mySemNet</span> <span class="o">=</span> <span class="n">LD</span><span class="o">.</span><span class="n">load_SemNet</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;semantics file&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">mySemNet</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;Loading TCG Grammar &#39;</span><span class="si">%s</span><span class="s">&#39;...</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;grammar file&#39;</span><span class="p">]</span>
+        <span class="n">myGrammar</span> <span class="o">=</span> <span class="n">LD</span><span class="o">.</span><span class="n">load_grammar</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;grammar file&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">myGrammar</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;Loading TCG Scene &#39;</span><span class="si">%s</span><span class="s">&#39;...</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;scene file&#39;</span><span class="p">]</span>
+            <span class="n">myScene</span> <span class="o">=</span> <span class="n">LD</span><span class="o">.</span><span class="n">load_scene</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;scene file&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">myScene</span><span class="p">:</span>
+                <span class="n">okay</span> <span class="o">=</span> <span class="bp">True</span>
+    
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">okay</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;LOADER ERROR&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    
+    <span class="n">json_data_inputs</span><span class="p">[</span><span class="s">&#39;semantics_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;semantics file&#39;</span><span class="p">]</span>
+    <span class="n">json_data_inputs</span><span class="p">[</span><span class="s">&#39;grammar_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;grammar file&#39;</span><span class="p">]</span>
+    <span class="n">json_data_inputs</span><span class="p">[</span><span class="s">&#39;scene_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="s">&#39;scene file&#39;</span><span class="p">]</span>
+	
+    <span class="c"># Initialize simulator</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Initializing Simulator...</span><span class="se">\n</span><span class="s">&quot;</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;max time&#39;</span><span class="p">])</span>
+        <span class="n">thresh_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;threshold time&#39;</span><span class="p">])</span>
+        <span class="n">thresh_cxn</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;threshold constructions&#39;</span><span class="p">])</span>
+        <span class="n">thresh_syll</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;threshold syllables&#39;</span><span class="p">])</span>
+        <span class="n">prem_prod</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;premature production&#39;</span><span class="p">]))</span>
+        <span class="n">utter_cont</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;utterance continuity&#39;</span><span class="p">]))</span>
+        <span class="n">verb_guide</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;verbal guidance&#39;</span><span class="p">]))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Invalid simulator parameter.</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">json_data_inputs</span><span class="p">,</span> <span class="n">json_data_param</span><span class="p">)</span>
+    
+    <span class="n">sim</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">myGrammar</span><span class="p">,</span> <span class="n">myScene</span><span class="p">,</span> <span class="n">mySemNet</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">thresh_time</span><span class="p">,</span> <span class="n">thresh_cxn</span><span class="p">,</span> <span class="n">thresh_syll</span><span class="p">,</span> <span class="n">prem_prod</span><span class="p">,</span> <span class="n">utter_cont</span><span class="p">,</span> <span class="n">verb_guide</span><span class="p">)</span>
+      
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;- Max Simulation Time : </span><span class="si">%i</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sim</span><span class="o">.</span><span class="n">max_time</span>
+    <span class="n">json_data_param</span><span class="p">[</span><span class="s">&#39;max_simulation_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">max_time</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;- Premature Production : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sim</span><span class="o">.</span><span class="n">prema_prod</span>
+    <span class="n">json_data_param</span><span class="p">[</span><span class="s">&#39;premature_production&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">prema_prod</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;- Utterance Continuity : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sim</span><span class="o">.</span><span class="n">utter_cont</span>
+    <span class="n">json_data_param</span><span class="p">[</span><span class="s">&#39;utterance_continuity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">utter_cont</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;- Verbal Guidance : </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sim</span><span class="o">.</span><span class="n">verb_guide</span>
+    <span class="n">json_data_param</span><span class="p">[</span><span class="s">&#39;verbal_guidance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">verb_guide</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;- Threshold of Utterance : &quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sim</span><span class="o">.</span><span class="n">thresh_time</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">thresh_cxn</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">thresh_syll</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;infinite&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        
+        <span class="n">i</span> <span class="o">+=</span><span class="mi">1</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;Time = </span><span class="si">%s</span><span class="s">, CXNs = </span><span class="si">%s</span><span class="s">, Syllables = </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">json_data_param</span><span class="p">[</span><span class="s">&#39;utterance_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;time&#39;</span><span class="p">:</span><span class="n">sim</span><span class="o">.</span><span class="n">thresh_time</span><span class="p">,</span> <span class="s">&#39;cxns&#39;</span><span class="p">:</span><span class="n">sim</span><span class="o">.</span><span class="n">thresh_cxn</span><span class="p">,</span> <span class="s">&#39;syllables&#39;</span><span class="p">:</span><span class="n">sim</span><span class="o">.</span><span class="n">thresh_syll</span><span class="p">}</span>
+    
+    <span class="k">return</span> <span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">json_data_inputs</span><span class="p">,</span> <span class="n">json_data_param</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../code.html#TCG.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run simulation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">json_data</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">TCG_ABOUT</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;Usage: python TCG.py [file.ini]</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">return</span> <span class="n">p</span>
+    
+    <span class="c"># Initialization</span>
+    <span class="n">mySim</span> <span class="o">=</span> <span class="n">SIM</span><span class="o">.</span><span class="n">SIMULATOR</span><span class="p">()</span>
+    
+    <span class="c"># Load init file</span>
+    <span class="n">load_res</span> <span class="o">=</span> <span class="n">load_init_file</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">mySim</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">load_res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="n">load_res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_res</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;parameters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_res</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">load_res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">flag</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">p</span>
+    
+    <span class="c"># Simulation</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Beginning Simulation...</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;states&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">mySim</span><span class="o">.</span><span class="n">proceed</span><span class="p">(</span><span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)):</span>
+        <span class="n">state_report</span> <span class="o">=</span> <span class="n">print_current_state</span><span class="p">(</span><span class="n">mySim</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">state_report</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="n">state_report</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;states&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state_report</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Simulation complete: &quot;</span>
+    <span class="k">if</span> <span class="n">mySim</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="n">mySim</span><span class="o">.</span><span class="n">max_time</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;inactivity termination.&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;max time reached.&quot;</span>
+    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span>
+    
+    <span class="k">return</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">json_data</span><span class="p">)</span>
+    
+<span class="c">############################################################################### </span></div>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+    <span class="kn">from</span> <span class="nn">viewer</span> <span class="kn">import</span> <span class="n">TCG_VIEWER</span>
+    
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="s">&quot;./data/&quot;</span>
+    <span class="n">output_root</span> <span class="o">=</span> <span class="s">&quot;./output/&quot;</span>
+    <span class="n">viewer_dir</span> <span class="o">=</span> <span class="s">&quot;./viewer/&quot;</span>
+    
+    <span class="n">out</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
+    
+    <span class="c">#########################</span>
+    <span class="c">### Saving to outputs ###</span>
+    <span class="c">#########################</span>
+    <span class="c">#Copying input files in output directory</span>
+    
+    <span class="n">filename</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;Enter a file name: &#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">output_folder</span> <span class="o">=</span> <span class="n">output_root</span> <span class="o">+</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%Y-%m-</span><span class="si">%d</span><span class="s">(%Hh-%Mm-%Ss)&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output_folder</span> <span class="o">=</span> <span class="n">output_root</span> <span class="o">+</span> <span class="n">filename</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span>
+        
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output_folder</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;inputs&#39;</span><span class="p">][</span><span class="s">&#39;grammar_file&#39;</span><span class="p">],</span> <span class="n">output_folder</span> <span class="o">+</span> <span class="s">&quot;TCG_grammar.json&quot;</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;inputs&#39;</span><span class="p">][</span><span class="s">&#39;semantics_file&#39;</span><span class="p">],</span> <span class="n">output_folder</span> <span class="o">+</span> <span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&#39;inputs&#39;</span><span class="p">][</span><span class="s">&#39;scene_file&#39;</span><span class="p">],</span> <span class="n">output_folder</span> <span class="o">+</span> <span class="s">&quot;TCG_scene.json&quot;</span><span class="p">)</span>
+    
+    <span class="c">#Copying scene image in output directory</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_folder</span> <span class="o">+</span> <span class="s">&quot;/TCG_scene.json&quot;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">scene_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">img_name</span> <span class="o">=</span> <span class="n">scene_data</span><span class="p">[</span><span class="s">&#39;scene&#39;</span><span class="p">][</span><span class="s">&#39;image&#39;</span><span class="p">]</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s">&quot;scenes/pics/&quot;</span> <span class="o">+</span> <span class="n">img_name</span><span class="p">,</span> <span class="n">output_folder</span> <span class="o">+</span> <span class="n">img_name</span><span class="p">)</span>
+    
+    <span class="c"># Saving simulation outputs in output directory</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_folder</span> <span class="o">+</span> <span class="s">&quot;TCG_output.txt&quot;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_folder</span> <span class="o">+</span> <span class="s">&quot;TCG_output.json&quot;</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">f</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">separators</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39;: &#39;</span><span class="p">))</span>
+
+    <span class="c">######################################</span>
+    <span class="c">### Setting up and starting viewer ###</span>
+    <span class="c">######################################</span>
+    <span class="n">my_viewer</span> <span class="o">=</span> <span class="n">TCG_VIEWER</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="n">PORT</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span> <span class="n">viewer_path</span><span class="o">=</span><span class="n">viewer_dir</span><span class="p">)</span>
+    <span class="n">my_viewer</span><span class="o">.</span><span class="n">start_viewer</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

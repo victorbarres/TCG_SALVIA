@@ -1,0 +1,1378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Documentation for the Code &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TCG 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-concept">
+<span id="documentation-for-the-code"></span><h1>Documentation for the Code<a class="headerlink" href="#module-concept" title="Permalink to this headline">¶</a></h1>
+<p>Created on Tue Apr 29 13:21:41 2014</p>
+<p>&#64;author: Victor Barres</p>
+<p>Define semantic knowledge related classes for TCG1.0</p>
+<dl class="class">
+<dt id="concept.CONCEPT">
+<em class="property">class </em><code class="descclassname">concept.</code><code class="descname">CONCEPT</code><span class="sig-paren">(</span><em>name=''</em>, <em>meaning=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#CONCEPT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.CONCEPT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Concept (semantico-syntactic knowledge)</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>name (STR): Name of the concept.</li>
+<li>meaning (STR) : Meaning it carries.</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="concept.CONCEPT.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>meaning=''</em>, <em>concept=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#CONCEPT.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.CONCEPT.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a concept from a meaning string or another concept.
+(TEMPORARY)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="concept.CONCEPT.match">
+<code class="descname">match</code><span class="sig-paren">(</span><em>concept1</em>, <em>concept2</em>, <em>inclusive=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#CONCEPT.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.CONCEPT.match" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if two concept match. Case inclusive = False: concepts match only if they carry the same meaning.
+Case inclusive = True: If a concept is tagged with + (e.g. ANIMAL+) it will match with any of its hyponyms.
+Otherwise, concepts match if they carry the same meaning.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>concept1 (CONCEPT)</li>
+<li>concept2 (CONCEPT)</li>
+<li>inclusive (BOOL)</li>
+</ul>
+</dd>
+<dt>Notes:</dt>
+<dd><ul class="first last simple">
+<li>In the c++ version matching is boolean. No impact of distance on similarity.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="concept.SEM_NET">
+<em class="property">class </em><code class="descclassname">concept.</code><code class="descname">SEM_NET</code><span class="sig-paren">(</span><em>relations=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#SEM_NET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.SEM_NET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Semantic network (acting as world knowledge)</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>relation ([SEM_REL]): List of semantic relations</li>
+</ul>
+</dd>
+<dt>Notes: </dt>
+<dd><ul class="first last simple">
+<li>The network is simply defined as a list of semantic relations.</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="concept.SEM_NET.add_relation">
+<code class="descname">add_relation</code><span class="sig-paren">(</span><em>sem_rel</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#SEM_NET.add_relation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.SEM_NET.add_relation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a relation to the semantic network</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>sem_rel = SEM_REL</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="concept.SEM_NET.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#SEM_NET.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.SEM_NET.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear all relations</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="concept.SEM_NET.distance">
+<code class="descname">distance</code><span class="sig-paren">(</span><em>supMean</em>, <em>subMean</em>, <em>relType=1</em>, <em>heuristic=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#SEM_NET.distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.SEM_NET.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the distance in the semantic network between a concept (subMean) and an hypernym (supMean).
+Return -1 if supMean is not a hypernym of subMean.
+If heuristic = True: -&gt; does not guarantee to find the shortest distance.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>supMean (str)</li>
+<li>subMean (str)</li>
+<li>relType (int)</li>
+<li>heuristic (bool)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="concept.SEM_NET.root">
+<code class="descname">root</code><span class="sig-paren">(</span><em>concept</em>, <em>relType</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#SEM_NET.root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.SEM_NET.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the farthest semantic root of a given concept (concept) for a given relation type (relType)</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>concept (str)</li>
+<li>relType (int)</li>
+</ul>
+</dd>
+<dt>Notes: </dt>
+<dd><ul class="first last simple">
+<li>Does not seem to be used anywhere in c++ code</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="concept.SEM_REL">
+<em class="property">class </em><code class="descclassname">concept.</code><code class="descname">SEM_REL</code><span class="sig-paren">(</span><em>aType=0</em>, <em>subMeaning=''</em>, <em>supMeaning=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/concept.html#SEM_REL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#concept.SEM_REL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Semantic Relation</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>type (INT): UNDEFINED=0, IS_A =1</li>
+<li>supMeaning (STR): Hypernym of subMeaning</li>
+<li>subMeaning (STR): Hyponym of supMeaning</li>
+</ul>
+</dd>
+<dt>Note:</dt>
+<dd><ul class="first last simple">
+<li>Only IS_A hyponymic relation is defined in c++ code.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-construction"></span><p>Created on Tue Apr 22 15:48:47 2014</p>
+<p>&#64;author: Victor Barres</p>
+<p>Define constructions related classes for TCG1.0</p>
+<dl class="class">
+<dt id="construction.CXN">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">CXN</code><a class="reference internal" href="_modules/construction.html#CXN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.CXN" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grammatical construction.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>name (str): construction name</li>
+<li>clss (str): construction class</li>
+<li>preference (int): construction preference</li>
+<li>template ([TP_ELEM]): all cxn template elements</li>
+<li>SemFrame ([TP_SEM_ELEM]): all cxn Sem-Frame elements</li>
+<li>SynForm ([TP_SYN_ELEM]): all cxn Syn-Form elements</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="construction.CXN.add_sem_elem">
+<code class="descname">add_sem_elem</code><span class="sig-paren">(</span><em>sem_elem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/construction.html#CXN.add_sem_elem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.CXN.add_sem_elem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add sem_elem (TP_SEM_ELEM) to the SemFrame.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="construction.CXN.add_syn_elem">
+<code class="descname">add_syn_elem</code><span class="sig-paren">(</span><em>syn_elem</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/construction.html#CXN.add_syn_elem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.CXN.add_syn_elem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add syn_elem (TP_SYN_ELEM) to the SynForm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="construction.CXN.find_sem_elem">
+<code class="descname">find_sem_elem</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/construction.html#CXN.find_sem_elem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.CXN.find_sem_elem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and return SemFrame element with a given name (str).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.GRAMMAR">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">GRAMMAR</code><a class="reference internal" href="_modules/construction.html#GRAMMAR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.GRAMMAR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grammar defined as a set of constructions (&#8220;constructicon&#8221;)</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>constructions ([CXN])</li>
+</ul>
+</dd>
+<dt>Notes:</dt>
+<dd><ul class="first last simple">
+<li>Corresponds to VOCAB in c++ code.</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="construction.GRAMMAR.add_construction">
+<code class="descname">add_construction</code><span class="sig-paren">(</span><em>construction</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/construction.html#GRAMMAR.add_construction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.GRAMMAR.add_construction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add construction (CXN) to grammar.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="construction.GRAMMAR.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/construction.html#GRAMMAR.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.GRAMMAR.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all constructions from grammar.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="construction.GRAMMAR.find_construction">
+<code class="descname">find_construction</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/construction.html#GRAMMAR.find_construction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.GRAMMAR.find_construction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find construction in grammar for a given name.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>name (str)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="construction.GRAMMAR.print_cxn">
+<code class="descname">print_cxn</code><span class="sig-paren">(</span><em>cxn_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/construction.html#GRAMMAR.print_cxn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.GRAMMAR.print_cxn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the cxn with name cxn_name (STR) if it is found in the grammar.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.TP_ELEM">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">TP_ELEM</code><a class="reference internal" href="_modules/construction.html#TP_ELEM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.TP_ELEM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Template element (base class).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.TP_NODE">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">TP_NODE</code><a class="reference internal" href="_modules/construction.html#TP_NODE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.TP_NODE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sem-Frame node.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.TP_PHON">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">TP_PHON</code><a class="reference internal" href="_modules/construction.html#TP_PHON"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.TP_PHON" title="Permalink to this definition">¶</a></dt>
+<dd><p>SynFrame phonetic notation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.TP_REL">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">TP_REL</code><a class="reference internal" href="_modules/construction.html#TP_REL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.TP_REL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sem-Frame relation.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.TP_SEM_ELEM">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">TP_SEM_ELEM</code><a class="reference internal" href="_modules/construction.html#TP_SEM_ELEM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.TP_SEM_ELEM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Template Sem-Frame element.</p>
+<dl class="docutils">
+<dt>Notes: </dt>
+<dd><ul class="first last simple">
+<li>Need to make sure that the link to synform is reciprocal.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.TP_SLOT">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">TP_SLOT</code><a class="reference internal" href="_modules/construction.html#TP_SLOT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.TP_SLOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>SynFrame slot.</p>
+<dl class="docutils">
+<dt>Notes: </dt>
+<dd><ul class="first last simple">
+<li>Need to make sure that the link to SemFrame is reciprocal.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="construction.TP_SYN_ELEM">
+<em class="property">class </em><code class="descclassname">construction.</code><code class="descname">TP_SYN_ELEM</code><a class="reference internal" href="_modules/construction.html#TP_SYN_ELEM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#construction.TP_SYN_ELEM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Template SynFrame element.</p>
+</dd></dl>
+
+<span class="target" id="module-instance"></span><p>Created on Mon Apr 28 18:14:40 2014</p>
+<p>&#64;author: Victor Barres</p>
+<p>Define schema instance related classes for TCG1.0</p>
+<dl class="class">
+<dt id="instance.CXN_INST">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">CXN_INST</code><a class="reference internal" href="_modules/instance.html#CXN_INST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_INST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construction instance.</p>
+<dl class="docutils">
+<dt>Data (inherited):</dt>
+<dd><ul class="first last simple">
+<li>id (int): Unique id</li>
+<li>type (int): Type of schema</li>
+<li>activation (int): Current activation value of schema instance</li>
+<li>alive, old, fresh (bool): status flags</li>
+</ul>
+</dd>
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>base_cxn (CXN): Base grammatical construction.</li>
+<li>cxn_struct (CXN_STRUCT): Structure to which the construction instance belong to.</li>
+<li>covers ([SEMREP_INST]): Covering SemRep instances.</li>
+<li>elems ([TP_SEM_ELEM]): SemFrame elements paired with covering SemRep instances.</li>
+<li>slots ([TP_SLOT]): Slots elements paired with covering SemRep instances.</li>
+<li>_matches ({INT: MATCH_INFO}): Matching dictionary. Key = Cxn  instance in. Value = match info</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="instance.CXN_INST.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>aCxnInst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_INST.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_INST.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare current cxn instance to another cxn instance aCxnInst (CXN_INST).</p>
+<dl class="docutils">
+<dt>Return true if  (1) the two cxn inst share the same base construction </dt>
+<dd><ol class="first last arabic simple" start="2">
+<li>they cover the same SemRep instances.</li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_INST.instantiate">
+<code class="descname">instantiate</code><span class="sig-paren">(</span><em>cxn</em>, <em>semrep</em>, <em>act</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_INST.instantiate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_INST.instantiate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a construction schema instance for the grammatical construction cxn (CXN) based
+on the matching with the SemRep instances semrep ([SEMREP_INST]),
+with activation act (int).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_INST.match">
+<code class="descname">match</code><span class="sig-paren">(</span><em>cxn1</em>, <em>cxn2</em>, <em>match_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_INST.match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_INST.match" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Match two construction instances. Return True when no conflict occurs.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>cxn1 (CNX_INST): first construction instance</li>
+<li>cxn2 (CXN_INST): second construction instance</li>
+<li>match_info (MATCH_INFO): Stores match operation results.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>Algorithm:</dt>
+<dd><blockquote class="first">
+<div><ul>
+<li><p class="first">1:If a relation already exists between instances (stored in cxn._matches), it is copied and returned.</p>
+</li>
+<li><dl class="first docutils">
+<dt>2: Loop through all the SemRep instances covered by both cxn1 and cxn2</dt>
+<dd><ul class="first simple">
+<li>if the two instances overlap on a SemRep instance that is not linked to a shared SemFrame elements in both instances -&gt; CONFLICT</li>
+<li>Otherwise, check if cxn2 can link to a slot of cxn1 (cxn1 = parent, cxn2 = child) or vice versa.</li>
+</ul>
+<dl class="last docutils">
+<dt>A link is possible if:</dt>
+<dd><ol class="first last lowerroman simple">
+<li>SemFrame element covering the SemRep instance in the parent instance has an associated slot</li>
+<li>The child instance&#8217;s class matches the class restriction of this slot.</li>
+<li>The SemFrame element of the child instance linked to the SemRep instance is the head.</li>
+</ol>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="last docutils">
+<dt>Notes:</dt>
+<dd><ul class="first last simple">
+<li>The match methods returns at most 1 match option. If both cxn1 and cxn2 can be parents, it will only return the option with cxn1 as parent.</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_INST.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_INST.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_INST.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether covering SemRep instances are still alive. Update status flags and match table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instance.CXN_LINK">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">CXN_LINK</code><a class="reference internal" href="_modules/instance.html#CXN_LINK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_LINK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hierachical link between construction instances.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>parent (CXN_INST): parent cxn instance</li>
+<li>child (CXN_INST): child cxn instance</li>
+<li>SynFormIdx (int): index of the parent&#8217;s linking slot in its SynFrom list</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="instance.CXN_STRUCT">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">CXN_STRUCT</code><a class="reference internal" href="_modules/instance.html#CXN_STRUCT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construction hiearchy structure.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>top (CXN_INST): Top construction instance</li>
+<li>insts ([CNX_INST]): Construction instances forming the structure</li>
+<li>links ([CXN_LINK]): Hierachical construction links forming the structure</li>
+<li>suitability (int): Suitability of the structure</li>
+<li>fresh, valid (bool): Status flags</li>
+</ul>
+</dd>
+<dt>Notes:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>Suitability is computed as:</dt>
+<dd><ul class="first simple">
+<li>each covered SemRep instance (that is not shared) adds SEM_WEIGHT</li>
+<li>utterance lengths is measured as number of syllables. Suitability is inveresely</li>
+</ul>
+<p>proportional to utterance length (favor compact utterances) weighted by LEN_WEIGHT.
+- each contruction adds preference*PRF_WEIGHT.</p>
+<p>ex. For a single construction that covers 2 unshared SemRep nodes, has 7 syllables and a preference of 4</p>
+<p>Suitability = 2*SEM_WEIGHT - 7*LEN_WEIGHT + 4*PRF_WEIGHT.</p>
+<p class="last">Other parameters (e.g. frequency, task requirement, etc.) can be considered to.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="instance.CXN_STRUCT.check_complete">
+<code class="descname">check_complete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.check_complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.check_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a cxn structure is complete. Structure is complete if all the slots 
+of all the cxn instances currently in the structure are linked to a cxn inst.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.check_lineage">
+<code class="descname">check_lineage</code><span class="sig-paren">(</span><em>cxn_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.check_lineage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.check_lineage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if cxn_str is identical, contains or is contained in the construction structure.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.check_membership">
+<code class="descname">check_membership</code><span class="sig-paren">(</span><em>cxn=None</em>, <em>link=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.check_membership"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.check_membership" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a given cxn (CXN_INST) or link (CXN_LINK) are part of the structure.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.check_obsolete">
+<code class="descname">check_obsolete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.check_obsolete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.check_obsolete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the cxn structure is obsolete. Structure is considered obsolete
+if all the SemRep instances covered by the cxn instances are old.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear cxn structure.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.combine">
+<code class="descname">combine</code><span class="sig-paren">(</span><em>cxn_str1</em>, <em>cxn_str2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.combine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.combine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combine two construction structures and spawn a new structure.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd><ul class="first last simple">
+<li>A new construction structure that combines both cxn_str1 and cxn_str2.</li>
+<li>None if combination fails.</li>
+</ul>
+</dd>
+<dt>Notes: </dt>
+<dd><ul class="first simple">
+<li>Cnx str are combined at the top.</li>
+<li>The top unit of one cxn str is linked to a compatible empty slot in the top unit of the other.</li>
+<li>CONDITIONS: Top units match; there is an compatible empty slot;</li>
+</ul>
+<p class="last">there is no conflict between the two construction structures.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.compare">
+<code class="descname">compare</code><span class="sig-paren">(</span><em>cxn_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare this construction structure with cxn_str (CXN_STR).</p>
+<dl class="docutils">
+<dt>Return:</dt>
+<dd><ul class="first last simple">
+<li>0: None matched</li>
+<li>1: Partial match</li>
+<li>2: Contained (subset of cxn_str)</li>
+<li>3: Identical</li>
+<li>4: Contains (superset of cxn_str)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.conflict">
+<code class="descname">conflict</code><span class="sig-paren">(</span><em>cxn_str1</em>, <em>cxn_str2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.conflict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.conflict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if there is a conflict between two construction structures. Return True if a conflict is found.</p>
+<p>Note: Method goes through all the match info data between pairs of instances (i1, i2) in cxn_str1 x cxn_str2.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>cxn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the empty construction struture with cxn (CXN_INST) as the top construction.
+Calculate initial suitability of the structure (see class docstring for more info).</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>cxn (CXN_INST): The initial top cxn instance</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.get_child">
+<code class="descname">get_child</code><span class="sig-paren">(</span><em>parent</em>, <em>idx</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.get_child"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.get_child" title="Permalink to this definition">¶</a></dt>
+<dd><p>If it exists, return the child (CXN_INST) for a given parent (CXN_INST) 
+and a given SynForm index idx (int).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.get_parent">
+<code class="descname">get_parent</code><span class="sig-paren">(</span><em>child</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.get_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.get_parent" title="Permalink to this definition">¶</a></dt>
+<dd><p>If it exist return the parent (CXN_INST) for a given child (CXN_INST).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.merge">
+<code class="descname">merge</code><span class="sig-paren">(</span><em>cxn_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge construction structure with cxn_str (CXN_STR). 
+Elements (links and cxn insts) of cxn_str are added to the construction structure.
+Suitability of both cnx structures are added.</p>
+<p>THE TWO CONSTRUCTION STRUCTURES SHOULD NOT SHARE ANY ELEMENT (NO DUPLICATION ASSUMED).</p>
+<p>Notes: This method is only there to be used within the combine class method, since the output of merge is not a proper
+construction structure (more a set containing 2 cnx sructs since the top instances have not been linked).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.overlap">
+<code class="descname">overlap</code><span class="sig-paren">(</span><em>cxn_str1</em>, <em>cxn_str2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if two construction structures overlap on the SemRep.. Return True if an overlap is found.</p>
+<p>Notes: Method goes through all the match info data between pairs of instances (i1, i2) in cxn_str1 x cxn_str2.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.CXN_STRUCT.readout">
+<code class="descname">readout</code><span class="sig-paren">(</span><em>cxn</em>, <em>act</em>, <em>phon_list</em>, <em>vocal=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#CXN_STRUCT.readout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.CXN_STRUCT.readout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively read out the phonological content generated by the cxn str starting 
+from a given cxn inst.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first simple">
+<li>cxn (CXN_INST): The cxn instance form where to start the read out process</li>
+</ul>
+<p class="last">(use top cxn inst to span the whole structure). 
+Method then called recursively on child cxn instances.
+- act (INT): Value used to reactivate cxn inst and SemRep inst.
+- phon_list ([TP_PHON]): List phonetic content of recursively read out from cxn inst SynForms.
+- vocal (BOOL): If True, read out impacts activations and status flags values of cxn inst and semrep insts.</p>
+</dd>
+<dt>Returns:</dt>
+<dd><ul class="first simple">
+<li>Phon_list is modified through the recursive application of method (side effect).</li>
+<li>Returns None if no emtpy slot is encountered.</li>
+<li>If an empty slot is encountered, process is interuppted, and a SemRep inst</li>
+</ul>
+<p class="last">that should be but are not covered is returned.</p>
+</dd>
+<dt>Notes:</dt>
+<dd><ul class="first last simple">
+<li>the SemRep instance returned is the one associate with the first empty slot found.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instance.MATCH_INFO">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">MATCH_INFO</code><a class="reference internal" href="_modules/instance.html#MATCH_INFO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.MATCH_INFO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construction instance matching information.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>match (int): -1 = conflict, 0 = no relation, 1 = union</li>
+<li>overlap (bool): overlap flag</li>
+<li>parent (CXN_INST): parent construction instance</li>
+<li>child (CXN_INST): child contruction instance</li>
+<li>SynFormIdx (int): SynForm index of the parent&#8217;s slot to which the child is linked.</li>
+<li>other (CXN_INST): ...for maintenance purposes...</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="instance.MATCH_INFO.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#MATCH_INFO.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.MATCH_INFO.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset match info values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.MATCH_INFO.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>mInfo</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#MATCH_INFO.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.MATCH_INFO.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies match info values from mInfo (MATCH_INFO).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instance.NODE_INST">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">NODE_INST</code><a class="reference internal" href="_modules/instance.html#NODE_INST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.NODE_INST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node instance</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="instance.REL_INST">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">REL_INST</code><a class="reference internal" href="_modules/instance.html#REL_INST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.REL_INST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relation instance.</p>
+<dl class="method">
+<dt id="instance.REL_INST.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#REL_INST.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.REL_INST.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if connecting SemRep instances exist and are alive.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instance.SCHEMA_INST">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">SCHEMA_INST</code><a class="reference internal" href="_modules/instance.html#SCHEMA_INST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SCHEMA_INST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schema instance (base class)</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>id (int): Unique id</li>
+<li>type (int): Type of schema</li>
+<li>activation (int): Current activation value of schema instance</li>
+<li>alive, old, fresh (bool): status flags</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="instance.SCHEMA_INST.Activation">
+<code class="descname">Activation</code><span class="sig-paren">(</span><em>act</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#SCHEMA_INST.Activation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SCHEMA_INST.Activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>If not already the case, set &#8216;activation&#8217; to act (int) and signal instananeous activity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.SCHEMA_INST.Alive">
+<code class="descname">Alive</code><span class="sig-paren">(</span><em>bool_val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#SCHEMA_INST.Alive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SCHEMA_INST.Alive" title="Permalink to this definition">¶</a></dt>
+<dd><p>If not already the case, set alive to bool_val (bool) and signal instantaneous activity.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.SCHEMA_INST.Fresh">
+<code class="descname">Fresh</code><span class="sig-paren">(</span><em>bool_val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#SCHEMA_INST.Fresh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SCHEMA_INST.Fresh" title="Permalink to this definition">¶</a></dt>
+<dd><p>If not already the case, set &#8216;fresh&#8217; to bool_val (bool) and signal instantaneous activity</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.SCHEMA_INST.Old">
+<code class="descname">Old</code><span class="sig-paren">(</span><em>bool_val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#SCHEMA_INST.Old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SCHEMA_INST.Old" title="Permalink to this definition">¶</a></dt>
+<dd><p>If not already the case, set old to bool_val (bool) and signal instantaneous activity</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="instance.SEMREP_INST">
+<em class="property">class </em><code class="descclassname">instance.</code><code class="descname">SEMREP_INST</code><a class="reference internal" href="_modules/instance.html#SEMREP_INST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SEMREP_INST" title="Permalink to this definition">¶</a></dt>
+<dd><p>SemRep instance</p>
+<dl class="docutils">
+<dt>Data (inherited):</dt>
+<dd><ul class="first last simple">
+<li>id (int): Unique id</li>
+<li>type (int): Type of schema</li>
+<li>activation (int): Current activation value of schema instance</li>
+<li>alive, old, fresh (bool): status flags</li>
+</ul>
+</dd>
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>concept (CONCEPT): Representing concept</li>
+<li>schema (SCHEMA): Associated perceptual schema</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="instance.SEMREP_INST.Instantiate">
+<code class="descname">Instantiate</code><span class="sig-paren">(</span><em>pSchema</em>, <em>act</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#SEMREP_INST.Instantiate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SEMREP_INST.Instantiate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate schema.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>pSchema(SCHEMA): perceptual schema</li>
+<li>act (int): initial activation</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="instance.SEMREP_INST.Update">
+<code class="descname">Update</code><span class="sig-paren">(</span><em>new_concept</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/instance.html#SEMREP_INST.Update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#instance.SEMREP_INST.Update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update concept to new_concept (CONCEPT)</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-loader"></span><p>Created on Fri Oct 10 2014</p>
+<p>&#64;author: Victor Barres</p>
+<p>TCG 1.1 data loader module</p>
+<blockquote>
+<div><p>This version requires JSON formatted inputs!</p>
+<p>Loader for grammar, scenes and conceptual knowledge.</p>
+<p>To load grammar use load_grammar function (returns a grammar)
+To load visual scene use load_scene function (returns a scene)
+To load conceptual knowledge use function (returns a SemNet)</p>
+<p>All other functions should be considered private and are subject to change.</p>
+</div></blockquote>
+<dl class="function">
+<dt id="loader.load_SemNet">
+<code class="descclassname">loader.</code><code class="descname">load_SemNet</code><span class="sig-paren">(</span><em>file_name</em>, <em>file_path='./'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/loader.html#load_SemNet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loader.load_SemNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load and return the semantic network defined in file_path/file_name. Return None if error.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="loader.load_grammar">
+<code class="descclassname">loader.</code><code class="descname">load_grammar</code><span class="sig-paren">(</span><em>file_name</em>, <em>file_path='./'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/loader.html#load_grammar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loader.load_grammar" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Load and return the TCG grammar defined in file_path</div></blockquote>
+<p>ile_name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="loader.load_scene">
+<code class="descclassname">loader.</code><code class="descname">load_scene</code><span class="sig-paren">(</span><em>file_name</em>, <em>file_path='./'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/loader.html#load_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#loader.load_scene" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div>Load and return the visual scene defined in file_path</div></blockquote>
+<p>ile_name. Return None if error.</p>
+</dd></dl>
+
+<span class="target" id="module-scene"></span><p>Created on Mon May 05 12:07:09 2014</p>
+<p>&#64;author: Victor Barres</p>
+<p>Define visual scene structure related classes for TCG1.0</p>
+<dl class="class">
+<dt id="scene.PERCEPT">
+<em class="property">class </em><code class="descclassname">scene.</code><code class="descname">PERCEPT</code><a class="reference internal" href="_modules/scene.html#PERCEPT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.PERCEPT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schema perception.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>schema (SCHEMA): Perceived schema.</li>
+<li>concept (CONCEPT): Perceived concept (can be different from original concept carried by schema).</li>
+<li>replace_concept (BOOL): Flag for replacing concept.</li>
+</ul>
+</dd>
+<dt>Notes:</dt>
+<dd><ul class="first simple">
+<li>If replace_concept = False -&gt; the concept associated with the percept is the one linked to the schema</li>
+</ul>
+<p class="last">if replace_concept = True -&gt; override schema concept and use the one associated directly with the percept.
+- This class is a first attempt to represent conceptualization process going from perceptual schemas
+to semantic reprsentation. Needs to be improved.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="scene.REGION">
+<em class="property">class </em><code class="descclassname">scene.</code><code class="descname">REGION</code><a class="reference internal" href="_modules/scene.html#REGION"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.REGION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scene region.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>name (STRING): Name of region</li>
+<li>x, y (INT): Location</li>
+<li>w, h (INT): Size</li>
+<li>saliency (INT): Perceptual saliency of region</li>
+<li>uncertainty (INT): How uncertain is the perception of this region.</li>
+<li>percepts ([PERCEPT]): List of percepts associated with this region.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="scene.SCENE">
+<em class="property">class </em><code class="descclassname">scene.</code><code class="descname">SCENE</code><a class="reference internal" href="_modules/scene.html#SCENE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SCENE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scene being perceived.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>width, height (INT): Scene resolution</li>
+<li>schemas ([SCHEMA]): List of perceptual schemas associated with the scene.</li>
+<li>regions ([REGION]): List of regions associated with the scene.</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="scene.SCENE.add_region">
+<code class="descname">add_region</code><span class="sig-paren">(</span><em>region</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scene.html#SCENE.add_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SCENE.add_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add region (REGION) to scene if no duplication.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="scene.SCENE.add_schema">
+<code class="descname">add_schema</code><span class="sig-paren">(</span><em>schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scene.html#SCENE.add_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SCENE.add_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add schema (SCHEMA) to scene if no duplication.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="scene.SCENE.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scene.html#SCENE.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SCENE.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset scene.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="scene.SCENE.find_region">
+<code class="descname">find_region</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scene.html#SCENE.find_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SCENE.find_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find region with name &#8216;name&#8217; (STR) in scene.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="scene.SCENE.find_schema">
+<code class="descname">find_schema</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scene.html#SCENE.find_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SCENE.find_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find schema with name &#8216;name&#8217; (STR) in scene.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="scene.SCHEMA">
+<em class="property">class </em><code class="descclassname">scene.</code><code class="descname">SCHEMA</code><a class="reference internal" href="_modules/scene.html#SCHEMA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SCHEMA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perceptual schema</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>type (INT): Schema type (UNDEFINED, OBJECT or RELATION).</li>
+<li>name (STRING): Schema name.</li>
+<li>concept (CONCEPT): Concept associated with the schema.</li>
+<li>region (REGION): Region of the visual scene associated with the schema.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="scene.SC_OBJECT">
+<em class="property">class </em><code class="descclassname">scene.</code><code class="descname">SC_OBJECT</code><a class="reference internal" href="_modules/scene.html#SC_OBJECT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SC_OBJECT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object schema</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="scene.SC_REL">
+<em class="property">class </em><code class="descclassname">scene.</code><code class="descname">SC_REL</code><a class="reference internal" href="_modules/scene.html#SC_REL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scene.SC_REL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relation schema. Define relation (edge) between two object schemas (SC_OBJECT) pFrom and pTo.</p>
+</dd></dl>
+
+<span class="target" id="module-simulator"></span><p>Created on Fri May 09 13:49:40 2014</p>
+<p>&#64;author: Victor Barres</p>
+<p>Define the simulator that runs the SemRep/TCG processes for TCG1.0</p>
+<dl class="class">
+<dt id="simulator.COMP_TRACE">
+<em class="property">class </em><code class="descclassname">simulator.</code><code class="descname">COMP_TRACE</code><a class="reference internal" href="_modules/simulator.html#COMP_TRACE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.COMP_TRACE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Competition trace
+Used by the simulator to keep track of construction instances competition outcomes.
+A comp_trace object is generated after each competition and stored by the simulator.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>winner (CXN_INST): winner instance</li>
+<li>loser (CXN_INST): loser instance</li>
+<li>winSuit (INT): winer suitability (i.e. suitability of the structure it belongs to)</li>
+<li>losSuit (INT): loser suitability (i.e. suitability of the structure it belongs to)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="simulator.SIMULATOR">
+<em class="property">class </em><code class="descclassname">simulator.</code><code class="descname">SIMULATOR</code><a class="reference internal" href="_modules/simulator.html#SIMULATOR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulator runs SemRep/TCG processes.
+The simulator needs to be initialized with a grammar, a SemNet (semantic knowledge) and a visual scene.
+Max time, thresholds of utterance values and TCG principles flags also need to be defined.</p>
+<p>Simulation is run by successive calls to proceed() method, until a termination condition is met. Each call to proceed() corresponds to
+1 time step.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><p class="first">&lt;LONG TERM MEMORY&gt;
+- SemNet (SEM_NET): Semantic network (world knowledge)
+- grammar (GRAMMAR): Grammatical knowledge</p>
+<p>&lt;VISUAL INPUT&gt;
+- scene (SCENE): Currently viewed scene</p>
+<p>&lt;VISION SYSTEM&gt;
+- atten (REGION): Region currently under attentional focus
+- next_atten (REGION): Next attention focus. Can be either defined based on saliency or based on verbal guidance (see produce_utterance())
+- vis_update (BOOL): Visual update flag
+- per_regions ([REGION]): Already perceived regions</p>
+<p>&lt;LANGUAGE SYSTEM&gt;
+- utter (STR): Produced utterance
+- incomp_utter (BOOL): Incomplete utterance flag. True if the last utterance did not cover the whole active SemRep. Trigers the VERBAL GUIDANCE!
+- rd_str (CXN_STRUCT): Last read-out construction structure (useful to implement utterance continuity)
+- rd_phons ([TP_PHON]): Last read-out phonetic notations (useful to implement utterance continuity)</p>
+<p>&lt;WORKING MEMORY&gt;
+- instances ([SCHEMA_INST]): All schema instances
+- sem_insts ([SEMREP_INST]): All SemRep instances
+- cxn_insts ([CXN_INST]): All construction instances
+- cxn_strs ([CXN_STRUCT]): All construction structures        
+- comp_traces ([COMP_TRACE]): Competition traces. Keep trace of cxn instances competition results</p>
+<p>&lt;SIMULATION PARAMETERS&gt;
+- time (INT):  Current simulation time (in relative unit)
+- max_time (INT): Max simulation duration
+- utter_time (INT): Last utterance production time</p>
+<p>&lt;THRESHOLD OF UTTERANCE&gt;
+- thresh_time (INT): Time threshold (-1 for infinity)
+- thresh_cxn (INT): Construction number limit (-1 for infinity)
+- thresh_syll (INT): Syllable length limit (-1 for infinity)</p>
+<p class="last">&lt;TCG PRINCIPLE FLAGS&gt;
+- prema_prod (BOOL): Premature production principle
+- utter_cont (BOOL): Utterance continuity principle
+- verb_guide (BOOL): Verbal guidance principle</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="simulator.SIMULATOR.add_schema_inst">
+<code class="descname">add_schema_inst</code><span class="sig-paren">(</span><em>sc_inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.add_schema_inst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.add_schema_inst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a schema instance to the working memory</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>sc_inst (SCHEMA_INST)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.create_comp_trace">
+<code class="descname">create_comp_trace</code><span class="sig-paren">(</span><em>winner</em>, <em>loser</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.create_comp_trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.create_comp_trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>winner (CXN_INST)</li>
+<li>loser (CXN_INST)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.deploy_attention">
+<code class="descname">deploy_attention</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.deploy_attention"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.deploy_attention" title="Permalink to this definition">¶</a></dt>
+<dd><p>Orient attention to most salient scene region and keep it under focus until the region&#8217;s uncertainty &lt; = 0.
+Include inhibition of return.</p>
+<p>This method simulate the effect of (bottom-up) visual saliency on the attention process.
+IMPORTANT: It can be overridden by verbal guidance (see produce_utterance()). If an utterance is produced orematurely while some information is
+still missing that would be needed to complete it, the next attentional region is set to the region that contains the piece of infomration
+needed.</p>
+<dl class="docutils">
+<dt>Steps:</dt>
+<dd><ol class="first last arabic simple">
+<li>Pick most salient region whose uncertainty &gt;=0 (i.e. that has not yet been perceived)</li>
+<li>Keep it under attentional focus until it&#8217;s uncertainty &lt;=0. Decrease uncertainty value by 1 ever time step.</li>
+<li>Go back to 1.</li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.do_competition">
+<code class="descname">do_competition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.do_competition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.do_competition" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.do_cooperation">
+<code class="descname">do_cooperation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.do_cooperation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.do_cooperation" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.ellapsed_time">
+<code class="descname">ellapsed_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.ellapsed_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.ellapsed_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maintenance process.</p>
+<dl class="docutils">
+<dt>Steps:</dt>
+<dd><ul class="first last simple">
+<li>Set cxn_inst with activity &lt;= 0 to dead</li>
+<li>Set old cxn_inst to activity = 0 (old means it has been read out)</li>
+<li>Set cxn_inst to Fresh = False (Fresh only when it has just been invoked)</li>
+<li>Validate all instances</li>
+<li>Remove dead instances</li>
+<li>Advance time</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.find_cxn_struct">
+<code class="descname">find_cxn_struct</code><span class="sig-paren">(</span><em>cxn_str</em>, <em>cxn_str_list</em>, <em>comp_val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.find_cxn_struct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.find_cxn_struct" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.get_semrep_inst">
+<code class="descname">get_semrep_inst</code><span class="sig-paren">(</span><em>schema</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.get_semrep_inst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.get_semrep_inst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look for the SemRep instance linked to a given perceptual schema.
+Return the SemRep instance if it exists, None otherwise.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><em>myGrammar</em>, <em>myScene</em>, <em>mySemNet</em>, <em>maxTime</em>, <em>threshTime</em>, <em>threshCxn</em>, <em>threshSyll</em>, <em>premaProd</em>, <em>utterCont</em>, <em>verbGuide</em>, <em>clearData=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the simulator.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>myGrammar (GRAMMAR): A grammatical knowledge</li>
+<li>myScene (SCENCE): The input scene</li>
+<li>mySemNet (SEM_NET): The semantic knowledge</li>
+<li>maxTime (INT): Max simulation duration</li>
+<li>threshTime (INT): Time threshold (-1 for infinity)</li>
+<li>threshCxn (INT): Construction number limit (-1 for infinity)</li>
+<li>threshSyll (INT): Syllable length limit (-1 for infinity)</li>
+<li>premaProd (BOOL): Premature production principle</li>
+<li>utterCont (BOOL): Utterance continuity principle</li>
+<li>verbGuide (BOOL): Verbal guidance principles</li>
+<li>clearData (BOOL): If True, grammatical knowlegde, semantic knowledge and visual input are cleared.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.invoke_constructions">
+<code class="descname">invoke_constructions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.invoke_constructions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.invoke_constructions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invoke all constructions whose SemFrame match SemRep subgraphs (no duplicate).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.invoke_cxn_inst">
+<code class="descname">invoke_cxn_inst</code><span class="sig-paren">(</span><em>aCxn</em>, <em>sf_idx</em>, <em>attaches</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.invoke_cxn_inst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.invoke_cxn_inst" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!
+SUBGRAPH MATCHING ALGORITHM.</p>
+<p>Try to match the SemFrame of a construction onto a SemRep subgraph. If
+success, instantiate construction.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first simple">
+<li>aCxn (CXN): A construction in the grammar.</li>
+<li>sf_idx (INT): Index of SemFrame element in aCXN.SemFrame.</li>
+<li>attaches ([SEMREP_INST]): Keeps track of the SemRep instances that have been matched during</li>
+</ul>
+<p class="last">recursive search of matching subgraphs.</p>
+</dd>
+<dt>Notes:</dt>
+<dd><ul class="first simple">
+<li>Only instantiates construction that match onto a SemRep sugraph that has</li>
+</ul>
+<p>at least one element alive.
+- Checks that a similar instance doesn&#8217;t already exist before adding to working
+memory.
+- Algorithm steps:</p>
+<blockquote>
+<div><ul class="simple">
+<li>For first element of SemFrame, try to find matching SemRep instance</li>
+<li>Then recursively try to find matches for other elements of the SemFrame</li>
+<li>Then check that topology match between SemFrame and list of matching attached SemFrame</li>
+</ul>
+<p>instances (i.e. check that toplogy match between SemFrame and Attatches)</p>
+</div></blockquote>
+<ul class="last">
+<li><dl class="first docutils">
+<dt>Algorithm comments:</dt>
+<dd><ul class="first simple">
+<li>This does not make use of the directed graph structure during the first search phase since</li>
+</ul>
+<p class="last">it only checks the topology afterwards.
+- If SemRep = N1 elements, SemFrame = N2 elements, number of test during search = N1^N2 !! + 
+then the cost of the topology checks... this algorithm is clearly NOT optimal, but works for now
+since SemRep and SemFrames are small.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">The matching of concept is very simple here (match or no match).</p>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.match_phon_lists">
+<code class="descname">match_phon_lists</code><span class="sig-paren">(</span><em>prev_phonlist</em>, <em>next_phonlist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.match_phon_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.match_phon_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if there is an i such that prev_phonlist[i:] is a sublist of next_phonlist</p>
+<dl class="docutils">
+<dt>Example:</dt>
+<dd><p class="first">prev_phonlist = [I, saw, that, the, man, kicks]
+next_phonlist = [The, man, kicks, a, ball]
+Return -&gt; matches = 3, corresponds to index of &#8216;a&#8217; in next_phon_list.</p>
+<p class="last">prev_phonlist = [I, saw, that, the, man, kicks]
+next_phonlist = [the, man, eats, a, cake]
+Return -&gt; matches = 0, prev_phonlist is not a sublist of next_phonlist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.pair_node">
+<code class="descname">pair_node</code><span class="sig-paren">(</span><em>node_inst</em>, <em>node_elem</em>, <em>aCxn</em>, <em>attaches</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.pair_node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.pair_node" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.perceive_scene">
+<code class="descname">perceive_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.perceive_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.perceive_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perceive all regions that are certain (uncertainty == 0) and set their uncertainty to -1 so that they won&#8217;t be perceived again.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.perceive_schema">
+<code class="descname">perceive_schema</code><span class="sig-paren">(</span><em>aPercept</em>, <em>new_rels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.perceive_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.perceive_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given percept, update or create associated SemRep nodes and relations.</p>
+<dl class="docutils">
+<dt>Notes:</dt>
+<dd><ul class="first last simple">
+<li>Newly created SemRep relations instances are added to new_rels.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.proceed">
+<code class="descname">proceed</code><span class="sig-paren">(</span><em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.proceed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.proceed" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.process_constructions">
+<code class="descname">process_constructions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.process_constructions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.process_constructions" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simulator.SIMULATOR.produce_utterance">
+<code class="descname">produce_utterance</code><span class="sig-paren">(</span><em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simulator.html#SIMULATOR.produce_utterance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simulator.SIMULATOR.produce_utterance" title="Permalink to this definition">¶</a></dt>
+<dd><p>WRITE DOCSTRING!!</p>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-TCG"></span><p>Created on Tue Oct 08 2014</p>
+<p>&#64;author: Victor Barres</p>
+<p>Define main() function and output printing functions for TCG1.1
+Adds a JSON output that can interface with the TCG_viewer.
+Use the JSON formatted inputs.</p>
+<dl class="function">
+<dt id="TCG.load_init_file">
+<code class="descclassname">TCG.</code><code class="descname">load_init_file</code><span class="sig-paren">(</span><em>file_name</em>, <em>sim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#load_init_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.load_init_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load intialization file and initialize simulator (sim).</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><ul class="first last simple">
+<li>file_name (STR): initialization file name (.ini file)</li>
+<li>sim (SIMULATOR): simulator to initialize.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.main">
+<code class="descclassname">TCG.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run simulation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.print_current_state">
+<code class="descclassname">TCG.</code><code class="descname">print_current_state</code><span class="sig-paren">(</span><em>sim</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#print_current_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.print_current_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print and saves the current simulator state.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.print_cxn_inst">
+<code class="descclassname">TCG.</code><code class="descname">print_cxn_inst</code><span class="sig-paren">(</span><em>cxn_inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#print_cxn_inst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.print_cxn_inst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print construction instance as BASE-CXN-NAME_ID</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.print_cxn_struct">
+<code class="descclassname">TCG.</code><code class="descname">print_cxn_struct</code><span class="sig-paren">(</span><em>cxn_str</em>, <em>cxn_inst</em>, <em>recursive=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#print_cxn_struct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.print_cxn_struct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print construction structure (cxn_str) starting from a given construction instance (cxn_inst) (usually Top instance).
+If recursive = True, recursively print sub-structures.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.print_inst_status">
+<code class="descclassname">TCG.</code><code class="descname">print_inst_status</code><span class="sig-paren">(</span><em>sc_inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#print_inst_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.print_inst_status" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Print status of schema instance</dt>
+<dd>! = Fresh, the instance was just invoked.
+X = Dead, the instance will be pruned out of the working memory next time step.
+x = Alive instance with activation &lt; 0
+O = Alive instance with activation &gt; 0 and not Old (Basic status of active instances)
+&#64; = Alive instance with activation &gt; 0 and Old -&gt; The Old flag means that the instance has already been used for read-out.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.print_region">
+<code class="descclassname">TCG.</code><code class="descname">print_region</code><span class="sig-paren">(</span><em>rgn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#print_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.print_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print regions (rgn) including the amount of uncertainty left.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.print_semrep_inst">
+<code class="descclassname">TCG.</code><code class="descname">print_semrep_inst</code><span class="sig-paren">(</span><em>sr_inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#print_semrep_inst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.print_semrep_inst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print SemRep instance as MEANINING_ID</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="TCG.print_struct_status">
+<code class="descclassname">TCG.</code><code class="descname">print_struct_status</code><span class="sig-paren">(</span><em>cxn_str</em>, <em>rd_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/TCG.html#print_struct_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#TCG.print_struct_status" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Print status of construction structure (cxn_str) with respect to the structure that is used for read out (rd_str)</dt>
+<dd><ul class="first simple">
+<li>= This is the cxn_str used for production</li>
+</ul>
+<p class="last">X = The structure is not Valid (contains dead instances).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-viewer"></span><p>Created on Thu Feb 12 16:13:10 2015</p>
+<p>&#64;author: Victor Barres</p>
+<p>Defines the TCG_VIEWER class that allows to view a certain dataset into the TCG viewer.</p>
+<p>Can be also be use in command line: python viewer.py</p>
+<dl class="class">
+<dt id="viewer.TCG_VIEWER">
+<em class="property">class </em><code class="descclassname">viewer.</code><code class="descname">TCG_VIEWER</code><span class="sig-paren">(</span><em>data_path</em>, <em>PORT=8080</em>, <em>viewer_path='viewer/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/viewer.html#TCG_VIEWER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#viewer.TCG_VIEWER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects the simulation to the the TCG viewer.</p>
+<dl class="docutils">
+<dt>Data:</dt>
+<dd><ul class="first last simple">
+<li>server_port (INT): Server port value, default 8080.</li>
+<li>viewer_path (STR): path to the viewer main directory.</li>
+<li>data_path (STR): Path to the data folder that needs to be displayed.</li>
+<li>tmp (STR): Temp folder.</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="viewer.TCG_VIEWER.start_viewer">
+<code class="descname">start_viewer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/viewer.html#TCG_VIEWER.start_viewer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#viewer.TCG_VIEWER.start_viewer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the viewer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/code.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TCG 1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>concept &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for concept</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Apr 29 13:21:41 2014</span>
+
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Define semantic knowledge related classes for TCG1.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c">###############################################################################</span>
+<div class="viewcode-block" id="SEM_REL"><a class="viewcode-back" href="../code.html#concept.SEM_REL">[docs]</a><span class="k">class</span> <span class="nc">SEM_REL</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Semantic Relation</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - type (INT): UNDEFINED=0, IS_A =1</span>
+<span class="sd">        - supMeaning (STR): Hypernym of subMeaning</span>
+<span class="sd">        - subMeaning (STR): Hyponym of supMeaning</span>
+<span class="sd">        </span>
+<span class="sd">    Note:</span>
+<span class="sd">        - Only IS_A hyponymic relation is defined in c++ code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Relation types</span>
+    <span class="n">UNDEFINED</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">IS_A</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># C++ code for TCG1.0 only handles hyponymy</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aType</span> <span class="o">=</span> <span class="n">UNDEFINED</span><span class="p">,</span> <span class="n">subMeaning</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">supMeaning</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">aType</span> <span class="c"># Relation type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span> <span class="o">=</span> <span class="n">supMeaning</span> <span class="c"># Superordinate meaning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span><span class="o">=</span> <span class="n">subMeaning</span> <span class="c"># Subordinate meaning</span>
+    
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">is_equal</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span> <span class="ow">and</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">)</span> <span class="ow">and</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">subMeaning</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">is_equal</span>
+    
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> IS_A </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="s">&quot;type: </span><span class="si">%i</span><span class="s">, subMeaning: </span><span class="si">%s</span><span class="s">, supMeaning: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span>
+    
+<span class="c">###############################################################################</span></div>
+<div class="viewcode-block" id="SEM_NET"><a class="viewcode-back" href="../code.html#concept.SEM_NET">[docs]</a><span class="k">class</span> <span class="nc">SEM_NET</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Semantic network (acting as world knowledge)</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - relation ([SEM_REL]): List of semantic relations</span>
+<span class="sd">    </span>
+<span class="sd">    Notes: </span>
+<span class="sd">        - The network is simply defined as a list of semantic relations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relations</span> <span class="o">=</span> <span class="p">[]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span> <span class="o">=</span> <span class="n">relations</span>
+    
+<div class="viewcode-block" id="SEM_NET.clear"><a class="viewcode-back" href="../code.html#concept.SEM_NET.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear all relations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span> <span class="o">=</span> <span class="p">[]</span>
+    </div>
+<div class="viewcode-block" id="SEM_NET.add_relation"><a class="viewcode-back" href="../code.html#concept.SEM_NET.add_relation">[docs]</a>    <span class="k">def</span> <span class="nf">add_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sem_rel</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a relation to the semantic network</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            sem_rel = SEM_REL</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="c"># Check validity</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">sem_rel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">SEM_REL</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span> <span class="ow">or</span> 
+            <span class="p">(</span><span class="n">sem_rel</span><span class="o">.</span><span class="n">supMeaning</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="ow">or</span> 
+            <span class="p">(</span><span class="n">sem_rel</span><span class="o">.</span><span class="n">subMeaning</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Check duplication</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">sem_rel</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Add new relation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sem_rel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="SEM_NET.root"><a class="viewcode-back" href="../code.html#concept.SEM_NET.root">[docs]</a>    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept</span><span class="p">,</span> <span class="n">relType</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the farthest semantic root of a given concept (concept) for a given relation type (relType)</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - concept (str)</span>
+<span class="sd">            - relType (int)</span>
+<span class="sd">        </span>
+<span class="sd">        Notes: </span>
+<span class="sd">            - Does not seem to be used anywhere in c++ code</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="SEM_NET.distance"><a class="viewcode-back" href="../code.html#concept.SEM_NET.distance">[docs]</a>    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supMean</span><span class="p">,</span> <span class="n">subMean</span><span class="p">,</span> <span class="n">relType</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the distance in the semantic network between a concept (subMean) and an hypernym (supMean).</span>
+<span class="sd">        Return -1 if supMean is not a hypernym of subMean.</span>
+<span class="sd">        If heuristic = True: -&gt; does not guarantee to find the shortest distance.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">         - supMean (str)</span>
+<span class="sd">         - subMean (str)</span>
+<span class="sd">         - relType (int)</span>
+<span class="sd">         - heuristic (bool)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">visited</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># Explored elements of the semantic network</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travel</span><span class="p">(</span><span class="n">supMean</span><span class="p">,</span> <span class="n">subMean</span><span class="p">,</span> <span class="n">relType</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">heuristic</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
+    </div>
+    <span class="k">def</span> <span class="nf">_travel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supMean</span><span class="p">,</span> <span class="n">subMean</span><span class="p">,</span> <span class="n">relType</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">heuristic</span><span class="p">,</span> <span class="n">visited</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="n">supMean</span> <span class="o">==</span> <span class="n">subMean</span><span class="p">:</span> <span class="c"># Match found</span>
+            <span class="k">return</span> <span class="n">dist</span>
+        
+        <span class="n">minDist</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">relType</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">subMeaning</span> <span class="o">!=</span> <span class="n">subMean</span><span class="p">):</span>
+                <span class="k">continue</span>
+            
+            <span class="c"># Visit the current relation</span>
+            <span class="n">visited</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            
+            <span class="c"># Recursively travel</span>
+            <span class="n">nextDist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travel</span><span class="p">(</span><span class="n">supMean</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">,</span> <span class="n">relType</span><span class="p">,</span> <span class="n">dist</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">heuristic</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
+            
+            <span class="c"># Un-visit</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">heuristic</span><span class="p">):</span> <span class="c"># if heuristic: path does not have to be the shortest</span>
+                <span class="n">visited</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                     
+            <span class="k">if</span> <span class="n">nextDist</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">minDist</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">minDist</span> <span class="o">&gt;</span> <span class="n">nextDist</span><span class="p">):</span>
+                    <span class="n">minDist</span> <span class="o">=</span> <span class="n">nextDist</span>
+                <span class="k">if</span> <span class="n">minDist</span> <span class="o">&lt;=</span> <span class="n">dist</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> 
+                    <span class="k">break</span> <span class="c"># assumed to be the possible minimum distance</span>
+                
+                <span class="k">if</span> <span class="n">heuristic</span><span class="p">:</span>
+                    <span class="k">break</span> <span class="c"># if heuristicL just find one possible path</span>
+            
+        <span class="k">return</span> <span class="n">minDist</span>
+    
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;### SEMANTIC NETWORK ###</span><span class="se">\n\n</span><span class="s">&#39;</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="k">return</span> <span class="n">p</span>
+            
+            
+<span class="c">###############################################################################    </span></div>
+<div class="viewcode-block" id="CONCEPT"><a class="viewcode-back" href="../code.html#concept.CONCEPT">[docs]</a><span class="k">class</span> <span class="nc">CONCEPT</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Concept (semantico-syntactic knowledge)</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - name (STR): Name of the concept.</span>
+<span class="sd">        - meaning (STR) : Meaning it carries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SEMANTIC_NETWORK</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># A constant SEM_NET</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="c"># Concept name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">=</span> <span class="n">meaning</span> <span class="c"># Concept meaning</span>
+        
+    <span class="c"># Create concept (temporary)</span>
+<div class="viewcode-block" id="CONCEPT.create"><a class="viewcode-back" href="../code.html#concept.CONCEPT.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">concept</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a concept from a meaning string or another concept.</span>
+<span class="sd">        (TEMPORARY)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># set field (temporary)</span>
+        <span class="k">if</span> <span class="n">meaning</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">meaning</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">=</span> <span class="n">meaning</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        
+        <span class="c"># set field (temporary)</span>
+        <span class="k">if</span> <span class="n">concept</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">concept</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">=</span> <span class="n">concept</span><span class="o">.</span><span class="n">meaning</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        
+        <span class="k">return</span> <span class="bp">False</span>
+        </div>
+<div class="viewcode-block" id="CONCEPT.match"><a class="viewcode-back" href="../code.html#concept.CONCEPT.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">inclusive</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;        </span>
+<span class="sd">        Check if two concept match. Case inclusive = False: concepts match only if they carry the same meaning.</span>
+<span class="sd">        Case inclusive = True: If a concept is tagged with + (e.g. ANIMAL+) it will match with any of its hyponyms.</span>
+<span class="sd">        Otherwise, concepts match if they carry the same meaning.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - concept1 (CONCEPT)</span>
+<span class="sd">            - concept2 (CONCEPT)</span>
+<span class="sd">            - inclusive (BOOL)</span>
+<span class="sd">        </span>
+<span class="sd">        Notes:</span>
+<span class="sd">            - In the c++ version matching is boolean. No impact of distance on similarity.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="n">mean1</span> <span class="o">=</span> <span class="n">concept1</span><span class="o">.</span><span class="n">meaning</span>
+        <span class="n">incl1</span> <span class="o">=</span> <span class="n">mean1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span>
+        <span class="k">if</span> <span class="n">incl1</span><span class="p">:</span>
+            <span class="n">mean1</span> <span class="o">=</span> <span class="n">mean1</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            
+        <span class="n">mean2</span> <span class="o">=</span> <span class="n">concept2</span><span class="o">.</span><span class="n">meaning</span>
+        <span class="n">incl2</span> <span class="o">=</span> <span class="n">mean2</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span>
+        <span class="k">if</span> <span class="n">incl2</span><span class="p">:</span>
+            <span class="n">mean2</span> <span class="o">=</span> <span class="n">mean2</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="c"># Forward direction</span>
+        <span class="n">dist1</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">mean1</span><span class="p">,</span> <span class="n">mean2</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">inclusive</span> <span class="ow">and</span> <span class="n">dist1</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">incl1</span><span class="p">):</span>
+            <span class="n">dist1</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># Inclusive</span>
+        
+        <span class="c"># Backward direction</span>
+        <span class="n">dist2</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">mean2</span><span class="p">,</span> <span class="n">mean1</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">inclusive</span> <span class="ow">and</span> <span class="n">dist2</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">incl2</span><span class="p">):</span>
+            <span class="n">dist2</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># Inclusive</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">dist1</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dist2</span><span class="o">!=</span><span class="mi">0</span><span class="p">):</span>
+         <span class="k">return</span> <span class="bp">False</span> <span class="c"># Only meaning with distance 0 are accepted as matched</span>
+        
+        <span class="c">#</span>
+        <span class="c"># Check other fields too</span>
+        <span class="mi">2</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<span class="c">###############################################################################</span></div></div>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">s1</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="p">(</span><span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="s">&#39;cat&#39;</span><span class="p">,</span> <span class="s">&#39;animal&#39;</span><span class="p">)</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="p">(</span><span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="s">&#39;dog&#39;</span><span class="p">,</span> <span class="s">&#39;animal&#39;</span><span class="p">)</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="p">(</span><span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="s">&#39;animal&#39;</span><span class="p">,</span> <span class="s">&#39;being&#39;</span><span class="p">)</span>
+    
+    <span class="k">print</span> <span class="n">s1</span>
+    <span class="k">print</span> <span class="n">s2</span>
+    <span class="k">print</span> <span class="n">s3</span>
+    
+    <span class="n">semantic_network</span> <span class="o">=</span> <span class="n">SEM_NET</span><span class="p">(</span><span class="n">relations</span> <span class="o">=</span> <span class="p">[</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">])</span>
+
+    <span class="n">semantic_network</span><span class="o">.</span><span class="n">add_relation</span><span class="p">(</span><span class="n">s3</span><span class="p">)</span>
+    
+    <span class="k">print</span> <span class="n">semantic_network</span>
+    
+    <span class="n">concept1</span> <span class="o">=</span> <span class="s">&#39;being&#39;</span>
+    <span class="n">concept2</span> <span class="o">=</span> <span class="s">&#39;cat&#39;</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">semantic_network</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;Distance between </span><span class="si">%s</span><span class="s"> and </span><span class="si">%s</span><span class="s"> = </span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>  
+
+    <span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span> <span class="o">=</span> <span class="n">semantic_network</span>
+    
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="p">(</span><span class="s">&#39;c1&#39;</span><span class="p">,</span> <span class="s">&#39;dog&#39;</span><span class="p">)</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="p">(</span><span class="s">&#39;c2&#39;</span><span class="p">,</span> <span class="s">&#39;animal+&#39;</span><span class="p">)</span>
+    
+    <span class="k">print</span> <span class="n">CONCEPT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+
+    
+    
+    
+    
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

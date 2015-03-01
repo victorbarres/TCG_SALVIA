@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>viewer &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for viewer</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Feb 12 16:13:10 2015</span>
+
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Defines the TCG_VIEWER class that allows to view a certain dataset into the TCG viewer.</span>
+
+<span class="sd">Can be also be use in command line: python viewer.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TCG_VIEWER"><a class="viewcode-back" href="../code.html#viewer.TCG_VIEWER">[docs]</a><span class="k">class</span> <span class="nc">TCG_VIEWER</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connects the simulation to the the TCG viewer.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - server_port (INT): Server port value, default 8080.</span>
+<span class="sd">        - viewer_path (STR): path to the viewer main directory.</span>
+<span class="sd">        - data_path (STR): Path to the data folder that needs to be displayed.</span>
+<span class="sd">        - tmp (STR): Temp folder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">PORT</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span> <span class="n">viewer_path</span><span class="o">=</span><span class="s">&quot;viewer/&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Requires the path (data_path) to the folder that contains the data to be diplayed in the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server_port</span> <span class="o">=</span> <span class="n">PORT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">=</span> <span class="n">viewer_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">data_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span> <span class="o">=</span> <span class="s">&quot;tmp/&quot;</span>
+    
+<div class="viewcode-block" id="TCG_VIEWER.start_viewer"><a class="viewcode-back" href="../code.html#viewer.TCG_VIEWER.start_viewer">[docs]</a>    <span class="k">def</span> <span class="nf">start_viewer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts the viewer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_server</span><span class="p">()</span>
+        </div>
+    <span class="k">def</span> <span class="nf">_start_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setting up server at port PORT serving the viewer folder defined by viewer_path</span>
+<span class="sd">        and opens default browser to &quot;http://localhost:PORT&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">os</span>
+        <span class="kn">import</span> <span class="nn">SimpleHTTPServer</span>
+        <span class="kn">import</span> <span class="nn">SocketServer</span>
+        
+        <span class="kn">import</span> <span class="nn">webbrowser</span>
+        <span class="n">PORT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_port</span>
+    
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span><span class="p">)</span>
+    
+        <span class="n">Handler</span> <span class="o">=</span> <span class="n">SimpleHTTPServer</span><span class="o">.</span><span class="n">SimpleHTTPRequestHandler</span>
+    
+        <span class="n">httpd</span> <span class="o">=</span> <span class="n">SocketServer</span><span class="o">.</span><span class="n">TCPServer</span><span class="p">((</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">PORT</span><span class="p">),</span> <span class="n">Handler</span><span class="p">)</span>
+    
+        <span class="k">print</span> <span class="s">&quot;serving at port&quot;</span><span class="p">,</span> <span class="n">PORT</span>
+        <span class="n">webbrowser</span><span class="o">.</span><span class="n">open_new</span><span class="p">(</span><span class="s">&quot;http://localhost:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">PORT</span><span class="p">))</span>
+        <span class="n">httpd</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+        
+    <span class="k">def</span> <span class="nf">_load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copies and creates all the required data in viewer/tmp directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="k">print</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_cxn_imgs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_concept_img</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">_create_cxn_imgs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create graph images for all the constructions.</span>
+<span class="sd">        Uses graphviz with pydot implementation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
+        <span class="kn">import</span> <span class="nn">subprocess</span>        
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="kn">import</span> <span class="nn">pydot</span>
+        
+        <span class="n">prog</span> <span class="o">=</span> <span class="s">&#39;dot&#39;</span>
+        <span class="n">file_type</span> <span class="o">=</span> <span class="s">&#39;svg&#39;</span>
+        
+        <span class="n">cxn_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span> <span class="o">+</span> <span class="s">&#39;cxn/&#39;</span>        
+        
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cxn_folder</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">cxn_folder</span><span class="p">)</span>
+        
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">cxn_folder</span><span class="p">)</span>
+        
+        <span class="n">grammar_file</span> <span class="o">=</span> <span class="s">&#39;TCG_grammar.json&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span> <span class="o">+</span> <span class="n">grammar_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        
+        <span class="n">grammar</span> <span class="o">=</span> <span class="n">json_data</span><span class="p">[</span><span class="s">&#39;grammar&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">cxn</span> <span class="ow">in</span> <span class="n">grammar</span><span class="p">:</span>
+            <span class="n">dot_cxn</span> <span class="o">=</span> <span class="n">pydot</span><span class="o">.</span><span class="n">Dot</span><span class="p">(</span><span class="n">graph_type</span> <span class="o">=</span> <span class="s">&#39;digraph&#39;</span><span class="p">)</span>
+            <span class="n">dot_cxn</span><span class="o">.</span><span class="n">set_rankdir</span><span class="p">(</span><span class="s">&#39;LR&#39;</span><span class="p">)</span>
+            <span class="n">dot_cxn</span><span class="o">.</span><span class="n">set_fontname</span><span class="p">(</span><span class="s">&#39;consolas&#39;</span><span class="p">)</span>
+
+            
+            <span class="n">cluster_SemFrame</span> <span class="o">=</span> <span class="n">pydot</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="s">&#39;SemFrame&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;SemFrame&#39;</span><span class="p">)</span>
+            <span class="n">cluster_SemFrame</span><span class="o">.</span><span class="n">set_bgcolor</span><span class="p">(</span><span class="s">&#39;lightcoral&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">cxn</span><span class="p">[</span><span class="s">&#39;SemFrame&#39;</span><span class="p">][</span><span class="s">&#39;nodes&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="s">&#39;head&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="n">node_shape</span> <span class="o">=</span> <span class="s">&#39;doublecircle&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">node_shape</span> <span class="o">=</span> <span class="s">&#39;circle&#39;</span>
+                <span class="n">cluster_SemFrame</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">node</span><span class="p">[</span><span class="s">&#39;concept&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">node_shape</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;filled&#39;</span><span class="p">,</span> <span class="n">fillcolor</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">cxn</span><span class="p">[</span><span class="s">&#39;SemFrame&#39;</span><span class="p">][</span><span class="s">&#39;edges&#39;</span><span class="p">]:</span>
+                <span class="n">cluster_SemFrame</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="s">&#39;from&#39;</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="s">&#39;to&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">edge</span><span class="p">[</span><span class="s">&#39;concept&#39;</span><span class="p">]))</span>
+            
+            <span class="n">dot_cxn</span><span class="o">.</span><span class="n">add_subgraph</span><span class="p">(</span><span class="n">cluster_SemFrame</span><span class="p">)</span>
+            
+            <span class="n">cluster_SynForm</span> <span class="o">=</span> <span class="n">pydot</span><span class="o">.</span><span class="n">Cluster</span><span class="p">(</span><span class="s">&#39;SynForm&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;SynForm&#39;</span><span class="p">)</span>
+            <span class="n">cluster_SynForm</span><span class="o">.</span><span class="n">set_bgcolor</span><span class="p">(</span><span class="s">&#39;lightblue&#39;</span><span class="p">)</span>
+            <span class="n">pre_form</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">for</span> <span class="n">form</span> <span class="ow">in</span> <span class="n">cxn</span><span class="p">[</span><span class="s">&#39;SynForm&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;SLOT&quot;</span><span class="p">:</span>
+                    <span class="n">cluster_SynForm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span><span class="s">&quot;[&quot;</span> <span class="o">+</span>  <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;classes&#39;</span><span class="p">])</span> <span class="o">+</span><span class="s">&quot;]&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s">&quot;box&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;filled&#39;</span><span class="p">,</span> <span class="n">fillcolor</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;PHON&#39;</span><span class="p">:</span>
+                    <span class="n">cluster_SynForm</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;phon&#39;</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="s">&quot;box&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s">&#39;filled&#39;</span><span class="p">,</span> <span class="n">fillcolor</span><span class="o">=</span><span class="s">&#39;white&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">pre_form</span><span class="p">):</span>
+                    <span class="n">pre_form</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cluster_SynForm</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Edge</span><span class="p">(</span><span class="n">pre_form</span><span class="p">,</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;next&#39;</span><span class="p">))</span>
+                    <span class="n">pre_form</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span>
+            
+            <span class="n">dot_cxn</span><span class="o">.</span><span class="n">add_subgraph</span><span class="p">(</span><span class="n">cluster_SynForm</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cxn</span><span class="p">[</span><span class="s">&#39;SymLinks&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">dot_cxn</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Edge</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">cxn</span><span class="p">[</span><span class="s">&#39;SymLinks&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="nb">dir</span><span class="o">=</span><span class="s">&#39;none&#39;</span><span class="p">,</span> <span class="n">penwidth</span><span class="o">=</span><span class="s">&#39;1&#39;</span><span class="p">))</span>
+            
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">cxn_folder</span> <span class="o">+</span> <span class="n">cxn</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;.gv&quot;</span>
+            <span class="n">dot_cxn</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+            
+        <span class="c"># This is a work around becauses dot.write or doc.create do not work properly -&gt; Cannot access dot.exe (even though it is on the system path)</span>
+        <span class="n">cxn_dots</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">cxn_folder</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cxn_file</span> <span class="ow">in</span> <span class="n">cxn_dots</span><span class="p">:</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -T</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> &gt; </span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">prog</span><span class="p">,</span> <span class="n">file_type</span><span class="p">,</span> <span class="n">cxn_folder</span> <span class="o">+</span> <span class="n">cxn_file</span><span class="p">,</span> <span class="n">cxn_folder</span> <span class="o">+</span> <span class="n">cxn_file</span><span class="p">,</span> <span class="n">file_type</span><span class="p">)</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_create_concept_img</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create graph image for the conceptual knowledge.</span>
+<span class="sd">        Uses graphviz with pydot implementation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">shutil</span>
+        <span class="kn">import</span> <span class="nn">subprocess</span>        
+        <span class="kn">import</span> <span class="nn">json</span>
+        <span class="kn">import</span> <span class="nn">pydot</span>
+        
+        <span class="n">prog</span> <span class="o">=</span> <span class="s">&#39;dot&#39;</span>
+        <span class="n">file_type</span> <span class="o">=</span> <span class="s">&#39;svg&#39;</span>
+        
+        <span class="n">sem_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span> <span class="o">+</span> <span class="s">&#39;sem/&#39;</span>        
+        
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">sem_folder</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">sem_folder</span><span class="p">)</span>
+        
+        <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">sem_folder</span><span class="p">)</span>
+        
+        <span class="n">sem_file</span> <span class="o">=</span> <span class="s">&#39;TCG_semantics.json&#39;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viewer_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tmp</span> <span class="o">+</span> <span class="n">sem_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        
+        <span class="n">sem</span> <span class="o">=</span> <span class="n">json_data</span>
+        <span class="n">edge_type</span> <span class="o">=</span> <span class="s">&#39;is_a&#39;</span>
+        <span class="n">dot_sem</span> <span class="o">=</span> <span class="n">pydot</span><span class="o">.</span><span class="n">Dot</span><span class="p">(</span><span class="n">graph_type</span><span class="o">=</span><span class="s">&#39;digraph&#39;</span><span class="p">)</span>
+        <span class="n">dot_sem</span><span class="o">.</span><span class="n">set_rankdir</span><span class="p">(</span><span class="s">&#39;BT&#39;</span><span class="p">)</span>
+        <span class="n">dot_sem</span><span class="o">.</span><span class="n">set_fontname</span><span class="p">(</span><span class="s">&#39;consolas&#39;</span><span class="p">)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s">&#39;black&#39;</span>
+        <span class="n">node_shape</span> <span class="o">=</span> <span class="s">&#39;box&#39;</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="s">&#39;filled&#39;</span>
+        <span class="n">fill_color</span> <span class="o">=</span> <span class="s">&#39;white&#39;</span>
+        
+        <span class="k">def</span> <span class="nf">_add_semrel</span><span class="p">(</span><span class="n">sup_node</span><span class="p">,</span> <span class="n">sem_data</span><span class="p">,</span> <span class="n">dot_sem</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">concept</span> <span class="ow">in</span> <span class="n">sem_data</span><span class="p">:</span>
+                <span class="n">dot_sem</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Node</span><span class="p">(</span><span class="n">concept</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">concept</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">node_shape</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span> <span class="n">fillcolor</span><span class="o">=</span><span class="n">fill_color</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">sup_node</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">dot_sem</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">pydot</span><span class="o">.</span><span class="n">Edge</span><span class="p">(</span><span class="n">concept</span><span class="p">,</span> <span class="n">sup_node</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">edge_type</span><span class="p">))</span>
+                
+                <span class="n">_add_semrel</span><span class="p">(</span><span class="n">concept</span><span class="p">,</span> <span class="n">sem_data</span><span class="p">[</span><span class="n">concept</span><span class="p">],</span> <span class="n">dot_sem</span><span class="p">)</span>
+        
+        <span class="n">_add_semrel</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">sem</span><span class="p">,</span> <span class="n">dot_sem</span><span class="p">)</span>
+        
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">sem_folder</span> <span class="o">+</span> <span class="s">&#39;TCG_semantics&#39;</span> <span class="o">+</span> <span class="s">&quot;.gv&quot;</span>
+        <span class="n">dot_sem</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="c"># This is a work around becauses dot.write or doc.create do not work properly -&gt; Cannot access dot.exe (even though it is on the system path)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> -T</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> &gt; </span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">prog</span><span class="p">,</span> <span class="n">file_type</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">file_type</span><span class="p">)</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        
+        
+
+        
+        
+        
+                
+<span class="c">###############################################################################</span></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="n">data_folder</span> <span class="o">=</span> <span class="s">&#39;./output/&#39;</span>
+    
+    <span class="n">data_list</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_folder</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;Available data:</span><span class="se">\n</span><span class="s">&quot;</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">d</span>
+    
+    <span class="n">filename</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;Enter a file name: &#39;</span><span class="p">)</span>
+    
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">data_folder</span> <span class="o">+</span> <span class="n">filename</span>
+    
+    <span class="n">myViewer</span> <span class="o">=</span> <span class="n">TCG_VIEWER</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+    <span class="n">myViewer</span><span class="o">.</span><span class="n">start_viewer</span><span class="p">()</span>
+    
+        
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

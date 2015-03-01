@@ -1,0 +1,359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>construction &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for construction</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Apr 22 15:48:47 2014</span>
+
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Define constructions related classes for TCG1.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c">###############################################################################</span>
+<span class="c">### Template ###</span>
+
+<div class="viewcode-block" id="TP_ELEM"><a class="viewcode-back" href="../code.html#construction.TP_ELEM">[docs]</a><span class="k">class</span> <span class="nc">TP_ELEM</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Template element (base class).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Element types</span>
+    <span class="n">UNDEFINED</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">NODE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RELATION</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">SLOT</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">PHONETICS</span> <span class="o">=</span> <span class="mi">4</span>    
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="c"># Element type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_cxn</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Parent construction</span>
+    </div>
+<div class="viewcode-block" id="TP_SEM_ELEM"><a class="viewcode-back" href="../code.html#construction.TP_SEM_ELEM">[docs]</a><span class="k">class</span> <span class="nc">TP_SEM_ELEM</span><span class="p">(</span><span class="n">TP_ELEM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Template Sem-Frame element.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes: </span>
+<span class="sd">        - Need to make sure that the link to synform is reciprocal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linked_slot</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Linked slot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concept</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Representing concept</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shared</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="bp">False</span>
+        </div>
+<div class="viewcode-block" id="TP_NODE"><a class="viewcode-back" href="../code.html#construction.TP_NODE">[docs]</a><span class="k">class</span> <span class="nc">TP_NODE</span><span class="p">(</span><span class="n">TP_SEM_ELEM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sem-Frame node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">TP_SEM_ELEM</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">NODE</span>
+</div>
+<div class="viewcode-block" id="TP_REL"><a class="viewcode-back" href="../code.html#construction.TP_REL">[docs]</a><span class="k">class</span> <span class="nc">TP_REL</span><span class="p">(</span><span class="n">TP_SEM_ELEM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sem-Frame relation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">TP_SEM_ELEM</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFrom</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTo</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">RELATION</span>
+</div>
+<div class="viewcode-block" id="TP_SYN_ELEM"><a class="viewcode-back" href="../code.html#construction.TP_SYN_ELEM">[docs]</a><span class="k">class</span> <span class="nc">TP_SYN_ELEM</span><span class="p">(</span><span class="n">TP_ELEM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Template SynFrame element.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c"># Syntactic order</span>
+        </div>
+<div class="viewcode-block" id="TP_SLOT"><a class="viewcode-back" href="../code.html#construction.TP_SLOT">[docs]</a><span class="k">class</span> <span class="nc">TP_SLOT</span><span class="p">(</span><span class="n">TP_SYN_ELEM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SynFrame slot.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes: </span>
+<span class="sd">        - Need to make sure that the link to SemFrame is reciprocal. </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">TP_SYN_ELEM</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linked_SemElem</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># Linked Sem-Frame element</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cxn_classes</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># Construction classes that can fill this slot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">SLOT</span>
+        </div>
+<div class="viewcode-block" id="TP_PHON"><a class="viewcode-back" href="../code.html#construction.TP_PHON">[docs]</a><span class="k">class</span> <span class="nc">TP_PHON</span><span class="p">(</span><span class="n">TP_SYN_ELEM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SynFrame phonetic notation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">TP_SYN_ELEM</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">PHONETICS</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonetics</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_syllables</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># Used to measure utterance length.</span>
+        
+<span class="c">###############################################################################     </span>
+<span class="c">### Construction ###</span>
+</div>
+<div class="viewcode-block" id="CXN"><a class="viewcode-back" href="../code.html#construction.CXN">[docs]</a><span class="k">class</span> <span class="nc">CXN</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Grammatical construction.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - name (str): construction name</span>
+<span class="sd">        - clss (str): construction class</span>
+<span class="sd">        - preference (int): construction preference</span>
+<span class="sd">        - template ([TP_ELEM]): all cxn template elements</span>
+<span class="sd">        - SemFrame ([TP_SEM_ELEM]): all cxn Sem-Frame elements</span>
+<span class="sd">        - SynForm ([TP_SYN_ELEM]): all cxn Syn-Form elements</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clss</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preference</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># construction preference</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># all template elements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SemFrame</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># Sem-Frame elements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SynForm</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># Syn_Form elements</span>
+    
+<div class="viewcode-block" id="CXN.find_sem_elem"><a class="viewcode-back" href="../code.html#construction.CXN.find_sem_elem">[docs]</a>    <span class="k">def</span> <span class="nf">find_sem_elem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find and return SemFrame element with a given name (str).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SemFrame</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">elem</span>
+        <span class="k">return</span> <span class="bp">None</span>
+        </div>
+<div class="viewcode-block" id="CXN.add_sem_elem"><a class="viewcode-back" href="../code.html#construction.CXN.add_sem_elem">[docs]</a>    <span class="k">def</span> <span class="nf">add_sem_elem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sem_elem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add sem_elem (TP_SEM_ELEM) to the SemFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Check for duplicate</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_sem_elem</span><span class="p">(</span><span class="n">sem_elem</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Set sem_elem variables</span>
+        <span class="n">sem_elem</span><span class="o">.</span><span class="n">parent_cxn</span> <span class="o">=</span> <span class="bp">self</span>
+        
+        <span class="c"># Add a new Sem-Frame element</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SemFrame</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sem_elem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sem_elem</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">True</span>
+        </div>
+<div class="viewcode-block" id="CXN.add_syn_elem"><a class="viewcode-back" href="../code.html#construction.CXN.add_syn_elem">[docs]</a>    <span class="k">def</span> <span class="nf">add_syn_elem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">syn_elem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add syn_elem (TP_SYN_ELEM) to the SynForm. </span>
+<span class="sd">        &quot;&quot;&quot;</span>          
+        <span class="c"># Set syn_elem variable</span>
+        <span class="n">syn_elem</span><span class="o">.</span><span class="n">parent_cxn</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="n">syn_elem</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SynForm</span><span class="p">)</span>
+    
+        <span class="c"># Add a new Syn-Form element</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SynForm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">syn_elem</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">syn_elem</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;class: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">clss</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;preference: </span><span class="si">%i</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">preference</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;SEM-FRAME:</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SemFrame</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">name: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">NODE</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">type: node</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">RELATION</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">type: relation</span><span class="se">\n</span><span class="s">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">type: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">concept: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">meaning</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">shared: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">shared</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">head: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">head</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">NODE</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">linked_slot</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">linked slot order: None</span><span class="se">\n</span><span class="s">&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">linked slot order: </span><span class="si">%i</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">linked_slot</span><span class="o">.</span><span class="n">order</span> 
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">RELATION</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">from: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">pFrom</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">to: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">pTo</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SemFrame</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">!=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SemFrame</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;SYN-FORM:</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SynForm</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">order: </span><span class="si">%i</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">order</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">SLOT</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">type: slot</span><span class="se">\n</span><span class="s">&quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">linked_node: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">linked_SemElem</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">classes: [</span><span class="si">%s</span><span class="s">]</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">cxn_classes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">TP_ELEM</span><span class="o">.</span><span class="n">PHONETICS</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">type: phonetics</span><span class="se">\n</span><span class="s">&quot;</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">phon: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">phonetics</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">num_syllables: </span><span class="si">%i</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">s</span><span class="o">.</span><span class="n">num_syllables</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">SynForm</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">!=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SynForm</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+        
+        <span class="k">return</span> <span class="n">p</span>
+        
+<span class="c">###############################################################################</span>
+<span class="c">### Grammar: set of construtions ###</span>
+</div>
+<div class="viewcode-block" id="GRAMMAR"><a class="viewcode-back" href="../code.html#construction.GRAMMAR">[docs]</a><span class="k">class</span> <span class="nc">GRAMMAR</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Grammar defined as a set of constructions (&quot;constructicon&quot;)</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - constructions ([CXN])</span>
+<span class="sd">    </span>
+<span class="sd">    Notes:</span>
+<span class="sd">        - Corresponds to VOCAB in c++ code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructions</span> <span class="o">=</span> <span class="p">[]</span>
+    
+<div class="viewcode-block" id="GRAMMAR.find_construction"><a class="viewcode-back" href="../code.html#construction.GRAMMAR.find_construction">[docs]</a>    <span class="k">def</span> <span class="nf">find_construction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find construction in grammar for a given name.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - name (str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">cxn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constructions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cxn</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">cxn</span>
+        <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="GRAMMAR.add_construction"><a class="viewcode-back" href="../code.html#construction.GRAMMAR.add_construction">[docs]</a>    <span class="k">def</span> <span class="nf">add_construction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">construction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add construction (CXN) to grammar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Check for duplicate</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_construction</span><span class="p">(</span><span class="n">construction</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Add new construction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">construction</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="GRAMMAR.clear"><a class="viewcode-back" href="../code.html#construction.GRAMMAR.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all constructions from grammar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructions</span> <span class="o">=</span> <span class="p">[]</span>
+    </div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;### TCG GRAMMAR ###</span><span class="se">\n\n</span><span class="s">&quot;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constructions</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span>
+        
+        <span class="k">return</span> <span class="n">p</span>
+    
+<div class="viewcode-block" id="GRAMMAR.print_cxn"><a class="viewcode-back" href="../code.html#construction.GRAMMAR.print_cxn">[docs]</a>    <span class="k">def</span> <span class="nf">print_cxn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cxn_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print the cxn with name cxn_name (STR) if it is found in the grammar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="n">cxn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_construction</span><span class="p">(</span><span class="n">cxn_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">cxn</span><span class="p">):</span>
+            <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> not found...&quot;</span> <span class="o">%</span> <span class="n">cxn_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">cxn</span>
+        
+
+<span class="c">###############################################################################</span>
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;No test case implemented.&quot;</span>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>
