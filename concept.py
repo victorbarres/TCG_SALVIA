@@ -4,70 +4,114 @@ Created on Tue Apr 29 13:21:41 2014
 
 @author: Victor Barres
 
-Define semantic knowledge related classes for TCG1.0
+Define semantic network related classes for TCG1.1
 """
 ###############################################################################
+class SEM:
+    """
+    Semantic entity
+    
+    Data:
+        - name (STR): Unique identifier of the entity.
+        - meaning (): Meaning associated with the semantic entity.
+    """    
+    def __init__(self, name='', meaning=''):
+        self.name = name # Concept name
+        self.meaning = meaning # Concept meaning
+    
+    def set_name(self, name=''):
+        """
+        Set semantic entity name.
+        """
+        self.name = name
+    
+    def set_meaning(self, meaning=''):
+        """
+        Set semantic entity meaning
+        """
+        self.meaning = meaning
+    
+    def __eq__(self, other):
+        is_equal = (isinstance(other, self.__class__) and 
+            (self.nametype == other.name) and
+            (self.meaning == other.meaning))
+        return is_equal
+    
 class SEM_REL:
     """
     Semantic Relation
     
     Data:
-        - type (INT): UNDEFINED=0, IS_A =1
-        - supMeaning (STR): Hypernym of subMeaning
-        - subMeaning (STR): Hyponym of supMeaning
+        - type (STR): Type of relation.
+        - from_sem (STR): Name of the source semantic entity.
+        - to_sem (STR): Name of the target semantic entity.
         
     Note:
         - Only IS_A hyponymic relation is defined in c++ code.
     """
     # Relation types
     UNDEFINED = 0
-    IS_A = 1 # C++ code for TCG1.0 only handles hyponymy
     
-    def __init__(self, aType = UNDEFINED, subMeaning = '', supMeaning = ''):
-        self.type = aType # Relation type
-        self.supMeaning = supMeaning # Superordinate meaning
-        self.subMeaning= subMeaning # Subordinate meaning
-    
+    def __init__(self, aType = 'UNDEFINED', from_sem = '', to_sem = ''):
+        self.type = aType
+        self.from_sem = from_sem 
+        self.to_sem= to_sem
+        
     def __eq__(self, other):
         is_equal = (isinstance(other, self.__class__) and 
             (self.type == other.type) and
-            (self.supMeaning == other.supMeaning) and 
-            (self.subMeaning == other.subMeaning))
+            (self.from_sem == other.from_sem) and 
+            (self.to_sem == other.to_sem))
         return is_equal
     
     def __str__(self):
-        if self.type == SEM_REL.IS_A:
-            p = "%s IS_A %s" % (self.subMeaning, self.supMeaning)
-        else:
-            p = "type: %i, subMeaning: %s, supMeaning: %s" % (self.type, self.subMeaning, self.supMeaning)
+        p = "%s %s %s" % (self.from_sem, self.type, self.to_sem)
         return p
-    
 ###############################################################################
 class SEM_NET:
     """
-    Semantic network (acting as world knowledge)
+    Semantic network.
     
     Data:
-        - relation ([SEM_REL]): List of semantic relations
-    
-    Notes: 
-        - The network is simply defined as a list of semantic relations.
+        - nodes ([SEM]): List of semantic entities.
+        - edges ([SEM_REL]): List of semantic relations.
     """
-    def __init__(self, relations = []):
-        self.relations = relations
+    def __init__(self, nodes=[], edges=[]):
+        self.nodes = nodes
+        self.edges = edges
     
     def clear(self):
         """
-        Clear all relations
+        Clear all.
         """
-        self.relations = []
+        self.nodes = []
+        self.edges = []
     
+    def add_entity(self, sem):
+        """
+        Add a semantic entity to the semantic network
+        
+        Args:
+            sem (SEM): A semantic entity
+        """
+        # Check validity        
+        if(not(isinstance(sem, SEM)) or sem.name==''):
+            return False
+        
+        # Check duplication
+        if self.find_node(sem.name):
+            return False
+        
+        # Add new semantic entity
+        self.nodes.append(sem)
+        return True
+        
     def add_relation(self, sem_rel):
         """
         Add a relation to the semantic network
         
         Args:
-            sem_rel = SEM_REL
+            sem_rel (SEM_REL): A semantic relation
         """        
         # Check validity
         if ((sem_rel.type == SEM_REL.UNDEFINED) or 
@@ -80,23 +124,30 @@ class SEM_NET:
             if r == sem_rel:
                 return False
         
+        # Check that source and target of relation are defined.
+        if not(self.find_node(sem_rel.from_sem)) or not(self.find_node(sem_rel.to_sem)):
+            return False
+        
         # Add new relation
         self.relations.append(sem_rel)
         return True
     
-    def root(self, concept, relType):
+    def find_node(self, name):
         """
-        Get the farthest semantic root of a given concept (concept) for a given relation type (relType)
+        Finds node with name 'name' (STR). Returns the node if found, else returns None.
         
         Args:
-            - concept (str)
-            - relType (int)
-        
-        Notes: 
-            - Does not seem to be used anywhere in c++ code
+            - name (STR): Name of a semantic entity.
         """
+        for n in self.nodes:
+            if n.name == name:
+                return n
+        
         return None
     
+    ######
+    # TO REWRITE
+    ######
     def distance(self, supMean, subMean, relType = SEM_REL.IS_A, heuristic = False):
         """
         Return the distance in the semantic network between a concept (subMean) and an hypernym (supMean).

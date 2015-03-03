@@ -5,7 +5,6 @@ Created on Tue Feb 24 11:57:27 2015
 @author: Victor Barres
 Defines the classes used to set up a brain system model
 """
-
 ############################    
 ### Brain system classes ###
 ############################   

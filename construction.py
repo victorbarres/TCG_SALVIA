@@ -10,7 +10,6 @@ The Template Classes define all the basic template elements that are used to bui
 ########################
 ### Template Classes ###
 ########################
-
 class TP_ELEM:
     """
     Template element (base class).
@@ -122,8 +121,7 @@ class TP_SYMLINKS(TP_ELEM):
            
 ############################    
 ### Construction classes ###
-############################
-        
+############################     
 class CXN:
     """
     Grammatical construction.
@@ -191,7 +189,7 @@ class CXN:
         
         return True
     
-    def add_symlink(self, node, slot):
+    def add_sym_link(self, node, slot):
         """
         Adds a symbolic link  between the node (TP_NODE) and slot (TP_SLOT)
         """
@@ -248,8 +246,7 @@ class CXN:
         
 ####################################
 ### Grammar: set of construtions ###
-####################################
-        
+####################################       
 class GRAMMAR:
     """
     Grammar defined as a set of constructions ("constructicon")
@@ -293,25 +290,24 @@ class GRAMMAR:
         """
         self.constructions = []
     
-    def __str__(self):
-        p = ''
-        p += "### TCG GRAMMAR ###\n\n"
-        for c in self.constructions:
-            p += str(c)
-            p += '\n\n'
-        
-        return p
-    
-    def print_cxn(self, cxn_name):
-        """
-        Print the cxn with name cxn_name (STR) if it is found in the grammar.
-        """        
-        cxn = self.find_construction(cxn_name)
-        if not(cxn):
-            print "%s not found..." % cxn_name
-        else:
-            print cxn
-        
+#    def __str__(self):
+#        p = ''
+#        p += "### TCG GRAMMAR ###\n\n"
+#        for c in self.constructions:
+#            p += str(c)
+#            p += '\n\n'
+#        
+#        return p
+#    
+#    def print_cxn(self, cxn_name):
+#        """
+#        Print the cxn with name cxn_name (STR) if it is found in the grammar.
+#        """        
+#        cxn = self.find_construction(cxn_name)
+#        if not(cxn):
+#            print "%s not found..." % cxn_name
+#        else:
+#            print cxn     
 ###############################################################################
 
 if __name__=='__main__':

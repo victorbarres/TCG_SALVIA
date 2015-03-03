@@ -189,13 +189,14 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
     """
     def __init__(self):
         SCHEMA_INST.__init__(self)
+    
         
 ##########################
 ### Perceptual process ###
 ##########################
 class PERCEPT:
     """
-    Schema perception.
+    Schema perception. ## -> THIS NEEDS TO BE REPLACED!!! It should use the conceptualizer.
     
     Data:
         - schema (SCHEMA): Perceived schema.
@@ -298,15 +299,24 @@ class SUB_SCENE:
         return False
     
     def set_anchor(self, schema_inst):
+        """
+        Define the anchor schema instance
+        """
         self.anchor = schema_inst
     
     def find_schema(self, name):
+        """
+        Find schema instance with name "name'. If found, return instance, else, return None.
+        """
         for schema_inst in self.nodes + self.edges:
             if schema_inst.schema.name == name:
                 return schema_inst
         return None
             
     def update_area(self):
+        """
+        Recalculates the area associated wiht the subscene based on associated schema instances.
+        """
         schema_insts = self.nodes + self.edges
         if len(schema_insts) == 0:
             self.area = None
