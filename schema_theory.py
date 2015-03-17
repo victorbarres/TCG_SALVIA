@@ -16,16 +16,31 @@ class SCHEMA:
     Data:
         - id (int): Unique id
         - name (str): schema name
+    """
+    ID_next = 0 # Global schema ID counter
+    def __init__(self, name=""):
+        self.id = KNOWLEDGE_SCHEMA.ID_next
+        SCHEMA.ID_next += 1
+        self.name = name
+        
+################################
+### KNOWLEDGE SCHEMA CLASSES ###
+################################
+class KNOWLEDGE_SCHEMA(SCHEMA):
+    """
+    Knowledge schema base class (Declarative schema)
+    Those schemas can be instantiated.
+    
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+    Data:
         - LTM (LTM): Associated long term memory.
         - content (): Procedural or semantic content of the schema.
         - init_act (float): Initial activation value.
-    """
-    ID_next = 0 # Global schema ID counter
-    
+    """    
     def __init__(self, name="", LTM=None, content=None, init_act=0):
-        self.id = SCHEMA.ID_next
-        SCHEMA.ID_next += 1
-        self.name = name
+        SCHEMA.init(self, name)
         self.LTM = LTM
         self.content = content
         self.init_act = init_act
@@ -49,13 +64,17 @@ class SCHEMA_INST:
     Data:
         - id (int): Unique id
         - activation (float): Current activation value of schema instance
-        - schema (SCHEMA):
-        - in_ports ([int]):
-        - out_ports ([int]):
+        - schema (KNOWLEDGE_SCHEMA):
+        - in_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
+        - out_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
+        
+    NOTE: SEE MODULE FOR HOW TO HANDLE PORTS!
     """
     ID_next = 0 # Global schema instance ID counter
+    PI_next = 0 # Global schema instance input port counter
+    PO_next = 0 # Global schema instance ouput port counter
     
     def __init__(self):
         self.id = SCHEMA_INST.ID_next
@@ -89,6 +108,23 @@ class SCHEMA_INST:
         """
         self.trace = a_trace
     
+    def add_port(self,port_type, port_name, value=None):
+        """
+        Adds a new port to the instance. Port_type (str) ['in' or 'out'], port_name (str), and a value for the port.
+        """
+        if port_type == 'in':
+            new_port = {'id':SCHEMA_INST.PI_next, 'name':port_name, 'value':value}
+            SCHEMA_INST.PI_next +=1
+            self.in_ports.append(new_port)
+            return True
+        elif port_type == 'out':
+            new_port = {'id':SCHEMA_INST.PO_next, 'name':port_name, 'value':value}
+            SCHEMA_INST.PO_next +=1
+            self.out_ports.append(new_port)
+            return True
+        else:
+            return False
+    
     def set_ports(self):
         return
     
@@ -103,26 +139,52 @@ class SCHEMA_INST:
     
     def get_inputs(self):
         """
+        I might only want to keep 'process'
         """
     
     def send_outputs(self):
         """
+        I might only want to keep 'process'
         """
         
-class LTM:
+    def process(self):
+        """
+        """
+#################################
+### PROCEDURAL SCHEMA CLASSES ###
+#################################
+class PROCEDURAL_SCHEMA(SCHEMA):
+    """
+    Procedural schema base class
+    Those schemas cannot be instantiated.
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+    Data:
+        - activation (float): The activation level of the schema.
+    """
+    def __init__(self, name=''):
+        SCHEMA.init(self,name)
+        self.activation = 0
+
+## LONG TERM MEMORY ###
+class LTM(PROCEDURAL_SCHEMA):
     """
     Long term memory. 
     Stores the set of schemas associated with this memory.
     In addition, weighted connection can be defined betweens schemas to set up the LTM as a schema network. NOT USED IN TCG1.1!
     
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+        - activation (float): schema activation
     Data:
-        - name (str): LTM name
         - WM (WM): Associated Working Memory
         - schemas ([SCHEMA]): Schema content of the long term memory
         - connections ([{from:schema1, to:schema2, weight:w}]): List of weighted connections between schemas (for future use if LTM needs to be defined as schema network)
     """
     def __init__(self, name):
-        self.name = name
+        PROCEDURAL_SCHEMA.init(self,name)
         self.WM = None
         self.schemas = []
         self.connections = []
@@ -139,14 +201,17 @@ class LTM:
     
     def add_connection(self, from_schema, to_schema, weight):
         self.connections.append({'from':from_schema, 'to':to_schema, 'weight':weight})        
-
-class WM:
+        
+### WORKING MEMORY ###
+class WM(PROCEDURAL_SCHEMA):
     """
     Working memory
     Stores the currently active schema instances and the functional links through which they enter in cooperative computation.
-    
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+        - activation (float): schema activation
     Data:
-        - name (str): WM name
         - LTM (LTM): Associated long term memory
         - schema_insts ([SCHEMA_INST]):
         - f-links ([F_LINK]):
@@ -155,8 +220,8 @@ class WM:
         
         - assemblages ????
     """
-    
     def __init__(self, name):
+        PROCEDURAL_SCHEMA.init(self,name)
         self.name = name
         self.LTM = None
         self.schema_insts = []
@@ -303,7 +368,3 @@ class ASSEMBLAGE:
         Update the activation of the assemblage.
         """
         return
-          
-    
-    
-

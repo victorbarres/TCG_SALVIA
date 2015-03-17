@@ -6,8 +6,7 @@ Created on Tue Apr 29 13:21:41 2014
 
 Define semantic network related classes for TCG1.1
 """
-###############################################################################
-class SEM:
+class SEM_ENT:
     """
     Semantic entity
     
@@ -43,37 +42,31 @@ class SEM_REL:
     
     Data:
         - type (STR): Type of relation.
-        - from_sem (STR): Name of the source semantic entity.
-        - to_sem (STR): Name of the target semantic entity.
-        
-    Note:
-        - Only IS_A hyponymic relation is defined in c++ code.
-    """
-    # Relation types
-    UNDEFINED = 0
-    
+        - pFrom (STR): Name of the source semantic entity.
+        - pTo (STR): Name of the target semantic entity.
+    """    
     def __init__(self, aType = 'UNDEFINED', from_sem = '', to_sem = ''):
         self.type = aType
-        self.from_sem = from_sem 
-        self.to_sem= to_sem
+        self.pFrom = from_sem 
+        self.pTo= to_sem
         
     def __eq__(self, other):
         is_equal = (isinstance(other, self.__class__) and 
             (self.type == other.type) and
-            (self.from_sem == other.from_sem) and 
-            (self.to_sem == other.to_sem))
+            (self.pFrom == other.pFrom) and 
+            (self.pTo == other.pTo))
         return is_equal
     
     def __str__(self):
-        p = "%s %s %s" % (self.from_sem, self.type, self.to_sem)
+        p = "%s %s %s" % (self.pFrom, self.type, self.pTo)
         return p
-###############################################################################
+
 class SEM_NET:
     """
     Semantic network.
     
     Data:
-        - nodes ([SEM]): List of semantic entities.
+        - nodes ([SEM_ENT]): List of semantic entities.
         - edges ([SEM_REL]): List of semantic relations.
     """
     def __init__(self, nodes=[], edges=[]):
@@ -92,10 +85,10 @@ class SEM_NET:
         Add a semantic entity to the semantic network
         
         Args:
-            sem (SEM): A semantic entity
+            sem (SEM_ENT): A semantic entity
         """
         # Check validity        
-        if(not(isinstance(sem, SEM)) or sem.name==''):
+        if(not(isinstance(sem, SEM_ENT)) or sem.name==''):
             return False
         
         # Check duplication
@@ -114,7 +107,8 @@ class SEM_NET:
             sem_rel (SEM_REL): A semantic relation
         """        
         # Check validity
-        if ((sem_rel.type == SEM_REL.UNDEFINED) or 
+        if (not(isinstance(sem_rel, SEM_REL)) or 
+            (sem_rel.type == 'undefined') or 
             (sem_rel.supMeaning == '') or 
             (sem_rel.subMeaning == '')):
             return False
@@ -125,7 +119,7 @@ class SEM_NET:
                 return False
         
         # Check that source and target of relation are defined.
-        if not(self.find_node(sem_rel.from_sem)) or not(self.find_node(sem_rel.to_sem)):
+        if not(self.find_node(sem_rel.pTo)) or not(self.find_node(sem_rel.pTo)):
             return False
         
         # Add new relation
@@ -134,7 +128,7 @@ class SEM_NET:
     
     def find_node(self, name):
         """
-        Finds node with name 'name' (STR). Returns the node if found, else returns None.
+        Find node with name 'name' (STR). Returns the node if found, else returns None.
         
         Args:
             - name (STR): Name of a semantic entity.

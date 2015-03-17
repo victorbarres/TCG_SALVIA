@@ -45,14 +45,14 @@ class MODULE:
     Data:
         - id (int): Unique id
         - name (str): Module name
-        - function (WM, LTM)
+        - function (PROCEDURAL_SCHEMA)
         - in_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
         - out_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
         - brain_regions([str]):
     """
-    ID_next = 0
-    PI_next = 0
-    PO_next = 0
+    ID_next = 0 # Global module ID counter
+    PI_next = 0 # Global module input port counter
+    PO_next = 0 # Global module output port counter
     def __init__(self, name, function = None, brain_regions = []):
         self.id = MODULE.ID_next
         MODULE.ID_next +=1
@@ -121,3 +121,7 @@ class CONNECT:
         """
         """
         self.delay = delay
+
+class LESION:
+    """
+    """
