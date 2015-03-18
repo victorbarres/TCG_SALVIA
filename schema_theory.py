@@ -22,7 +22,36 @@ class SCHEMA:
         self.id = KNOWLEDGE_SCHEMA.ID_next
         SCHEMA.ID_next += 1
         self.name = name
+
+class PORT:
+    """
+    Port class defining inputs and outputs connections.
+    Data:
+        - id (int): unique port id.
+        - name (str): optional port name.
+        - schema (SCHEMA): the schema the port is associated with.
+        - type ('IN' or 'OUT'): type of port (input or output port)
+        - value(): current value at the port.
+    """
+    TYPE_IN = 'IN'
+    TYPE_OUT = 'OUT'
+    ID_NEXT = 1 # Global port counter
+    
+    def __init__(self, port_type, port_schema = None, port_name='', port_value=None):
+        self.name = port_name
+        self.value = port_value
+        self.id = PORT.ID_NEXT
+        self.type = port_type
+        self.schema = port_schema
+    
+    def set_schema(self, schema):
+        self.schema = schema
         
+    def set_value(self, val):
+        self.value = val
+    
+    def get_value(self):
+        return self.value
 ################################
 ### KNOWLEDGE SCHEMA CLASSES ###
 ################################
@@ -65,16 +94,12 @@ class SCHEMA_INST:
         - id (int): Unique id
         - activation (float): Current activation value of schema instance
         - schema (KNOWLEDGE_SCHEMA):
-        - in_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
-        - out_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
-        
-    NOTE: SEE MODULE FOR HOW TO HANDLE PORTS!
     """
     ID_next = 1 # Global schema instance ID counter
-    PI_next = 1 # Global schema instance input port counter
-    PO_next = 1 # Global schema instance ouput port counter
     
     def __init__(self):
         self.id = SCHEMA_INST.ID_next
@@ -83,6 +108,8 @@ class SCHEMA_INST:
         self.schema = None         
         self.alive = False
         self.trace = None
+        self.in_ports = []
+        self.out_ports = []
         
     def set_activation(self, act):
         """
@@ -108,28 +135,30 @@ class SCHEMA_INST:
         """
         self.trace = a_trace
     
-    def add_port(self,port_type, port_name, value=None):
+    def add_port(self,port_type, port_name='', port_value=None):
         """
-        Adds a new port to the instance. Port_type (str) ['in' or 'out'], port_name (str), and a value for the port.
+        Adds a new port to the instance. Port_type (str) ['IN' or 'OUT'], port_name (str), and a value port_value for the port.
+        If sucessessful, returns the port id. Else returns None.
         """
-        if port_type == 'in':
-            new_port = {'id':SCHEMA_INST.PI_next, 'name':port_name, 'value':value}
-            SCHEMA_INST.PI_next +=1
+        new_port = PORT(port_type,port_schema=self, port_name = port_name, port_value = port_value)
+        if port_type == PORT.TYPE_IN:
             self.in_ports.append(new_port)
-            return True
-        elif port_type == 'out':
-            new_port = {'id':SCHEMA_INST.PO_next, 'name':port_name, 'value':value}
-            SCHEMA_INST.PO_next +=1
+            return new_port.id
+        elif port_type == PORT.TYPE_OUT:
             self.out_ports.append(new_port)
-            return True
+            return new_port.id
         else:
-            return False
+            return None
     
     def set_ports(self):
+        """
+        THIS FUNCTION NEEDS TO BE DEFINED FOR EACH SPECIFIC SUBCLASS OF SCHEMA_INST.
+        """
         return
     
     def instantiate(self, schema, trace):
         """
+        Sets up the state of the schema instance at t0 of instantiation.
         """
         self.set_schema(schema)
         self.set_activation(schema.init_act)
@@ -137,35 +166,109 @@ class SCHEMA_INST:
         self.set_trace(trace)
         self.set_ports()
     
-    def get_inputs(self):
+    def update(self):
         """
-        I might only want to keep 'process'
+        This function should be specified for every specific SCHEMA_INST class.
+        When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the instance and 
+        post values at the output ports.
         """
-    
-    def send_outputs(self):
-        """
-        I might only want to keep 'process'
-        """
-        
-    def process(self):
-        """
-        """
+        return
 #################################
 ### PROCEDURAL SCHEMA CLASSES ###
 #################################
 class PROCEDURAL_SCHEMA(SCHEMA):
     """
     Procedural schema base class
-    Those schemas cannot be instantiated.
+    Those schemas cannot be instantiated. They can be linked to brain data.
     Data (inherited):
         - id (int): Unique id
         - name (str): schema name
     Data:
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
         - activation (float): The activation level of the schema.
+        - brain_regions([str]): Set of brain regions associated with this procedural schema.
     """
     def __init__(self, name=''):
         SCHEMA.__init__(self,name)
         self.activation = 0
+        self.in_ports = []
+        self.out_ports = []
+        self.brain_regions = []
+    
+    
+    def add_port(self,port_type, port_name='', port_value=None):
+        """
+        Adds a new port to the procedural schema. Port_type (str) ['IN' or 'OUT'], port_name (str), and a value port_value for the port.
+        If sucessessful, returns the port id. Else returns None.
+        """
+        new_port = PORT(port_type, port_schema=self, port_name = port_name, port_value = port_value)
+        if port_type == PORT.TYPE_IN:
+            self.in_ports.append(new_port)
+            return new_port.id
+        elif port_type == PORT.TYPE_OUT:
+            self.out_ports.append(new_port)
+            return new_port.id
+        else:
+            return None
+    
+    def update(self):
+        """
+        This function should be specified for every specific PROCEDURAL_SCHEMA class.
+        When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the procedural schema
+        and post values at the output ports.
+        """
+        return
+
+class CONNECT(SCHEMA):
+    """
+    Defines connections between procedural schemas (input_port -> output_port)
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+    Data:
+        - port_in (PORT)
+        - port_out (PORT)
+        - weight (float)
+        - delay (float)
+    """
+    def __init__(self, name='',  port_in=None, port_out=None, weight=0, delay=0):
+        """
+        """
+        SCHEMA.__init__(self, name=name)
+        self.port_in = port_in
+        self.port_out = port_out
+        self.weight = weight
+        self.delay = delay
+    
+    def set_from(self, port):
+        """
+        """
+        if port.type == PORT.TYPE_OUT:
+            self.port_in = port
+            return True
+        else:
+            return False
+        
+    def set_to(self, port):
+        """
+        """
+        if port.type == PORT.TYPE_IN:
+            self.port_out = port
+            return True
+        else:
+            return False
+    
+    def set_weight(self, weight):
+        """
+        """
+        self.weight = weight
+    
+    def set_delay(self, delay):
+        """
+        """
+        self.delay = delay
+    
 
 ## LONG TERM MEMORY ###
 class LTM(PROCEDURAL_SCHEMA):
@@ -177,30 +280,32 @@ class LTM(PROCEDURAL_SCHEMA):
     Data (inherited):
         - id (int): Unique id
         - name (str): schema name
-        - activation (float): schema activation
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
+        - activation (float): The activation level of the schema.
+        - brain_regions([str]): Set of brain regions associated with this procedural schema.
     Data:
-        - WM (WM): Associated Working Memory
         - schemas ([SCHEMA]): Schema content of the long term memory
         - connections ([{from:schema1, to:schema2, weight:w}]): List of weighted connections between schemas (for future use if LTM needs to be defined as schema network)
     """
     def __init__(self, name=''):
         PROCEDURAL_SCHEMA.__init__(self,name)
-        self.WM = None
         self.schemas = []
         self.connections = []
-    
-    def set_WM(self, WM):
-        self.WM = WM
-        if WM.LTM != self:
-            WM.set_LTM(self)
-        
+
     def add_schema(self, schema):
         if schema.LTM != self:
             schema.set_LTM(self) # Link the schema to this LTM object
         self.schemas.append(schema)
     
     def add_connection(self, from_schema, to_schema, weight):
-        self.connections.append({'from':from_schema, 'to':to_schema, 'weight':weight})        
+        self.connections.append({'from':from_schema, 'to':to_schema, 'weight':weight})
+    
+    def update(self):
+        """
+        NEEDS TO DEFINE THIS FUNCTION FOR LTM
+        """
+        return
         
 ### WORKING MEMORY ###
 class WM(PROCEDURAL_SCHEMA):
@@ -210,9 +315,11 @@ class WM(PROCEDURAL_SCHEMA):
     Data (inherited):
         - id (int): Unique id
         - name (str): schema name
-        - activation (float): schema activation
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
+        - activation (float): The activation level of the schema.
+        - brain_regions([str]): Set of brain regions associated with this procedural schema.
     Data:
-        - LTM (LTM): Associated long term memory
         - schema_insts ([SCHEMA_INST]):
         - f-links ([F_LINK]):
         - time_constant (int):
@@ -223,18 +330,11 @@ class WM(PROCEDURAL_SCHEMA):
     def __init__(self, name=''):
         PROCEDURAL_SCHEMA.__init__(self,name)
         self.name = name
-        self.LTM = None
         self.schema_insts = []
         self.f_links = []
         self.time_constant = 1
         self.prune_threshold = 0
-    
-    def set_LTM(self, LTM):
-        self.LTM = LTM
-        if LTM.WM != self:
-            LTM.set_WM(self)
-        
-        
+       
     def set_time_constant(self, time_constant):
         self.time_constant = time_constant
     
@@ -263,13 +363,13 @@ class WM(PROCEDURAL_SCHEMA):
         results = []
         for flink in self.f_links:
             match = True
-            if from_inst!='any' and (flink.port_in['instance']!=from_inst):
+            if from_inst!='any' and (flink.port_in.schema!=from_inst):
                 match = False
-            if to_inst!='any' and (flink.port_out['instance']!=to_inst):
+            if to_inst!='any' and (flink.port_out.schema!=to_inst):
                 match = False
-            if from_port!='any' and (flink.port_in['port']!=from_port):
+            if from_port!='any' and (flink.port_in!=from_port):
                 match = False
-            if to_port !='any' and (flink.port_out['port']!=to_port):
+            if to_port !='any' and (flink.port_out!=to_port):
                 match = False
             
             if match:
@@ -286,8 +386,7 @@ class WM(PROCEDURAL_SCHEMA):
             self.f_links.remove(f_link)
         
         # -> Might require to redo the assemblages!
-        
-        
+           
     def update(self):
         return
         
@@ -298,8 +397,8 @@ class F_LINK:
     
     Data:
         - WM (WM): Associated working memory
-        - port_in ({"schema_inst":SCHEMA_INST, "port":port_id, "value":value})
-        - port_out ({"schema_inst":SCHEMA_INST, "port":port_id, "value":value})
+        - port_in (PORT)
+        - port_out (PORT)
         - weight (float)
     """
     
@@ -307,8 +406,8 @@ class F_LINK:
         """
         """
         self.WM = None
-        self.port_in = {"instance":None, "port":None, "value":None}
-        self.port_out = {"instance":None, "port":None, "value":None}
+        self.port_in = None
+        self.port_out = None
         self.weight = 0
     
     def set_WM(self, WM):
@@ -317,19 +416,23 @@ class F_LINK:
         """
         self.WM = WM
     
-    def set_port_in(self, instance, port_id):
+    def set_from(self, port):
         """
-        Sets up the origin of the f-link to the (instance, port_id)
         """
-        self.port_in["instance"] = instance
-        self.port_in["port"] = port_id
+        if port.type == PORT.TYPE_OUT:
+            self.port_in = port
+            return True
+        else:
+            return False
         
-    def set_port_out(self, instance, port_id):
+    def set_to(self, port):
         """
-        Sets up the target of the f-link to the (instance, port_id)
         """
-        self.port_out["instance"] = instance
-        self.port_out["port"] = port_id
+        if port.type == PORT.TYPE_IN:
+            self.port_out = port
+            return True
+        else:
+            return False
     
     def set_weight(self, weight):
         """
@@ -337,18 +440,9 @@ class F_LINK:
         """
         self.weight = weight
     
-    def read_inputs(self):
+    def update():
         """
-        Gathers inputs and sets up the input values (self.port_in['value'])
-        The input port value is equal to the output port value of the instance it is connected to.
         """
-        return
-    
-    def send_outputs(self):
-        """
-        Defines the output port value (self.port_out['value'])
-        """
-        return
 
 class ASSEMBLAGE:
     """

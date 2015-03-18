@@ -57,6 +57,9 @@ class SYSTEM:
             return True
         else:
             return False
+    
+    def system2dot(self):
+        return
             
         
     
