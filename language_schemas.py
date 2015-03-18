@@ -5,7 +5,7 @@ Created on Tue Mar 17 16:03:19 2015
 @author: Victor Barres
 Defines language schemas for TCG.
 """
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, LTM, WM
 ##################################
 ### Language knowledge schemas ###
 ##################################
@@ -55,6 +55,5 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                 self.add_port('out', f.order)
     
         self.add_port('in','input')
-        
         
             

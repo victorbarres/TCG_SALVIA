@@ -17,7 +17,7 @@ class SCHEMA:
         - id (int): Unique id
         - name (str): schema name
     """
-    ID_next = 0 # Global schema ID counter
+    ID_next = 1 # Global schema ID counter
     def __init__(self, name=""):
         self.id = KNOWLEDGE_SCHEMA.ID_next
         SCHEMA.ID_next += 1
@@ -40,7 +40,7 @@ class KNOWLEDGE_SCHEMA(SCHEMA):
         - init_act (float): Initial activation value.
     """    
     def __init__(self, name="", LTM=None, content=None, init_act=0):
-        SCHEMA.init(self, name)
+        SCHEMA.__init__(self, name)
         self.LTM = LTM
         self.content = content
         self.init_act = init_act
@@ -72,9 +72,9 @@ class SCHEMA_INST:
         
     NOTE: SEE MODULE FOR HOW TO HANDLE PORTS!
     """
-    ID_next = 0 # Global schema instance ID counter
-    PI_next = 0 # Global schema instance input port counter
-    PO_next = 0 # Global schema instance ouput port counter
+    ID_next = 1 # Global schema instance ID counter
+    PI_next = 1 # Global schema instance input port counter
+    PO_next = 1 # Global schema instance ouput port counter
     
     def __init__(self):
         self.id = SCHEMA_INST.ID_next
@@ -164,7 +164,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         - activation (float): The activation level of the schema.
     """
     def __init__(self, name=''):
-        SCHEMA.init(self,name)
+        SCHEMA.__init__(self,name)
         self.activation = 0
 
 ## LONG TERM MEMORY ###
@@ -183,16 +183,16 @@ class LTM(PROCEDURAL_SCHEMA):
         - schemas ([SCHEMA]): Schema content of the long term memory
         - connections ([{from:schema1, to:schema2, weight:w}]): List of weighted connections between schemas (for future use if LTM needs to be defined as schema network)
     """
-    def __init__(self, name):
-        PROCEDURAL_SCHEMA.init(self,name)
+    def __init__(self, name=''):
+        PROCEDURAL_SCHEMA.__init__(self,name)
         self.WM = None
         self.schemas = []
         self.connections = []
     
     def set_WM(self, WM):
+        self.WM = WM
         if WM.LTM != self:
             WM.set_LTM(self)
-        self.WM = WM
         
     def add_schema(self, schema):
         if schema.LTM != self:
@@ -220,19 +220,20 @@ class WM(PROCEDURAL_SCHEMA):
         
         - assemblages ????
     """
-    def __init__(self, name):
-        PROCEDURAL_SCHEMA.init(self,name)
+    def __init__(self, name=''):
+        PROCEDURAL_SCHEMA.__init__(self,name)
         self.name = name
         self.LTM = None
         self.schema_insts = []
         self.f_links = []
         self.time_constant = 1
-        self.prune_threshold
+        self.prune_threshold = 0
     
     def set_LTM(self, LTM):
+        self.LTM = LTM
         if LTM.WM != self:
             LTM.set_WM(self)
-        self.LTM = LTM
+        
         
     def set_time_constant(self, time_constant):
         self.time_constant = time_constant
