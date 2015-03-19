@@ -5,7 +5,11 @@ Created on Tue Apr 29 13:21:41 2014
 @author: Victor Barres
 
 Define semantic network related classes for TCG1.1
+
+Uses NetworkX module to represent the semantic net.
 """
+import networkx as nx
+
 class SEM_ENT:
     """
     Semantic entity
@@ -68,10 +72,14 @@ class SEM_NET:
     Data:
         - nodes ([SEM_ENT]): List of semantic entities.
         - edges ([SEM_REL]): List of semantic relations.
+        - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.
+            Each node has an additional attributes meaning = sem_ent.meaning
+            Each edge has an additional attribute type = sem_rel.type
     """
     def __init__(self, nodes=[], edges=[]):
         self.nodes = nodes
         self.edges = edges
+        self.graph = None
     
     def clear(self):
         """
@@ -79,6 +87,7 @@ class SEM_NET:
         """
         self.nodes = []
         self.edges = []
+        self._create_NX_graph()
     
     def add_entity(self, sem):
         """
@@ -97,6 +106,7 @@ class SEM_NET:
         
         # Add new semantic entity
         self.nodes.append(sem)
+        self._create_NX_graph()
         return True
         
     def add_relation(self, sem_rel):
@@ -124,7 +134,17 @@ class SEM_NET:
         
         # Add new relation
         self.relations.append(sem_rel)
+        self._create_NX_graph()
         return True
+        
+    def _create_NX_graph(self):
+        graph = nx.DiGraph()
+        for node in self.nodes:
+            graph.add_node(node.name, meaning = node.meaning)
+        for edge in self.edges:
+            graph.add_edge(edge.pFrom, edge.pTo, type= edge.type)
+        
+        self.graph = graph
     
     def find_node(self, name):
         """
