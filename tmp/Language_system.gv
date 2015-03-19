@@ -1,0 +1,21 @@
+digraph G {
+rankdir=LR;
+fontname=consolas;
+splines=ortho;
+INPUT [shape=circle, label=INPUT];
+OUTPUT [shape=circle, label=OUTPUT];
+Conceptualizer [color=black, shape=record, style=filled, fillcolor=white, label=Conceptualizer];
+Grammatical_WM [color=black, shape=record, style=filled, fillcolor=white, label=Grammatical_WM];
+Grammatical_LTM [color=black, shape=record, style=filled, fillcolor=white, label=Grammatical_LTM];
+Cxn_retrieval [color=black, shape=record, style=filled, fillcolor=white, label=Cxn_retrieval];
+Semantic_WM [color=black, shape=record, style=filled, fillcolor=white, label=Semantic_WM];
+Phonological_WM [color=black, shape=record, style=filled, fillcolor=white, label=Phonological_WM];
+Conceptualizer -> Semantic_WM  [label=""];
+Semantic_WM -> Cxn_retrieval  [label=""];
+Semantic_WM -> Grammatical_WM  [label=""];
+Grammatical_LTM -> Cxn_retrieval  [label=""];
+Cxn_retrieval -> Grammatical_WM  [label=""];
+Grammatical_WM -> Phonological_WM  [label=""];
+INPUT -> Conceptualizer;
+Phonological_WM -> OUTPUT;
+}

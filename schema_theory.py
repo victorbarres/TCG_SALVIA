@@ -270,17 +270,17 @@ class CONNECT(SCHEMA):
         - id (int): Unique id
         - name (str): schema name
     Data:
-        - port_in (PORT)
-        - port_out (PORT)
+        - port_from (PORT)
+        - port_to (PORT)
         - weight (float)
         - delay (float)
     """
-    def __init__(self, name='',  port_in=None, port_out=None, weight=0, delay=0):
+    def __init__(self, name='',  port_from=None, port_to=None, weight=0, delay=0):
         """
         """
         SCHEMA.__init__(self, name=name)
-        self.port_in = port_in
-        self.port_out = port_out
+        self.port_from = port_from
+        self.port_to = port_to
         self.weight = weight
         self.delay = delay
     
@@ -288,7 +288,7 @@ class CONNECT(SCHEMA):
         """
         """
         if port.type == PORT.TYPE_OUT:
-            self.port_in = port
+            self.port_from = port
             return True
         else:
             return False
@@ -297,7 +297,7 @@ class CONNECT(SCHEMA):
         """
         """
         if port.type == PORT.TYPE_IN:
-            self.port_out = port
+            self.port_to = port
             return True
         else:
             return False
@@ -311,6 +311,13 @@ class CONNECT(SCHEMA):
         """
         """
         self.delay = delay
+    
+    def update(self):
+        """
+        For now does not involve weight or delay!
+        Simply sets the value of port_rom to the value of port_to
+        """
+        self.port_to.value = self.port_from.value
     
 
 ## LONG TERM MEMORY ###
@@ -438,8 +445,8 @@ class F_LINK:
     
     Data:
         - WM (WM): Associated working memory
-        - port_in (PORT)
-        - port_out (PORT)
+        - port_from (PORT)
+        - port_to (PORT)
         - weight (float)
     """
     
@@ -447,8 +454,8 @@ class F_LINK:
         """
         """
         self.WM = None
-        self.port_in = None
-        self.port_out = None
+        self.port_from = None
+        self.port_to= None
         self.weight = 0
     
     def set_WM(self, WM):
@@ -461,7 +468,7 @@ class F_LINK:
         """
         """
         if port.type == PORT.TYPE_OUT:
-            self.port_in = port
+            self.port_from = port
             return True
         else:
             return False
@@ -470,7 +477,7 @@ class F_LINK:
         """
         """
         if port.type == PORT.TYPE_IN:
-            self.port_out = port
+            self.port_to = port
             return True
         else:
             return False
@@ -532,6 +539,8 @@ class SCHEMA_SYSTEM:
         - name (str):
         - schemas([PROCEDURAL_SCHEMAS]):
         - connections ([CONNECT]):
+        - input_port ([PORT]): the list of ports that read the input
+        - output_port (PORT): The port that defines the output value
         - input (): system's input.
         - output (): system's output.
         - brain_mapping (BRAIN_MAPPING)
@@ -540,6 +549,8 @@ class SCHEMA_SYSTEM:
         self.name = name
         self.schemas = []
         self.connections = []
+        self.input_ports = None
+        self.output_port = None
         self.input = None
         self.output = None
     
@@ -548,10 +559,10 @@ class SCHEMA_SYSTEM:
         Adds connection (CONNECT) between from_schema:from_port (PROCEDURAL_SCHEMA:PORT) to to_schema:to_port (PROCEDURAL_SCHEMA:PORT).
         Returns True if successful, False otherwise.
         """
-        port_in = from_schema._find_port(from_port)
-        port_out = to_schema._find_port(to_port)
-        if port_in and port_out:
-            new_connect = CONNECT(name=name, port_in=port_in, port_out=port_out, weight=weight, delay=delay)
+        port_from = from_schema._find_port(from_port)
+        port_to = to_schema._find_port(to_port)
+        if port_from and port_to:
+            new_connect = CONNECT(name=name, port_from=port_from, port_to=port_to, weight=weight, delay=delay)
             self.connections.append(new_connect)
             return True
         else:
@@ -562,6 +573,16 @@ class SCHEMA_SYSTEM:
         Add all the procedural schemas in "schemas" ([PROCEDURAL_SCHEMAS]) to the system.
         """
         self.schemas += schemas
+    
+    def set_input_ports(self, ports):
+        """
+        """
+        self.input_ports = ports
+    
+    def set_output_port(self, port):
+        """
+        """
+        self.output_port = port
     
     def set_input(self, sys_input):
         """
@@ -575,17 +596,73 @@ class SCHEMA_SYSTEM:
         """
         return self.output
         
+    def update(self):
+        """
+        By defaults:
+            - Gets system input
+            - Updates all the schemas.
+            - Propage port values through connections.
+            - Update system output.
+        """
+        # Get system input
+        for port in self.input_ports:
+            port.set_value(self.input)
+        
+        # Update all the schema states
+        for schema in self.schemas:
+            schema.update()
+        
+        # Propagate value through connections
+        for connection in self.connections:
+            connection.update()
+        
+        # Update the system output
+        self.output = self.output_port.value
     
     def system2dot(self):
         """
         Generates a dot file of the system's graph.
+        Also creates an SVG image.
         """
-        return
-    
-    def update(self):
-        """
-        This function should be specified for every specific SCHEMA_SYSTEM class.
-        When called, this function should read the  input value and based on the state of the system, update the state schemas and 
-        output value.
-        """
-        return
+        import subprocess
+        import pydot
+        
+        tmp_folder = './tmp/'          
+        
+        prog = 'dot'
+        file_type = 'svg'
+        dot_sys = pydot.Dot(graph_type = 'digraph', splines = 'ortho')
+        dot_sys.set_rankdir('LR')
+        dot_sys.set_fontname('consolas')
+
+        color = 'black'
+        node_shape = 'record'
+        style = 'filled'
+        fill_color = 'white'
+        
+        dot_sys.add_node(pydot.Node('INPUT', label='INPUT', shape='circle'))
+        dot_sys.add_node(pydot.Node('OUTPUT', label='OUTPUT', shape='circle'))
+        
+        for schema in self.schemas:
+            dot_sys.add_node(pydot.Node(schema.name, label=schema.name, color=color, shape=node_shape, style=style, fillcolor=fill_color))
+        
+        for connection in self.connections:
+            from_schema = connection.port_from.schema.name
+            to_schema = connection.port_to.schema.name
+            dot_sys.add_edge(pydot.Edge(from_schema, to_schema, label=connection.name))
+        
+        for port in self.input_ports:
+            from_schema = 'INPUT'
+            to_schema = port.schema.name
+            dot_sys.add_edge(pydot.Edge(from_schema, to_schema))
+        
+        from_schema = self.output_port.schema.name
+        to_schema = 'OUTPUT'
+        dot_sys.add_edge(pydot.Edge(from_schema, to_schema))
+        
+        file_name = tmp_folder + self.name + ".gv"
+        dot_sys.write(file_name)
+        
+         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)

@@ -164,6 +164,7 @@ class PHON_WM(PROCEDURAL_SCHEMA):
     def __init__(self, name='Phonological_WM'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_grammatical_WM')
+        self.add_port('OUT', 'to_output')
     
     def update(self):
         """
@@ -201,9 +202,14 @@ if __name__=='__main__':
     language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
     language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
     
+    language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
+    language_system.set_output_port(phonWM._find_port('to_output'))
+    
     language_brain_mapping = BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     language_system.brain_mapping = language_brain_mapping
+    
+    language_system.system2dot()
 
 
 
