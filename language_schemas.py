@@ -66,11 +66,10 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
 class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
     """
     """
-    def __init__(self, name='Phonological_WM'):
+    def __init__(self, name='Conceptualizer'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_visual_WM')
         self.add_port('OUT', 'to_semantic_WM')
-        self.brain_regions =[]
     
     def update(self):
         """
@@ -85,7 +84,6 @@ class SEMANTIC_WM(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatica_lWM')
         self.add_port('OUT', 'to_grammatical_LTM')
         self.SemRep = nx.DiGraph()
-        self.brain_regions =['left_SFG', 'LIP', 'Hippocampus']
     
     def update(self):
         """
@@ -100,7 +98,6 @@ class GRAMMATICAL_WM(WM):
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('OUT', 'to_phonological_WM')
-        self.brain_regions =['left_BA45', 'leftBA44']
     
     def update(self):
         """
@@ -113,7 +110,6 @@ class GRAMMATICAL_LTM(LTM):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('OUT', 'to_grammatical_WM')
-        self.brain_regions =['left_STG', 'left_MTG']
     
     def update(self):
         """
@@ -125,11 +121,16 @@ class PHON_WM(PROCEDURAL_SCHEMA):
     def __init__(self, name='Phonological_WM'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_grammatical_WM')
-        self.brain_regions =['left_BA6']
     
     def update(self):
         """
         """
+
+language_mapping = {'Conceptualizer':[], 
+                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
+                    'Grammatical_WM':['left_BA45', 'leftBA44'], 
+                    'Grammatical_LTM':['left_STG', 'left_MTG'], 
+                    'Phonological_WM':['left_BA6']}
 
 
         

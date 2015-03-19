@@ -187,14 +187,12 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         - in_ports ([PORT]):
         - out_ports ([PORT]):
         - activation (float): The activation level of the schema.
-        - brain_regions([str]): Set of brain regions associated with this procedural schema.
     """
     def __init__(self, name=''):
         SCHEMA.__init__(self,name)
         self.activation = 0
         self.in_ports = []
         self.out_ports = []
-        self.brain_regions = []
     
     
     def add_port(self,port_type, port_name='', port_value=None):
@@ -283,7 +281,6 @@ class LTM(PROCEDURAL_SCHEMA):
         - in_ports ([PORT]):
         - out_ports ([PORT]):
         - activation (float): The activation level of the schema.
-        - brain_regions([str]): Set of brain regions associated with this procedural schema.
     Data:
         - schemas ([SCHEMA]): Schema content of the long term memory
         - connections ([{from:schema1, to:schema2, weight:w}]): List of weighted connections between schemas (for future use if LTM needs to be defined as schema network)
@@ -318,7 +315,6 @@ class WM(PROCEDURAL_SCHEMA):
         - in_ports ([PORT]):
         - out_ports ([PORT]):
         - activation (float): The activation level of the schema.
-        - brain_regions([str]): Set of brain regions associated with this procedural schema.
     Data:
         - schema_insts ([SCHEMA_INST]):
         - f-links ([F_LINK]):
@@ -464,6 +460,23 @@ class ASSEMBLAGE:
         """
         return
 
+#############################
+### BRAIN MAPPING CLASSES ###
+#############################
+class BRAIN_MAPPING:
+    """
+    Defines the mappings between procedural schemas and brain regions and between schema connections and brain connections.
+    
+    Data:
+        -schema_mapping {schema_name1:[brain_region1, brain_region2,...], schema_name2:[brain_region3, brain_region4,...],...}
+        -connect_mapping {connect_name1:[brain_connecion1, brain_connection2,...], connect_name2:[brain_connection3, brain_connection4,...],...}
+    """
+    BRAIN_REGIONS = []
+    BRAIN_CONNECTIONS = []
+    def __init__(self):
+        self.schema_mapping = {}
+        self.connect_mapping = {}
+
 ############################
 ### SCHEMA SYSTEM CLASSES###
 ############################
@@ -476,6 +489,7 @@ class SCHEMA_SYSTEM:
         - connections ([CONNECT]):
         - input (): system's input.
         - output (): system's output.
+        - brain_mapping (BRAIN_MAPPING)
     """
     def __init__(self, name=''):
         self.name = name
