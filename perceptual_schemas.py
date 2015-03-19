@@ -5,7 +5,7 @@ Created on Tue Mar 17 13:53:03 2015
 @author: Victor Barres
 Defines perceptual schemas for TCG.
 """
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM
 
 ####################################
 ### Perceptual knowledge schemas ###
@@ -189,4 +189,54 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
     """
     def __init__(self):
         SCHEMA_INST.__init__(self)
+
+#####################################
+### Perceptual procedural schemas ###
+#####################################
+class VISUAL_WM(PROCEDURAL_SCHEMA):
+    """
+    """
+    def __init__(self, name='Visual_WM'):
+        PROCEDURAL_SCHEMA.__init__(self, name)
+        self.add_port('IN', 'from_fixation')
+        self.add_port('IN', 'from_perceptual_LTM')
+        self.add_port('OUT', 'to_conceptualizer')
+        self.perceptual_schemas = []
+        
+    def update(self):
+        """
+        """
+        sub_scene= self.get_input('from_fixation')
+        perceptual_knowledge = self.get_input('from_perceptual_LTM')
+        self._update_schemas(sub_scene, perceptual_knowledge)
+        self.set_output('to_conceptualizer', self.perceptual_schemas)
+    
+    def _update_schemas(self, sub_scene, perceptual_knowledge):
+        """
+        """
+        return
+    
+class PERCEPTUAL_LTM(LTM):
+    """
+    """
+    def __init__(self, name='Perceptual_LTM'):
+        LTM.__init__(self, name)
+        self.add_port('OUT', 'to_visual_WM')
+    
+    def update(self):
+        """
+        """
+        self.set_output('to_visual_WM', self.schemas)
+
+class SALIENCY_MAP(PROCEDURAL_SCHEMA):
+    """
+    """
+
+class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
+    """
+    """
+
+class FIXATION(PROCEDURAL_SCHEMA):
+    """
+    """
 
