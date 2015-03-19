@@ -210,6 +210,36 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         else:
             return None
     
+    def get_input(self, port_name):
+        """
+        Return the current value of the port with name 'port_name'. If the port is not an input port, if multiple ports shared the same name or if the port is 
+        not found, returns None.
+        """
+        port = self._find_port(port_name)
+        if port and (port.type == PORT.TYPE_IN):
+            return port.value
+        elif port and (port.type == PORT.TYPE_OUT):
+            print("ERROR: port %s refers to an output port" % port_name)
+            return None
+        else:
+            print("ERROR: port %s does not exist or could refer to multiple ports" % port_name)
+            return None
+    
+    def set_output(self, port_name, val):
+        """
+        Sets the value of the output port with name 'port_name' to 'val'. If the port is not an output port, if multiple ports shared the same name or if the port is 
+        not found, returns False, else returns True.
+        """
+        port = self._find_port(port_name)
+        if port and (port.type == PORT.TYPE_OUT):
+            port.value = val
+            return True
+        elif port and (port.type == PORT.TYPE_IN):
+            print("ERROR: port %s refers to an output port" % port_name)
+            return False
+        else:
+            return False
+        
     def update(self):
         """
         This function should be specified for every specific PROCEDURAL_SCHEMA class.
@@ -217,7 +247,22 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         and post values at the output ports.
         """
         return
-
+    
+    def _find_port(self, port_name):
+        """
+        Looks for port with name 'port_name'. 
+        Returns the port if a single port with this name is found. Else returns None.
+        """
+        found = []
+        for port in self.in_ports + self.out_ports:
+            if port.name == port_name:
+                found.append(port)
+        
+        if len(found)!= 1:
+            print("ERROR: port %s does not exist or could refer to multiple ports" % port_name)
+            return None
+        return found[0]
+        
 class CONNECT(SCHEMA):
     """
     Defines connections between procedural schemas (input_port -> output_port)
@@ -497,6 +542,39 @@ class SCHEMA_SYSTEM:
         self.connections = []
         self.input = None
         self.output = None
+    
+    def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
+        """
+        Adds connection (CONNECT) between from_schema:from_port (PROCEDURAL_SCHEMA:PORT) to to_schema:to_port (PROCEDURAL_SCHEMA:PORT).
+        Returns True if successful, False otherwise.
+        """
+        port_in = from_schema._find_port(from_port)
+        port_out = to_schema._find_port(to_port)
+        if port_in and port_out:
+            new_connect = CONNECT(name=name, port_in=port_in, port_out=port_out, weight=weight, delay=delay)
+            self.connections.append(new_connect)
+            return True
+        else:
+            return False
+    
+    def add_schemas(self, schemas):
+        """
+        Add all the procedural schemas in "schemas" ([PROCEDURAL_SCHEMAS]) to the system.
+        """
+        self.schemas += schemas
+    
+    def set_input(self, sys_input):
+        """
+        Sets system input to 'sys_input'
+        """
+        self.input = sys_input
+        
+    def get_output(self):
+        """
+        Returns sysetm output
+        """
+        return self.output
+        
     
     def system2dot(self):
         """
