@@ -463,3 +463,37 @@ class ASSEMBLAGE:
         Update the activation of the assemblage.
         """
         return
+
+############################
+### SCHEMA SYSTEM CLASSES###
+############################
+class SCHEMA_SYSTEM:
+    """
+    Defines a model as a system of procedural schemas.
+    Data:
+        - name (str):
+        - schemas([PROCEDURAL_SCHEMAS]):
+        - connections ([CONNECT]):
+        - input (): system's input.
+        - output (): system's output.
+    """
+    def __init__(self, name=''):
+        self.name = name
+        self.schemas = []
+        self.connections = []
+        self.input = None
+        self.output = None
+    
+    def system2dot(self):
+        """
+        Generates a dot file of the system's graph.
+        """
+        return
+    
+    def update(self):
+        """
+        This function should be specified for every specific SCHEMA_SYSTEM class.
+        When called, this function should read the  input value and based on the state of the system, update the state schemas and 
+        output value.
+        """
+        return

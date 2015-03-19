@@ -178,8 +178,8 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
             - id (int): Unique id
             - activation (float): Current activation value of schema instance
             - schema (PERCEPT_SCHEMA):
-            - in_ports ([int]):
-            - out_ports ([int]):
+            - in_ports ([PORT]):
+            - out_ports ([PORT]):
             - alive (bool): status flag
             - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
         

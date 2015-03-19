@@ -4,6 +4,10 @@ Created on Tue Feb 24 11:57:27 2015
 
 @author: Victor Barres
 Defines the classes used to set up a brain system model
+
+
+THIS SET OF CLASSES IS NOW PARTIALLY OBSOLETE AND HAS BEEN INCORPORATED IN SCHEMA THEORY...
+USE BRAIN SYSTEM AS A WAY TO DEFINE THINGS LIKE LESIONS ETC...
 """
 ############################    
 ### Brain system classes ###
