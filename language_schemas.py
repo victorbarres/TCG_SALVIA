@@ -203,7 +203,7 @@ if __name__=='__main__':
     language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
     
     language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
-    language_system.set_output_port(phonWM._find_port('to_output'))
+    language_system.set_output_ports([phonWM._find_port('to_output')])
     
     language_brain_mapping = BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping

@@ -540,7 +540,7 @@ class SCHEMA_SYSTEM:
         - schemas([PROCEDURAL_SCHEMAS]):
         - connections ([CONNECT]):
         - input_port ([PORT]): the list of ports that read the input
-        - output_port (PORT): The port that defines the output value
+        - output_ports ([PORT]): The list of ports that defines the output value
         - input (): system's input.
         - output (): system's output.
         - brain_mapping (BRAIN_MAPPING)
@@ -550,7 +550,7 @@ class SCHEMA_SYSTEM:
         self.schemas = []
         self.connections = []
         self.input_ports = None
-        self.output_port = None
+        self.output_ports = None
         self.input = None
         self.output = None
     
@@ -579,10 +579,10 @@ class SCHEMA_SYSTEM:
         """
         self.input_ports = ports
     
-    def set_output_port(self, port):
+    def set_output_ports(self, ports):
         """
         """
-        self.output_port = port
+        self.output_ports = ports
     
     def set_input(self, sys_input):
         """
@@ -640,11 +640,14 @@ class SCHEMA_SYSTEM:
         style = 'filled'
         fill_color = 'white'
         
-        dot_sys.add_node(pydot.Node('INPUT', label='INPUT', shape='circle'))
-        dot_sys.add_node(pydot.Node('OUTPUT', label='OUTPUT', shape='circle'))
+        dot_sys.add_node(pydot.Node('INPUT', label='INPUT', shape='oval'))
+        dot_sys.add_node(pydot.Node('OUTPUT', label='OUTPUT', shape='oval'))
         
         for schema in self.schemas:
-            dot_sys.add_node(pydot.Node(schema.name, label=schema.name, color=color, shape=node_shape, style=style, fillcolor=fill_color))
+            brain_regions = self.brain_mapping.schema_mapping[schema.name]
+            label = '<'+schema.name+'<BR /><FONT POINT-SIZE="10">('+', '.join(brain_regions) +')</FONT>>'
+            br = ' (' + ', '.join(brain_regions) +')'
+            dot_sys.add_node(pydot.Node(schema.name, label=label, color=color, shape=node_shape, style=style, fillcolor=fill_color))
         
         for connection in self.connections:
             from_schema = connection.port_from.schema.name
@@ -656,9 +659,10 @@ class SCHEMA_SYSTEM:
             to_schema = port.schema.name
             dot_sys.add_edge(pydot.Edge(from_schema, to_schema))
         
-        from_schema = self.output_port.schema.name
-        to_schema = 'OUTPUT'
-        dot_sys.add_edge(pydot.Edge(from_schema, to_schema))
+        for port in self.output_ports:
+            from_schema =  port.schema.name
+            to_schema = 'OUTPUT'
+            dot_sys.add_edge(pydot.Edge(from_schema, to_schema))
         
         file_name = tmp_folder + self.name + ".gv"
         dot_sys.write(file_name)

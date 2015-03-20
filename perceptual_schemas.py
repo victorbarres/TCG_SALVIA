@@ -321,7 +321,7 @@ if __name__=='__main__':
    
     
     perceptual_system.set_input_ports([fixation._find_port('from_input'), saliency_map._find_port('from_input')])
-    perceptual_system.set_output_port(visualWM._find_port('to_conceptualizer'))
+    perceptual_system.set_output_ports([visualWM._find_port('to_conceptualizer')])
     
     perception_brain_mapping = BRAIN_MAPPING()
     perception_brain_mapping.schema_mapping = perception_mapping
