@@ -4,8 +4,11 @@ Created on Tue Mar 17 13:53:03 2015
 
 @author: Victor Barres
 Defines perceptual schemas for TCG.
+
+Uses numpy for the saliency map.
 """
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM
+import numpy as np
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, SCHEMA_SYSTEM, BRAIN_MAPPING
 
 ####################################
 ### Perceptual knowledge schemas ###
@@ -200,6 +203,7 @@ class VISUAL_WM(PROCEDURAL_SCHEMA):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_fixation')
         self.add_port('IN', 'from_perceptual_LTM')
+        self.add_port('OUT', 'to_saliency_map')
         self.add_port('OUT', 'to_conceptualizer')
         self.perceptual_schemas = []
         
@@ -231,12 +235,97 @@ class PERCEPTUAL_LTM(LTM):
 class SALIENCY_MAP(PROCEDURAL_SCHEMA):
     """
     """
+    def __init__(self, name='Saliency_map'):
+        PROCEDURAL_SCHEMA.__init__(self, name)
+        self.add_port('IN', 'from_saccade_system')
+        self.add_port('IN', 'from_input')
+        self.add_port('IN', 'from_visual_WM')
+        self.add_port('OUT', 'to_saccade_system') # For inhibition of return?
+        self.saliency_map = None
+    
+    def update(self):
+        """
+        """
 
 class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
     """
     """
+    def __init__(self, name='Saccade_system'):
+        PROCEDURAL_SCHEMA.__init__(self, name)
+        self.add_port('IN', 'from_saliency_map')
+        self.add_port('IN', 'from_visual_WM') # Need to clarify this...where does the bottom up saliency signal comes from?
+        self.add_port('IN', 'from_fixation')
+        self.add_port('OUT', 'to_fixation')
+        self.add_port('OUT', 'to_saliency_map') # For inhibition of return?
+        self.next_saccade = (0,0) # Next saccade coordinates (x,y)
+    
+    def update(self):
+        """
+        """
 
 class FIXATION(PROCEDURAL_SCHEMA):
     """
     """
+    def __init__(self,name='Fixation'):
+        PROCEDURAL_SCHEMA.__init__(self, name)
+        self.add_port('IN', 'from_input')
+        self.add_port('IN', 'from_saccade_system')
+        self.add_port('OUT','to_visual_WM')
+        self.add_port('OUT', 'to_saccade_system')
+        self.subscene = None
+        self.next_saccade = False
+    
+    def update(self):
+        """
+        """
+        vis_input = self.get_input('from_input')
+        eye_pos = self.get_input('from_saccade_system')
+        self._get_subscene(vis_input, eye_pos)
+        self.set_output('to_visual_WM', self.subscene)
+        self.set_output('to_saccade_system', self.next_saccade)
+    
+    def _get_subscene(self, vis_input, eye_pos):
+        """
+        """
+        return
+
+###############################################################################
+if __name__=='__main__':
+    ##############################
+    ### percepaul schema system ###
+    ##############################
+    visualWM = VISUAL_WM()
+    perceptualLTM = PERCEPTUAL_LTM()
+    saliency_map = SALIENCY_MAP()
+    saccade_system = SACCADE_SYSTEM()
+    fixation = FIXATION()
+    perception_mapping = {'Visual_WM':['ITG'], 
+                        'Perceptual_LTM':[], 
+                        'Saliency_map':['IPS'], 
+                        'Saccade_system':['Basal Ganglia', 'FEF', 'Superior Colliculus'],
+                        'Fixation':['Visual cortex']}
+                        
+    perceptual_schemas = [fixation, saliency_map, saccade_system, visualWM, perceptualLTM]
+    
+    perceptual_system = SCHEMA_SYSTEM('Perceptual_system')
+    perceptual_system.add_schemas(perceptual_schemas)
+    
+    perceptual_system.add_connection(visualWM, 'to_saliency_map', saliency_map, 'from_visual_WM')
+    perceptual_system.add_connection(perceptualLTM, 'to_visual_WM', visualWM, 'from_perceptual_LTM')
+    perceptual_system.add_connection(fixation, 'to_visual_WM', visualWM, 'from_fixation')
+    perceptual_system.add_connection(saliency_map, 'to_saccade_system', saccade_system , 'from_saliency_map')
+    perceptual_system.add_connection(saccade_system, 'to_saliency_map', saliency_map, 'from_saccade_system')
+    perceptual_system.add_connection(saccade_system, 'to_fixation', fixation, 'from_saccade_system')
+    perceptual_system.add_connection(fixation, 'to_saccade_system', saccade_system , 'from_fixation')
+    
+   
+    
+    perceptual_system.set_input_ports([fixation._find_port('from_input'), saliency_map._find_port('from_input')])
+    perceptual_system.set_output_port(visualWM._find_port('to_conceptualizer'))
+    
+    perception_brain_mapping = BRAIN_MAPPING()
+    perception_brain_mapping.schema_mapping = perception_mapping
+    perceptual_system.brain_mapping = perception_brain_mapping
+    
+    perceptual_system.system2dot()
 
