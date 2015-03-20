@@ -645,8 +645,7 @@ class SCHEMA_SYSTEM:
         
         for schema in self.schemas:
             brain_regions = self.brain_mapping.schema_mapping[schema.name]
-            label = '<'+schema.name+'<BR /><FONT POINT-SIZE="10">('+', '.join(brain_regions) +')</FONT>>'
-            br = ' (' + ', '.join(brain_regions) +')'
+            label = '<'+schema.name+'<BR /><FONT POINT-SIZE="10">['+', '.join(brain_regions) +']</FONT>>'
             dot_sys.add_node(pydot.Node(schema.name, label=label, color=color, shape=node_shape, style=style, fillcolor=fill_color))
         
         for connection in self.connections:
