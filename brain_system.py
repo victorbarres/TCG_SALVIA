@@ -4,8 +4,11 @@ Created on Tue Feb 24 11:57:27 2015
 
 @author: Victor Barres
 Defines the classes used to set up a brain system model
-"""
 
+
+THIS SET OF CLASSES IS NOW PARTIALLY OBSOLETE AND HAS BEEN INCORPORATED IN SCHEMA THEORY...
+USE BRAIN SYSTEM AS A WAY TO DEFINE THINGS LIKE LESIONS ETC...
+"""
 ############################    
 ### Brain system classes ###
 ############################   
@@ -38,6 +41,31 @@ class SYSTEM:
         """
         Each class that inherit from this base class need to define its update procedure.
         """
+        return
+        
+    def connect(self, module1, module2, weight=1, delay=0):
+        """
+        Adds a directed connection between module1 and module2.
+        """
+        outport_name = 'to_%s' % module2.name
+        inport_name = 'from_%s' % module1.name
+        id_out = module1.add_port('out', outport_name)
+        id_in = module2.add_port('in', inport_name)
+        if id_in and id_out:
+            new_connect = CONNECT()
+            new_connect.set_from(module1, id_out)
+            new_connect.set_to(module2, id_in)
+            new_connect.set_weight(weight)
+            new_connect.set_delay(delay)
+            self.add_connections([new_connect])
+            return True
+        else:
+            return False
+    
+    def system2dot(self):
+        return
+            
+        
     
 class MODULE:
     """
@@ -46,14 +74,14 @@ class MODULE:
     Data:
         - id (int): Unique id
         - name (str): Module name
-        - function (WM, LTM)
+        - function (PROCEDURAL_SCHEMA)
         - in_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
         - out_ports ([{'id':port_id, 'name':port_name, 'value':value}]):
         - brain_regions([str]):
     """
-    ID_next = 0
-    PI_next = 0
-    PO_next = 0
+    ID_next = 1 # Global module ID counter
+    PI_next = 1 # Global module input port counter
+    PO_next = 1 # Global module output port counter
     def __init__(self, name, function = None, brain_regions = []):
         self.id = MODULE.ID_next
         MODULE.ID_next +=1
@@ -71,47 +99,48 @@ class MODULE:
     def add_port(self,port_type, port_name):
         """
         Adds a new port to the module. Port_type (str) ['in' or 'out'], port_name (str).
+        Return new port id if the creation successful, None otherwise.
         """
         if port_type == 'in':
             new_port = {'id':MODULE.PI_next, 'name':port_name, 'value':None}
             MODULE.PI_next +=1
             self.in_ports.append(new_port)
-            return True
+            return new_port['id']
         elif port_type == 'out':
             new_port = {'id':MODULE.PO_next, 'name':port_name, 'value':None}
             MODULE.PO_next +=1
             self.out_ports.append(new_port)
-            return True
+            return new_port['id']
         else:
-            return False
+            return None
 
 class CONNECT:
     """
     Data:
-        - port_in ({"module":MODULE, "port":port_id}):
-        - port_out ({"module":MODULE, "port":port_id}):
+        - pFrom ({"module":MODULE, "port":port_id}):
+        - pTo ({"module":MODULE, "port":port_id}):
         - weight (float):
         - delay (float):
     """
     def __init__(self):
         """
         """
-        self.port_in = {"module":None, "port":None}
-        self.port_out = {"module":None, "port":None}
+        self.pFrom = {"module":None, "port":None}
+        self.pTo = {"module":None, "port":None}
         self.weight = 0
         self.delay = 0
     
-    def set_port_in(self, module, port_id):
+    def set_from(self, module, port_id):
         """
         """
-        self.port_in["module"] = module
-        self.port_in["port"] = port_id
+        self.pFrom["module"] = module
+        self.pFrom["port"] = port_id
         
-    def set_port_out(self, module, port_id):
+    def set_to(self, module, port_id):
         """
         """
-        self.port_out["module"] = module
-        self.port_out["port"] = port_id
+        self.pTo["module"] = module
+        self.pTo["port"] = port_id
     
     def set_weight(self, weight):
         """
@@ -122,3 +151,7 @@ class CONNECT:
         """
         """
         self.delay = delay
+
+class LESION:
+    """
+    """

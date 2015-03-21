@@ -6,11 +6,14 @@ Created on Tue Apr 22 15:48:47 2014
 
 Define constructions related classes for TCG1.1
 The Template Classes define all the basic template elements that are used to build a construction.
+
+Uses NetworkX module to represent construction SemFrame graph.
 """
+import networkx as nx
+
 ########################
 ### Template Classes ###
 ########################
-
 class TP_ELEM:
     """
     Template element (base class).
@@ -44,6 +47,12 @@ class TP_SEM_ELEM(TP_ELEM):
 class TP_NODE(TP_SEM_ELEM):
     """
     Sem-Frame node.
+    
+    Data(inherited):
+    Data:
+        - type = TP_ELEM.NODE
+        - head (BOOL): 
+        - focus (BOOL):
     """
     def __init__(self):
         TP_SEM_ELEM.__init__(self)
@@ -54,6 +63,12 @@ class TP_NODE(TP_SEM_ELEM):
 class TP_REL(TP_SEM_ELEM):
     """
     Sem-Frame relation.
+    
+    Data(inherited):
+    Data:
+        - type = TP_ELEM.RELATION
+        - pFrom (TP_NODE): 
+        - pTo (TP_NODE):
     """
     def __init__(self):
         TP_SEM_ELEM.__init__(self)
@@ -64,14 +79,23 @@ class TP_REL(TP_SEM_ELEM):
 class TP_SYN_ELEM(TP_ELEM):
     """
     Template SynFrame element.
+    
+    Data(inherited):
+    Data:
+        - order (int): Syntactic order.
     """
     def __init__(self):
         TP_ELEM.__init__(self)
-        self.order = -1 # Syntactic order
+        self.order = -1 
         
 class TP_SLOT(TP_SYN_ELEM):
     """
     SynFrame slot.
+    
+    Data(inherited):
+    Data:
+        - type = TP_ELEM.SLOT
+        - cxn_classes ([str]): Set of construction classes that can be accepted as filling this slot.
     
     Notes: 
         - Need to make sure that the link to SemFrame is reciprocal. 
@@ -84,25 +108,51 @@ class TP_SLOT(TP_SYN_ELEM):
 class TP_PHON(TP_SYN_ELEM):
     """
     SynFrame phonetic notation.
+    
+    Data(inherited):
+    Data:
+        - type = TP_ELEM.PHONETICS
+        - cxn_phonetics (str): the phonetic content.
+        - num_syllables (int): number of syllables (used to measure utterance length)
     """
     def __init__(self):
         TP_SYN_ELEM.__init__(self)
         self.type = TP_ELEM.PHONETICS
         self.phonetics = ''
-        self.num_syllables = 0 # Used to measure utterance length.
-
+        self.num_syllables = 0
 
 class TP_SEMFRAME(TP_ELEM):
     """
     SemFrame construction template element
+
+    Data(inherited):
+    Data:
+        - type = TP_ELEM.SEMFRAME
+        - nodes ([TP_NODES]): Set of template semantic nodes.
+        - edges ([TP_REL]): Set of template semantic relations.
+        - graph (networkx.DiGraph): A NetworkX implementation of the graph.
+            Each node and edge have the additional 'concept' attribute derived from their respective node.concept and edge.concept
+    
+    The use of NetworkX graph allows the system to rely on NetworkX efficient python implementation of graph algorithms (in particular
+    subgraph isomorphisms search).
     """
     def __init__(self):
         TP_ELEM.__init__(self)
         self.type = TP_ELEM.SEMFRAME
         self.nodes = []
         self.edges = []
-
-
+        self.graph = None
+    
+    def _create_NX_graph(self):
+        graph = nx.DiGraph()
+        for node in self.nodes:
+            graph.add_node(node, concept=node.concept)
+        for edge in self.edges:
+            graph.add_edge(edge.pFrom, edge.pTo, concept= edge.concept)
+        
+        self.graph = graph
+        
+        
 class TP_SYNFORM(TP_ELEM):
     """
     SynForm construction template element
@@ -122,8 +172,7 @@ class TP_SYMLINKS(TP_ELEM):
            
 ############################    
 ### Construction classes ###
-############################
-        
+############################     
 class CXN:
     """
     Grammatical construction.
@@ -175,7 +224,9 @@ class CXN:
             self.SemFrame.edges.append(sem_elem)
         else:
             return False
-
+        
+        # Update NetworkX graph
+        self.SemFrame._create_NX_graph()
         return True
         
     def add_syn_elem(self, syn_elem):
@@ -191,7 +242,7 @@ class CXN:
         
         return True
     
-    def add_symlink(self, node, slot):
+    def add_sym_link(self, node, slot):
         """
         Adds a symbolic link  between the node (TP_NODE) and slot (TP_SLOT)
         """
@@ -248,17 +299,13 @@ class CXN:
         
 ####################################
 ### Grammar: set of construtions ###
-####################################
-        
+####################################       
 class GRAMMAR:
     """
     Grammar defined as a set of constructions ("constructicon")
     
     Data:
         - constructions ([CXN])
-    
-    Notes:
-        - Corresponds to VOCAB in c++ code.
     """
     def __init__(self):
         self.constructions = []
@@ -293,25 +340,24 @@ class GRAMMAR:
         """
         self.constructions = []
     
-    def __str__(self):
-        p = ''
-        p += "### TCG GRAMMAR ###\n\n"
-        for c in self.constructions:
-            p += str(c)
-            p += '\n\n'
-        
-        return p
-    
-    def print_cxn(self, cxn_name):
-        """
-        Print the cxn with name cxn_name (STR) if it is found in the grammar.
-        """        
-        cxn = self.find_construction(cxn_name)
-        if not(cxn):
-            print "%s not found..." % cxn_name
-        else:
-            print cxn
-        
+#    def __str__(self):
+#        p = ''
+#        p += "### TCG GRAMMAR ###\n\n"
+#        for c in self.constructions:
+#            p += str(c)
+#            p += '\n\n'
+#        
+#        return p
+#    
+#    def print_cxn(self, cxn_name):
+#        """
+#        Print the cxn with name cxn_name (STR) if it is found in the grammar.
+#        """        
+#        cxn = self.find_construction(cxn_name)
+#        if not(cxn):
+#            print "%s not found..." % cxn_name
+#        else:
+#            print cxn     
 ###############################################################################
 
 if __name__=='__main__':
