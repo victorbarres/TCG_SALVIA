@@ -212,12 +212,14 @@ class PROCEDURAL_SCHEMA(SCHEMA):
     
     def get_input(self, port_name):
         """
-        Return the current value of the port with name 'port_name'. If the port is not an input port, if multiple ports shared the same name or if the port is 
+        Return the current value of the port with name 'port_name' and resets the port value to None. If the port is not an input port, if multiple ports shared the same name or if the port is 
         not found, returns None.
         """
         port = self._find_port(port_name)
         if port and (port.type == PORT.TYPE_IN):
-            return port.value
+            val = port.value
+            port.value = None # Resets port value
+            return val
         elif port and (port.type == PORT.TYPE_OUT):
             print("ERROR: port %s refers to an output port" % port_name)
             return None
@@ -315,9 +317,11 @@ class CONNECT(SCHEMA):
     def update(self):
         """
         For now does not involve weight or delay!
-        Simply sets the value of port_rom to the value of port_to
+        Sets the value of port_rom to the value of port_to.
+        Resets the port_from value to None.
         """
         self.port_to.value = self.port_from.value
+        self.port_from.value = None
     
 
 ## LONG TERM MEMORY ###
@@ -542,7 +546,7 @@ class SCHEMA_SYSTEM:
         - input_port ([PORT]): the list of ports that read the input
         - output_ports ([PORT]): The list of ports that defines the output value
         - input (): system's input.
-        - output (): system's output.
+        - outputs {'schema:pid':val}: system's outputs.
         - brain_mapping (BRAIN_MAPPING)
     """
     def __init__(self, name=''):
@@ -552,7 +556,7 @@ class SCHEMA_SYSTEM:
         self.input_ports = None
         self.output_ports = None
         self.input = None
-        self.output = None
+        self.outputs = None
     
     def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
         """
@@ -602,7 +606,7 @@ class SCHEMA_SYSTEM:
             - Gets system input
             - Updates all the schemas.
             - Propage port values through connections.
-            - Update system output.
+            - Update system outputs.
         """
         # Get system input
         for port in self.input_ports:
@@ -617,7 +621,7 @@ class SCHEMA_SYSTEM:
             connection.update()
         
         # Update the system output
-        self.output = self.output_port.value
+        self.outputs = {p.schema.name+":"+str(p.id):p.value for p in self.output_ports}
     
     def system2dot(self):
         """
