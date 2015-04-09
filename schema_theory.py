@@ -55,6 +55,65 @@ class PORT:
     
     def get_value(self):
         return self.value
+
+class CONNECT(SCHEMA):
+    """
+    Defines connections between ports (input_port -> output_port)
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+    Data:
+        - port_from (PORT)
+        - port_to (PORT)
+        - weight (float)
+        - delay (float)
+    """
+    def __init__(self, name='',  port_from=None, port_to=None, weight=0, delay=0):
+        """
+        """
+        SCHEMA.__init__(self, name=name)
+        self.port_from = port_from
+        self.port_to = port_to
+        self.weight = weight
+        self.delay = delay
+    
+    def set_from(self, port):
+        """
+        """
+        if port.type == PORT.TYPE_OUT:
+            self.port_from = port
+            return True
+        else:
+            return False
+        
+    def set_to(self, port):
+        """
+        """
+        if port.type == PORT.TYPE_IN:
+            self.port_to = port
+            return True
+        else:
+            return False
+    
+    def set_weight(self, weight):
+        """
+        """
+        self.weight = weight
+    
+    def set_delay(self, delay):
+        """
+        """
+        self.delay = delay
+    
+    def update(self):
+        """
+        For now does not involve weight or delay!
+        Sets the value of port_rom to the value of port_to.
+        Resets the port_from value to None.
+        """
+        self.port_to.value = self.port_from.value
+        self.port_from.value = None
+        
 ################################
 ### KNOWLEDGE SCHEMA CLASSES ###
 ################################
@@ -143,7 +202,7 @@ class SCHEMA_INST:
         Adds a new port to the instance. Port_type (str) ['IN' or 'OUT'], port_name (str), and a value port_value for the port.
         If sucessessful, returns the port id. Else returns None.
         """
-        new_port = PORT(port_type,port_schema=self, port_name = port_name, port_value = port_value)
+        new_port = PORT(port_type, port_schema=self, port_name = port_name, port_value = port_value)
         if port_type == PORT.TYPE_IN:
             self.in_ports.append(new_port)
             return new_port.id
@@ -168,14 +227,6 @@ class SCHEMA_INST:
         self.set_alive(True)
         self.set_trace(trace)
         self.set_ports()
-    
-    def update_activation(self):
-        """
-        Gathers all the input values and updates the activation value of the schema.
-        """
-        I = 0
-        for(p in self.in_ports):
-            if 
     
     def update(self):
         """
@@ -282,14 +333,6 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             return False
         else:
             return False
-        
-    def update(self):
-        """
-        This function should be specified for every specific PROCEDURAL_SCHEMA class.
-        When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the procedural schema
-        and post values at the output ports.
-        """
-        return
     
     def _find_port(self, port_name):
         """
@@ -306,63 +349,13 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             return None
         return found[0]
         
-class CONNECT(SCHEMA):
-    """
-    Defines connections between procedural schemas (input_port -> output_port)
-    Data (inherited):
-        - id (int): Unique id
-        - name (str): schema name
-    Data:
-        - port_from (PORT)
-        - port_to (PORT)
-        - weight (float)
-        - delay (float)
-    """
-    def __init__(self, name='',  port_from=None, port_to=None, weight=0, delay=0):
-        """
-        """
-        SCHEMA.__init__(self, name=name)
-        self.port_from = port_from
-        self.port_to = port_to
-        self.weight = weight
-        self.delay = delay
-    
-    def set_from(self, port):
-        """
-        """
-        if port.type == PORT.TYPE_OUT:
-            self.port_from = port
-            return True
-        else:
-            return False
-        
-    def set_to(self, port):
-        """
-        """
-        if port.type == PORT.TYPE_IN:
-            self.port_to = port
-            return True
-        else:
-            return False
-    
-    def set_weight(self, weight):
-        """
-        """
-        self.weight = weight
-    
-    def set_delay(self, delay):
-        """
-        """
-        self.delay = delay
-    
     def update(self):
         """
-        For now does not involve weight or delay!
-        Sets the value of port_rom to the value of port_to.
-        Resets the port_from value to None.
+        This function should be specified for every specific PROCEDURAL_SCHEMA class.
+        When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the procedural schema
+        and post values at the output ports.
         """
-        self.port_to.value = self.port_from.value
-        self.port_from.value = None
+        return
     
 
 ## LONG TERM MEMORY ###
@@ -483,59 +476,30 @@ class WM(PROCEDURAL_SCHEMA):
     def update(self):
         return
         
-class F_LINK:
+class F_LINK(CONNECT):
     """
     Functional links between schema instances in working memory
-    Stores the currently active schema instances and the functional links through which they enter in cooperative computation.
     
-    Data:
-        - WM (WM): Associated working memory
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
         - port_from (PORT)
         - port_to (PORT)
         - weight (float)
+        - delay (float)
     """
+    def __init__(self, name='',  port_from=None, port_to=None, weight=1):
+        """
+        """
+        CONNECT.__init__(self, name=name,  port_from=port_from, port_to=port_to, weight=weight, delay=0)
     
-    def __init__(self):
+    def update(self):
         """
+        Sets the value of port_from to the value of port_to*weight.
+        Resets the port_from value to 0.
         """
-        self.WM = None
-        self.port_from = None
-        self.port_to= None
-        self.weight = 0
-    
-    def set_WM(self, WM):
-        """
-        Links the f-link to the associated working memory
-        """
-        self.WM = WM
-    
-    def set_from(self, port):
-        """
-        """
-        if port.type == PORT.TYPE_OUT:
-            self.port_from = port
-            return True
-        else:
-            return False
-        
-    def set_to(self, port):
-        """
-        """
-        if port.type == PORT.TYPE_IN:
-            self.port_to = port
-            return True
-        else:
-            return False
-    
-    def set_weight(self, weight):
-        """
-        Sets up the weight of the f-link.
-        """
-        self.weight = weight
-    
-    def update():
-        """
-        """
+        self.port_to.value = self.port_from.value*self.weight
+        self.port_from.value = 0
 
 class ASSEMBLAGE:
     """
@@ -728,3 +692,5 @@ if __name__=="__main__":
     plt.xlabel('t')
     plt.ylabel('act')
     plt.show()
+    
+    
