@@ -4,8 +4,11 @@ Created on Wed Feb 18 14:14:08 2015
 
 @author: Victor Barres
 
-Defines the based schema theory classes
+Defines the based schema theory classes.
+
+Uses math to implement the schema instances activation values.
 """
+import math
 ##################################
 ### Schemas (Functional units) ###
 ##################################
@@ -92,7 +95,7 @@ class SCHEMA_INST:
     
     Data:
         - id (int): Unique id
-        - activation (float): Current activation value of schema instance
+        - activation (INST_ACTIVATION): Activation value of schema instance
         - schema (KNOWLEDGE_SCHEMA):
         - in_ports ([PORT]):
         - out_ports ([PORT]):
@@ -104,18 +107,18 @@ class SCHEMA_INST:
     def __init__(self):
         self.id = SCHEMA_INST.ID_next
         SCHEMA_INST.ID_next +=1
-        self.activation = 0
+        self.activation = None
         self.schema = None         
         self.alive = False
         self.trace = None
         self.in_ports = []
         self.out_ports = []
         
-    def set_activation(self, act):
+    def set_activation(self, tau=1, act0=1, act_inf=0, t0=0, dt=0.1):
         """
-        Set 'activation' to act (float).
+        Set activation parameters
         """
-        self.activation = act
+        self.activation = INST_ACTIVATION(tau, act0, act_inf, t0, dt)
     
     def set_schema(self, schema):
         """
@@ -166,6 +169,14 @@ class SCHEMA_INST:
         self.set_trace(trace)
         self.set_ports()
     
+    def update_activation(self):
+        """
+        Gathers all the input values and updates the activation value of the schema.
+        """
+        I = 0
+        for(p in self.in_ports):
+            if 
+    
     def update(self):
         """
         This function should be specified for every specific SCHEMA_INST class.
@@ -173,6 +184,36 @@ class SCHEMA_INST:
         post values at the output ports.
         """
         return
+
+class INST_ACTIVATION:
+    """
+    """
+    def __init__(self, tau=1, act0=1, act_inf=0, t0=0, dt=0.1):
+        self.tau = tau
+        self.act0 = act0
+        self.act_inf = act_inf
+        self.t0 = t0
+        self.dt = dt
+        self.t = self.t0
+        self.act = self.act0
+        self.save_vals = {"t":[self.t0], "act":[self.act0]}
+        
+    
+    def update(self, I):
+        """
+        """
+        d_act = 1.0/(self.tau)*(-self.act + self.logistic(I) + self.act_inf)*self.dt
+        self.t += self.dt
+        self.act += d_act
+        self.save_vals["t"].append(self.t)
+        self.save_vals["act"].append(self.act)
+    
+    def logistic(self, x):
+        L = 1.0
+        k = 10.0
+        x0 = 0.5
+        return L/(1 + math.exp(-k*(x-x0)))
+        
 #################################
 ### PROCEDURAL SCHEMA CLASSES ###
 #################################
@@ -673,3 +714,17 @@ class SCHEMA_SYSTEM:
          # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
+        
+###############################################################################
+if __name__=="__main__":
+    import matplotlib.pyplot as plt
+    from random import random
+    act = INST_ACTIVATION(1.0,1,0,0,0.01);
+    tmax = 20;
+    while act.t<tmax:
+        act.update(random())
+    # Plot the trajectory
+    plt.plot(act.save_vals["t"],act.save_vals["act"])
+    plt.xlabel('t')
+    plt.ylabel('act')
+    plt.show()
