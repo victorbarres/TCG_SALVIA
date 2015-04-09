@@ -10,6 +10,7 @@ Uses NetworkX for the implementation of the content of the Semantic Working Memo
 import networkx as nx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, SCHEMA_SYSTEM, BRAIN_MAPPING
+import construction
 ##################################
 ### Language knowledge schemas ###
 ##################################
@@ -50,15 +51,15 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
     def set_port(self):
         """
         Defines the input and output port for the construction schema instance.
-        Each instance has 1 input port.
-        Each instance has an output port for each TP_SLOT element in the construction's SynForm.
+        Each instance has 1 output port.
+        Each instance has an input port for each TP_SLOT element in the construction's SynForm.
         """
         SynForm = self.schema.content.SynForm
         for f in SynForm.form:
-            if isinstance(f,TP_SLOT): # 1 output port per slot
-                self.add_port('OUT', port_name=f.order)
+            if isinstance(f,construction.TP_SLOT): # 1 intput port per slot
+                self.add_port('IN', port_name=f.order)
     
-        self.add_port('IN','input')
+        self.add_port('OUT','output')
 
 ###################################
 ### Language procedural schemas ###

@@ -22,7 +22,7 @@ class SCHEMA:
     """
     ID_next = 1 # Global schema ID counter
     def __init__(self, name=""):
-        self.id = KNOWLEDGE_SCHEMA.ID_next
+        self.id = SCHEMA.ID_next
         SCHEMA.ID_next += 1
         self.name = name
 
@@ -58,7 +58,7 @@ class PORT:
 
 class CONNECT(SCHEMA):
     """
-    Defines connections between ports (input_port -> output_port)
+    Defines connections and message passing between ports (input_port -> output_port)
     Data (inherited):
         - id (int): Unique id
         - name (str): schema name
@@ -148,32 +148,31 @@ class KNOWLEDGE_SCHEMA(SCHEMA):
     def set_LTM(self, LTM):
         self.LTM = LTM
         
-class SCHEMA_INST:
+class SCHEMA_INST(SCHEMA):
     """
-    Schema instance (base class)
+    Schema instance
     
-    Data:
+    Data (inherited):
         - id (int): Unique id
-        - activation (INST_ACTIVATION): Activation value of schema instance
+        - name (str): schema name
+    Data:
         - schema (KNOWLEDGE_SCHEMA):
-        - in_ports ([PORT]):
-        - out_ports ([PORT]):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
-    """
-    ID_next = 1 # Global schema instance ID counter
-    
-    def __init__(self):
-        self.id = SCHEMA_INST.ID_next
-        SCHEMA_INST.ID_next +=1
+        - activation (INST_ACTIVATION): Activation value of schema instance
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
+    """    
+    def __init__(self, name="", schema=None, alive=False, trace=None):
+        SCHEMA.__init__(self, name)
+        self.schema = schema      
+        self.alive = alive
+        self.trace = trace
         self.activation = None
-        self.schema = None         
-        self.alive = False
-        self.trace = None
         self.in_ports = []
         self.out_ports = []
         
-    def set_activation(self, tau=1, act0=1, act_inf=0, t0=0, dt=0.1):
+    def set_activation(self, act0=1, tau=1, t0=0, act_inf=0, dt=0.1):
         """
         Set activation parameters
         """
@@ -181,7 +180,7 @@ class SCHEMA_INST:
     
     def set_schema(self, schema):
         """
-        Set schema to schema (SCHEMA) -> The schema that is instantiated.
+        Set schema to schema (KNOWLEDGE_SCHEMA) -> The schema that is instantiated.
         """
         self._schema = schema
         
@@ -218,15 +217,29 @@ class SCHEMA_INST:
         """
         return
     
-    def instantiate(self, schema, trace):
+    def instantiate(self, schema, trace, t0, tau):
         """
-        Sets up the state of the schema instance at t0 of instantiation.
+        Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
         self.set_schema(schema)
-        self.set_activation(schema.init_act)
+        self.set_activation(schema.init_act, tau=tau, t0=t0)
         self.set_alive(True)
         self.set_trace(trace)
         self.set_ports()
+    
+    def update_activation(self):
+        """
+        Gathers values of all input port; reset their values to 0; update activation value based on INST_ACTIVATION dynamics; post new activation value to all output ports.
+        """
+        I = 0
+        for port in self.in_ports:
+            I+= port.val
+            port.val = 0;
+        
+        self.activation.update(I)
+        
+        for port in self.out_ports:
+            port.val = self.activation.act
     
     def update(self):
         """
@@ -410,6 +423,7 @@ class WM(PROCEDURAL_SCHEMA):
         - f-links ([F_LINK]):
         - time_constant (int):
         - prune_threshold (int):
+        - save_state (DICT): Saves the history of the WM states.
         
         - assemblages ????
     """
@@ -420,6 +434,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.f_links = []
         self.time_constant = 1
         self.prune_threshold = 0
+        self.save_state = {}
        
     def set_time_constant(self, time_constant):
         self.time_constant = time_constant
@@ -429,6 +444,7 @@ class WM(PROCEDURAL_SCHEMA):
     
     def add_instance(self,schema_inst):
         self.schema_insts.append(schema_inst)
+        self.save_state[schema_inst.schema.name + "_" + schema_inst.id] = schema_inst.activation.save_vals.copy();
     
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
@@ -473,8 +489,22 @@ class WM(PROCEDURAL_SCHEMA):
         
         # -> Might require to redo the assemblages!
            
+    def update_activations(self):
+        """
+        """
+        # Get system input
+        for inst in self.schema_insts:
+            inst.update_activation()
+        
+        # Propagate value through f-links
+        for flink in self.f_links:
+            flink.update()
+    
     def update(self):
+        """
+        """
         return
+        
         
 class F_LINK(CONNECT):
     """
