@@ -245,8 +245,7 @@ class SALIENCY_MAP(PROCEDURAL_SCHEMA):
         - IOR_max (INT): Max number of IORmaks that can be maintained.
         - IOR_masks ([{'mask':ARRAY, 't':INT, 'fix':(INT, INT)}]): set of inhibition of return masks.
         - IOR_mask (ARRAY): Stores the combined IOR_masks
-        - saliency_map (array): BU_saliency_map + inhibition of return
-        
+        - saliency_map (array): BU_saliency_map + inhibition of return  
     """
     def __init__(self, name='Saliency_map'):
         PROCEDURAL_SCHEMA.__init__(self, name)
@@ -307,20 +306,23 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
     def __init__(self, name='Saccade_system'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_saliency_map')
+        self.add_port('IN', 'from_fixation') # Receives signal to triger next saccade once subscene perception is done.
         self.add_port('OUT', 'to_fixation')
-        self.add_port('OUT', 'to_saliency_map') # For inhibition of return?
+        self.add_port('OUT', 'to_saliency_map') # For inhibition of return
         self.eye_pos = None # Crrent  eye position (x,y)
         self.next_fixation = None # Next saccade coordinates (x,y)
     
     def update(self):
         """
         """
-        saliency_map  = self.get_input('from_saliency_map')
-        self.next_fixation = self._WTA(saliency_map)
-        if self.next_fixation != self.eye_pos: #Updates next-saccedes if the result of the WTA differs from previously computed value.
-            self.eye_pos = self.next_fixation
-            self.set_output('to_fixation', self.eye_pos)
-            self.set_output('to_saliency_map', self.eye_pos)
+        self.trigger_saccade = self.get_input('from_fixation')
+        if self.trigger_saccade:
+            saliency_map  = self.get_input('from_saliency_map')
+            self.next_fixation = self._WTA(saliency_map)
+            if self.next_fixation != self.eye_pos: #Updates next-saccedes if the result of the WTA differs from previously computed value.
+                self.eye_pos = self.next_fixation
+                self.set_output('to_fixation', self.eye_pos)
+                self.set_output('to_saliency_map', self.eye_pos)
     
     def _WTA(self, saliency_map):
         """
@@ -341,14 +343,17 @@ class FIXATION(PROCEDURAL_SCHEMA):
     """
     Data"
         - subscene
-        - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False
+        - uncertainty (INT): Remaining uncertainy in subscene perception.
+        - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
     """
     def __init__(self,name='Fixation'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_saccade_system')
         self.add_port('OUT','to_visual_WM')
+        self.add_port('OUT', 'to_saccade_system')
         self.subscene = None
+        self.uncertainty = None
         self.next_saccade = False 
     
     def update(self):
@@ -356,8 +361,19 @@ class FIXATION(PROCEDURAL_SCHEMA):
         """
         vis_input = self.get_input('from_input')
         eye_pos = self.get_input('from_saccade_system')
-        self._get_subscene(vis_input, eye_pos)
-        self.set_output('to_visual_WM', self.subscene)
+        if eye_pos != None:
+            self._get_subscene(vis_input, eye_pos)
+            if self.subscene != None:
+                self.uncertainty = self.subscene.uncertainty
+        
+        if self.uncertainty != None:
+            self.uncertainty -= 1
+            if self.uncertainty <0:
+                self.next_saccade = True
+                self.set_output('to_visual_WM', self.subscene)
+        
+        self.set_output('to_saccade_system', self.next_saccade)
+        self.next_saccade = False
     
     def _get_subscene(self, vis_input, eye_pos):
         """
@@ -371,11 +387,14 @@ if __name__=='__main__':
     ##############################
     ### percepaul schema system ###
     ##############################
+    # Instantiating all the necessary procedural schemas
     visualWM = VISUAL_WM()
     perceptualLTM = PERCEPTUAL_LTM()
     saliency_map = SALIENCY_MAP()
     saccade_system = SACCADE_SYSTEM()
     fixation = FIXATION()
+    
+    # Defining schema to brain mappings.
     perception_mapping = {'Visual_WM':['ITG'], 
                         'Perceptual_LTM':[], 
                         'Saliency_map':['IPS'], 
@@ -384,25 +403,29 @@ if __name__=='__main__':
                         
     perceptual_schemas = [fixation, saliency_map, saccade_system, visualWM, perceptualLTM]
     
+    # Creating schema system and adding procedural schemas
     perceptual_system = SCHEMA_SYSTEM('Perceptual_system')
     perceptual_system.add_schemas(perceptual_schemas)
     
+    # Defining connections
     perceptual_system.add_connection(visualWM, 'to_saliency_map', saliency_map, 'from_visual_WM')
     perceptual_system.add_connection(perceptualLTM, 'to_visual_WM', visualWM, 'from_perceptual_LTM')
     perceptual_system.add_connection(fixation, 'to_visual_WM', visualWM, 'from_fixation')
     perceptual_system.add_connection(saliency_map, 'to_saccade_system', saccade_system , 'from_saliency_map')
     perceptual_system.add_connection(saccade_system, 'to_saliency_map', saliency_map, 'from_saccade_system')
     perceptual_system.add_connection(saccade_system, 'to_fixation', fixation, 'from_saccade_system')
+    perceptual_system.add_connection(fixation, 'to_saccade_system', saccade_system, 'from_fixation', )
     
-   
-    
+    # Defining input and output ports 
     perceptual_system.set_input_ports([fixation._find_port('from_input'), saliency_map._find_port('from_input')])
     perceptual_system.set_output_ports([visualWM._find_port('to_conceptualizer')])
     
+    # Setting up schema to brain mappings
     perception_brain_mapping = BRAIN_MAPPING()
     perception_brain_mapping.schema_mapping = perception_mapping
     perceptual_system.brain_mapping = perception_brain_mapping
     
+    # Generating schema system graph visualization
     perceptual_system.system2dot()
     
     # Setting up BU saliency data
@@ -410,7 +433,9 @@ if __name__=='__main__':
     saliency_data.load("./data/scenes/cholitas")
     saliency_map.BU_saliency_map = saliency_data.saliency_map.data
     
-    for t in range(10):    
+    # Running the schema system
+    time = 10
+    for t in range(time):    
         perceptual_system.update()
         map = saliency_map.IOR_mask
         if map != None:

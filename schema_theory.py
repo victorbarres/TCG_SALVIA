@@ -498,7 +498,7 @@ class F_LINK:
 
 class ASSEMBLAGE:
     """
-    Defines a schema instance assemablage.
+    Defines a schema instance assemblage.
     """
     def __init__(self):
         self.f_links = []

@@ -76,7 +76,7 @@ class SUB_SCENE:
     
     Data:
         - name (str): sub-scene name
-        - nodes ([PERCEPT_SCHEMA_INST]): the nodes of the graph. Has to be an instance of a perceptual schema that is not a relation
+        - nodes ([PERCEPT_SCHEMA_INST]): the nodes of the graph. Has to be an instance of a perceptual schema that is not a relation.
         - edges ([PERCEPT_SCHEMA_INST]): the edges of the graph. Has to be an instance of a perceptual schema that is  a relation.
         - area (AREA): The area associated with the sub-scenes -> Defined as the hull of the areas associated with all the subscenes perceptual schema instances.
         - anchor (PERCEPT_SCHEMA_INST): The perceptual anchor of the subscene. Should not be a relation.
@@ -159,7 +159,7 @@ class SCENE:
         self.height = 0
         self.subscenes = []
         self.schemas = []
-        self.focus_regions = []
+        self.focus_regions = {}
     
     
     def clear(self):

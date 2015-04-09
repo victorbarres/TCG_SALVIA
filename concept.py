@@ -218,8 +218,7 @@ class SEM_NET:
         p += '### SEMANTIC NETWORK ###\n\n'
         for r in self.relations:
             p += str(r) + '\n'
-        return p
-            
+        return p      
             
 ###############################################################################    
 class CONCEPT:
