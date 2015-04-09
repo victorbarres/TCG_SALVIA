@@ -7,8 +7,10 @@ Created on Wed Feb 18 14:14:08 2015
 Defines the based schema theory classes.
 
 Uses math to implement the schema instances activation values.
+Uses random
 """
 import math
+import random
 ##################################
 ### Schemas (Functional units) ###
 ##################################
@@ -489,12 +491,25 @@ class WM(PROCEDURAL_SCHEMA):
         
         # -> Might require to redo the assemblages!
            
-    def update_activations(self):
+    def update_activations(self, mode="SYNCHRONOUS", n=1):
         """
+        Update all the activations of instances in working memory based on cooperation and competition f-links.
+        mode:
+            - SYNCHRONOUS: updates activation of all instances; then updates all f-links.
+            - RANDOM: updates activation of "n" randomly selected instances; then updates all f-links.
         """
-        # Get system input
-        for inst in self.schema_insts:
-            inst.update_activation()
+        
+        if(mode == "SYNCHRONOUS"):
+            n = len(self.schema_insts)
+        elif(mode == "RANDOM"):
+            n = min([n, len(self.schema_insts)])
+            random.shuffle(self.schema_insts)
+        else:
+            print "ERROR: unkwnown mode %s" % mode
+       
+       # Get system input
+        for i in range(n):
+           self. schema_insts[i].update_activation()
         
         # Propagate value through f-links
         for flink in self.f_links:
