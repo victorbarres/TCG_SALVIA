@@ -573,14 +573,21 @@ class ASSEMBLAGE:
     Defines a schema instance assemblage.
     """
     def __init__(self):
-        self.f_links = []
+        self.coop_links = []
         self.activation = 0
     
-    def add_f_link(self, f_link):
+    def add_link(self, link):
         """
-        Add an flink f_link (F_LINK) to the assemblage.
+        Add an cooperation link link (COOP_LINK) to the assemblage.
+        A link can only be added does not add a connection to an already used in port or out port.
+        Returns True if the link was sucessfully added, False otherwise.
         """
-        self.f_links.append(f_link)
+        for l in self.coop_links:
+            if (l.connect.port_from == link.connect.port_from) or (l.connect.port_to == link.connect_port_to):
+                return False
+                
+        self.coop_links.append(link)
+        return True
     
     def update_activation(self):
         """
