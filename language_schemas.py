@@ -37,7 +37,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
     Data:
         SCHEMA_INST:
             - id (int): Unique id
-            - activation (float): Current activation value of schema instance
+            - activation (INST_ACTIVATION): Current activation value of schema instance
             - schema (CXN_SCHEMA):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
