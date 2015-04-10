@@ -67,16 +67,14 @@ class CONNECT(SCHEMA):
     Data:
         - port_from (PORT)
         - port_to (PORT)
-        - weight (float)
         - delay (float)
     """
-    def __init__(self, name='',  port_from=None, port_to=None, weight=0, delay=0):
+    def __init__(self, name='',  port_from=None, port_to=None, delay=0):
         """
         """
         SCHEMA.__init__(self, name=name)
         self.port_from = port_from
         self.port_to = port_to
-        self.weight = weight
         self.delay = delay
     
     def set_from(self, port):
@@ -97,11 +95,6 @@ class CONNECT(SCHEMA):
         else:
             return False
     
-    def set_weight(self, weight):
-        """
-        """
-        self.weight = weight
-    
     def set_delay(self, delay):
         """
         """
@@ -109,7 +102,7 @@ class CONNECT(SCHEMA):
     
     def update(self):
         """
-        For now does not involve weight or delay!
+        For now does not involve delay!
         Sets the value of port_rom to the value of port_to.
         Resets the port_from value to None.
         """
@@ -507,7 +500,7 @@ class WM(PROCEDURAL_SCHEMA):
         else:
             print "ERROR: unkwnown mode %s" % mode
        
-       # Get system input
+        # Update  instances activation
         for i in range(n):
            self. schema_insts[i].update_activation()
         
