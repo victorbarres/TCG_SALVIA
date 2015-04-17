@@ -6,11 +6,13 @@ Created on Wed Feb 18 14:14:08 2015
 
 Defines the based schema theory classes.
 
-Uses numpy to implement the schema instances activation values.
 Uses random
+Uses numpy to implement the schema instances activation values.
+Uses matplotlib.plt to visualize WM state
 """
-import numpy as np
 import random
+import numpy as np
+import matplotlib.pyplot as plt
 ##################################
 ### SCHEMAS (Functional units) ###
 ##################################
@@ -502,6 +504,20 @@ class WM(PROCEDURAL_SCHEMA):
         """
         return
         
+    
+    def plot_dynamics(self):
+        """
+        """
+        plt.figure(1)
+        for inst in self.save_state.keys():
+            plt.plot(self.save_state[inst]['t'], self.save_state[inst]['act'], label=inst, linewidth=2)
+        
+        plt.title('working memory dynamics')
+        plt.xlabel('time', fontsize= 16)
+        plt.ylabel('activity', fontsize=16)
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True)
+        plt.show()
+        
 class F_LINK:
     """
     Functional links between schema instances in working memory
@@ -745,7 +761,7 @@ class SCHEMA_SYSTEM:
         
 ###############################################################################
 if __name__=="__main__":
-    import matplotlib.pyplot as plt
+
 #    act = INST_ACTIVATION(1.0,1,0,0,0.01);
 #    tmax = 20;
 #    while act.t<tmax:
@@ -787,8 +803,6 @@ if __name__=="__main__":
     for t in range(max_t):
         wm.update_activations()
         
-    for inst in wm.save_state.keys():
-        plt.plot(wm.save_state[inst]['act'])
-        plt.show()
+    wm.plot_dynamics()
     
     
