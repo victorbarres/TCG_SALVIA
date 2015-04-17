@@ -6,10 +6,10 @@ Created on Wed Feb 18 14:14:08 2015
 
 Defines the based schema theory classes.
 
-Uses math to implement the schema instances activation values.
+Uses numpy to implement the schema instances activation values.
 Uses random
 """
-import math
+import numpy as np
 import random
 ##################################
 ### SCHEMAS (Functional units) ###
@@ -248,38 +248,21 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
     """    
-    def __init__(self, name="", schema=None, alive=False, trace=None):
-        PROCEDURAL_SCHEMA.__init__(self,name)
-        self.schema = schema      
-        self.alive = alive
-        self.trace = trace
+    def __init__(self,schema=None, alive=False, trace=None, t0=0, tau=1):
+        PROCEDURAL_SCHEMA.__init__(self,name="")
+        self.schema = None      
+        self.alive = False
+        self.trace = None
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
+        self.instantiate(schema, trace, t0, tau)
         
     def set_activation(self, act0=1, tau=1, t0=0, act_inf=0, dt=0.1):
         """
         Set activation parameters
         """
         self.activation = INST_ACTIVATION(tau, act0, act_inf, t0, dt)
-    
-    def set_schema(self, schema):
-        """
-        Set schema to schema (KNOWLEDGE_SCHEMA) -> The schema that is instantiated.
-        """
-        self._schema = schema
-        
-    def set_alive(self, bool_val):
-        """
-        Set alive to bool_val (bool)
-        """
-        self.alive = bool_val
-    
-    def set_trace(self, a_trace):
-        """
-        Set trace value to a_trace.
-        """
-        self.trace = a_trace
     
     def set_ports(self):
         """
@@ -291,11 +274,14 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
-        self.set_schema(schema)
+        self.schema = schema        
+        self.name = "%s_%i" %(self.schema.name, self.id)
         self.set_activation(schema.init_act, tau=tau, t0=t0)
-        self.set_alive(True)
-        self.set_trace(trace)
+        self.alive = True
+        self.trace = trace
         self.set_ports()
+        self.activity = self.activation.act0
+        self.act_port_out.value = self.activity
     
     def update_activation(self):
         """
@@ -304,10 +290,11 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         I = 0
         for v in self.act_port_in.value:
             I+= v
-        self.act_port_in = [];
+        self.act_port_in.value = [];
         
         self.activation.update(I)
-        self.act_port_out.value = self.activation.act
+        self.activity = self.activation.act
+        self.act_port_out.value = self.activity
         
     def update(self):
         """
@@ -343,8 +330,8 @@ class INST_ACTIVATION:
     def logistic(self, x):
         L = 1.0
         k = 10.0
-        x0 = 0.5
-        return L/(1 + math.exp(-k*(x-x0)))
+        x0 = 0
+        return L/(1 + np.exp(-k*(x-x0)))
     
 
 ## LONG TERM MEMORY ###
@@ -400,7 +387,7 @@ class WM(PROCEDURAL_SCHEMA):
         - comp_links ([COMP_LINK]):
         - time_constant (float):
         - prune_threshold (float):
-        - save_state (DICT): Saves the history of the WM states.
+        - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
         
         - assemblages ????
     """
@@ -414,10 +401,10 @@ class WM(PROCEDURAL_SCHEMA):
         self.prune_threshold = 0.1
         self.save_state = {}
        
-       
     def add_instance(self,schema_inst):
         self.schema_insts.append(schema_inst)
-        self.save_state[schema_inst.schema.name + "_" + schema_inst.id] = schema_inst.activation.save_vals.copy();
+        name = "%s_%i" % (schema_inst.schema.name, schema_inst.id)
+        self.save_state[name] = schema_inst.activation.save_vals.copy();
     
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
@@ -491,6 +478,7 @@ class WM(PROCEDURAL_SCHEMA):
         Update all the activations of instances in working memory based on cooperation and competition f-links.
         Passes activations through coop links with probabiliy coop_p, and through competition liks with probability comp_p
         Then updates all instance activation.
+        Saves states.
         """
         # Propagating cooperation
         for flink in self.coop_links:
@@ -505,8 +493,9 @@ class WM(PROCEDURAL_SCHEMA):
                 flink.update()
        
         # Update all instances activation
-        for inst in self.save_state:
-           inst.update_activation()
+        for inst in self.schema_insts:
+            inst.update_activation()
+           
     
     def update(self):
         """
@@ -527,6 +516,7 @@ class F_LINK:
         """
         self.inst_from = inst_from
         self.inst_to = inst_to
+        self.weight=weight
     
     def update(self):
         """
@@ -545,7 +535,7 @@ class COOP_LINK(F_LINK):
     def __init__(self, inst_from=None, inst_to=None, weight=1):
         """
         """
-        F_LINK.__init__(self, inst_from, inst_to)
+        F_LINK.__init__(self, inst_from, inst_to, weight)
         self.connect = CONNECT()
     
     def set_connect(self, port_from, port_to, weight=0, delay=0):
@@ -566,7 +556,7 @@ class COMP_LINK(F_LINK):
     def __init__(self, inst_from=None, inst_to=None, weight=-1):
         """
         """
-        F_LINK.__init__(self, inst_from, inst_to)
+        F_LINK.__init__(self, inst_from, inst_to, weight)
 
 class ASSEMBLAGE:
     """
@@ -756,15 +746,49 @@ class SCHEMA_SYSTEM:
 ###############################################################################
 if __name__=="__main__":
     import matplotlib.pyplot as plt
-    from random import random
-    act = INST_ACTIVATION(1.0,1,0,0,0.01);
-    tmax = 20;
-    while act.t<tmax:
-        act.update(random())
-    # Plot the trajectory
-    plt.plot(act.save_vals["t"],act.save_vals["act"])
-    plt.xlabel('t')
-    plt.ylabel('act')
-    plt.show()
+#    act = INST_ACTIVATION(1.0,1,0,0,0.01);
+#    tmax = 20;
+#    while act.t<tmax:
+#        act.update(random.random())
+#    # Plot the trajectory
+#    plt.plot(act.save_vals["t"],act.save_vals["act"])
+#    plt.xlabel('t')
+#    plt.ylabel('act')
+#    plt.show()
+#    
+    ###############
+    ### Test WM ###
+    ###############
+    num_schemas=10
+    schemas = [KNOWLEDGE_SCHEMA(name="act:"+str(i*1.0/num_schemas), LTM=None, content=None, init_act=i*1.0/num_schemas) for i in range(1,num_schemas+1)]
+    insts = [SCHEMA_INST(schema=s) for s in schemas]
+    wm = WM()
+    for inst in insts:
+            wm.add_instance(inst)
+    
+    for i in range(len(insts)):
+        for j in range(len(insts)):
+            if i != j:               
+                r = random.random()
+                if r <0.1:
+                    wm.add_comp_link(inst_from=insts[i], inst_to=insts[j], weight=-1)
+                    print "comp: %s and %s" %(insts[i].name, insts[j].name)
+                
+    for i in range(len(insts)):
+        for j in range(len(insts)):
+            if i != j:    
+                r = random.random()
+                if r <0.1:
+                    wm.add_coop_link(inst_from=insts[i], port_from=None, inst_to=insts[j], port_to=None, weight=1)
+                    print "coop: %s and %s" %(insts[i].name, insts[j].name)
+    
+    
+    max_t = 100
+    for t in range(max_t):
+        wm.update_activations()
+        
+    for inst in wm.save_state.keys():
+        plt.plot(wm.save_state[inst]['act'])
+        plt.show()
     
     

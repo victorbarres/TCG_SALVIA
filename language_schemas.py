@@ -44,9 +44,9 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - alive (bool): status flag
             - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
     """
-    def __init__(self, cxn_schema, trace):
+    def __init__(self, cxn_schema, trace, t0, tau):
         SCHEMA_INST.__init__(self)
-        self.instantiate(cxn_schema, trace)
+        self.instantiate(cxn_schema, trace, t0, tau)
     
     def set_port(self):
         """
@@ -110,7 +110,7 @@ class GRAMMATICAL_WM(WM):
     """
     """
     def __init__(self, name='Grammatical_WM'):
-        PROCEDURAL_SCHEMA.__init__(self, name)
+        WM.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_cxn_retrieval')
         self.add_port('OUT', 'to_phonological_WM')
@@ -211,6 +211,9 @@ if __name__=='__main__':
     language_system.brain_mapping = language_brain_mapping
     
     language_system.system2dot()
+    
+    ###########################################################################
+    ### TEST GRAMMATICAL WM ###
 
 
 
