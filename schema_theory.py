@@ -513,7 +513,7 @@ class WM(PROCEDURAL_SCHEMA):
             plt.plot(self.save_state[inst]['t'], self.save_state[inst]['act'], label=inst, linewidth=2)
         
         plt.title('working memory dynamics')
-        plt.xlabel('time', fontsize= 16)
+        plt.xlabel('time', fontsize=16)
         plt.ylabel('activity', fontsize=16)
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True)
         plt.show()
