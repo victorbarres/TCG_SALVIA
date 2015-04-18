@@ -142,7 +142,6 @@ def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER TH
         if char.isalpha():
             new_phon.num_syllables += 1
             
-            
 def read_semframe(new_cxn, SemFrame, name_table):
     """
     """
@@ -191,7 +190,6 @@ def read_cxn(grammar, aCxn):
     new_cxn.clss = aCxn['class']
     if 'preference' in aCxn:
         new_cxn.preference = aCxn['preference']
-    
     
     # Name table
     name_table = {'SemNames':{}, 'SemEdges':{}, 'SlotNames':{}}

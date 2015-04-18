@@ -155,6 +155,14 @@ class TP_SEMFRAME(TP_ELEM):
             graph.add_edge(edge.pFrom, edge.pTo, concept= edge.concept)
         
         self.graph = graph
+    
+    def draw(self):
+        node_labels = dict((n, d['concept'].meaning) for n,d in self.graph.nodes(data=True))
+        edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.graph.edges(data=True))
+        pos = nx.spring_layout(self.graph)        
+        nx.draw_networkx(self.graph, pos=pos, with_labels= False)
+        nx.draw_networkx_labels(self.graph, pos=pos, labels= node_labels)
+        nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
         
         
 class TP_SYNFORM(TP_ELEM):
@@ -261,7 +269,7 @@ class CXN:
             return False
         if self.SymLinks.SL.has_key(node) or (slot in self.SymLinks.SL.values()):
             return False
-        self.SymLinks[node] = slot
+        self.SymLinks.SL[node] = slot
         return True
     
     

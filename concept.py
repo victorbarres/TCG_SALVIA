@@ -162,63 +162,63 @@ class SEM_NET:
     ######
     # TO REWRITE
     ######
-    def distance(self, supMean, subMean, relType = SEM_REL.IS_A, heuristic = False):
-        """
-        Return the distance in the semantic network between a concept (subMean) and an hypernym (supMean).
-        Return -1 if supMean is not a hypernym of subMean.
-        If heuristic = True: -> does not guarantee to find the shortest distance.
-        
-        Args:
-         - supMean (str)
-         - subMean (str)
-         - relType (int)
-         - heuristic (bool)
-        """
-        visited = [] # Explored elements of the semantic network
-        dist = 0
-        
-        return self._travel(supMean, subMean, relType, dist, heuristic, visited)
-    
-    def _travel(self, supMean, subMean, relType, dist, heuristic, visited):
-        
-        if supMean == subMean: # Match found
-            return dist
-        
-        minDist = -1
-        
-        for r in self.relations:
-            if r in visited:
-                continue
-            if (r.type != relType) or (r.subMeaning != subMean):
-                continue
-            
-            # Visit the current relation
-            visited.append(r)
-            
-            # Recursively travel
-            nextDist = self._travel(supMean, r.supMeaning, relType, dist+1, heuristic, visited)
-            
-            # Un-visit
-            if not(heuristic): # if heuristic: path does not have to be the shortest
-                visited.pop()
-                     
-            if nextDist >= 0:
-                if (minDist < 0) or (minDist > nextDist):
-                    minDist = nextDist
-                if minDist <= dist + 1: 
-                    break # assumed to be the possible minimum distance
-                
-                if heuristic:
-                    break # if heuristicL just find one possible path
-            
-        return minDist
-    
-    def __str__(self):
-        p = ''
-        p += '### SEMANTIC NETWORK ###\n\n'
-        for r in self.relations:
-            p += str(r) + '\n'
-        return p      
+#    def distance(self, supMean, subMean, relType = SEM_REL.IS_A, heuristic = False):
+#        """
+#        Return the distance in the semantic network between a concept (subMean) and an hypernym (supMean).
+#        Return -1 if supMean is not a hypernym of subMean.
+#        If heuristic = True: -> does not guarantee to find the shortest distance.
+#        
+#        Args:
+#         - supMean (str)
+#         - subMean (str)
+#         - relType (int)
+#         - heuristic (bool)
+#        """
+#        visited = [] # Explored elements of the semantic network
+#        dist = 0
+#        
+#        return self._travel(supMean, subMean, relType, dist, heuristic, visited)
+#    
+#    def _travel(self, supMean, subMean, relType, dist, heuristic, visited):
+#        
+#        if supMean == subMean: # Match found
+#            return dist
+#        
+#        minDist = -1
+#        
+#        for r in self.relations:
+#            if r in visited:
+#                continue
+#            if (r.type != relType) or (r.subMeaning != subMean):
+#                continue
+#            
+#            # Visit the current relation
+#            visited.append(r)
+#            
+#            # Recursively travel
+#            nextDist = self._travel(supMean, r.supMeaning, relType, dist+1, heuristic, visited)
+#            
+#            # Un-visit
+#            if not(heuristic): # if heuristic: path does not have to be the shortest
+#                visited.pop()
+#                     
+#            if nextDist >= 0:
+#                if (minDist < 0) or (minDist > nextDist):
+#                    minDist = nextDist
+#                if minDist <= dist + 1: 
+#                    break # assumed to be the possible minimum distance
+#                
+#                if heuristic:
+#                    break # if heuristicL just find one possible path
+#            
+#        return minDist
+#    
+#    def __str__(self):
+#        p = ''
+#        p += '### SEMANTIC NETWORK ###\n\n'
+#        for r in self.relations:
+#            p += str(r) + '\n'
+#        return p      
             
 ###############################################################################    
 class CONCEPT:
