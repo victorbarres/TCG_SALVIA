@@ -36,6 +36,10 @@ class TP_SEM_ELEM(TP_ELEM):
     """
     Template Sem-Frame element.
     
+    Data (inherited):
+        - name (STR): Element's name.
+        - concept (CONCEPT): Concept associated with the semantic element.
+    
     Notes: 
         - Need to make sure that the link to synform is reciprocal.
     """
@@ -156,6 +160,9 @@ class TP_SEMFRAME(TP_ELEM):
 class TP_SYNFORM(TP_ELEM):
     """
     SynForm construction template element
+    Data (inherited):
+    Data:
+        - form ([TP_SYN_ELEM]): Form sequence.
     """
     def __init__(self):
         TP_ELEM.__init__(self)
@@ -165,6 +172,10 @@ class TP_SYNFORM(TP_ELEM):
 class TP_SYMLINKS(TP_ELEM):
     """
     SymLinks construction template element.
+    Data (inherited):
+    Data:
+        - SL (DICT): Map between SemFrame (TP_NODE) elements and SynForm (TP_SLOT) elements.
+        
     """
     def __init__(self):
         TP_ELEM.__init__(self)

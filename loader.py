@@ -23,8 +23,9 @@ import construction as cxn
 import scene as scn
 
 
-###########################################################################
-### Data reading function ### 
+#############################
+### Data reading function ###
+#############################
 def json_read(file_name, path='./'):
     file_name = path+file_name
     try:
@@ -38,8 +39,13 @@ def json_read(file_name, path='./'):
     
     return json_data
 
-###########################################################################
+########################################
 ### Private object reading functions ###
+########################################
+
+###########
+### SEM ###
+
 def read_semrel(atype, supMeaning, sem_net, aSemantics):
     
     for meaning in aSemantics:
@@ -59,8 +65,15 @@ def read_semrel(atype, supMeaning, sem_net, aSemantics):
             return False
     
     return True
-    
-def read_node(new_cxn, aNode, name_table):        
+
+###########
+### CXN ###
+
+# NEED TO ADD PROPER TRUE/FALSE RETURN VALUES FOR ALL THOSE FUNCTIONS
+
+def read_node(new_cxn, aNode, name_table): # NEED TO CHECK THE CURRENT STATUS OF CONCEPT OBJECTS.
+    """
+    """
     # Create new node
     new_node = cxn.TP_NODE()
     new_node.name = aNode['name']
@@ -70,16 +83,19 @@ def read_node(new_cxn, aNode, name_table):
     new_node.concept = new_concept
     
     new_node.head = aNode['head']
-    new_node.shared = aNode['shared']
+    if 'focus' in aNode:
+        new_node.focus = aNode['focus']
     
-    #Update construction and name_table
+    # Update construction and name_table
     if new_cxn.find_sem_elem(new_node.name):
         return False
     
     new_cxn.add_sem_elem(new_node)
     name_table['SemNames'][new_node.name] = new_node
 
-def read_rel(new_cxn, aRel, name_table):        
+def read_rel(new_cxn, aRel, name_table):
+    """
+    """    
     # Create new relation
     new_rel = cxn.TP_REL()
     new_rel.name = aRel['name']
@@ -103,6 +119,8 @@ def read_rel(new_cxn, aRel, name_table):
     name_table['SemEdges'][new_rel.name] = (pFrom, pTo)
 
 def read_slot(new_cxn, aSlot, name_table):
+    """
+    """
     slot_name = aSlot['name']
     
     new_slot = cxn.TP_SLOT()
@@ -113,7 +131,9 @@ def read_slot(new_cxn, aSlot, name_table):
     new_cxn.add_syn_elem(new_slot)
     name_table['SlotNames'][slot_name] = new_slot
         
-def read_phon(new_cxn, aPhon, name_table):
+def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER THE PHON TYPE?
+    """
+    """
     new_phon = cxn.TP_PHON()
     new_phon.phonetics = aPhon['phon']
     
@@ -121,43 +141,17 @@ def read_phon(new_cxn, aPhon, name_table):
     for char in new_phon.phonetics:
         if char.isalpha():
             new_phon.num_syllables += 1
-    
-    new_cxn.add_syn_elem(new_phon)
-    
-def build_symlinks(SymLinks, name_table):
-    for key, val in SymLinks.iteritems():
-        sem_elem = name_table['SemNames'][key]
-        slot = name_table['SlotNames'][val]
-        sem_elem.linked_slot = slot
-        slot.linked_SemElem = sem_elem
-          
-def read_cxn(grammar, aCxn):        
-    # Create new cxn  
-    new_cxn = cxn.CXN()
-    new_cxn.name = aCxn['name']
-    new_cxn.clss = aCxn['class']
-    if 'preference' in aCxn:
-        new_cxn.preference = aCxn['preference']
-    
-    
-    # Name table
-    name_table = {'SemNames':{}, 'SemEdges':{}, 'SlotNames':{}}
-
-    for node in aCxn['SemFrame']['nodes']:
+            
+            
+def read_semframe(new_cxn, SemFrame, name_table):
+    """
+    """
+    for node in SemFrame['nodes']:
         read_node(new_cxn, node, name_table)
-    for rel in aCxn['SemFrame']['edges']:
+    for rel in SemFrame['edges']:
         read_rel(new_cxn, rel, name_table)
-   
-    for form_elem in aCxn['SynForm']:
-        if form_elem['type'] == 'SLOT':
-            read_slot(new_cxn, form_elem, name_table)
-        elif form_elem['type'] == 'PHON':
-            read_phon(new_cxn, form_elem, name_table)
     
-    build_symlinks(aCxn['SymLinks'], name_table)
-
-    # Creating SemFrame relations
-    for rel_name, node_pair in name_table['SemEdges'].iteritems():
+    for rel_name, node_pair in name_table['SemEdges'].iteritems(): # Creating SemFrame relations
         from_name = node_pair[0]
         to_name = node_pair[1]
         if(not(name_table['SemNames'].has_key(rel_name) and 
@@ -169,11 +163,56 @@ def read_cxn(grammar, aCxn):
         sem_elem.pFrom = name_table['SemNames'][from_name]
         sem_elem.pTo = name_table['SemNames'][to_name]
     
+    new_cxn.SemFrame._create_NX_graph() # Creating NetworkX implementation of SemFrame
+
+def read_synform(new_cxn, SynForm, name_table):
+    """
+    """
+    for form_elem in SynForm:
+        if form_elem['type'] == 'SLOT':
+            read_slot(new_cxn, form_elem, name_table)
+        elif form_elem['type'] == 'PHON':
+            read_phon(new_cxn, form_elem, name_table)
+    
+def read_symlinks(new_cxn, sym_links, name_table):
+    """
+    """
+    for key, val in sym_links.iteritems():
+        sem_elem = name_table['SemNames'][key]
+        slot = name_table['SlotNames'][val]
+        new_cxn.add_sym_link(sem_elem, slot)
+          
+def read_cxn(grammar, aCxn):
+    """
+    """
+    # Create new cxn  
+    new_cxn = cxn.CXN()
+    new_cxn.name = aCxn['name']
+    new_cxn.clss = aCxn['class']
+    if 'preference' in aCxn:
+        new_cxn.preference = aCxn['preference']
+    
+    
+    # Name table
+    name_table = {'SemNames':{}, 'SemEdges':{}, 'SlotNames':{}}
+    
+    # READ SEMFRAME
+    read_semframe(new_cxn, aCxn['SemFrame'], name_table)
+        
+    # READ SYNFORM
+    read_synform(new_cxn, aCxn['SynForm'], name_table)
+            
+    # READ SYMLINKS
+    read_symlinks(new_cxn, aCxn['SymLinks'], name_table)
+    
     flag = grammar.add_construction(new_cxn)
     if not(flag):
         return False
         
     return True
+
+#############
+### SCENE ###
 
 def read_sc_obj(new_rgn, aObj, name_table):
     # Create new object
@@ -272,8 +311,10 @@ def read_region(scene, aRgn, name_table):
         return False
     return True
             
-###########################################################################            
-### Public loading functions ###             
+################################           
+### Public loading functions ###
+################################
+            
 def load_grammar(file_name, file_path = './'):
     """
     Load and return the TCG grammar defined in file_path\file_name.
