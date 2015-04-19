@@ -332,8 +332,8 @@ class INST_ACTIVATION:
     def logistic(self, x):
         L = 1.0
         k = 10.0
-        x0 = 0
-        return L/(1 + np.exp(-k*(x-x0)))
+        x0 = 0.5
+        return L/(1.0 + np.exp(-1.0*k*(x-x0)))
     
 
 ## LONG TERM MEMORY ###
@@ -365,12 +365,6 @@ class LTM(PROCEDURAL_SCHEMA):
     
     def add_connection(self, from_schema, to_schema, weight):
         self.connections.append({'from':from_schema, 'to':to_schema, 'weight':weight})
-    
-    def update(self):
-        """
-        NEEDS TO DEFINE THIS FUNCTION FOR LTM
-        """
-        return
         
 ### WORKING MEMORY ###
 class WM(PROCEDURAL_SCHEMA):
@@ -387,7 +381,7 @@ class WM(PROCEDURAL_SCHEMA):
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
-        - time_constant (float):
+        - time_constant (FLOAT):
         - prune_threshold (float):
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
         
@@ -496,14 +490,7 @@ class WM(PROCEDURAL_SCHEMA):
        
         # Update all instances activation
         for inst in self.schema_insts:
-            inst.update_activation()
-           
-    
-    def update(self):
-        """
-        """
-        return
-        
+            inst.update_activation()        
     
     def plot_dynamics(self):
         """
@@ -799,8 +786,8 @@ if __name__=="__main__":
                     print "coop: %s and %s" %(insts[i].name, insts[j].name)
     
     
-    max_t = 100
-    for t in range(max_t):
+    max_step = 100
+    for step in range(max_step):
         wm.update_activations()
         
     wm.plot_dynamics()
