@@ -1,0 +1,5 @@
+*.py[cod]
+tmp/*
+output/*
+viewer/tmp/*
+data/scenes/*.mat
