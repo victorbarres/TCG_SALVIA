@@ -42,9 +42,13 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - out_ports ([PORT]):
             - alive (bool): status flag
             - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
+        
+        - covers (DICT): maps SemRep element in trace to CXN.SemFrame elements
     """
-    def __init__(self, cxn_schema, trace, t0, tau):
+    def __init__(self, cxn_schema, trace, t0, tau, mapping):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace, t0=t0, tau=tau)
+        self.covers = {}
+        self.set_covers(mapping)
         self.set_port()
     
     def set_port(self):
@@ -59,6 +63,12 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                 self.add_port('IN', port_name=f.order)
     
         self.add_port('OUT','output')
+    
+    def set_covers(self, mapping):
+        """
+        Sets covers as mapping (DICT). Mapping should be of the form {t1:s1, t2:s2, ...} mapping each element of the trace to an element of the CXN.SemFrame
+        """
+        self.covers = mapping
 
 ###################################
 ### Language procedural schemas ###
