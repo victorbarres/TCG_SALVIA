@@ -250,22 +250,32 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
     """    
-    def __init__(self,schema=None, alive=False, trace=None, t0=0, tau=1, act_inf=0, dt=0.1):
+    def __init__(self,schema=None, alive=False, trace=None):
         PROCEDURAL_SCHEMA.__init__(self,name="")
         self.schema = None      
         self.alive = False
         self.trace = None
         self.activity = 0
-        self.activation = None
+        self.activation = INST_ACTIVATION()
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
-        self.instantiate(schema, trace, t0, tau, act_inf, dt)
+        self.instantiate(schema, trace)
+        self.set_activation(act0=schema.init_act)
         
-    def set_activation(self, act0=1, tau=1, t0=0, act_inf=0, dt=0.1):
+    def set_activation(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
         """
         Set activation parameters
         """
-        self.activation = INST_ACTIVATION(tau, act0, act_inf, t0, dt)
+        self.activation.t0 = t0
+        self.activation.act0 = act0
+        self.activation.dt = dt
+        self.activation.tau = tau
+        self.activation.act_inf = act_inf
+        self.activation.L = L
+        self.activation.k = k
+        self.activation.x0 = x0
+        self.activity = act0
+        self.act_port_out.value = self.activity
     
     def set_ports(self):
         """
@@ -273,17 +283,15 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         return
     
-    def instantiate(self, schema, trace, t0, tau, act_inf, dt):
+    def instantiate(self, schema, trace):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
         self.schema = schema
         self.name = "%s_%i" %(self.schema.name, self.id)
-        self.set_activation(act0=schema.init_act, tau=tau, t0=t0, act_inf=act_inf, dt=dt)
         self.alive = True
         self.trace = trace
         self.set_ports()
-        self.activity = self.activation.act0
         self.act_port_out.value = self.activity
     
     def update_activation(self):
@@ -310,12 +318,15 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
 class INST_ACTIVATION:
     """
     """
-    def __init__(self, tau=1, act0=1, act_inf=0, t0=0, dt=0.1):
-        self.tau = tau
-        self.act0 = act0
-        self.act_inf = act_inf
+    def __init__(self, t0=0, act0=1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
         self.t0 = t0
-        self.dt = dt
+        self.act0 = act0
+        self.tau = tau
+        self.act_inf = act_inf
+        self.L = L
+        self.k = k
+        self.x0 = x0
+        self.dt = 1.0 # This should not be changed.
         self.t = self.t0
         self.act = self.act0
         self.save_vals = {"t":[self.t0], "act":[self.act0]}
@@ -324,17 +335,14 @@ class INST_ACTIVATION:
     def update(self, I):
         """
         """
-        d_act = 1.0/(self.tau)*(-self.act + self.logistic(I) + self.act_inf)*self.dt
+        d_act = self.dt/(self.tau)*(-self.act + self.logistic(I) + self.act_inf)
         self.t += self.dt
         self.act += d_act
         self.save_vals["t"].append(self.t)
         self.save_vals["act"].append(self.act)
     
     def logistic(self, x):
-        L = 1.0
-        k = 10.0
-        x0 = 0.5
-        return L/(1.0 + np.exp(-1.0*k*(x-x0)))
+        return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
     
 
 ## LONG TERM MEMORY ###
@@ -382,7 +390,8 @@ class WM(PROCEDURAL_SCHEMA):
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
-        - tau (FLOAT): 
+        - t (INT): time (+1 at each update)
+        - dyn_params ({'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT})
         - prune_threshold (float): Below this threshold the instances are considered inactive (Alive=False)
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
         
@@ -394,17 +403,19 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.dt = 0.1 ## I need to clean up the way activation is set up. Have a WM method to set up activaition.
-        self.tau = 1.0
-        self.act_inf = 0.0
+        self.t = 0
+        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5}
         self.prune_threshold = 0.3
         self.save_state = {}
        
     def add_instance(self,schema_inst):
         self.schema_insts.append(schema_inst) #There is still an issue with TIME! Need to keep track of t0 for each construction instance....
-        schema_inst.activation.dt = self.dt
-        schema_inst.activation.tau=1.0
-        schema_inst.activation.act_inf = self.act_inf
+        schema_inst.set_activation(t0= self.t,
+                                    tau=self.dyn_params['tau'], 
+                                    act_inf=self.dyn_params['act_inf'], 
+                                    L=self.dyn_params['L'], 
+                                    k=self.dyn_params['k'], 
+                                    x0=self.dyn_params['x0'])
         name = "%s_%i" % (schema_inst.schema.name, schema_inst.id)
         self.save_state[name] = schema_inst.activation.save_vals.copy();
     
@@ -637,6 +648,8 @@ class SCHEMA_SYSTEM:
         - outputs {'schema:pid':val}: system's outputs.
         - brain_mapping (BRAIN_MAPPING)
     """
+    T0 = 0
+    TIME_STEP = 1.0
     def __init__(self, name=''):
         self.name = name
         self.schemas = []
@@ -645,6 +658,8 @@ class SCHEMA_SYSTEM:
         self.output_ports = None
         self.input = None
         self.outputs = None
+        self.t = SCHEMA_SYSTEM.T0
+        self.dt = SCHEMA_SYSTEM.TIME_STEP
     
     def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
         """
@@ -710,6 +725,9 @@ class SCHEMA_SYSTEM:
         
         # Update the system output
         self.outputs = {p.schema.name+":"+str(p.id):p.value for p in self.output_ports}
+        
+        # Update time
+        self.t += self.dt
     
     def system2dot(self):
         """
@@ -802,7 +820,7 @@ if __name__=="__main__":
                     print "coop: %s and %s" %(insts[i].name, insts[j].name)
     
     
-    max_step = 100
+    max_step = 1000
     for step in range(max_step):
         wm.update_activations()
         

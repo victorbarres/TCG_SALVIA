@@ -43,9 +43,9 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
             - alive (bool): status flag
-            - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
+            - trace ({"nodes":[], "edge"=[]}): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
         
-        - covers (DICT): maps SemRep element in trace to CXN.SemFrame elements
+        - covers (DICT): maps CXN.SemFrame elements to SemRep elements in the trace
     """
     def __init__(self, cxn_schema, trace, t0, tau, mapping):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace, t0=t0, tau=tau)
@@ -173,7 +173,8 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
             if sub_iso:
                 for a_sub_iso in sub_iso:
                     match_qual = self._SemMatch_qual(a_sub_iso)
-                    new_instance = CXN_SCHEMA_INST(cxn_schema, trace=, mapping=a_sub_iso)### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
+                    trace = {"nodes":a_sub_iso["nodes"].values, "edges":a_sub_iso["edges"].values}
+                    new_instance = CXN_SCHEMA_INST(cxn_schema, trace=trace, mapping=a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
                     new_instance.activation.act *= match_qual ### NEED To HAVE QUALITY OF MATCH IMPACT THE ACTIVATION SOMEHOW
                     self.cxn_instances.append(new_instance)
                     

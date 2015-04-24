@@ -80,4 +80,4 @@ if __name__=="__main__":
     nm_gen = isomorphism.generic_node_match("attr", 0, op)
     sub_iso = find_sub_iso(G, G_pat, node_match = nm_gen, edge_match=None)
     
-    print sub_iso
+    print sub_iso[0]["nodes"].values()
