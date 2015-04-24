@@ -255,6 +255,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.schema = None      
         self.alive = False
         self.trace = None
+        self.activity = 0
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
@@ -276,7 +277,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
-        self.schema = schema        
+        self.schema = schema
         self.name = "%s_%i" %(self.schema.name, self.id)
         self.set_activation(schema.init_act, tau=tau, t0=t0)
         self.alive = True

@@ -11,6 +11,7 @@ import networkx as nx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, SCHEMA_SYSTEM, BRAIN_MAPPING
 import construction
+import TCG_graph
 ##################################
 ### Language knowledge schemas ###
 ##################################
@@ -36,7 +37,8 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
     Data:
         SCHEMA_INST:
             - id (int): Unique id
-            - activation (INST_ACTIVATION): Current activation value of schema instance
+            - activity = The current activity level of the schema.
+            - activation (INST_ACTIVATION): Handles the activation dynamics.
             - schema (CXN_SCHEMA):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
@@ -166,7 +168,35 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
     def _instantiate_cxns(self, SemRep, gram, WK):
         """
         """
+        for cxn_schema in gram.constructions:
+            sub_iso = self._SemMatch(SemRep, cxn_schema)
+            if sub_iso:
+                for a_sub_iso in sub_iso:
+                    match_qual = self._SemMatch_qual(a_sub_iso)
+                    new_instance = CXN_SCHEMA_INST(cxn_schema, trace=, mapping=a_sub_iso)### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
+                    new_instance.activation.act *= match_qual ### NEED To HAVE QUALITY OF MATCH IMPACT THE ACTIVATION SOMEHOW
+                    self.cxn_instances.append(new_instance)
+                    
+    def _SemMatch(self, SemRep, cxn_schema): ## NEED TO INCLUDE ASPECTS OF WORLD KNOWLEDGE.
+        """
+        IMPORTANT ALGORITHM
+        """
+        SemFrame_graph = cxn_schema.content.SemFrame.graph
         
+        # Match functions
+        nm = TCG_graph.isomorphism.categorical_node_match("concept", "")
+        em = TCG_graph.isomorphism.categorical_edge_match("concept", "")
+
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em)
+        
+        return sub_iso
+    
+    def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!!
+        """
+        Computes the quality of match?
+        Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
+        """
+        return 0
 
 class PHON_WM(PROCEDURAL_SCHEMA):
     """
