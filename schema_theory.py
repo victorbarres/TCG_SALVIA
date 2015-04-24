@@ -250,7 +250,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
     """    
-    def __init__(self,schema=None, alive=False, trace=None, t0=0, tau=1):
+    def __init__(self,schema=None, alive=False, trace=None, t0=0, tau=1, act_inf=0, dt=0.1):
         PROCEDURAL_SCHEMA.__init__(self,name="")
         self.schema = None      
         self.alive = False
@@ -259,7 +259,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
-        self.instantiate(schema, trace, t0, tau)
+        self.instantiate(schema, trace, t0, tau, act_inf, dt)
         
     def set_activation(self, act0=1, tau=1, t0=0, act_inf=0, dt=0.1):
         """
@@ -273,13 +273,13 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         return
     
-    def instantiate(self, schema, trace, t0, tau):
+    def instantiate(self, schema, trace, t0, tau, act_inf, dt):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
         self.schema = schema
         self.name = "%s_%i" %(self.schema.name, self.id)
-        self.set_activation(schema.init_act, tau=tau, t0=t0)
+        self.set_activation(act0=schema.init_act, tau=tau, t0=t0, act_inf=act_inf, dt=dt)
         self.alive = True
         self.trace = trace
         self.set_ports()
@@ -382,8 +382,8 @@ class WM(PROCEDURAL_SCHEMA):
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
-        - time_constant (FLOAT):
-        - prune_threshold (float):
+        - tau (FLOAT): 
+        - prune_threshold (float): Below this threshold the instances are considered inactive (Alive=False)
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
         
         - assemblages ????
@@ -394,12 +394,17 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.time_constant = 1
-        self.prune_threshold = 0.1
+        self.dt = 0.1 ## I need to clean up the way activation is set up. Have a WM method to set up activaition.
+        self.tau = 1.0
+        self.act_inf = 0.0
+        self.prune_threshold = 0.3
         self.save_state = {}
        
     def add_instance(self,schema_inst):
-        self.schema_insts.append(schema_inst)
+        self.schema_insts.append(schema_inst) #There is still an issue with TIME! Need to keep track of t0 for each construction instance....
+        schema_inst.activation.dt = self.dt
+        schema_inst.activation.tau=1.0
+        schema_inst.activation.act_inf = self.act_inf
         name = "%s_%i" % (schema_inst.schema.name, schema_inst.id)
         self.save_state[name] = schema_inst.activation.save_vals.copy();
     
@@ -489,9 +494,19 @@ class WM(PROCEDURAL_SCHEMA):
             if(r<comp_p):
                 flink.update()
        
-        # Update all instances activation
+        # Update all instances activation and sets alive=False for instances that fall below threshold.
         for inst in self.schema_insts:
-            inst.update_activation()        
+            inst.update_activation()
+            if inst.activity<self.prune_threshold:
+                inst.alive = False
+    
+    def prune(self):
+        """
+        Removes from WM all the dead instances
+        """
+        for inst in self.schema_insts[:]:
+            if not inst.alive:
+                self.schema_insts.remove(inst)
     
     def plot_dynamics(self):
         """
