@@ -47,8 +47,8 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
         
         - covers (DICT): maps CXN.SemFrame elements to SemRep elements in the trace
     """
-    def __init__(self, cxn_schema, trace, t0, tau, mapping):
-        SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace, t0=t0, tau=tau)
+    def __init__(self, cxn_schema, trace, act0, mapping):
+        SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace, act0=act0)
         self.covers = {}
         self.set_covers(mapping)
         self.set_port()
@@ -173,9 +173,9 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
             if sub_iso:
                 for a_sub_iso in sub_iso:
                     match_qual = self._SemMatch_qual(a_sub_iso)
+                    act0 = cxn_schema.init_act * match_qual ### NEED To HAVE QUALITY OF MATCH IMPACT THE ACTIVATION SOMEHOW
                     trace = {"nodes":a_sub_iso["nodes"].values, "edges":a_sub_iso["edges"].values}
-                    new_instance = CXN_SCHEMA_INST(cxn_schema, trace=trace, mapping=a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
-                    new_instance.activation.act *= match_qual ### NEED To HAVE QUALITY OF MATCH IMPACT THE ACTIVATION SOMEHOW
+                    new_instance = CXN_SCHEMA_INST(cxn_schema, trace, act0, a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
                     self.cxn_instances.append(new_instance)
                     
     def _SemMatch(self, SemRep, cxn_schema): ## NEED TO INCLUDE ASPECTS OF WORLD KNOWLEDGE.
@@ -197,7 +197,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         Computes the quality of match?
         Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
         """
-        return 0
+        return 1
 
 class PHON_WM(PROCEDURAL_SCHEMA):
     """

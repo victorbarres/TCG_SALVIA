@@ -250,7 +250,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
     """    
-    def __init__(self,schema=None, alive=False, trace=None):
+    def __init__(self,schema=None, trace=None, act0=0):
         PROCEDURAL_SCHEMA.__init__(self,name="")
         self.schema = None      
         self.alive = False
@@ -259,8 +259,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.activation = INST_ACTIVATION()
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
-        self.instantiate(schema, trace)
-        self.set_activation(act0=schema.init_act)
+        self.instantiate(schema, trace, act0)
         
     def set_activation(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
         """
@@ -283,7 +282,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         return
     
-    def instantiate(self, schema, trace):
+    def instantiate(self, schema, trace,act0):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
@@ -292,7 +291,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = True
         self.trace = trace
         self.set_ports()
-        self.act_port_out.value = self.activity
+        self.set_activation(act0=act0)
     
     def update_activation(self):
         """
