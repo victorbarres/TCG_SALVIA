@@ -250,7 +250,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
     """    
-    def __init__(self,schema=None, trace=None, act0=0):
+    def __init__(self,schema=None, trace=None):
         PROCEDURAL_SCHEMA.__init__(self,name="")
         self.schema = None      
         self.alive = False
@@ -259,20 +259,27 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.activation = INST_ACTIVATION()
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
-        self.instantiate(schema, trace, act0)
+        self.instantiate(schema, trace)
         
-    def set_activation(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
+    def set_activation_dyn(self, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
         """
         Set activation parameters
         """
-        self.activation.t0 = t0
-        self.activation.act0 = act0
         self.activation.dt = dt
         self.activation.tau = tau
         self.activation.act_inf = act_inf
         self.activation.L = L
         self.activation.k = k
         self.activation.x0 = x0
+    
+    def set_activation_init(self, t0=0, act0=1):
+        """
+        """
+        self.activation.t0 = t0
+        self.activation.act0 = act0
+        self.activation.act= act0
+        self.activation.save_vals["t"].append(t0)
+        self.activation.save_vals["act"].append(act0)
         self.activity = act0
         self.act_port_out.value = self.activity
     
@@ -282,7 +289,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         return
     
-    def instantiate(self, schema, trace,act0):
+    def instantiate(self, schema, trace):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
@@ -291,7 +298,8 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = True
         self.trace = trace
         self.set_ports()
-        self.set_activation(act0=act0)
+        self.set_activation_dyn()
+        self.set_activation_init(t0=0, act0=schema.init_act)
     
     def update_activation(self):
         """
@@ -316,8 +324,9 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
 
 class INST_ACTIVATION:
     """
+    Note: Having dt and Tau is redundant... dt should be defined at the system level.
     """
-    def __init__(self, t0=0, act0=1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
+    def __init__(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
         self.t0 = t0
         self.act0 = act0
         self.tau = tau
@@ -325,10 +334,10 @@ class INST_ACTIVATION:
         self.L = L
         self.k = k
         self.x0 = x0
-        self.dt = 1.0 # This should not be changed.
+        self.dt = dt 
         self.t = self.t0
         self.act = self.act0
-        self.save_vals = {"t":[self.t0], "act":[self.act0]}
+        self.save_vals = {"t":[], "act":[]}
         
     
     def update(self, I):
@@ -407,14 +416,14 @@ class WM(PROCEDURAL_SCHEMA):
         self.prune_threshold = 0.3
         self.save_state = {}
        
-    def add_instance(self,schema_inst):
+    def add_instance(self,schema_inst, act0):
         self.schema_insts.append(schema_inst) #There is still an issue with TIME! Need to keep track of t0 for each construction instance....
-        schema_inst.set_activation(t0= self.t,
-                                    tau=self.dyn_params['tau'], 
+        schema_inst.set_activation_dyn(tau=self.dyn_params['tau'], 
                                     act_inf=self.dyn_params['act_inf'], 
                                     L=self.dyn_params['L'], 
                                     k=self.dyn_params['k'], 
                                     x0=self.dyn_params['x0'])
+        schema_inst.set_activation_init(t0=self.t, act0=act0)
         name = "%s_%i" % (schema_inst.schema.name, schema_inst.id)
         self.save_state[name] = schema_inst.activation.save_vals.copy();
     
@@ -800,7 +809,7 @@ if __name__=="__main__":
     insts = [SCHEMA_INST(schema=s) for s in schemas]
     wm = WM()
     for inst in insts:
-            wm.add_instance(inst)
+            wm.add_instance(inst, inst.schema.init_act)
     
     for i in range(len(insts)):
         for j in range(len(insts)):

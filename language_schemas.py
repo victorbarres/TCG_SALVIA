@@ -47,8 +47,8 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
         
         - covers (DICT): maps CXN.SemFrame elements to SemRep elements in the trace
     """
-    def __init__(self, cxn_schema, trace, act0, mapping):
-        SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace, act0=act0)
+    def __init__(self, cxn_schema, trace, mapping):
+        SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
         self.covers = {}
         self.set_covers(mapping)
         self.set_port()
@@ -110,12 +110,22 @@ class SEMANTIC_WM(PROCEDURAL_SCHEMA):
         """
         conceptualization = self.get_input('from_conceptualizer')
         self._update_SemRep(conceptualization)
-        self.set_output('to_grammatical_WM',self.SemRep)
-        self.set_output('to_grammatical_LTM', self.SemRep)
+        self.set_output('to_grammatical_WM', self.SemRep)
+        self.set_output('to_cxn_retrieval', self.SemRep)
     
     def _update_SemRep(self, conceptualiztion):
         """
         """
+    
+    def show_state(self):
+        node_labels = dict((n, d['concept']) for n,d in self.SemRep.nodes(data=True))
+        edge_labels = dict(((u,v), d['concept']) for u,v,d in self.SemRep.edges(data=True))
+        pos = nx.spring_layout(self.SemRep)        
+        nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
+        nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
+        nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
+    
+        
 
 class GRAMMATICAL_WM(WM):
     """
@@ -160,27 +170,30 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         """
         """
         SemRep = self.get_input('from_semantic_WM')
-        gram = self.get_input('from_grammatical_LTM')
-        WK = self.get_input('from_WK_LTM')
-        self._instantiate_cxns(self,SemRep, gram, WK)
-        self.set_output('to_grammatical_WM', self.cxn_instances)
+        cxn_schemas = self.get_input('from_grammatical_LTM')
+#        WK = self.get_input('from_WK_LTM')
+        if cxn_schemas and SemRep:
+            self._instantiate_cxns(SemRep, cxn_schemas)
+            self.set_output('to_grammatical_WM', self.cxn_instances)
+        self.cxn_instances = []
     
-    def _instantiate_cxns(self, SemRep, gram, WK):
+    def _instantiate_cxns(self, SemRep, cxn_schemas, WK=None):
         """
         """
-        for cxn_schema in gram.constructions:
-            sub_iso = self._SemMatch(SemRep, cxn_schema)
-            if sub_iso:
-                for a_sub_iso in sub_iso:
-                    match_qual = self._SemMatch_qual(a_sub_iso)
-                    act0 = cxn_schema.init_act * match_qual ### NEED To HAVE QUALITY OF MATCH IMPACT THE ACTIVATION SOMEHOW
-                    trace = {"nodes":a_sub_iso["nodes"].values, "edges":a_sub_iso["edges"].values}
-                    new_instance = CXN_SCHEMA_INST(cxn_schema, trace, act0, a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
-                    self.cxn_instances.append(new_instance)
+        if not cxn_schemas:
+            return
+        for cxn_schema in cxn_schemas:
+            sub_iso = self._SemMatch_cat(SemRep, cxn_schema)
+            for a_sub_iso in sub_iso:
+                match_qual = self._SemMatch_qual(a_sub_iso)
+                trace = {"nodes":a_sub_iso["nodes"].values, "edges":a_sub_iso["edges"].values}
+                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
+                self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
-    def _SemMatch(self, SemRep, cxn_schema): ## NEED TO INCLUDE ASPECTS OF WORLD KNOWLEDGE.
+    def _SemMatch_cat(self, SemRep, cxn_schema): ## NEED TO INCLUDE ASPECTS OF WORLD KNOWLEDGE.
         """
         IMPORTANT ALGORITHM
+        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
         """
         SemFrame_graph = cxn_schema.content.SemFrame.graph
         
@@ -188,11 +201,11 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         nm = TCG_graph.isomorphism.categorical_node_match("concept", "")
         em = TCG_graph.isomorphism.categorical_edge_match("concept", "")
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em)
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=None, edge_match=None)
         
         return sub_iso
     
-    def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!!
+    def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!! Need to add WK as an input?
         """
         Computes the quality of match?
         Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
@@ -253,30 +266,74 @@ if __name__=='__main__':
 #    language_system.system2dot()
     
     ###########################################################################
-    ### TEST GRAMMATICAL WM ###
+    ### TEST GRAMMATICAL WM 1 ###
     
-    # Load grammar
-    import random
+#    # Load grammar
+#    import random
+#    import loader as ld
+#    my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+#    
+#    # Set up grammatical LTM content
+#    for cxn in my_grammar.constructions:
+#        new_cxn_schema = CXN_SCHEMA(cxn, random.random())
+#        grammaticalLTM.add_schema(new_cxn_schema)
+#        
+#    # Select random cxn
+#    WM_size = 10
+#    idx = [random.randint(0,len(grammaticalLTM.schemas)-1) for i in range(WM_size)]
+#    
+#    # Instaniate constructions in WM
+#    for i in idx:
+#        cxn_inst = CXN_SCHEMA_INST(grammaticalLTM.schemas[i], trace=None, mapping=None)
+#        grammaticalWM.add_instance(cxn_inst, act0=grammaticalLTM.schemas[i].init_act)
+#    
+#    # Run WM
+#    max_step = 1000
+#    for step in range(max_step):
+#        grammaticalWM.update_activations()
+#    
+#    grammaticalWM.plot_dynamics()
+    
+    ###########################################################################
+    ### TEST CXN RETRIEVAL ###
+    
     import loader as ld
     my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
     
     # Set up grammatical LTM content
+    act0 = 1
     for cxn in my_grammar.constructions:
-        new_cxn_schema = CXN_SCHEMA(cxn, 1)
+        new_cxn_schema = CXN_SCHEMA(cxn, act0)
         grammaticalLTM.add_schema(new_cxn_schema)
-        
-    # Select random cxn
-    WM_size = 5
-    idx = [random.randint(0,len(grammaticalLTM.schemas)-1) for i in range(WM_size)]
     
-    # Instaniate constructions in WM
-    for i in idx:
-        cxn_inst = CXN_SCHEMA_INST(grammaticalLTM.schemas[i], trace=None, t0=0.0, tau=2.0)
-        grammaticalWM.add_instance(cxn_inst)
+    # Set up Semantic WM content
+    semanticWM.SemRep.add_node("WOMAN", concept="WOMAN")
+    semanticWM.SemRep.add_node("KICK", concept="KICK")
+    semanticWM.SemRep.add_node("MAN", concept="MAN")
+    semanticWM.SemRep.add_edge("WOMAN", "KICK", concept="AGENT")
+    semanticWM.SemRep.add_edge("KICK", "MAN", concept="PATIENT")
     
-    # Run WM
-    max_step = 100
-    for step in range(max_step):
-        grammaticalWM.update_activations()
-        
-    grammaticalWM.plot_dynamics()
+    semanticWM.show_state()
+    
+    # Set up language system
+    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
+    
+    language_system = SCHEMA_SYSTEM('Language_system')
+    language_system.add_schemas(language_schemas)
+    language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+    
+    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
+    language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
+    
+    print cxn_retrieval.cxn_instances
+    
+    language_system.update()
+    print cxn_retrieval.cxn_instances
+    language_system.update()
+    print cxn_retrieval.cxn_instances
+    language_system.update()
+
+    
+    
+    
