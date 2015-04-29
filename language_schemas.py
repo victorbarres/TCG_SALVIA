@@ -11,6 +11,7 @@ import networkx as nx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, SCHEMA_SYSTEM, BRAIN_MAPPING
 import construction
+import concept as cpt
 import TCG_graph
 ##################################
 ### Language knowledge schemas ###
@@ -103,7 +104,7 @@ class SEMANTIC_WM(PROCEDURAL_SCHEMA):
         self.add_port('IN', 'from_conceptualizer')
         self.add_port('OUT', 'to_grammatical_WM')
         self.add_port('OUT', 'to_cxn_retrieval')
-        self.SemRep = nx.DiGraph()
+        self.SemRep = nx.DiGraph() ### NEED TO ADD A WAY TO KEEP TRACK OF WHICH SEMREP ELEMENTS HAVE BEEN OR HAVEN'T BEEN ALREADY PASSED THROUGH RETRIEVAL
     
     def update(self):
         """
@@ -118,8 +119,8 @@ class SEMANTIC_WM(PROCEDURAL_SCHEMA):
         """
     
     def show_state(self):
-        node_labels = dict((n, d['concept']) for n,d in self.SemRep.nodes(data=True))
-        edge_labels = dict(((u,v), d['concept']) for u,v,d in self.SemRep.edges(data=True))
+        node_labels = dict((n, d['concept'].meaning) for n,d in self.SemRep.nodes(data=True))
+        edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.SemRep.edges(data=True))
         pos = nx.spring_layout(self.SemRep)        
         nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
@@ -186,7 +187,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
             sub_iso = self._SemMatch_cat(SemRep, cxn_schema)
             for a_sub_iso in sub_iso:
                 match_qual = self._SemMatch_qual(a_sub_iso)
-                trace = {"nodes":a_sub_iso["nodes"].values, "edges":a_sub_iso["edges"].values}
+                trace = {"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
@@ -198,10 +199,11 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         SemFrame_graph = cxn_schema.content.SemFrame.graph
         
         # Match functions
-        nm = TCG_graph.isomorphism.categorical_node_match("concept", "")
-        em = TCG_graph.isomorphism.categorical_edge_match("concept", "")
+        op = lambda cpt1,cpt2: cpt1.meaning == cpt2.meaning ### I NEED An IS-A RELATION HERE!
+        nm = TCG_graph.isomorphism.generic_node_match("concept", "", op)
+        em = TCG_graph.isomorphism.generic_edge_match("concept", "", op)
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=None, edge_match=None)
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=None)
         
         return sub_iso
     
@@ -306,12 +308,18 @@ if __name__=='__main__':
         new_cxn_schema = CXN_SCHEMA(cxn, act0)
         grammaticalLTM.add_schema(new_cxn_schema)
     
+    man_cpt = cpt.CONCEPT(name="man", meaning="MAN")
+    woman_cpt = cpt.CONCEPT(name="woman", meaning="WOMAN")
+    kick_cpt = cpt.CONCEPT(name="kick", meaning="KICK")
+    agent_cpt = cpt.CONCEPT(name="agent", meaning="AGENT")
+    patient_cpt = cpt.CONCEPT(name="patient", meaning="PATIENT")
+
     # Set up Semantic WM content
-    semanticWM.SemRep.add_node("WOMAN", concept="WOMAN")
-    semanticWM.SemRep.add_node("KICK", concept="KICK")
-    semanticWM.SemRep.add_node("MAN", concept="MAN")
-    semanticWM.SemRep.add_edge("WOMAN", "KICK", concept="AGENT")
-    semanticWM.SemRep.add_edge("KICK", "MAN", concept="PATIENT")
+    semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
+    semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
+    semanticWM.SemRep.add_node("MAN", concept=man_cpt)
+    semanticWM.SemRep.add_edge("WOMAN", "KICK", concept=agent_cpt)
+    semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
     
     semanticWM.show_state()
     
@@ -326,12 +334,12 @@ if __name__=='__main__':
     language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
     language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
     
-    print cxn_retrieval.cxn_instances
+    print cxn_retrieval.out_ports[0].value
     
     language_system.update()
-    print cxn_retrieval.cxn_instances
+    print cxn_retrieval.out_ports[0].value
     language_system.update()
-    print cxn_retrieval.cxn_instances
+    print cxn_retrieval.out_ports[0].value
     language_system.update()
 
     

@@ -152,7 +152,7 @@ class TP_SEMFRAME(TP_ELEM):
         for node in self.nodes:
             graph.add_node(node, concept=node.concept)
         for edge in self.edges:
-            graph.add_edge(edge.pFrom, edge.pTo, concept= edge.concept)
+            graph.add_edge(edge.pFrom, edge.pTo, concept=edge.concept)
         
         self.graph = graph
     
