@@ -200,11 +200,10 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         
         # Match functions
         op = lambda cpt1,cpt2: cpt1.meaning == cpt2.meaning ### I NEED An IS-A RELATION HERE!
-        nm = TCG_graph.isomorphism.generic_node_match("concept", "", op)
-        em = TCG_graph.isomorphism.generic_edge_match("concept", "", op)
+        nm = TCG_graph.node_iso_match("concept", "", op)
+        em = TCG_graph.edge_iso_match("concept", "", op)
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=None)
-        
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em)        
         return sub_iso
     
     def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!! Need to add WK as an input?

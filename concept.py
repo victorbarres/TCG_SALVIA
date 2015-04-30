@@ -118,22 +118,22 @@ class SEM_NET:
         """        
         # Check validity
         if (not(isinstance(sem_rel, SEM_REL)) or 
-            (sem_rel.type == 'undefined') or 
-            (sem_rel.supMeaning == '') or 
-            (sem_rel.subMeaning == '')):
+            (sem_rel.type == 'UNDEFINED') or 
+            not(sem_rel.pFrom) or 
+            not(sem_rel.pTo)):
             return False
         
         # Check duplication
-        for r in self.relations:
+        for r in self.edges:
             if r == sem_rel:
                 return False
         
         # Check that source and target of relation are defined.
-        if not(self.find_node(sem_rel.pTo)) or not(self.find_node(sem_rel.pTo)):
+        if not(self.find_node(sem_rel.pFrom)) or not(self.find_node(sem_rel.pTo)):
             return False
         
         # Add new relation
-        self.relations.append(sem_rel)
+        self.edges.append(sem_rel)
         self._create_NX_graph()
         return True
         
