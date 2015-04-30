@@ -51,14 +51,14 @@ def read_sem(atype, sup_ent, sem_net, aSemantics):
         
         # Create new semantic entity
         
-        sub_ent = cpt.SEM_ENT(name=meaning, meaning=meaning)
+        sub_ent = cpt.SEM_ENT(meaning=meaning)
         sem_net.add_entity(sub_ent)
 
         # Create new semantic relation
         new_semrel = cpt.SEM_REL()
         new_semrel.type = atype
-        new_semrel.pFrom = sub_ent.name
-        new_semrel.pTo = sup_ent.name
+        new_semrel.pFrom = sub_ent
+        new_semrel.pTo = sup_ent
         
         # update sem_net
         flag = sem_net.add_relation(new_semrel)
@@ -392,7 +392,7 @@ def load_SemNet(file_name, file_path = './'):
     # Create scene object
     my_semnet = cpt.SEM_NET()
     
-    top_ent = cpt.SEM_ENT('TOP', 'CONCEPTUAL_KNOWLEDGE')
+    top_ent = cpt.SEM_ENT('CONCEPTUAL_KNOWLEDGE')
     my_semnet.add_entity(top_ent)
     
     flag = read_sem("IS-A", top_ent, my_semnet, sem_data['CONCEPTUAL_KNOWLEDGE'])
@@ -406,4 +406,5 @@ def load_SemNet(file_name, file_path = './'):
 if __name__=='__main__':
     my_grammar = load_grammar("TCG_grammar.json", "./data/grammars/")
     my_semnet = load_SemNet("TCG_semantics.json", "./data/semantics/")
+    
     

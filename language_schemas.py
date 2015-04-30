@@ -300,6 +300,8 @@ if __name__=='__main__':
     
     import loader as ld
     my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+    my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
+    cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
     
     # Set up grammatical LTM content
     act0 = 1
@@ -307,39 +309,43 @@ if __name__=='__main__':
         new_cxn_schema = CXN_SCHEMA(cxn, act0)
         grammaticalLTM.add_schema(new_cxn_schema)
     
-    man_cpt = cpt.CONCEPT(name="man", meaning="MAN")
-    woman_cpt = cpt.CONCEPT(name="woman", meaning="WOMAN")
-    kick_cpt = cpt.CONCEPT(name="kick", meaning="KICK")
-    agent_cpt = cpt.CONCEPT(name="agent", meaning="AGENT")
-    patient_cpt = cpt.CONCEPT(name="patient", meaning="PATIENT")
+    man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
+    woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
+    kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
+    agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
+    patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
+    
+    entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+    
+    print cpt.CONCEPT.match(man_cpt, man_cpt)
 
-    # Set up Semantic WM content
-    semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
-    semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
-    semanticWM.SemRep.add_node("MAN", concept=man_cpt)
-    semanticWM.SemRep.add_edge("WOMAN", "KICK", concept=agent_cpt)
-    semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
-    
-    semanticWM.show_state()
-    
-    # Set up language system
-    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
-    
-    language_system = SCHEMA_SYSTEM('Language_system')
-    language_system.add_schemas(language_schemas)
-    language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
-    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
-    
-    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
-    language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
-    
-    print cxn_retrieval.out_ports[0].value
-    
-    language_system.update()
-    print cxn_retrieval.out_ports[0].value
-    language_system.update()
-    print cxn_retrieval.out_ports[0].value
-    language_system.update()
+#    # Set up Semantic WM content
+#    semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
+#    semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
+#    semanticWM.SemRep.add_node("MAN", concept=man_cpt)
+#    semanticWM.SemRep.add_edge("WOMAN", "KICK", concept=agent_cpt)
+#    semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+#    
+#    semanticWM.show_state()
+#    
+#    # Set up language system
+#    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
+#    
+#    language_system = SCHEMA_SYSTEM('Language_system')
+#    language_system.add_schemas(language_schemas)
+#    language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+#    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+#    
+#    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
+#    language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
+#    
+#    print cxn_retrieval.out_ports[0].value
+#    
+#    language_system.update()
+#    print cxn_retrieval.out_ports[0].value
+#    language_system.update()
+#    print cxn_retrieval.out_ports[0].value
+#    language_system.update()
 
     
     

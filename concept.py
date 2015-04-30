@@ -15,28 +15,18 @@ class SEM_ENT:
     Semantic entity
     
     Data:
-        - name (STR): Unique identifier of the entity.
+        - id (INT): Unique identifier of the entity.
         - meaning (): Meaning associated with the semantic entity.
-    """    
-    def __init__(self, name='', meaning=''):
-        self.name = name # Concept name
+    """
+    ID_NEXT = 1 # Global entity counter    
+    def __init__(self, meaning=''):
+        self.id = SEM_ENT.ID_NEXT
+        SEM_ENT.ID_NEXT += 1
         self.meaning = meaning # Concept meaning
-    
-    def set_name(self, name=''):
-        """
-        Set semantic entity name.
-        """
-        self.name = name
-    
-    def set_meaning(self, meaning=''):
-        """
-        Set semantic entity meaning
-        """
-        self.meaning = meaning
     
     def __eq__(self, other):
         is_equal = (isinstance(other, self.__class__) and 
-            (self.nametype == other.name) and
+            (self.id == other.id) and
             (self.meaning == other.meaning))
         return is_equal
     
@@ -46,10 +36,10 @@ class SEM_REL:
     
     Data:
         - type (STR): Type of relation.
-        - pFrom (STR): Name of the source semantic entity.
-        - pTo (STR): Name of the target semantic entity.
+        - pFrom (SemEnt): Name of the source semantic entity.
+        - pTo (SemEnt): Name of the target semantic entity.
     """    
-    def __init__(self, aType = 'UNDEFINED', from_sem = '', to_sem = ''):
+    def __init__(self, aType = 'UNDEFINED', from_sem = None, to_sem = None):
         self.type = aType
         self.pFrom = from_sem 
         self.pTo= to_sem
@@ -62,7 +52,7 @@ class SEM_REL:
         return is_equal
     
     def __str__(self):
-        p = "%s %s %s" % (self.pFrom, self.type, self.pTo)
+        p = "%s %s %s" % (self.pFrom.meaning, self.type, self.pTo.meaning)
         return p
 
 class SEM_NET:
@@ -97,11 +87,11 @@ class SEM_NET:
             sem (SEM_ENT): A semantic entity
         """
         # Check validity        
-        if(not(isinstance(sem, SEM_ENT)) or sem.name==''):
+        if(not(isinstance(sem, SEM_ENT)) or not(sem.meaning)):
             return False
         
         # Check duplication
-        if self.find_node(sem.name):
+        if self.find_node(sem.meaning):
             return False
         
         # Add new semantic entity
@@ -140,24 +130,42 @@ class SEM_NET:
     def _create_NX_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
-            graph.add_node(node.name, meaning = node.meaning)
+            graph.add_node(node.id, meaning=node.meaning)
         for edge in self.edges:
-            graph.add_edge(edge.pFrom, edge.pTo, type= edge.type)
+            graph.add_edge(edge.pFrom.id, edge.pTo.id, type= edge.type)
         
         self.graph = graph
     
-    def find_node(self, name):
+    def find_node(self, meaning):
         """
-        Find node with name 'name' (STR). Returns the node if found, else returns None.
+        Find node with meaning "meaning". Returns the node if found, else returns None.
         
         Args:
-            - name (STR): Name of a semantic entity.
+            - meaning (): Meaning of a semantic entity.
         """
         for n in self.nodes:
-            if n.name == name:
+            if n.meaning == meaning:
                 return n
         
         return None
+    
+    def shortest_path(self, from_ent, to_ent):
+        """
+        Returns the length of the shortest path, if it exists, between from_ent and to_ent in the SemNet graph.
+        If no path exists, returns -1
+        
+        Args:
+            - from_ent (SEM_ENT): Origin
+            - to_ent (SEM_ENT): Target
+        """
+        path_len = -1
+        try:
+            path_len = nx.shortest_path_length(self.graph, source=from_ent.id, target=to_ent.id, weight=None)
+        except nx.NetworkXNoPath:
+            return path_len
+            
+        return path_len
+        
     
     ######
     # TO REWRITE
@@ -284,12 +292,12 @@ class CONCEPT:
             mean2 = mean2[:-1]
         
         # Forward direction
-        dist1 = CONCEPT.SEMANTIC_NETWORK.distance(mean1, mean2, heuristic = True)
+        dist1 = CONCEPT.SEMANTIC_NETWORK.shortest_path(concept1, concept2)
         if (inclusive and dist1>=0 and incl1):
             dist1 = 0 # Inclusive
         
         # Backward direction
-        dist2 = CONCEPT.SEMANTIC_NETWORK.distance(mean2, mean1, heuristic = True)
+        dist2 = CONCEPT.SEMANTIC_NETWORK.shortest_path(concept2, concept1)
         if (inclusive and dist2>=0 and incl2):
             dist2 = 0 # Inclusive
         
@@ -298,7 +306,6 @@ class CONCEPT:
         
         #
         # Check other fields too
-        2
         return True
 
 ###############################################################################
