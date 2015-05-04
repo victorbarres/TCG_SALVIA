@@ -91,7 +91,7 @@ class SEM_NET:
             return False
         
         # Check duplication
-        if self.find_node(sem.meaning):
+        if self.find_meaning(sem.meaning):
             return False
         
         # Add new semantic entity
@@ -119,7 +119,7 @@ class SEM_NET:
                 return False
         
         # Check that source and target of relation are defined.
-        if not(self.find_node(sem_rel.pFrom)) or not(self.find_node(sem_rel.pTo)):
+        if not(self.find_meaning(sem_rel.pFrom.meaning)) or not(self.find_meaning(sem_rel.pTo.meaning)):
             return False
         
         # Add new relation
@@ -136,9 +136,9 @@ class SEM_NET:
         
         self.graph = graph
     
-    def find_node(self, meaning):
+    def find_meaning(self, meaning):
         """
-        Find node with meaning "meaning". Returns the node if found, else returns None.
+        Find entity with meaning "meaning". Returns the entity if found, else returns None.
         
         Args:
             - meaning (): Meaning of a semantic entity.
@@ -263,50 +263,34 @@ class CONCEPT:
         
         return False
         
-    def match(concept1, concept2, inclusive = True):
+    def match(concept1, concept2, match_type = "is_a"):
         """        
-        Check if two concept match. Case inclusive = False: concepts match only if they carry the same meaning.
-        Case inclusive = True: If a concept is tagged with + (e.g. ANIMAL+) it will match with any of its hyponyms.
-        Otherwise, concepts match if they carry the same meaning.
+        Check if concept1 matches concept2. 
+        Type = "is_a":  concept1 matches concept2 if concept1 is a hyponym of concept2 (or equal to concept2)
+        Type = "equal": concept1 matches concept2 if concept1 is equal to concept2.
         
         Args:
             - concept1 (CONCEPT)
             - concept2 (CONCEPT)
-            - inclusive (BOOL)
+            - match_type (STR): "is_a" or "equal"
         
         Notes:
-            - In the c++ version matching is boolean. No impact of distance on similarity.
+            - In the currrent version matching is boolean. No impact of distance on similarity.
         
         """
         if not(CONCEPT.SEMANTIC_NETWORK):
             return False
         
-        mean1 = concept1.meaning
-        incl1 = mean1[-1] == '+'
-        if incl1:
-            mean1 = mean1[:-1]
-            
-        mean2 = concept2.meaning
-        incl2 = mean2[-1] == '+'
-        if incl2:
-            mean2 = mean2[:-1]
-        
         # Forward direction
-        dist1 = CONCEPT.SEMANTIC_NETWORK.shortest_path(concept1, concept2)
-        if (inclusive and dist1>=0 and incl1):
-            dist1 = 0 # Inclusive
-        
-        # Backward direction
-        dist2 = CONCEPT.SEMANTIC_NETWORK.shortest_path(concept2, concept1)
-        if (inclusive and dist2>=0 and incl2):
-            dist2 = 0 # Inclusive
-        
-        if (dist1!=0) and (dist2!=0):
-         return False # Only meaning with distance 0 are accepted as matched
-        
-        #
-        # Check other fields too
-        return True
+        sem_ent1 = CONCEPT.SEMANTIC_NETWORK.find_meaning(concept1.meaning)
+        sem_ent2 = CONCEPT.SEMANTIC_NETWORK.find_meaning(concept2.meaning)
+        dist = CONCEPT.SEMANTIC_NETWORK.shortest_path(sem_ent1, sem_ent2)
+        if (match_type == "is_a" and dist >= 0):
+            return True
+        elif (match_type == "equal" and dist == 0):
+            return True
+
+        return False
 
 ###############################################################################
 if __name__=='__main__':

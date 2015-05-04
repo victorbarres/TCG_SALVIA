@@ -44,13 +44,10 @@ def json_read(file_name, path='./'):
 
 ###########
 ### SEM ###
-
 def read_sem(atype, sup_ent, sem_net, aSemantics):
     
     for meaning in aSemantics:
-        
         # Create new semantic entity
-        
         sub_ent = cpt.SEM_ENT(meaning=meaning)
         sem_net.add_entity(sub_ent)
 
@@ -73,7 +70,6 @@ def read_sem(atype, sup_ent, sem_net, aSemantics):
 
 ###########
 ### CXN ###
-
 # NEED TO ADD PROPER TRUE/FALSE RETURN VALUES FOR ALL THOSE FUNCTIONS
 
 def read_node(new_cxn, aNode, name_table): # NEED TO CHECK THE CURRENT STATUS OF CONCEPT OBJECTS.
