@@ -7,6 +7,7 @@ Defines language schemas for TCG.
 
 Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
 """
+import matplotlib.pyplot as plt
 import networkx as nx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, SCHEMA_SYSTEM, BRAIN_MAPPING
@@ -120,7 +121,8 @@ class SEMANTIC_WM(PROCEDURAL_SCHEMA):
     def show_state(self):
         node_labels = dict((n, d['concept'].meaning) for n,d in self.SemRep.nodes(data=True))
         edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.SemRep.edges(data=True))
-        pos = nx.spring_layout(self.SemRep)        
+        pos = nx.spring_layout(self.SemRep)  
+        plt.figure()
         nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
@@ -142,25 +144,42 @@ class GRAMMATICAL_WM(WM):
         """
         """
         SemRep = self.get_input('from_semantic_WM')
-        cxn_instances = self.get_input('from_cxn_retrieval')
-        # Add new instances
-        if cxn_instances:
-            for inst in cxn_instances:
-                match_qual = inst["match_qual"]
-                act = inst["cxn_inst"].activity
-                self.add_instance(inst["cxn_inst"], act*match_qual)
-        
+        new_cxn_insts= self.get_input('from_cxn_retrieval')
+        if new_cxn_insts:
+            self._add_new_insts(new_cxn_insts)
         self.update_activations(coop_p=1, comp_p=1)
+        self.prune()
     
     # HERE NEED TO SET UP THE C2 COMPUTATION + POST THE OUTPUT.
-    def _cooperation(self):
-       """
-       """
-    
-    def _competition(self):
+    def _add_new_insts(self, new_insts):
         """
         """
+        for inst in new_insts:
+            match_qual = inst["match_qual"]
+            act = inst["cxn_inst"].activity
+            new_inst = inst["cxn_inst"]
+            self.add_instance(new_inst, act*match_qual)
+            self._cooperation(new_inst)
+            self._competition(new_inst)
+                
+    def _cooperation(self, new_inst):
+       """
+       """
+       for old_inst in self.schema_insts:
+           if new_inst != old_inst:
+               print "%s ?coop? %s Do something!" % (old_inst.name, new_inst.name)
+       
     
+    def _competition(self, new_inst):
+        """
+        How to make it incremental....?
+        Competition if they overlap on an edge.
+        I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
+        """
+    
+    def _match(self, inst1, inst2):
+        """
+        """
     
     def _assemble(self):
         """
@@ -414,7 +433,7 @@ if __name__=='__main__':
     semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
     semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
     
-#    semanticWM.show_state()
+    semanticWM.show_state()
             
     
     # Set up language system

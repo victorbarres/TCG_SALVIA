@@ -526,11 +526,17 @@ class WM(PROCEDURAL_SCHEMA):
         for inst in self.schema_insts[:]:
             if not inst.alive:
                 self.schema_insts.remove(inst)
+                for flink in self.coop_links[:]:
+                    if (flink.inst_from == inst) or (flink.inst_to == inst):
+                        self.coop_links.remove(flink)
+                for flink in self.comp_links[:]:
+                    if (flink.inst_from == inst) or (flink.inst_to == inst):
+                        self.comp_links.remove(flink)          
     
     def plot_dynamics(self):
         """
         """
-        plt.figure(1)
+        plt.figure()
         for inst in self.save_state.keys():
             plt.plot(self.save_state[inst]['t'], self.save_state[inst]['act'], label=inst, linewidth=2)
         
