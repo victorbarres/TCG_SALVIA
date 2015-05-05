@@ -44,9 +44,8 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
             - alive (bool): status flag
-            - trace ({"nodes":[], "edge"=[]}): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
-        
-        - covers (DICT): maps CXN.SemFrame elements to SemRep elements in the trace
+            - trace ({"nodes":[], "edge"=[]}): Pointer to the element that triggered the instantiation.
+            - covers ({"nodes":{}, "edge"={}}): maps CXN.SemFrame nodes and edges to SemRep elements (in the trace)
     """
     def __init__(self, cxn_schema, trace, mapping):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
@@ -136,13 +135,40 @@ class GRAMMATICAL_WM(WM):
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_cxn_retrieval')
         self.add_port('OUT', 'to_phonological_WM')
+        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5}
+        self.prune_threshold = 0.3
     
     def update(self):
         """
         """
         SemRep = self.get_input('from_semantic_WM')
         cxn_instances = self.get_input('from_cxn_retrieval')
-        # HERE NEED TO SET UP THE C2 COMPUTATION + POST THE OUTPUT.
+        # Add new instances
+        if cxn_instances:
+            for inst in cxn_instances:
+                match_qual = inst["match_qual"]
+                act = inst["cxn_inst"].activity
+                self.add_instance(inst["cxn_inst"], act*match_qual)
+        
+        self.update_activations(coop_p=1, comp_p=1)
+    
+    # HERE NEED TO SET UP THE C2 COMPUTATION + POST THE OUTPUT.
+    def _cooperation(self):
+       """
+       """
+    
+    def _competition(self):
+        """
+        """
+    
+    
+    def _assemble(self):
+        """
+        """
+    
+    def _read_out(self):
+        """
+        """
         
 class GRAMMATICAL_LTM(LTM):
     """
@@ -163,7 +189,6 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         PROCEDURAL_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('IN', 'from_semantic_WM')
-        self.add_port('IN', 'from_WK_LTM')
         self.add_port('OUT', 'to_grammatical_WM')
         self.cxn_instances = []
     
@@ -172,7 +197,6 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         """
         SemRep = self.get_input('from_semantic_WM')
         cxn_schemas = self.get_input('from_grammatical_LTM')
-#        WK = self.get_input('from_WK_LTM')
         if cxn_schemas and SemRep:
             self._instantiate_cxns(SemRep, cxn_schemas)
             self.set_output('to_grammatical_WM', self.cxn_instances)
@@ -191,7 +215,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
-    def _SemMatch_cat(self, SemRep, cxn_schema): ## NEED TO INCLUDE ASPECTS OF WORLD KNOWLEDGE.
+    def _SemMatch_cat(self, SemRep, cxn_schema):
         """
         IMPORTANT ALGORITHM
         Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
@@ -206,11 +230,13 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em)        
         return sub_iso
     
-    def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!! Need to add WK as an input?
+    def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
         """
-        Computes the quality of match?
+        Computes the quality of match.
         Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
-        """
+        
+        NOTE: I NEED TO THINK ABOUT HOW TO INCORPORATE FOCUS ETC....
+        """            
         return 1
 
 class PHON_WM(PROCEDURAL_SCHEMA):
@@ -298,6 +324,69 @@ if __name__=='__main__':
     ###########################################################################
     ### TEST CXN RETRIEVAL ###
     
+#    import loader as ld
+#    my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+#    my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
+#    cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+#    
+#    # Set up grammatical LTM content
+#    act0 = 1
+#    for cxn in my_grammar.constructions:
+#        new_cxn_schema = CXN_SCHEMA(cxn, act0)
+#        grammaticalLTM.add_schema(new_cxn_schema)
+#    
+#    man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
+#    woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
+#    kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
+#    agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
+#    patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
+#    
+#    entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+#    
+#
+#    # Set up Semantic WM content
+#    semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
+#    semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
+#    semanticWM.SemRep.add_node("MAN", concept=man_cpt)
+#    semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
+#    semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+#    
+#    semanticWM.show_state()
+#            
+#    
+#    # Set up language system
+#    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
+#    
+#    language_system = SCHEMA_SYSTEM('Language_system')
+#    language_system.add_schemas(language_schemas)
+#    language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+#    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+#    
+#    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
+#    language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
+#    
+#    def print_output(value):
+#        if value:
+#            print [v["cxn_inst"].name for v in cxn_retrieval.out_ports[0].value]
+#        else:
+#            print "NOTHING!"
+#    
+#    print_output(cxn_retrieval.out_ports[0].value)
+#    cxn_retrieval.out_ports[0].value = None
+#    language_system.update()
+#    print_output(cxn_retrieval.out_ports[0].value)
+#    cxn_retrieval.out_ports[0].value = None
+#    language_system.update()
+#    print_output(cxn_retrieval.out_ports[0].value)
+#    cxn_retrieval.out_ports[0].value = None
+#    semanticWM.SemRep.clear()
+#    language_system.update()
+#    print_output(cxn_retrieval.out_ports[0].value)
+
+    ###########################################################################
+    ### TEST GRAMMATICAL WM 2 ###
+    
+    
     import loader as ld
     my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
     my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
@@ -325,34 +414,41 @@ if __name__=='__main__':
     semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
     semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
     
-    semanticWM.show_state()
+#    semanticWM.show_state()
             
     
     # Set up language system
-    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
+    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM]
     
     language_system = SCHEMA_SYSTEM('Language_system')
     language_system.add_schemas(language_schemas)
     language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
     language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+    language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
+    language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
     
     language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
-    language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
+    language_system.set_output_ports([grammaticalWM._find_port('to_phonological_WM')])
     
-    def print_output(value):
-        if value:
-            print [v["cxn_inst"].name for v in cxn_retrieval.out_ports[0].value]
-        else:
-            print "NOTHING!"
-    
-    print_output(cxn_retrieval.out_ports[0].value)
-    language_system.update()
-    print_output(cxn_retrieval.out_ports[0].value)
-    language_system.update()
-    print_output(cxn_retrieval.out_ports[0].value)
-    language_system.update()
-    print_output(cxn_retrieval.out_ports[0].value)
 
+    language_system.update()
+    print grammaticalWM.schema_insts
+    language_system.update()
+    semanticWM.SemRep.clear()
+    print grammaticalWM.schema_insts
+    semanticWM.SemRep.clear()
+    language_system.update()
+    print grammaticalWM.schema_insts
+    language_system.update()
+    print grammaticalWM.schema_insts
+    language_system.update()
+    print grammaticalWM.schema_insts
+    
+    max_step = 1000
+    for step in range(max_step):
+        language_system.update()
+    
+    grammaticalWM.plot_dynamics()
     
     
     
