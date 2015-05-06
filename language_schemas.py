@@ -171,7 +171,7 @@ class GRAMMATICAL_WM(WM):
                if match["match"] == 1:
                    for link in match["links"]:
                        self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"])
-                        
+                       
     def _add_complinks(self, new_inst):
         """
         How to make it incremental....?
@@ -179,6 +179,7 @@ class GRAMMATICAL_WM(WM):
         I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
     
+    @staticmethod
     def _overlap(inst1, inst2):
         """
         Returns the set of SemRep nodes and edges on which inst1 and inst2 overlaps.
@@ -191,7 +192,8 @@ class GRAMMATICAL_WM(WM):
         overlap["nodes"] = [n for n in inst1.trace["nodes"] if n in inst2.trace["nodes"]]
         overlap["edges"] = [e for e in inst1.trace["edges"] if e in inst2.trace["edges"]]
         return overlap
-    
+        
+    @staticmethod    
     def _link(inst_p, inst_c, SR_node):
         """
         Args:
@@ -200,21 +202,20 @@ class GRAMMATICAL_WM(WM):
             - SR_node (): SemRep node on which both instances overlap
         """
         cxn_p = inst_p.schema.content
-        sf_p = [k for k,v in inst_p.covers.iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
-        
+        sf_p = [k for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
         cxn_c = inst_c.schema.content
-        sf_c = [k for k,v in inst_c.covers.iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+        sf_c = [k for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
         
-        cond1 = sf_p in cxn_p.SymLinks # sf_p is linked to a slot in cxn_p
+        cond1 = sf_p in cxn_p.SymLinks.SL # sf_p is linked to a slot in cxn_p
         cond2 = sf_c.head # sf_c is a head node
         if cond1 and cond2:
-            slot_p = cxn_p.SymLinks[sf_p]
+            slot_p = cxn_p.SymLinks.SL[sf_p]
             cond3 = cxn_c.clss in slot_p.cxn_classes
             if cond3:
                 return {"inst_from": inst_p, "port_from":inst_c._find_port("output"), "inst_to": inst_c, "port_to":inst_p._find_port(slot_p.order)}
         return None
-            
-        
+    
+    @staticmethod
     def _match(inst1, inst2):
         """
         """

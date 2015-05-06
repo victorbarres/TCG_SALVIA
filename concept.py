@@ -263,6 +263,7 @@ class CONCEPT:
         
         return False
         
+    @staticmethod   
     def match(concept1, concept2, match_type = "is_a"):
         """        
         Check if concept1 matches concept2. 

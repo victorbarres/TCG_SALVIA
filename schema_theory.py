@@ -10,6 +10,7 @@ Uses random
 Uses numpy to implement the schema instances activation values.
 Uses matplotlib.plt to visualize WM state
 """
+import abc
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -221,6 +222,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             return None
         return found[0]
         
+    @abc.abstractmethod    
     def update(self):
         """
         This function should be specified for every specific PROCEDURAL_SCHEMA class.
@@ -283,6 +285,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.activity = act0
         self.act_port_out.value = self.activity
     
+    @abc.abstractmethod
     def set_ports(self):
         """
         THIS FUNCTION NEEDS TO BE DEFINED FOR EACH SPECIFIC SUBCLASS OF SCHEMA_INST.
@@ -313,7 +316,8 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.activation.update(I)
         self.activity = self.activation.act
         self.act_port_out.value = self.activity
-        
+    
+    @abc.abstractmethod
     def update(self):
         """
         This function should be specified for every specific SCHEMA_INST class.
