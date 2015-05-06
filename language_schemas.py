@@ -159,27 +159,87 @@ class GRAMMATICAL_WM(WM):
             act = inst["cxn_inst"].activity
             new_inst = inst["cxn_inst"]
             self.add_instance(new_inst, act*match_qual)
-            self._cooperation(new_inst)
-            self._competition(new_inst)
+            self._add_cooplinks(new_inst)
+            self._add_complinks(new_inst)
                 
-    def _cooperation(self, new_inst):
+    def _add_cooplinks(self, new_inst):
        """
        """
        for old_inst in self.schema_insts:
            if new_inst != old_inst:
-               print "%s ?coop? %s Do something!" % (old_inst.name, new_inst.name)
-       
-    
-    def _competition(self, new_inst):
+               match = GRAMMATICAL_WM._match(new_inst, old_inst)
+               if match["match"] == 1:
+                   for link in match["links"]:
+                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"])
+                        
+    def _add_complinks(self, new_inst):
         """
         How to make it incremental....?
         Competition if they overlap on an edge.
         I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
     
-    def _match(self, inst1, inst2):
+    def _overlap(inst1, inst2):
+        """
+        Returns the set of SemRep nodes and edges on which inst1 and inst2 overlaps.
+        
+        Args:
+            - inst1 (CXN_SCHEMA_INST): A cxn instance
+            - inst2 (CXN_SCHEMA_INST): A cxn instance
+        """
+        overlap = {}
+        overlap["nodes"] = [n for n in inst1.trace["nodes"] if n in inst2.trace["nodes"]]
+        overlap["edges"] = [e for e in inst1.trace["edges"] if e in inst2.trace["edges"]]
+        return overlap
+    
+    def _link(inst_p, inst_c, SR_node):
+        """
+        Args:
+            - inst_p (CXN_SCHEMA_INST): A cxn instance (parent)
+            - inst_c (CXN_SCHEMA_INST): A cxn instance (child)
+            - SR_node (): SemRep node on which both instances overlap
+        """
+        cxn_p = inst_p.schema.content
+        sf_p = [k for k,v in inst_p.covers.iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+        
+        cxn_c = inst_c.schema.content
+        sf_c = [k for k,v in inst_c.covers.iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+        
+        cond1 = sf_p in cxn_p.SymLinks # sf_p is linked to a slot in cxn_p
+        cond2 = sf_c.head # sf_c is a head node
+        if cond1 and cond2:
+            slot_p = cxn_p.SymLinks[sf_p]
+            cond3 = cxn_c.clss in slot_p.cxn_classes
+            if cond3:
+                return {"inst_from": inst_p, "port_from":inst_c._find_port("output"), "inst_to": inst_c, "port_to":inst_p._find_port(slot_p.order)}
+        return None
+            
+        
+    def _match(inst1, inst2):
         """
         """
+        match = 0
+        links = []
+        if inst1 == inst2:
+           match = -1
+        else:
+            overlap = GRAMMATICAL_WM._overlap(inst1, inst2)
+            if not(overlap["nodes"]) and not(overlap["edges"]):
+                match = 0
+            elif overlap["edges"]:
+                match = -1
+            else:
+                for n in overlap["nodes"]:
+                    link = GRAMMATICAL_WM._link(inst1, inst2, n)
+                    if link:
+                        links.append(link)
+                    link = GRAMMATICAL_WM._link(inst2, inst1, n)
+                    if link:
+                        links.append(link)
+                if not(links):
+                    match = -1       
+        return {"match":match, "links":links}
+            
     
     def _assemble(self):
         """
