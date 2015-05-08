@@ -127,8 +127,6 @@ class SEMANTIC_WM(PROCEDURAL_SCHEMA):
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
     
-        
-
 class GRAMMATICAL_WM(WM):
     """
     """
@@ -137,7 +135,7 @@ class GRAMMATICAL_WM(WM):
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_cxn_retrieval')
         self.add_port('OUT', 'to_phonological_WM')
-        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5}
+        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
         self.prune_threshold = 0.3
     
     def update(self):
@@ -159,10 +157,10 @@ class GRAMMATICAL_WM(WM):
             act = inst["cxn_inst"].activity
             new_inst = inst["cxn_inst"]
             self.add_instance(new_inst, act*match_qual)
-            self._add_cooplinks(new_inst)
-            self._add_complinks(new_inst)
+            self._cooperate(new_inst)
+            self._compete(new_inst)
                 
-    def _add_cooplinks(self, new_inst):
+    def _cooperate(self, new_inst):
        """
        """
        for old_inst in self.schema_insts:
@@ -170,14 +168,21 @@ class GRAMMATICAL_WM(WM):
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
                if match["match"] == 1:
                    for link in match["links"]:
-                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"])
+                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], weight=1)
                        
-    def _add_complinks(self, new_inst):
+    def _compete(self, new_inst):
         """
         How to make it incremental....?
         Competition if they overlap on an edge.
         I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
+        for old_inst in self.schema_insts:
+           if new_inst != old_inst:
+               match = GRAMMATICAL_WM._match(new_inst, old_inst)
+               if match["match"] == -1:
+                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst, weight=-1) # Reciprocal competition connections
+                   self.add_comp_link(inst_from=old_inst, inst_to=new_inst, weight=-1)
+        
     
     @staticmethod
     def _overlap(inst1, inst2):
@@ -212,7 +217,7 @@ class GRAMMATICAL_WM(WM):
             slot_p = cxn_p.SymLinks.SL[sf_p]
             cond3 = cxn_c.clss in slot_p.cxn_classes
             if cond3:
-                return {"inst_from": inst_p, "port_from":inst_c._find_port("output"), "inst_to": inst_c, "port_to":inst_p._find_port(slot_p.order)}
+                return {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.order)}
         return None
     
     @staticmethod
@@ -234,8 +239,10 @@ class GRAMMATICAL_WM(WM):
                     link = GRAMMATICAL_WM._link(inst1, inst2, n)
                     if link:
                         links.append(link)
+                        match = 1
                     link = GRAMMATICAL_WM._link(inst2, inst1, n)
                     if link:
+                        match = 1
                         links.append(link)
                 if not(links):
                     match = -1       
@@ -468,7 +475,7 @@ if __name__=='__main__':
     
     
     import loader as ld
-    my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+    my_grammar = ld.load_grammar("TCG_grammar_light.json", "./data/grammars/")
     my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
     cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
     
@@ -512,19 +519,14 @@ if __name__=='__main__':
     
 
     language_system.update()
-    print grammaticalWM.schema_insts
     language_system.update()
     semanticWM.SemRep.clear()
-    print grammaticalWM.schema_insts
-    semanticWM.SemRep.clear()
     language_system.update()
-    print grammaticalWM.schema_insts
     language_system.update()
-    print grammaticalWM.schema_insts
     language_system.update()
-    print grammaticalWM.schema_insts
+    grammaticalWM.plot_state()
     
-    max_step = 1000
+    max_step = 100
     for step in range(max_step):
         language_system.update()
     

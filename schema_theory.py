@@ -6,14 +6,17 @@ Created on Wed Feb 18 14:14:08 2015
 
 Defines the based schema theory classes.
 
+Uses abc to define abstract classes
 Uses random
 Uses numpy to implement the schema instances activation values.
-Uses matplotlib.plt to visualize WM state
+Uses matplotlib.plt to visualize WM state dynamics
+Uses networkx to visualize WM state
 """
 import abc
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import networkx as nx
 ##################################
 ### SCHEMAS (Functional units) ###
 ##################################
@@ -263,7 +266,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
         self.instantiate(schema, trace)
         
-    def set_activation_dyn(self, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
+    def set_activation_dyn(self, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5, noise_mean=0, noise_std=0):
         """
         Set activation parameters
         """
@@ -273,6 +276,8 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.activation.L = L
         self.activation.k = k
         self.activation.x0 = x0
+        self.activation.noise_mean=noise_mean
+        self.activation.noise_std = noise_std
     
     def set_activation_init(self, t0=0, act0=1):
         """
@@ -330,7 +335,7 @@ class INST_ACTIVATION:
     """
     Note: Having dt and Tau is redundant... dt should be defined at the system level.
     """
-    def __init__(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5):
+    def __init__(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5, noise_mean=0, noise_std=0):
         self.t0 = t0
         self.act0 = act0
         self.tau = tau
@@ -341,13 +346,16 @@ class INST_ACTIVATION:
         self.dt = dt 
         self.t = self.t0
         self.act = self.act0
+        self.noise_mean= noise_mean
+        self.noise_std=noise_std
         self.save_vals = {"t":[], "act":[]}
         
     
     def update(self, I):
         """
         """
-        d_act = self.dt/(self.tau)*(-self.act + self.logistic(I) + self.act_inf)
+        noise =  random.normalvariate(self.noise_mean, self.noise_std)
+        d_act = self.dt/(self.tau)*(-self.act + self.logistic(I + noise)) + self.act_inf
         self.t += self.dt
         self.act += d_act
         self.save_vals["t"].append(self.t)
@@ -403,7 +411,7 @@ class WM(PROCEDURAL_SCHEMA):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
         - t (INT): time (+1 at each update)
-        - dyn_params ({'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT})
+        - dyn_params ({'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT})
         - prune_threshold (float): Below this threshold the instances are considered inactive (Alive=False)
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
         
@@ -416,7 +424,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.coop_links = []
         self.comp_links = []
         self.t = 0
-        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5}
+        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.1}
         self.prune_threshold = 0.3
         self.save_state = {}
        
@@ -426,7 +434,9 @@ class WM(PROCEDURAL_SCHEMA):
                                     act_inf=self.dyn_params['act_inf'], 
                                     L=self.dyn_params['L'], 
                                     k=self.dyn_params['k'], 
-                                    x0=self.dyn_params['x0'])
+                                    x0=self.dyn_params['x0'],
+                                    noise_mean=self.dyn_params['noise_mean'],
+                                    noise_std=self.dyn_params['noise_std'])
         schema_inst.set_activation_init(t0=self.t, act0=act0)
         name = "%s_%i" % (schema_inst.schema.name, schema_inst.id)
         self.save_state[name] = schema_inst.activation.save_vals.copy();
@@ -549,7 +559,27 @@ class WM(PROCEDURAL_SCHEMA):
         plt.ylabel('activity', fontsize=16)
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True)
         plt.show()
+    
+    def plot_state(self):
+        """
+        """
+        state = nx.DiGraph()
+        for inst in self.schema_insts:
+            state.add_node(inst.name)
+        for link in self.coop_links:
+            state.add_edge(link.inst_from.name, link.inst_to.name, type="coop")
+        for link in self.comp_links:
+            state.add_edge(link.inst_from.name, link.inst_to.name, type="comp")
+            
+        pos = nx.spring_layout(state)        
+        get_edges = lambda edge_type: [e for e in state.edges() if state.edge[e[0]][e[1]]['type'] == edge_type]
         
+        plt.figure()
+        nx.draw(state, pos=pos)
+        nx.draw_networkx_nodes(state, pos=pos, node_color='b')
+        nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('coop'), edge_color='g')
+        nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('comp'), edge_color='r')
+             
 class F_LINK:
     """
     Functional links between schema instances in working memory
