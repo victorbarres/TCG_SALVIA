@@ -9,11 +9,14 @@ Uses NetworkX for the implementation of the content of the Semantic Working Memo
 """
 import matplotlib.pyplot as plt
 import networkx as nx
+import random
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, SCHEMA_SYSTEM, BRAIN_MAPPING
 import construction
 import concept as cpt
 import TCG_graph
+
+random.seed(1)
 ##################################
 ### Language knowledge schemas ###
 ##################################
@@ -169,7 +172,8 @@ class GRAMMATICAL_WM(WM):
                if match["match"] == 1:
                    for link in match["links"]:
                        self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], weight=1)
-                       
+#                       self.add_coop_link(inst_from=link["inst_to"], port_from=link["port_to"], inst_to=link["inst_from"], port_to=link["port_from"], weight=1) # Now the f-link are bidirectional in the propagation of activation.
+    
     def _compete(self, new_inst):
         """
         How to make it incremental....?
@@ -180,8 +184,8 @@ class GRAMMATICAL_WM(WM):
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
                if match["match"] == -1:
-                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst, weight=-1) # Reciprocal competition connections
-                   self.add_comp_link(inst_from=old_inst, inst_to=new_inst, weight=-1)
+                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst, weight=-10) # BOOSTEDD THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
+#                   self.add_comp_link(inst_from=old_inst, inst_to=new_inst, weight=-1)  # Now the f-link are bidirectional in the propagation of activation.
         
     
     @staticmethod
@@ -480,16 +484,19 @@ if __name__=='__main__':
     cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
     
     # Set up grammatical LTM content
-    act0 = 1
+    random.seed()
+    act0 = 0.6
     for cxn in my_grammar.constructions:
-        new_cxn_schema = CXN_SCHEMA(cxn, act0)
+        new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.prune_threshold))
         grammaticalLTM.add_schema(new_cxn_schema)
     
     man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
     woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
     kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
+    blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
     agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
     patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
+    modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
     
     entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
     
@@ -500,6 +507,12 @@ if __name__=='__main__':
     semanticWM.SemRep.add_node("MAN", concept=man_cpt)
     semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
     semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+    
+    # A bit more info
+    semanticWM.SemRep.add_node("BLUE", concept=blue_cpt)
+    semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt)
+    
+
     
     semanticWM.show_state()
             
@@ -526,11 +539,12 @@ if __name__=='__main__':
     language_system.update()
     grammaticalWM.plot_state()
     
-    max_step = 100
+    max_step = 1000
     for step in range(max_step):
         language_system.update()
-    
+        
     grammaticalWM.plot_dynamics()
+    grammaticalWM.plot_state()
     
     
     

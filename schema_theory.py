@@ -17,6 +17,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+
 ##################################
 ### SCHEMAS (Functional units) ###
 ##################################
@@ -568,21 +569,24 @@ class WM(PROCEDURAL_SCHEMA):
             state.add_node(inst.name)
         for link in self.coop_links:
             state.add_edge(link.inst_from.name, link.inst_to.name, type="coop")
+            state.add_edge(link.inst_to.name, link.inst_from.name, type="coop")
         for link in self.comp_links:
             state.add_edge(link.inst_from.name, link.inst_to.name, type="comp")
+            state.add_edge(link.inst_to.name, link.inst_from.name, type="comp")
             
         pos = nx.spring_layout(state)        
         get_edges = lambda edge_type: [e for e in state.edges() if state.edge[e[0]][e[1]]['type'] == edge_type]
         
         plt.figure()
-        nx.draw(state, pos=pos)
-        nx.draw_networkx_nodes(state, pos=pos, node_color='b')
+        nx.draw_networkx_nodes(state, pos=pos, node_color='b', node_shape='s')
+        nx.draw_networkx_labels(state, pos=pos)
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('coop'), edge_color='g')
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('comp'), edge_color='r')
              
 class F_LINK:
     """
     Functional links between schema instances in working memory
+    Activations propagates in both directions.
         
     Data:
         - inst_from (SCHEMA_INST)
@@ -594,12 +598,13 @@ class F_LINK:
         """
         self.inst_from = inst_from
         self.inst_to = inst_to
-        self.weight=weight
+        self.weight = weight
     
     def update(self):
         """
         """
-        self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight)
+        self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight) # Activation is propagates in both directions.
+        self.inst_from.act_port_in.value.append(self.inst_to.act_port_out.value*self.weight)
 
 class COOP_LINK(F_LINK):
     """
