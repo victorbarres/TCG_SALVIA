@@ -251,11 +251,67 @@ class GRAMMATICAL_WM(WM):
                 if not(links):
                     match = -1       
         return {"match":match, "links":links}
-            
     
     def _assemble(self):
         """
+        "Un-superpose" the trees!
         """
+        graph = nx.DiGraph()
+        for inst in self.schema_insts:
+            graph.add_node(inst.name, type="instance")
+            for port in inst.in_ports:
+                port_name = "%s:%i" %(inst.name, port.name)
+                graph.add_node(port_name, type="port", port_value=port.name)
+                graph.add_edge(port_name, inst.name, type="port2inst")
+        for link in self.coop_links:
+            port_to_name = "%s:%i" %(link.inst_to.name, link.connect.port_to.name)
+            graph.add_edge(link.inst_from.name, port_to_name, type="inst2port")
+        
+        plt.figure()
+        pos = nx.spring_layout(graph)
+        nx.draw_networkx_nodes(graph, pos, nodelist=[n for n in graph.nodes() if graph.node[n]['type']=='instance'], node_color='b', node_shape='s', node_size=300)
+        nx.draw_networkx_nodes(graph, pos, nodelist=[n for n in graph.nodes() if graph.node[n]['type']=='port'], node_color='r', node_shape='h', node_size=100)
+        nx.draw_networkx_edges(graph, pos=pos, edgelist=[e for e in graph.edges() if graph.edge[e[0]][e[1]]['type'] == 'port2inst'], edge_color='k')
+        nx.draw_networkx_edges(graph, pos=pos, edgelist=[e for e in graph.edges() if graph.edge[e[0]][e[1]]['type'] == 'inst2port'], edge_color='r')
+        nx.draw_networkx_labels(graph, pos=pos)
+        
+        tops = [n for n in graph.nodes() if not(graph.successors(n))]
+        results = []
+        self._get_trees(tops, [], graph, results)
+        
+        for res in  results:
+            plt.figure()
+            H = graph.subgraph(res)
+            pos = nx.spring_layout(H)
+            nx.draw_networkx(H, pos, node_color='b', node_shape='s')
+
+            
+        
+    
+    def _get_trees(self, frontier, node_list, graph, results):
+        """
+        """
+        if frontier:
+            new_frontiers = [[]]
+            for node in frontier:
+                node_list.append(node)
+                ports = graph.predecessors(node)
+                if ports:
+                    node_list += ports
+                    for port in ports:
+                        children = graph.predecessors(port)
+                        updated_frontiers = []
+                        for f in new_frontiers:
+                            for child in children:
+                                updated_frontiers.append(f[:] + [child])
+                        new_frontiers = updated_frontiers
+            if new_frontiers == [[]]:
+                results.append(node_list)
+            else:
+                for a_frontier in new_frontiers:
+                    self._get_trees(a_frontier, node_list[:], graph, results)
+                    
+        
     
     def _read_out(self):
         """
@@ -318,7 +374,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em)        
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em)    
         return sub_iso
     
     def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
@@ -514,7 +570,7 @@ if __name__=='__main__':
     
 
     
-    semanticWM.show_state()
+#    semanticWM.show_state()
             
     
     # Set up language system
@@ -537,14 +593,15 @@ if __name__=='__main__':
     language_system.update()
     language_system.update()
     language_system.update()
-    grammaticalWM.plot_state()
+#    grammaticalWM.plot_state()
     
     max_step = 1000
     for step in range(max_step):
         language_system.update()
         
-    grammaticalWM.plot_dynamics()
-    grammaticalWM.plot_state()
+#    grammaticalWM.plot_dynamics()
+#    grammaticalWM.plot_state()
+    grammaticalWM._assemble()
     
     
     

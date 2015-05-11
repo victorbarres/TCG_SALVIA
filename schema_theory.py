@@ -560,7 +560,7 @@ class WM(PROCEDURAL_SCHEMA):
         plt.ylabel('activity', fontsize=16)
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True)
         plt.show()
-    
+        
     def plot_state(self):
         """
         """
