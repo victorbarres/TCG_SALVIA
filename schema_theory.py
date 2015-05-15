@@ -53,6 +53,7 @@ class PORT:
         self.name = port_name
         self.value = port_value
         self.id = PORT.ID_NEXT
+        PORT.ID_NEXT += 1
         self.type = port_type
         self.schema = port_schema
 
@@ -464,7 +465,7 @@ class WM(PROCEDURAL_SCHEMA):
                 match = False
             if port_from!='any' and (flink.connect.port_from != port_from):
                 match = False
-            if port_to !='any' and (flink.conncet.port_to != port_to):
+            if port_to !='any' and (flink.connect.port_to != port_to):
                 match = False
             
             if match:
@@ -586,25 +587,30 @@ class WM(PROCEDURAL_SCHEMA):
 class F_LINK:
     """
     Functional links between schema instances in working memory
-    Activations propagates in both directions.
+    Activations propagates in both directions. The asymmetry_coef parameter controls how asymmetrical is the link.
+        0 <= asymmetry_coef <= 1
+            from_inst -> to_inst: weight
+            to_inst -> from_inst: weight*(1-asymmetry_coef)
         
     Data:
         - inst_from (SCHEMA_INST)
         - inst_to (SCHEMA_INST)
         - weight (float)
+        - asymmetry_coef (float): 0 <= asymmetry_coef <= 1
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=0):
+    def __init__(self, inst_from=None, inst_to=None, weight=0, asymmetry_coef=0):
         """
         """
         self.inst_from = inst_from
         self.inst_to = inst_to
         self.weight = weight
+        self.asymmetry_coef = asymmetry_coef
     
     def update(self):
         """
         """
         self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight) # Activation is propagates in both directions.
-        self.inst_from.act_port_in.value.append(self.inst_to.act_port_out.value*self.weight)
+        self.inst_from.act_port_in.value.append(self.inst_to.act_port_out.value*self.weight*(1-self.asymmetry_coef))
 
 class COOP_LINK(F_LINK):
     """
@@ -614,11 +620,13 @@ class COOP_LINK(F_LINK):
         - inst_from (SCHEMA_INST)
         - inst_to (SCHEMA_INST)
         - connect (CONNECT)
+        
+    NOTE: I need to experiment with the possibility to have 
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=1):
+    def __init__(self, inst_from=None, inst_to=None, weight=1, asymmetry_coef=0): # Test of having assymetric weights
         """
         """
-        F_LINK.__init__(self, inst_from, inst_to, weight)
+        F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
         self.connect = CONNECT()
     
     def set_connect(self, port_from, port_to, weight=0, delay=0):
@@ -636,19 +644,32 @@ class COMP_LINK(F_LINK):
         - inst_to (SCHEMA_INST)
         - weight (float)
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=-1):
+    def __init__(self, inst_from=None, inst_to=None, weight=-1, asymmetry_coef=0): #Symmetric links
         """
         """
-        F_LINK.__init__(self, inst_from, inst_to, weight)
+        F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
 
 class ASSEMBLAGE:
     """
     Defines a schema instance assemblage.
     """
     def __init__(self):
+        self.schema_insts = []
         self.coop_links = []
         self.activation = 0
     
+    def add_instance(self, new_inst):
+        """
+        Add an instance new_inst (SCHEMA_INST) to the assemblage.
+        An instance can only be added if it is not already presen in the assemblage
+        Returns True if the link was sucessfully added, False otherwise.
+        """
+        for inst in self.schema_insts:
+            if inst == new_inst:
+                return False
+        self.schema_insts.append(new_inst)
+        return True
+        
     def add_link(self, link):
         """
         Add an cooperation link link (COOP_LINK) to the assemblage.
@@ -656,17 +677,27 @@ class ASSEMBLAGE:
         Returns True if the link was sucessfully added, False otherwise.
         """
         for l in self.coop_links:
-            if (l.connect.port_from == link.connect.port_from) or (l.connect.port_to == link.connect_port_to):
-                return False
-                
+            if (l.connect.port_from == link.connect.port_from) or (l.connect.port_to == link.connect.port_to):
+                return False  
         self.coop_links.append(link)
         return True
-    
+
+    @abc.abstractmethod 
     def update_activation(self):
         """
         Update the activation of the assemblage.
         """
         return
+    
+    def copy(self):
+        """
+        Returns a copy of itself.
+        """
+        new_assemblage = ASSEMBLAGE()
+        new_assemblage.activation = self.activation
+        new_assemblage.schema_insts = self.schema_insts[:] # neither deep nor shallow copy.
+        new_assemblage.coop_links = self.coop_links[:] 
+        return new_assemblage
 
 #############################
 ### BRAIN MAPPING CLASSES ###

@@ -7,11 +7,13 @@ Defines language schemas for TCG.
 
 Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
 """
-import matplotlib.pyplot as plt
-import networkx as nx
 import random
+import matplotlib.pyplot as plt
 
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, SCHEMA_SYSTEM, BRAIN_MAPPING
+import networkx as nx
+
+
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE, SCHEMA_SYSTEM, BRAIN_MAPPING
 import construction
 import concept as cpt
 import TCG_graph
@@ -150,7 +152,8 @@ class GRAMMATICAL_WM(WM):
             self._add_new_insts(new_cxn_insts)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
-    
+#        assemblages = self._assemble()
+#    
     # HERE NEED TO SET UP THE C2 COMPUTATION + POST THE OUTPUT.
     def _add_new_insts(self, new_insts):
         """
@@ -252,67 +255,86 @@ class GRAMMATICAL_WM(WM):
                     match = -1       
         return {"match":match, "links":links}
     
-    def _assemble(self):
+    def _assemble(self): # THIS IS VERY DIFFERENT FROM THE ASSEMBLE ALGORITHM OF TCG 1.0
         """
-        "Un-superpose" the trees!
-        """
-        graph = nx.DiGraph()
-        for inst in self.schema_insts:
-            graph.add_node(inst.name, type="instance")
-            for port in inst.in_ports:
-                port_name = "%s:%i" %(inst.name, port.name)
-                graph.add_node(port_name, type="port", port_value=port.name)
-                graph.add_edge(port_name, inst.name, type="port2inst")
-        for link in self.coop_links:
-            port_to_name = "%s:%i" %(link.inst_to.name, link.connect.port_to.name)
-            graph.add_edge(link.inst_from.name, port_to_name, type="inst2port")
+        WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
+        """        
+        inst_network = GRAMMATICAL_WM._build_instance_network(self.schema_insts, self.coop_links)
         
+        tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
+        results = []
+        self._get_trees(tops, None, inst_network, results)
+        
+        return results
+        
+    @staticmethod
+    def _build_instance_network(schema_insts, coop_links):
+        """
+        """
+        graph = nx.DiGraph() # This could be built incrementally.....
+        for inst in schema_insts:
+            graph.add_node(inst, type="instance")
+            for port in inst.in_ports:
+                graph.add_node(port, type="port")
+                graph.add_edge(port, inst, type="port2inst")
+        for link in coop_links: # Does not requires the competition to be resolved (there could still be active competition links)
+            graph.add_edge(link.inst_from, link.connect.port_to, type="inst2port")
+        
+        return graph
+
+    def _get_trees(self, frontier, assemblage, graph, results):
+        """
+        Recursive function
+        "Un-superpose" the trees!
+
+        DOES NOT HANDLE THE CASE WHERE THERE STILL IS SOME COMPETITION GOING ON.
+        """
+        new_frontiers = [[]]
+        for node, link in frontier:
+            if assemblage == None:
+                assemblage = ASSEMBLAGE()
+            assemblage.add_instance(node)
+            if link:
+                assemblage.add_link(link)
+            ports = graph.predecessors(node)
+            for port in ports:
+                children = graph.predecessors(port)
+                updated_frontiers = []
+                for child in children:
+                    link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child._find_port("output"), port_to=port)
+#                    assemblage.add_link(link[0]) # WRONG!!!
+                    for f in new_frontiers:
+                        updated_frontiers.append(f[:] + [(child, link[0])])
+                new_frontiers = updated_frontiers
+        if new_frontiers == [[]]:
+            results.append(assemblage)
+        else:
+            for a_frontier in new_frontiers:
+                self._get_trees(a_frontier, assemblage.copy(), graph, results)
+    
+    @staticmethod
+    def _draw_instance_network(graph):
+        """
+        """
         plt.figure()
         pos = nx.spring_layout(graph)
         nx.draw_networkx_nodes(graph, pos, nodelist=[n for n in graph.nodes() if graph.node[n]['type']=='instance'], node_color='b', node_shape='s', node_size=300)
-        nx.draw_networkx_nodes(graph, pos, nodelist=[n for n in graph.nodes() if graph.node[n]['type']=='port'], node_color='r', node_shape='h', node_size=100)
+        nx.draw_networkx_nodes(graph, pos, nodelist=[n for n in graph.nodes() if graph.node[n]['type']=='port'], node_color='r', node_shape='h', node_size=200)
         nx.draw_networkx_edges(graph, pos=pos, edgelist=[e for e in graph.edges() if graph.edge[e[0]][e[1]]['type'] == 'port2inst'], edge_color='k')
         nx.draw_networkx_edges(graph, pos=pos, edgelist=[e for e in graph.edges() if graph.edge[e[0]][e[1]]['type'] == 'inst2port'], edge_color='r')
-        nx.draw_networkx_labels(graph, pos=pos)
+        node_labels = dict((n, n.name) for n in graph.nodes())
+        nx.draw_networkx_labels(graph, pos=pos, labels=node_labels)
         
-        tops = [n for n in graph.nodes() if not(graph.successors(n))]
-        results = []
-        self._get_trees(tops, [], graph, results)
-        
-        for res in  results:
-            plt.figure()
-            H = graph.subgraph(res)
-            pos = nx.spring_layout(H)
-            nx.draw_networkx(H, pos, node_color='b', node_shape='s')
-
-            
-        
-    
-    def _get_trees(self, frontier, node_list, graph, results):
+    def _draw_assemblages(self):
         """
         """
-        if frontier:
-            new_frontiers = [[]]
-            for node in frontier:
-                node_list.append(node)
-                ports = graph.predecessors(node)
-                if ports:
-                    node_list += ports
-                    for port in ports:
-                        children = graph.predecessors(port)
-                        updated_frontiers = []
-                        for f in new_frontiers:
-                            for child in children:
-                                updated_frontiers.append(f[:] + [child])
-                        new_frontiers = updated_frontiers
-            if new_frontiers == [[]]:
-                results.append(node_list)
-            else:
-                for a_frontier in new_frontiers:
-                    self._get_trees(a_frontier, node_list[:], graph, results)
+        assemblages = self._assemble()
+        for assemblage in assemblages:
+            print [inst.name for inst in assemblage.schema_insts]
+            print [(link.inst_from.name, link.inst_to.name) for link in assemblage.coop_links]
+            graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
+            GRAMMATICAL_WM._draw_instance_network(graph)
                     
-        
-    
     def _read_out(self):
         """
         """
@@ -601,7 +623,8 @@ if __name__=='__main__':
         
 #    grammaticalWM.plot_dynamics()
 #    grammaticalWM.plot_state()
-    grammaticalWM._assemble()
+#    assemblages = grammaticalWM._assemble()
+    grammaticalWM._draw_assemblages()
     
     
     
