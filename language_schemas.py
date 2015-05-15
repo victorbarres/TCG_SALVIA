@@ -262,10 +262,14 @@ class GRAMMATICAL_WM(WM):
         inst_network = GRAMMATICAL_WM._build_instance_network(self.schema_insts, self.coop_links)
         
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
-        results = []
-        self._get_trees(tops, None, inst_network, results)
+        assemblages = []
+        self._get_trees(tops, None, inst_network, assemblages)
         
-        return results
+        # Compute assemblage activation values
+        for assemblage in assemblages:
+            assemblage.update_activation()
+            
+        return assemblages
         
     @staticmethod
     def _build_instance_network(schema_insts, coop_links):
@@ -330,8 +334,6 @@ class GRAMMATICAL_WM(WM):
         """
         assemblages = self._assemble()
         for assemblage in assemblages:
-            print [inst.name for inst in assemblage.schema_insts]
-            print [(link.inst_from.name, link.inst_to.name) for link in assemblage.coop_links]
             graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
             GRAMMATICAL_WM._draw_instance_network(graph)
                     

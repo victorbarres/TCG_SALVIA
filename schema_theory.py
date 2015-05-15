@@ -682,12 +682,15 @@ class ASSEMBLAGE:
         self.coop_links.append(link)
         return True
 
-    @abc.abstractmethod 
     def update_activation(self):
         """
         Update the activation of the assemblage.
+        
+        FOR NOW SIMPLY THE AVERAGE (or SUM) ACTIVATION OF THE INSTANCES CONTAINED IN THE ASSEMBLAGE.
         """
-        return
+        
+#        self.activation = sum([inst.activity for inst in self.schema_insts])/len(self.schema_insts) # Average
+        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum
     
     def copy(self):
         """
