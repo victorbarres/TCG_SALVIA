@@ -152,9 +152,18 @@ class GRAMMATICAL_WM(WM):
             self._add_new_insts(new_cxn_insts)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
-#        assemblages = self._assemble()
-#    
-    # HERE NEED TO SET UP THE C2 COMPUTATION + POST THE OUTPUT.
+        if not(self.comp_links) and self.coop_links:
+            assemblages = self._assemble()
+            activations = [a.activation for a in assemblages]
+            winner_idx = activations.index(max(activations))
+            phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
+            self.set_output('to_phonological_WM', phon_form)
+            self.schema_insts = []
+            self.coop_links = []
+            self.comp_links = []
+            
+            # HERE NEED TO SET UP THE C2 COMPUTATION + POST THE OUTPUT.
+    
     def _add_new_insts(self, new_insts):
         """
         """
@@ -165,7 +174,10 @@ class GRAMMATICAL_WM(WM):
             self.add_instance(new_inst, act*match_qual)
             self._cooperate(new_inst)
             self._compete(new_inst)
-                
+            
+    ###############################
+    ### cooperative computation ###
+    ###############################
     def _cooperate(self, new_inst):
        """
        """
@@ -255,9 +267,14 @@ class GRAMMATICAL_WM(WM):
                     match = -1       
         return {"match":match, "links":links}
     
+    ##################
+    ### Assemblage ###
+    ##################    
     def _assemble(self): # THIS IS VERY DIFFERENT FROM THE ASSEMBLE ALGORITHM OF TCG 1.0
         """
         WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
+        
+        NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. THIS IS THE ONE THA SHOULD BE CONSIDERED!!!
         """        
         inst_network = GRAMMATICAL_WM._build_instance_network(self.schema_insts, self.coop_links)
         
@@ -306,7 +323,6 @@ class GRAMMATICAL_WM(WM):
                 updated_frontiers = []
                 for child in children:
                     link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child._find_port("output"), port_to=port)
-#                    assemblage.add_link(link[0]) # WRONG!!!
                     for f in new_frontiers:
                         updated_frontiers.append(f[:] + [(child, link[0])])
                 new_frontiers = updated_frontiers
@@ -315,6 +331,34 @@ class GRAMMATICAL_WM(WM):
         else:
             for a_frontier in new_frontiers:
                 self._get_trees(a_frontier, assemblage.copy(), graph, results)
+                
+    @staticmethod                
+    def _read_out(assemblage):
+        """
+        Left2right reading of the tree formed byt the assemblage.
+        """
+        def L2R_read(inst, graph, phon_form):
+            """
+            """
+            cxn = inst.schema.content
+            SynForm = cxn.SynForm.form
+            for f in SynForm:
+                if isinstance(f, construction.TP_PHON):
+                    phon_form.append(f.cxn_phonetics)
+                else:
+                    port = inst._find_port(SynForm.index(f))
+                    child  = graph.predecessors(port)
+                    if not(child):
+                        print "MISSING INFORMATION!"
+                    else:
+                        L2R_read(child[0], graph, phon_form)
+        
+        graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
+        tops = [n for n in graph.nodes() if not(graph.successors(n))]
+        phon_form = []
+        L2R_read(tops[0], graph, phon_form)
+        return phon_form
+
     
     @staticmethod
     def _draw_instance_network(graph):
@@ -336,10 +380,8 @@ class GRAMMATICAL_WM(WM):
         for assemblage in assemblages:
             graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
             GRAMMATICAL_WM._draw_instance_network(graph)
-                    
-    def _read_out(self):
-        """
-        """
+        
+    
         
 class GRAMMATICAL_LTM(LTM):
     """
@@ -421,6 +463,9 @@ class PHON_WM(PROCEDURAL_SCHEMA):
     def update(self):
         """
         """
+        phon_form = self.get_input('from_grammatical_WM')
+        if phon_form:
+            print phon_form
 
 
 ###############################################################################
@@ -598,7 +643,7 @@ if __name__=='__main__':
             
     
     # Set up language system
-    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM]
+    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
     
     language_system = SCHEMA_SYSTEM('Language_system')
     language_system.add_schemas(language_schemas)
@@ -606,9 +651,10 @@ if __name__=='__main__':
     language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
     language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
     language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
+    language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
     
     language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
-    language_system.set_output_ports([grammaticalWM._find_port('to_phonological_WM')])
+    language_system.set_output_ports([phonWM._find_port('to_output')])
     
 
     language_system.update()
@@ -626,7 +672,8 @@ if __name__=='__main__':
 #    grammaticalWM.plot_dynamics()
 #    grammaticalWM.plot_state()
 #    assemblages = grammaticalWM._assemble()
-    grammaticalWM._draw_assemblages()
+#    grammaticalWM._read_out(assemblages[0])
+#    grammaticalWM._draw_assemblages()
     
     
     

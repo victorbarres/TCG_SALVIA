@@ -122,7 +122,7 @@ class TP_PHON(TP_SYN_ELEM):
     def __init__(self):
         TP_SYN_ELEM.__init__(self)
         self.type = TP_ELEM.PHONETICS
-        self.phonetics = ''
+        self.cxn_phonetics = ''
         self.num_syllables = 0
 
 class TP_SEMFRAME(TP_ELEM):

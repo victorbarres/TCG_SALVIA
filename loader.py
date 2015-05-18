@@ -136,12 +136,14 @@ def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER TH
     """
     """
     new_phon = cxn.TP_PHON()
-    new_phon.phonetics = aPhon['phon']
+    new_phon.cxn_phonetics = aPhon['phon']
     
     # Temporarily estimates the syllable length (count the number of alphabet characters)
-    for char in new_phon.phonetics:
+    for char in new_phon.cxn_phonetics:
         if char.isalpha():
             new_phon.num_syllables += 1
+    
+    new_cxn.add_syn_elem(new_phon)
             
 def read_semframe(new_cxn, SemFrame, name_table):
     """
