@@ -7,6 +7,8 @@ Defines perceptual schemas for TCG.
 
 Uses numpy for the saliency map.
 """
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import numpy as np
 import random
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, SCHEMA_SYSTEM, BRAIN_MAPPING
@@ -282,8 +284,7 @@ class SALIENCY_MAP(PROCEDURAL_SCHEMA):
             self.IOR_mask += mask['mask']
         
         #Compute final saliency_map: BU_saliency - mask
-        self.saliency_map = self.BU_saliency_map.copy() - self.IOR_mask
-        
+        self.saliency_map = self.BU_saliency_map.copy() - self.IOR_mask        
         self.set_output('to_saccade_system', self.saliency_map)
     
     def _IOR(self, fixation):
@@ -353,7 +354,7 @@ class FIXATION(PROCEDURAL_SCHEMA):
         self.add_port('OUT','to_visual_WM')
         self.add_port('OUT', 'to_saccade_system')
         self.subscene = None
-        self.uncertainty = None
+        self.uncertainty = 0
         self.next_saccade = False 
     
     def update(self):
@@ -433,17 +434,46 @@ if __name__=='__main__':
     saliency_data.load("./data/scenes/cholitas")
     saliency_map.BU_saliency_map = saliency_data.saliency_map.data
     
+    
+    # Display and run    
+    plt.figure(1)
+    plt.subplot(2,2,1)
+    plt.axis('off')
+    plt.title('Input scene')
+    plt.imshow(saliency_data.orig_image.data)
+    
+    r = 2**(saliency_data.params.levelParams['mapLevel']-1) # ONly works if pyramidtype = dyadic!
+    
+    plt.subplot(2,2,2)
+    plt.axis('off')
+    plt.title('Bottom-up saliency map')
+    plt.imshow(saliency_map.BU_saliency_map, cmap = cm.Greys_r)
+    
     # Running the schema system
-    time = 10
+    fixation = plt.subplot(2,2,3)
+    plt.axis('off')
+    plt.title('Fixation')
+    plt.imshow(saliency_data.orig_image.data)
+    fix = plt.Circle((0,0), saliency_data.params.foaSize, color='r', alpha=0.3)
+    fixation.add_patch(fix)
+    
+    ior_fig = plt.subplot(2,2,4)
+    plt.axis('off')
+    plt.title('IOR')
+    time = 200
     for t in range(time):    
         perceptual_system.update()
         map = saliency_map.IOR_mask
         if map != None:
-            imshow(map)
-            pause(0.2)
-        
-        print saccade_system.eye_pos
-        print len(saliency_map.IOR_masks)
+            plt.sca(ior_fig)
+            ior_fig.cla()
+            plt.imshow(map, cmap = cm.Greys_r)
+        if saccade_system.eye_pos:
+            fix.remove()
+            fix.center = (saccade_system.eye_pos[1]*r,saccade_system.eye_pos[0]*r)
+            plt.sca(fixation)
+            fixation.add_patch(fix)
+        plt.pause(0.01)
     
 
     

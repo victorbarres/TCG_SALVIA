@@ -562,7 +562,7 @@ class WM(PROCEDURAL_SCHEMA):
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True)
         plt.show()
         
-    def plot_state(self):
+    def show_state(self):
         """
         """
         state = nx.DiGraph()
@@ -788,7 +788,7 @@ class SCHEMA_SYSTEM:
         """
         Returns sysetm output
         """
-        return self.output
+        return self.outputs
         
     def update(self):
         """

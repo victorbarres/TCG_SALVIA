@@ -158,6 +158,8 @@ class GRAMMATICAL_WM(WM):
             winner_idx = activations.index(max(activations))
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
             self.set_output('to_phonological_WM', phon_form)
+            self.show_state()
+            self._draw_assemblages()
             self.schema_insts = []
             self.coop_links = []
             self.comp_links = []
@@ -464,8 +466,7 @@ class PHON_WM(PROCEDURAL_SCHEMA):
         """
         """
         phon_form = self.get_input('from_grammatical_WM')
-        if phon_form:
-            print phon_form
+        self.set_output('to_output', phon_form)
 
 
 ###############################################################################
@@ -480,200 +481,214 @@ if __name__=='__main__':
     semanticWM = SEMANTIC_WM()
     phonWM = PHON_WM()
     
-#    language_mapping = {'Conceptualizer':[], 
-#                        'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
-#                        'Grammatical_WM':['left_BA45', 'leftBA44'], 
-#                        'Grammatical_LTM':['left_STG', 'left_MTG'],
-#                        'Cxn_retrieval':[], 
-#                        'Phonological_WM':['left_BA6']}
-#                        
-#    language_schemas = [conceptualizer, grammaticalWM, grammaticalLTM, cxn_retrieval, semanticWM, phonWM]
-#    
-#    language_system = SCHEMA_SYSTEM('Language_system')
-#    language_system.add_schemas(language_schemas)
-#    
-#    language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
-#    language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
-#    language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
-#    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
-#    language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
-#    language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
-#    
-#    language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
-#    language_system.set_output_ports([phonWM._find_port('to_output')])
-#    
-#    language_brain_mapping = BRAIN_MAPPING()
-#    language_brain_mapping.schema_mapping = language_mapping
-#    language_system.brain_mapping = language_brain_mapping
-#    
-#    language_system.system2dot()
-    
-    ###########################################################################
-    ### TEST GRAMMATICAL WM 1 ###
-    
-#    # Load grammar
-#    import random
-#    import loader as ld
-#    my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
-#    
-#    # Set up grammatical LTM content
-#    for cxn in my_grammar.constructions:
-#        new_cxn_schema = CXN_SCHEMA(cxn, random.random())
-#        grammaticalLTM.add_schema(new_cxn_schema)
-#        
-#    # Select random cxn
-#    WM_size = 10
-#    idx = [random.randint(0,len(grammaticalLTM.schemas)-1) for i in range(WM_size)]
-#    
-#    # Instaniate constructions in WM
-#    for i in idx:
-#        cxn_inst = CXN_SCHEMA_INST(grammaticalLTM.schemas[i], trace=None, mapping=None)
-#        grammaticalWM.add_instance(cxn_inst, act0=grammaticalLTM.schemas[i].init_act)
-#    
-#    # Run WM
-#    max_step = 1000
-#    for step in range(max_step):
-#        grammaticalWM.update_activations()
-#    
-#    grammaticalWM.plot_dynamics()
-    
-    ###########################################################################
-    ### TEST CXN RETRIEVAL ###
-    
-#    import loader as ld
-#    my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
-#    my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-#    cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
-#    
-#    # Set up grammatical LTM content
-#    act0 = 1
-#    for cxn in my_grammar.constructions:
-#        new_cxn_schema = CXN_SCHEMA(cxn, act0)
-#        grammaticalLTM.add_schema(new_cxn_schema)
-#    
-#    man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
-#    woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
-#    kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-#    agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
-#    patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
-#    
-#    entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
-#    
-#
-#    # Set up Semantic WM content
-#    semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
-#    semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
-#    semanticWM.SemRep.add_node("MAN", concept=man_cpt)
-#    semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
-#    semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
-#    
-#    semanticWM.show_state()
-#            
-#    
-#    # Set up language system
-#    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
-#    
-#    language_system = SCHEMA_SYSTEM('Language_system')
-#    language_system.add_schemas(language_schemas)
-#    language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
-#    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
-#    
-#    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
-#    language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
-#    
-#    def print_output(value):
-#        if value:
-#            print [v["cxn_inst"].name for v in cxn_retrieval.out_ports[0].value]
-#        else:
-#            print "NOTHING!"
-#    
-#    print_output(cxn_retrieval.out_ports[0].value)
-#    cxn_retrieval.out_ports[0].value = None
-#    language_system.update()
-#    print_output(cxn_retrieval.out_ports[0].value)
-#    cxn_retrieval.out_ports[0].value = None
-#    language_system.update()
-#    print_output(cxn_retrieval.out_ports[0].value)
-#    cxn_retrieval.out_ports[0].value = None
-#    semanticWM.SemRep.clear()
-#    language_system.update()
-#    print_output(cxn_retrieval.out_ports[0].value)
-
-    ###########################################################################
-    ### TEST GRAMMATICAL WM 2 ###
-    
-    
-    import loader as ld
-    my_grammar = ld.load_grammar("TCG_grammar_light.json", "./data/grammars/")
-    my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-    cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
-    
-    # Set up grammatical LTM content
-    random.seed()
-    act0 = 0.6
-    for cxn in my_grammar.constructions:
-        new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.prune_threshold))
-        grammaticalLTM.add_schema(new_cxn_schema)
-    
-    man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
-    woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
-    kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-    blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
-    agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
-    patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
-    modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
-    
-    entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
-    
-
-    # Set up Semantic WM content
-    semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
-    semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
-    semanticWM.SemRep.add_node("MAN", concept=man_cpt)
-    semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
-    semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
-    
-    # A bit more info
-    semanticWM.SemRep.add_node("BLUE", concept=blue_cpt)
-    semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt)
-    
-
-    
-#    semanticWM.show_state()
-            
-    
-    # Set up language system
-    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
-    
-    language_system = SCHEMA_SYSTEM('Language_system')
-    language_system.add_schemas(language_schemas)
-    language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
-    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
-    language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
-    language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
-    language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
-    
-    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
-    language_system.set_output_ports([phonWM._find_port('to_output')])
-    
-
-    language_system.update()
-    language_system.update()
-    semanticWM.SemRep.clear()
-    language_system.update()
-    language_system.update()
-    language_system.update()
-#    grammaticalWM.plot_state()
-    
-    max_step = 1000
-    for step in range(max_step):
-        language_system.update()
+    prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP"
+    print prompt
+    case = raw_input("ENTER CASE #: ")
+    while case not in ['1','2','3','4']:
+        print "INVALID CHOICE"
+        print prompt
+        case = raw_input("ENTER CASE #: ")
         
-#    grammaticalWM.plot_dynamics()
-#    grammaticalWM.plot_state()
-#    assemblages = grammaticalWM._assemble()
-#    grammaticalWM._read_out(assemblages[0])
-#    grammaticalWM._draw_assemblages()
+    if case == '1':
+        ###########################################################################
+        ### TEST BUILD LANGUAGE SYSTEM ###
+        language_mapping = {'Conceptualizer':[], 
+                            'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
+                            'Grammatical_WM':['left_BA45', 'leftBA44'], 
+                            'Grammatical_LTM':['left_STG', 'left_MTG'],
+                            'Cxn_retrieval':[], 
+                            'Phonological_WM':['left_BA6']}
+                            
+        language_schemas = [conceptualizer, grammaticalWM, grammaticalLTM, cxn_retrieval, semanticWM, phonWM]
+        
+        language_system = SCHEMA_SYSTEM('Language_system')
+        language_system.add_schemas(language_schemas)
+        
+        language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
+        language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+        language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
+        language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+        language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
+        language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
+        
+        language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
+        language_system.set_output_ports([phonWM._find_port('to_output')])
+        
+        language_brain_mapping = BRAIN_MAPPING()
+        language_brain_mapping.schema_mapping = language_mapping
+        language_system.brain_mapping = language_brain_mapping
+        
+        language_system.system2dot()
     
+    elif case == '2':
+        ###########################################################################
+        ### TEST GRAMMATICAL WM 1 ###
+        
+        # Load grammar
+        import random
+        import loader as ld
+        my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+        
+        # Set up grammatical LTM content
+        for cxn in my_grammar.constructions:
+            new_cxn_schema = CXN_SCHEMA(cxn, random.random())
+            grammaticalLTM.add_schema(new_cxn_schema)
+            
+        # Select random cxn
+        WM_size = 10
+        idx = [random.randint(0,len(grammaticalLTM.schemas)-1) for i in range(WM_size)]
+        
+        # Instaniate constructions in WM
+        for i in idx:
+            cxn_inst = CXN_SCHEMA_INST(grammaticalLTM.schemas[i], trace=None, mapping=None)
+            grammaticalWM.add_instance(cxn_inst, act0=grammaticalLTM.schemas[i].init_act)
+        
+        # Run WM
+        max_step = 1000
+        for step in range(max_step):
+            grammaticalWM.update_activations()
+        
+        grammaticalWM.plot_dynamics()
+    
+    elif case == '3': 
+        ###########################################################################
+        ### TEST CXN RETRIEVAL ###
+        
+        import loader as ld
+        my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+        my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
+        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        
+        # Set up grammatical LTM content
+        act0 = 1
+        for cxn in my_grammar.constructions:
+            new_cxn_schema = CXN_SCHEMA(cxn, act0)
+            grammaticalLTM.add_schema(new_cxn_schema)
+        
+        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
+        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
+        
+        entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+        
+    
+        # Set up Semantic WM content
+        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
+        semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
+        semanticWM.SemRep.add_node("MAN", concept=man_cpt)
+        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
+        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+        
+        semanticWM.show_state()
+                
+        
+        # Set up language system
+        language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
+        
+        language_system = SCHEMA_SYSTEM('Language_system')
+        language_system.add_schemas(language_schemas)
+        language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+        language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+        
+        language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
+        language_system.set_output_ports([cxn_retrieval._find_port('to_grammatical_WM')])
+        
+        def print_output(value):
+            if value:
+                print [v["cxn_inst"].name for v in cxn_retrieval.out_ports[0].value]
+            else:
+                print "NOTHING!"
+        
+        print_output(cxn_retrieval.out_ports[0].value)
+        cxn_retrieval.out_ports[0].value = None
+        language_system.update()
+        print_output(cxn_retrieval.out_ports[0].value)
+        cxn_retrieval.out_ports[0].value = None
+        language_system.update()
+        print_output(cxn_retrieval.out_ports[0].value)
+        cxn_retrieval.out_ports[0].value = None
+        semanticWM.SemRep.clear()
+        language_system.update()
+        print_output(cxn_retrieval.out_ports[0].value)
+
+    elif case == '4':
+        ###########################################################################
+        ### TEST STATIC SEMREP ###
+        
+        
+        import loader as ld
+        my_grammar = ld.load_grammar("TCG_grammar_light.json", "./data/grammars/")
+        my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
+        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        
+        # Set up grammatical LTM content
+        random.seed()
+        act0 = 0.6
+        for cxn in my_grammar.constructions:
+            new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.prune_threshold))
+            grammaticalLTM.add_schema(new_cxn_schema)
+        
+        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
+        blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
+        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
+        modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
+        
+        entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+        
+    
+        # Set up Semantic WM content
+        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
+        semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
+        semanticWM.SemRep.add_node("MAN", concept=man_cpt)
+        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
+        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+        
+        # A bit more info
+        semanticWM.SemRep.add_node("BLUE", concept=blue_cpt)
+        semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt)
+        
+
+        semanticWM.show_state()
+                
+        
+        # Set up language system
+        language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
+        
+        language_system = SCHEMA_SYSTEM('Language_system')
+        language_system.add_schemas(language_schemas)
+        language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+        language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+        language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
+        language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
+        language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
+        
+        language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
+        language_system.set_output_ports([phonWM._find_port('to_output')])
+        
+    
+        language_system.update()
+        language_system.update()
+        semanticWM.SemRep.clear()
+        language_system.update()
+        language_system.update()
+        language_system.update()
+        grammaticalWM.show_state()
+        
+        max_step = 1000
+        for step in range(max_step):
+            language_system.update()
+            if language_system.outputs['Phonological_WM:14']:
+                print language_system.outputs['Phonological_WM:14']
+            
+        grammaticalWM.plot_dynamics()
+    
+    else:
+        print "ERROR"
+        
     
     
