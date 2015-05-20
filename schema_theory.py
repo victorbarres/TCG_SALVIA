@@ -552,7 +552,7 @@ class WM(PROCEDURAL_SCHEMA):
     def plot_dynamics(self):
         """
         """
-        plt.figure()
+        plt.figure(facecolor='white')
         for inst in self.save_state.keys():
             plt.plot(self.save_state[inst]['t'], self.save_state[inst]['act'], label=inst, linewidth=2)
         
@@ -578,7 +578,10 @@ class WM(PROCEDURAL_SCHEMA):
         pos = nx.spring_layout(state)        
         get_edges = lambda edge_type: [e for e in state.edges() if state.edge[e[0]][e[1]]['type'] == edge_type]
         
-        plt.figure()
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        title = '%s (state)' %self.name
+        plt.title(title)
         nx.draw_networkx_nodes(state, pos=pos, node_color='b', node_shape='s')
         nx.draw_networkx_labels(state, pos=pos)
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('coop'), edge_color='g')

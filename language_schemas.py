@@ -6,11 +6,13 @@ Created on Tue Mar 17 16:03:19 2015
 Defines language schemas for TCG.
 
 Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
+Uses pyttsx for the text to speech implementation (optional!)
 """
 import random
 import matplotlib.pyplot as plt
 
 import networkx as nx
+import pyttsx
 
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE, SCHEMA_SYSTEM, BRAIN_MAPPING
@@ -127,7 +129,10 @@ class SEMANTIC_WM(PROCEDURAL_SCHEMA):
         node_labels = dict((n, d['concept'].meaning) for n,d in self.SemRep.nodes(data=True))
         edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.SemRep.edges(data=True))
         pos = nx.spring_layout(self.SemRep)  
-        plt.figure()
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        title = '%s (state)' %self.name
+        plt.title(title)
         nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
@@ -163,8 +168,6 @@ class GRAMMATICAL_WM(WM):
             self.schema_insts = []
             self.coop_links = []
             self.comp_links = []
-            
-            # HERE NEED TO SET UP THE C2 COMPUTATION + POST THE OUTPUT.
     
     def _add_new_insts(self, new_insts):
         """
@@ -183,12 +186,13 @@ class GRAMMATICAL_WM(WM):
     def _cooperate(self, new_inst):
        """
        """
+       weight = 1
        for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
                if match["match"] == 1:
                    for link in match["links"]:
-                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], weight=1)
+                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], weight=weight)
 #                       self.add_coop_link(inst_from=link["inst_to"], port_from=link["port_to"], inst_to=link["inst_from"], port_to=link["port_from"], weight=1) # Now the f-link are bidirectional in the propagation of activation.
     
     def _compete(self, new_inst):
@@ -197,11 +201,12 @@ class GRAMMATICAL_WM(WM):
         Competition if they overlap on an edge.
         I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
+        weight = -3.5
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
                if match["match"] == -1:
-                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst, weight=-10) # BOOSTEDD THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
+                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst, weight=weight) # BOOSTEDD THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
 #                   self.add_comp_link(inst_from=old_inst, inst_to=new_inst, weight=-1)  # Now the f-link are bidirectional in the propagation of activation.
         
     
@@ -361,12 +366,13 @@ class GRAMMATICAL_WM(WM):
         L2R_read(tops[0], graph, phon_form)
         return phon_form
 
-    
     @staticmethod
-    def _draw_instance_network(graph):
+    def _draw_instance_network(graph, title=''):
         """
         """
-        plt.figure()
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        plt.title(title)
         pos = nx.spring_layout(graph)
         nx.draw_networkx_nodes(graph, pos, nodelist=[n for n in graph.nodes() if graph.node[n]['type']=='instance'], node_color='b', node_shape='s', node_size=300)
         nx.draw_networkx_nodes(graph, pos, nodelist=[n for n in graph.nodes() if graph.node[n]['type']=='port'], node_color='r', node_shape='h', node_size=200)
@@ -379,11 +385,12 @@ class GRAMMATICAL_WM(WM):
         """
         """
         assemblages = self._assemble()
+        i=0
         for assemblage in assemblages:
             graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
-            GRAMMATICAL_WM._draw_instance_network(graph)
-        
-    
+            title = 'Assemblage_%i' % i
+            GRAMMATICAL_WM._draw_instance_network(graph, title)
+            i += 1
         
 class GRAMMATICAL_LTM(LTM):
     """
@@ -468,7 +475,21 @@ class PHON_WM(PROCEDURAL_SCHEMA):
         phon_form = self.get_input('from_grammatical_WM')
         self.set_output('to_output', phon_form)
 
-
+class TEXT2SPEECH:
+    """
+    """
+    def __init__(self, rate_percent=100):
+        self.rate_percent = float(rate_percent)/100
+        self.utterance = None
+        self.engine = pyttsx.init()
+        engine_rate = self.engine.getProperty('rate')
+        self.engine.setProperty('rate', engine_rate*self.rate_percent)
+    
+    def utter(self):
+        if self.utterance:
+            self.engine.say(self.utterance)
+            self.engine.runAndWait()
+            self.utterance = None
 ###############################################################################
 if __name__=='__main__':
     ##############################
@@ -481,10 +502,10 @@ if __name__=='__main__':
     semanticWM = SEMANTIC_WM()
     phonWM = PHON_WM()
     
-    prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP"
+    prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP; 5: TEST INCREMENTAL SEMREP"
     print prompt
     case = raw_input("ENTER CASE #: ")
-    while case not in ['1','2','3','4']:
+    while case not in ['1','2','3','4','5']:
         print "INVALID CHOICE"
         print prompt
         case = raw_input("ENTER CASE #: ")
@@ -684,6 +705,81 @@ if __name__=='__main__':
             language_system.update()
             if language_system.outputs['Phonological_WM:14']:
                 print language_system.outputs['Phonological_WM:14']
+            
+        grammaticalWM.plot_dynamics()
+     
+    elif case == '5':
+        ###########################################################################
+        ### TEST STATIC SEMREP ###
+        import loader as ld
+        my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+        my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
+        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        
+        # Set up grammatical LTM content
+        random.seed()
+        act0 = 0.6
+        for cxn in my_grammar.constructions:
+            new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.prune_threshold))
+            grammaticalLTM.add_schema(new_cxn_schema)
+        
+        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
+        blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
+        big_cpt = cpt.CONCEPT(name="BIG", meaning="BIG")
+        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
+        modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")        
+    
+        # Set up Semantic WM content
+        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
+        semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
+        semanticWM.SemRep.add_node("MAN", concept=man_cpt)
+        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
+        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+        semanticWM.SemRep.add_node("BLUE", concept=blue_cpt)
+        semanticWM.SemRep.add_node("BIG", concept=big_cpt) 
+        semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt)
+        semanticWM.SemRep.add_edge("BIG", "MAN", concept=modify_cpt)
+            
+        semanticWM.show_state()
+                
+        # Set up language system
+        language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
+        
+        language_system = SCHEMA_SYSTEM('Language_system')
+        language_system.add_schemas(language_schemas)
+        language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+        language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+        language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
+        language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
+        language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
+        
+        language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
+        language_system.set_output_ports([phonWM._find_port('to_output')])
+        
+    
+        language_system.update()
+        language_system.update()
+        semanticWM.SemRep.clear()
+        language_system.update()
+        language_system.update()
+        language_system.update()
+        grammaticalWM.show_state()
+        
+        
+        # Set up text2speech
+        text2speech = TEXT2SPEECH(rate_percent=80)
+        max_step = 1000
+        for step in range(max_step):
+            language_system.update()
+            if language_system.outputs['Phonological_WM:14']:
+                output =  language_system.outputs['Phonological_WM:14']
+                print output
+                text2speech.utterance = ' '.join(output)
+                text2speech.utter()
+                
             
         grammaticalWM.plot_dynamics()
     
