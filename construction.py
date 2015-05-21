@@ -90,7 +90,7 @@ class TP_SYN_ELEM(TP_ELEM):
     """
     def __init__(self):
         TP_ELEM.__init__(self)
-        self.order = -1 
+        self.order = -1
         
 class TP_SLOT(TP_SYN_ELEM):
     """
@@ -147,6 +147,14 @@ class TP_SEMFRAME(TP_ELEM):
         self.edges = []
         self.graph = None
     
+    def get_head(self):
+        """
+        Return head node (NEED TO CHECK FOR THE CASE OF MULTIPLE NODES!!!!!!)
+        """
+        for node in self.nodes:
+            if node.head:
+                return node
+    
     def _create_NX_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
@@ -163,7 +171,30 @@ class TP_SEMFRAME(TP_ELEM):
         nx.draw_networkx(self.graph, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.graph, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
+    
+    @staticmethod
+    def unify(SF_p, node_p, SF_c, node_c):
+        """
+        None commutative.
+        """
+        new_SF = TP_SEMFRAME()
+        parent_nodes = SF_p.nodes[:]
+        parent_nodes.remove(node_p)
+        parent_edges = SF_p.edges[:]
+        for rel in parent_edges:
+            if rel.pFrom == node_p:
+                rel.pFrom = node_c
+            if rel.pTo == node_p:
+                rel.pTo = node_c
         
+        new_SF.nodes += SF_c.nodes[:]
+        new_SF.nodes += parent_nodes
+        new_SF.edges += SF_c.edges[:]
+        new_SF.edges += parent_edges
+        
+        new_SF._create_NX_graph()
+        
+        return new_SF
         
 class TP_SYNFORM(TP_ELEM):
     """
@@ -176,19 +207,71 @@ class TP_SYNFORM(TP_ELEM):
         TP_ELEM.__init__(self)
         self.type = TP_ELEM.SYNFORM
         self.form = []
+    
+    def add_syn_elem(self, elem):
+        """
+        """
+        elem.order = len(self.form)
+        self.form.append(elem)
+        
+    
+    @staticmethod
+    def unify(SF_p, slot_p, SF_c):
+        """
+        None commutative
+        """
+        new_synform = TP_SYNFORM()
+        idx = slot_p.order
+        for elem in SF_p.form[:idx]:    
+            new_synform.add_syn_elem(elem)
+        for elem in SF_c.form:
+            new_synform.add_syn_elem(elem)
+        if idx+1<len(SF_p):
+            for elem in SF_p.form[idx+1:]:
+                new_synform.add_syn_elem(elem)   
+        return new_synform
+    
 
 class TP_SYMLINKS(TP_ELEM):
     """
     SymLinks construction template element.
     Data (inherited):
     Data:
-        - SL (DICT): Map between SemFrame (TP_NODE) elements and SynForm (TP_SLOT) elements.
+        - SL (DICT): Map between SemFrame (TP_NODE) elements and SynForm (TP_SYNFORM) elements.
         
     """
     def __init__(self):
         TP_ELEM.__init__(self)
         self.SL = {}
-           
+    
+    def form2node(self, form):
+        """
+        Returns the node associated with the form "form"
+        """
+        res = [n for n,v in self.SL.iteritems() if v==form]
+        return res[0]
+    
+    def node2form(self, node):
+        """
+        Returns the form associated with the node "node"
+        """
+        return self.SL[node]
+    
+    @staticmethod
+    def unify(SL_p, node_p, SL_c):
+        """
+        None commutative
+        """
+        new_symlinks = TP_SYMLINKS()
+        for k,v in SL_p.SL.iteritems():
+            if k != node_p:
+                new_symlinks.SL[k]=v
+        
+        for k,v in SL_c.SL.iteritems():
+            new_symlinks.SL[k]=v
+        
+        return new_symlinks
+        
 ############################    
 ### Construction classes ###
 ############################     
@@ -254,28 +337,42 @@ class CXN:
         """          
         # Set syn_elem variable
         syn_elem.parent_cxn = self
-        syn_elem.order = len(self.SynForm.form)
     
         # Add a new Syn-Form element
-        self.SynForm.form.append(syn_elem)
+        self.SynForm.add_syn_elem(syn_elem)        
+        return True
+    
+    def add_sym_link(self, node, form):
+        """
+        Adds a symbolic link  between the node (TP_NODE) and form (TP_SLOT or TP_PHON)
+        """
+        if node.type != TP_ELEM.NODE:
+            return False
+        if self.SymLinks.SL.has_key(node) or (form in self.SymLinks.SL.values()):
+            return False
+        self.SymLinks.SL[node] = form
+        return True
+    
+    @staticmethod
+    def unify(cxn_p, slot_p, cxn_c):
+        """
+        None commutative
+        """
+        node_p = cxn_p.SymLinks.form2node(slot_p)
+        node_c = cxn_c.SemFrame.get_head()
+        new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p, cxn_c.SemFrame, node_c)
+        new_synform = TP_SYNFORM.unify(cxn_p.SynForm, slot_p, cxn_c.SynForm)
+        new_symlinks = TP_SYMLINKS.unify(cxn_p.SymLinks, node_p, cxn_c.SymLinks)
         
-        return True
-    
-    def add_sym_link(self, node, slot):
-        """
-        Adds a symbolic link  between the node (TP_NODE) and slot (TP_SLOT)
-        """
-        if (node.type != TP_ELEM.NODE) or (slot.type != TP_ELEM.SLOT):
-            return False
-        if self.SymLinks.SL.has_key(node) or (slot in self.SymLinks.SL.values()):
-            return False
-        self.SymLinks.SL[node] = slot
-        return True
-    
-    def unify(cxn1, slot1, cxn2):
-        """
-        """
-    
+        new_cxn = CXN()
+        new_cxn.name = "%s U[%i] %s" %(cxn_p.name,slot_p.order, cxn_c.name)
+        new_cxn.clss = cxn_p.clss
+        new_cxn.preference = 0 # For now does not need to be defined....
+        new_cxn.SemFrame = new_semframe
+        new_cxn.SynForm = new_synform
+        new_cxn.SymLinks = new_symlinks
+        
+        return new_cxn
     
 #    def __str__(self): # To rewrite
 #        p = ''

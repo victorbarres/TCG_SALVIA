@@ -41,6 +41,7 @@ class PORT:
     Data:
         - id (int): unique port id.
         - name (str): optional port name.
+        - data (): optional port data
         - schema (SCHEMA): the schema the port is associated with.
         - type ('IN' or 'OUT'): type of port (input or output port)
         - value(): current value at the port.
@@ -49,8 +50,9 @@ class PORT:
     TYPE_OUT = 'OUT'
     ID_NEXT = 1 # Global port counter
     
-    def __init__(self, port_type, port_schema = None, port_name='', port_value=None):
+    def __init__(self, port_type, port_schema = None, port_name='', port_data = None, port_value=None):
         self.name = port_name
+        self.data = port_data
         self.value = port_value
         self.id = PORT.ID_NEXT
         PORT.ID_NEXT += 1
@@ -165,7 +167,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.out_ports = []
     
     
-    def add_port(self,port_type, port_name='', port_value=None):
+    def add_port(self,port_type, port_name='', port_data=None, port_value=None):
         """
         Adds a new port to the procedural schema. Port_type (str) ['IN' or 'OUT'], port_name (str), and a value port_value for the port.
         If sucessessful, returns the port id. Else returns None.

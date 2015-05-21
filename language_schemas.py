@@ -52,7 +52,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
             - alive (bool): status flag
-            - trace ({"nodes":[], "edge"=[]}): Pointer to the element that triggered the instantiation.
+            - trace ({"nodes":[], "edge"=[]}): Pointer to the elements that triggered the instantiation.
             - covers ({"nodes":{}, "edge"={}}): maps CXN.SemFrame nodes and edges to SemRep elements (in the trace)
     """
     def __init__(self, cxn_schema, trace, mapping):
@@ -70,8 +70,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
         SynForm = self.schema.content.SynForm
         for f in SynForm.form:
             if isinstance(f,construction.TP_SLOT): # 1 intput port per slot
-                self.add_port('IN', port_name=f.order)
-    
+                self.add_port('IN', port_name=f.order, port_data=f)
         self.add_port('OUT','output')
     
     def set_covers(self, mapping):
@@ -237,7 +236,7 @@ class GRAMMATICAL_WM(WM):
         cxn_c = inst_c.schema.content
         sf_c = [k for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
         
-        cond1 = sf_p in cxn_p.SymLinks.SL # sf_p is linked to a slot in cxn_p
+        cond1 = (sf_p in cxn_p.SymLinks.SL) and isinstance(cxn_p.SymLinks.SL[sf_p], construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
         cond2 = sf_c.head # sf_c is a head node
         if cond1 and cond2:
             slot_p = cxn_p.SymLinks.SL[sf_p]
@@ -339,7 +338,20 @@ class GRAMMATICAL_WM(WM):
         else:
             for a_frontier in new_frontiers:
                 self._get_trees(a_frontier, assemblage.copy(), graph, results)
-                
+    
+    def build_schema(self,assemblage):
+        """
+        """
+        for coop_link in assemblage.coop_link:
+            inst_p = coop_link.inst_to
+            inst_c = coop_link.inst_from
+            port_p = coop_link.connect.port_to
+            port_c = coop_link.connect.port_from
+            
+            new_cxn_inst = CXN_SCHEMA_INST()
+            
+        
+            
     @staticmethod                
     def _read_out(assemblage):
         """
@@ -771,24 +783,13 @@ if __name__=='__main__':
         # Set up text2speech
         text2speech = TEXT2SPEECH(rate_percent=80)
         max_step = 1000
-        flag = False
         for step in range(max_step):
             language_system.update()
             if language_system.outputs['Phonological_WM:14']:
-                flag = True
                 output =  language_system.outputs['Phonological_WM:14']
                 print output
                 text2speech.utterance = ' '.join(output)
                 text2speech.utter()
-                
-        if not(flag):
-            grammaticalWM.end_competitions()
-            language_system.update()
-            language_system.update()
-            output =  language_system.outputs['Phonological_WM:14']
-            print output
-            text2speech.utterance = ' '.join(output)
-            text2speech.utter()
             
         grammaticalWM.plot_dynamics()
     
