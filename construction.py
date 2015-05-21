@@ -272,6 +272,10 @@ class CXN:
         self.SymLinks.SL[node] = slot
         return True
     
+    def unify(cxn1, slot1, cxn2):
+        """
+        """
+    
     
 #    def __str__(self): # To rewrite
 #        p = ''

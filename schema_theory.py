@@ -534,6 +534,8 @@ class WM(PROCEDURAL_SCHEMA):
             inst.update_activation()
             if inst.activity<self.prune_threshold:
                 inst.alive = False
+        
+        self.udpate_activity()
     
     def prune(self):
         """
@@ -547,7 +549,44 @@ class WM(PROCEDURAL_SCHEMA):
                         self.coop_links.remove(flink)
                 for flink in self.comp_links[:]:
                     if (flink.inst_from == inst) or (flink.inst_to == inst):
-                        self.comp_links.remove(flink)          
+                        self.comp_links.remove(flink)  
+    
+    def end_competitions(self):
+        """
+        Picks a winner for each ongoing competitions. 
+        Winner is the instance with the max activatity at the time when the method is called.
+        Loser is set to dead (alive=False). All the dead instances are then pruned.
+        """
+        for link in self.comp_links:
+            inst_from = link.inst_from
+            inst_to = link.inst_to
+            if inst_from.activity <= inst_to.activity:
+                inst_from.alive = False
+            else:
+                inst_to.alive = False
+        self.comp_links = []
+        self.prune()
+    
+    def udpate_activity(self):
+        """
+        Computes the overall activity of the working memory.
+        The activity reflects the amount of cooperation and competition going on.
+        """
+        activity = 0
+        for link in self.coop_links:
+            inst_from = link.inst_from
+            inst_to = link.inst_to
+            transfer = abs(inst_from.activity - inst_to.activity)*link.weight
+            activity += transfer
+        
+        for link in self.comp_links:
+            inst_from = link.inst_from
+            inst_to = link.inst_to
+            transfer = abs(inst_from.activity - inst_to.activity)*link.weight*-1
+            activity += transfer
+        
+        self.activity = activity
+            
     
     def plot_dynamics(self):
         """

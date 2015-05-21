@@ -282,7 +282,7 @@ class GRAMMATICAL_WM(WM):
         WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
         
         NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. THIS IS THE ONE THA SHOULD BE CONSIDERED!!!
-        """        
+        """
         inst_network = GRAMMATICAL_WM._build_instance_network(self.schema_insts, self.coop_links)
         
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
@@ -316,6 +316,7 @@ class GRAMMATICAL_WM(WM):
         "Un-superpose" the trees!
 
         DOES NOT HANDLE THE CASE WHERE THERE STILL IS SOME COMPETITION GOING ON.
+        ALSO, it returns sub-optimal trees. (Not only the tree that contains all the cooperating instances in the WM).
         """
         new_frontiers = [[]]
         for node, link in frontier:
@@ -502,7 +503,7 @@ if __name__=='__main__':
     semanticWM = SEMANTIC_WM()
     phonWM = PHON_WM()
     
-    prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP; 5: TEST INCREMENTAL SEMREP"
+    prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP; 5: TEST STATIC SEMREP (FULL GRAMMAR + TEXT2SPEECH)"
     print prompt
     case = raw_input("ENTER CASE #: ")
     while case not in ['1','2','3','4','5']:
@@ -636,7 +637,7 @@ if __name__=='__main__':
 
     elif case == '4':
         ###########################################################################
-        ### TEST STATIC SEMREP ###
+        ### TEST STATIC SEMREP###
         
         
         import loader as ld
@@ -710,7 +711,7 @@ if __name__=='__main__':
      
     elif case == '5':
         ###########################################################################
-        ### TEST STATIC SEMREP ###
+        ### TEST STATIC SEMREP FULL GRAMMAR + TEXT2SPEECH ###
         import loader as ld
         my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
@@ -758,7 +759,6 @@ if __name__=='__main__':
         
         language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
         language_system.set_output_ports([phonWM._find_port('to_output')])
-        
     
         language_system.update()
         language_system.update()
@@ -768,18 +768,27 @@ if __name__=='__main__':
         language_system.update()
         grammaticalWM.show_state()
         
-        
         # Set up text2speech
         text2speech = TEXT2SPEECH(rate_percent=80)
         max_step = 1000
+        flag = False
         for step in range(max_step):
             language_system.update()
             if language_system.outputs['Phonological_WM:14']:
+                flag = True
                 output =  language_system.outputs['Phonological_WM:14']
                 print output
                 text2speech.utterance = ' '.join(output)
                 text2speech.utter()
                 
+        if not(flag):
+            grammaticalWM.end_competitions()
+            language_system.update()
+            language_system.update()
+            output =  language_system.outputs['Phonological_WM:14']
+            print output
+            text2speech.utterance = ' '.join(output)
+            text2speech.utter()
             
         grammaticalWM.plot_dynamics()
     
