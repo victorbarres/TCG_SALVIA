@@ -172,7 +172,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         Adds a new port to the procedural schema. Port_type (str) ['IN' or 'OUT'], port_name (str), and a value port_value for the port.
         If sucessessful, returns the port id. Else returns None.
         """
-        new_port = PORT(port_type, port_schema=self, port_name = port_name, port_value = port_value)
+        new_port = PORT(port_type, port_schema=self, port_name=port_name, port_data=port_data, port_value=port_value)
         if port_type == PORT.TYPE_IN:
             self.in_ports.append(new_port)
             return new_port.id
@@ -655,6 +655,10 @@ class F_LINK:
         """
         self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight) # Activation is propagates in both directions.
         self.inst_from.act_port_in.value.append(self.inst_to.act_port_out.value*self.weight*(1-self.asymmetry_coef))
+    
+    def copy(self):
+        new_flink = F_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
+        return new_flink
 
 class COOP_LINK(F_LINK):
     """
@@ -678,6 +682,11 @@ class COOP_LINK(F_LINK):
         self.connect.port_to = port_to
         self.connect.weight = weight
         self.connect.delay = delay
+    
+    def copy(self):
+        new_flink = COOP_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
+        new_flink.connect = self.connect
+        return new_flink
 
 class COMP_LINK(F_LINK):
     """
@@ -716,7 +725,7 @@ class ASSEMBLAGE:
         
     def add_link(self, link):
         """
-        Add an cooperation link link (COOP_LINK) to the assemblage.
+        Add an cooperation link 'lin'k (COOP_LINK) to the assemblage.
         A link can only be added does not add a connection to an already used in port or out port.
         Returns True if the link was sucessfully added, False otherwise.
         """

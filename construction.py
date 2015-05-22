@@ -9,6 +9,7 @@ The Template Classes define all the basic template elements that are used to bui
 
 Uses NetworkX module to represent construction SemFrame graph.
 """
+import matplotlib.pyplot as plt
 import networkx as nx
 
 ########################
@@ -165,6 +166,7 @@ class TP_SEMFRAME(TP_ELEM):
         self.graph = graph
     
     def draw(self):
+        plt.figure()
         node_labels = dict((n, d['concept'].meaning) for n,d in self.graph.nodes(data=True))
         edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.graph.edges(data=True))
         pos = nx.spring_layout(self.graph)        
@@ -191,8 +193,6 @@ class TP_SEMFRAME(TP_ELEM):
         new_SF.nodes += parent_nodes
         new_SF.edges += SF_c.edges[:]
         new_SF.edges += parent_edges
-        
-        new_SF._create_NX_graph()
         
         return new_SF
         
@@ -226,7 +226,7 @@ class TP_SYNFORM(TP_ELEM):
             new_synform.add_syn_elem(elem)
         for elem in SF_c.form:
             new_synform.add_syn_elem(elem)
-        if idx+1<len(SF_p):
+        if idx+1<len(SF_p.form):
             for elem in SF_p.form[idx+1:]:
                 new_synform.add_syn_elem(elem)   
         return new_synform

@@ -59,19 +59,32 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
         self.covers = {}
         self.set_covers(mapping)
-        self.set_port()
+        self.set_ports()
     
-    def set_port(self):
+    def set_ports(self, in_ports=None, out_ports=None):
         """
         Defines the input and output port for the construction schema instance.
         Each instance has 1 output port.
         Each instance has an input port for each TP_SLOT element in the construction's SynForm.
         """
-        SynForm = self.schema.content.SynForm
-        for f in SynForm.form:
-            if isinstance(f,construction.TP_SLOT): # 1 intput port per slot
-                self.add_port('IN', port_name=f.order, port_data=f)
-        self.add_port('OUT','output')
+        self.in_ports = []
+        self.out_ports = []
+        if in_ports == None:
+            SynForm = self.schema.content.SynForm
+            for f in SynForm.form:
+                if isinstance(f,construction.TP_SLOT): # 1 intput port per slot
+                    self.add_port('IN', port_name=f.order, port_data=f)
+        else:
+            for port in in_ports:
+                self.in_ports.append(port)
+                port.schema=self
+        
+        if out_ports == None:
+            self.add_port('OUT','output')
+        else:
+             for port in in_ports:
+                self.out_ports.append(port)
+                port.schema=self
     
     def set_covers(self, mapping):
         """
@@ -157,13 +170,16 @@ class GRAMMATICAL_WM(WM):
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
         if not(self.comp_links) and self.coop_links:
+            self.show_state()
+            self._draw_assemblages()
             assemblages = self._assemble()
+            eq_inst = self._assemblage2inst(assemblages[0])
+            print eq_inst
             activations = [a.activation for a in assemblages]
             winner_idx = activations.index(max(activations))
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
             self.set_output('to_phonological_WM', phon_form)
-            self.show_state()
-            self._draw_assemblages()
+            
             self.schema_insts = []
             self.coop_links = []
             self.comp_links = []
@@ -200,7 +216,7 @@ class GRAMMATICAL_WM(WM):
         Competition if they overlap on an edge.
         I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
-        weight = -3.5
+        weight = -10
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
@@ -339,18 +355,57 @@ class GRAMMATICAL_WM(WM):
             for a_frontier in new_frontiers:
                 self._get_trees(a_frontier, assemblage.copy(), graph, results)
     
-    def build_schema(self,assemblage):
+    def _assemblage2inst(self, assemblage):
         """
         """
-        for coop_link in assemblage.coop_link:
-            inst_p = coop_link.inst_to
-            inst_c = coop_link.inst_from
-            port_p = coop_link.connect.port_to
-            port_c = coop_link.connect.port_from
+        new_assemblage = assemblage.copy()
+        coop_links = new_assemblage.coop_links
+        while len(coop_links)>0:
+            new_assemblage = self._combine_schemas(new_assemblage, new_assemblage.coop_links[0])
+            coop_links = new_assemblage.coop_links
+        return new_assemblage.schema_insts[0]
             
-            new_cxn_inst = CXN_SCHEMA_INST()
-            
+    def _combine_schemas(self, assemblage, coop_link):
+        """
+        """
+        inst_p = coop_link.inst_to
+        port_p = coop_link.connect.port_to
+        cxn_p = inst_p.schema.content
+        slot_p = port_p.data
         
+        inst_c = coop_link.inst_from
+        cxn_c = inst_c.schema.content        
+        
+        new_cxn = construction.CXN.unify(cxn_p, slot_p, cxn_c)
+        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
+        new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=None, mapping=None)
+        
+        in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
+        out_ports = [inst_p.out_ports]
+        
+        new_cxn_inst.set_ports(in_ports=in_ports, out_ports=out_ports)
+        new_assemblage = ASSEMBLAGE()
+        new_assemblage.activation = assemblage.activation
+        
+        for inst in assemblage.schema_insts:
+            if inst != inst_p and inst != inst_c:
+                new_assemblage.add_instance(inst)
+        new_assemblage.add_instance(new_cxn_inst)
+        coop_links = assemblage.coop_links[:]
+        coop_links.remove(coop_link)
+        for coop_link in coop_links:
+            new_link = coop_link.copy()
+            if new_link.inst_to == inst_p:
+                new_link.inst_to = new_cxn_inst
+            if new_link.inst_to == inst_c:
+                new_link.inst_to = new_cxn_inst
+            if new_link.inst_from == inst_p:
+                new_link.inst_from = new_cxn_inst
+            if new_link.inst_from == inst_c:
+                new_link.inst_to = new_cxn_inst
+            new_assemblage.add_link(new_link)
+        
+        return new_assemblage
             
     @staticmethod                
     def _read_out(assemblage):
