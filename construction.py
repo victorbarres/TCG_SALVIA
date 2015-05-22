@@ -96,6 +96,12 @@ class TP_SYN_ELEM(TP_ELEM):
     def __init__(self):
         TP_ELEM.__init__(self)
         self.order = -1
+    
+    def set_order(self):
+        """
+        """
+        self.order = self.parent_cxn.SynForm.form.index(self)
+        
         
 class TP_SLOT(TP_SYN_ELEM):
     """
@@ -224,6 +230,7 @@ class TP_SYNFORM(TP_ELEM):
         """
 #        elem.order = len(self.form)
         self.form.append(elem)
+        elem.set_order()
         
     
     @staticmethod
@@ -238,6 +245,7 @@ class TP_SYNFORM(TP_ELEM):
         elems = SF_p.form[:idx] + SF_c.form + SF_p.form[min(idx+1,len(SF_p.form)):]
         for elem in elems:
             new_synform.add_syn_elem(elem)
+        
 #        for elem in SF_p.form[:idx]:    
 #            new_synform.add_syn_elem(elem)
 #        for elem in SF_c.form:
@@ -369,14 +377,47 @@ class CXN:
         self.SymLinks.SL[node] = form
         return True
     
-    
+    def copy(self):
+        """
+        Returns a deep copy of the construction.
+        """
+        new_cxn = CXN()
+        new_cxn.name = self.name
+        new_cxn.clss = self.clss
+        new_cxn.preference = self.preference
+        copy = {"semframe":{}, "synform":{}}
+        for node in self.SemFrame.nodes:
+            new_node = TP_NODE()
+            new_node.head = node.head
+            new_node.focus = node.focus
+            copy['semframe'][node] = new_node
+            new_cxn.add_sem_elem(new_node)
+        for edge in self.SemFrame.edges:
+            new_edge = TP_REL()
+            new_edge.pFrom = copy['semframe'][edge.pFrom]
+            new_edge.pTo = copy['semframe'][edge.pTo]
+            copy['semframe'][edge] = new_edge
+            new_cxn.add_sem_elem(new_edge)
+        for form in self.SynForm.form:
+            if isinstance(form, TP_SLOT):
+                new_form= TP_SLOT()
+                new_form.cxn_classes = form.cxn_classes[:]
+            elif isinstance(form, TP_PHON):
+                new_form = TP_PHON()
+                new_form.cxn_phonetics = form.cxn_phonetics
+                new_form.num_syllables = form.num_syllables
+            copy['synform'][form]  = new_form
+            new_cxn.add_syn_elem(new_form)
+        for k,v in self.SymLinks.SL.iteritems():
+            new_cxn.add_sym_link(copy['semframe'][k], copy['synform'][v])
+            
+        return new_cxn
+        
     @staticmethod
     def unify(cxn_p, slot_p, cxn_c):
         """
         None commutative
         """
-        print cxn_p.name
-        print slot_p.id
         node_p = cxn_p.SymLinks.form2node(slot_p)
         node_c = cxn_c.SemFrame.get_head()
         new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p, cxn_c.SemFrame, node_c)
@@ -384,7 +425,7 @@ class CXN:
         new_symlinks = TP_SYMLINKS.unify(cxn_p.SymLinks, node_p, cxn_c.SymLinks)
         
         new_cxn = CXN()
-        new_cxn.name = "[%s] U(%i) %s" %(cxn_p.name,slot_p.order, cxn_c.name)
+        new_cxn.name = "[%s] U(%i) %s" %(cxn_p.name, slot_p.order, cxn_c.name)
         new_cxn.clss = cxn_p.clss
         new_cxn.preference = 0 # For now does not need to be defined....
         new_cxn.SemFrame = new_semframe

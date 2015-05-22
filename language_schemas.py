@@ -38,6 +38,14 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     def __init__(self,aCXN, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=aCXN.name, content=aCXN, init_act=init_act)
+    
+    def copy(self):
+        """
+        Returns a deep copy of the schema
+        """
+        cxn_copy = self.content.copy()
+        new_cxn_schema = CXN_SCHEMA(cxn_copy, self.init_act)
+        return new_cxn_schema
 
 class CXN_SCHEMA_INST(SCHEMA_INST):
     """
@@ -73,7 +81,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             SynForm = self.schema.content.SynForm
             for f in SynForm.form:
                 if isinstance(f,construction.TP_SLOT): # 1 intput port per slot
-                    self.add_port('IN', port_name=f.id, port_data=f)
+                    self.add_port('IN', port_name=f.order, port_data=f)
         else:
             for port in in_ports:
                 self.in_ports.append(port)
@@ -257,7 +265,7 @@ class GRAMMATICAL_WM(WM):
             slot_p = cxn_p.SymLinks.SL[sf_p]
             cond3 = cxn_c.clss in slot_p.cxn_classes
             if cond3:
-                return {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.id)}
+                return {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.order)}
         return None
     
     @staticmethod
@@ -420,7 +428,7 @@ class GRAMMATICAL_WM(WM):
                 if isinstance(f, construction.TP_PHON):
                     phon_form.append(f.cxn_phonetics)
                 else:
-                    port = inst._find_port(f.id)
+                    port = inst._find_port(f.order)
                     child  = graph.predecessors(port)
                     if not(child):
                         print "MISSING INFORMATION!"

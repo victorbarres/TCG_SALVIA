@@ -254,7 +254,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
     Data:
         - schema (KNOWLEDGE_SCHEMA):
         - alive (bool): status flag
-        - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
+        - trace (): Pointer to the element that triggered the instantiation.
         - activation (INST_ACTIVATION): Activation value of schema instance
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
