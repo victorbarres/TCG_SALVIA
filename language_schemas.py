@@ -173,10 +173,10 @@ class GRAMMATICAL_WM(WM):
             self.show_state()
             self._draw_assemblages()
             assemblages = self._assemble()
-            eq_inst = self._assemblage2inst(assemblages[0])
-            print eq_inst
             activations = [a.activation for a in assemblages]
             winner_idx = activations.index(max(activations))
+            eq_inst = self._assemblage2inst(assemblages[winner_idx])
+            eq_inst.schema.content.SemFrame.draw()
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
             self.set_output('to_phonological_WM', phon_form)
             
@@ -216,7 +216,7 @@ class GRAMMATICAL_WM(WM):
         Competition if they overlap on an edge.
         I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
-        weight = -10
+        weight = -4
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)

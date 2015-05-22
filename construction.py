@@ -166,11 +166,14 @@ class TP_SEMFRAME(TP_ELEM):
         self.graph = graph
     
     def draw(self):
-        plt.figure()
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        title = 'SemFrame'
+        plt.title(title)
         node_labels = dict((n, d['concept'].meaning) for n,d in self.graph.nodes(data=True))
         edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.graph.edges(data=True))
         pos = nx.spring_layout(self.graph)        
-        nx.draw_networkx(self.graph, pos=pos, with_labels= False)
+        nx.draw_networkx(self.graph, pos=pos, with_labels= False, node_color='g')
         nx.draw_networkx_labels(self.graph, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
     
@@ -193,6 +196,8 @@ class TP_SEMFRAME(TP_ELEM):
         new_SF.nodes += parent_nodes
         new_SF.edges += SF_c.edges[:]
         new_SF.edges += parent_edges
+        
+        new_SF._create_NX_graph()
         
         return new_SF
         
