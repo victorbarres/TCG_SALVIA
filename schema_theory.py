@@ -261,7 +261,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
     """    
     def __init__(self,schema=None, trace=None):
         PROCEDURAL_SCHEMA.__init__(self,name="")
-        self.schema = None      
+        self.content = None      
         self.alive = False
         self.trace = None
         self.activity = 0
@@ -305,8 +305,8 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
-        self.schema = schema
-        self.name = "%s_%i" %(self.schema.name, self.id)
+        self.content = schema.content
+        self.name = "%s_%i" %(schema.name, self.id)
         self.alive = True
         self.trace = trace
         self.set_ports()
@@ -445,7 +445,7 @@ class WM(PROCEDURAL_SCHEMA):
                                     noise_mean=self.dyn_params['noise_mean'],
                                     noise_std=self.dyn_params['noise_std'])
         schema_inst.set_activation_init(t0=self.t, act0=act0)
-        name = "%s_%i" % (schema_inst.schema.name, schema_inst.id)
+        name = "%s_%i" % (schema_inst.name, schema_inst.id)
         self.save_state[name] = schema_inst.activation.save_vals.copy();
     
     def remove_instance(self, schema_inst):
@@ -945,10 +945,10 @@ if __name__=="__main__":
     ###############
     num_schemas=10
     schemas = [KNOWLEDGE_SCHEMA(name="act:"+str(i*1.0/num_schemas), LTM=None, content=None, init_act=i*1.0/num_schemas) for i in range(1,num_schemas+1)]
-    insts = [SCHEMA_INST(schema=s) for s in schemas]
+    insts = [SCHEMA_INST(schema=s, trace=s) for s in schemas]
     wm = WM()
     for inst in insts:
-            wm.add_instance(inst, inst.schema.init_act)
+            wm.add_instance(inst, inst.trace.init_act)
     
     for i in range(len(insts)):
         for j in range(len(insts)):

@@ -39,13 +39,13 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     def __init__(self,aCXN, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=aCXN.name, content=aCXN, init_act=init_act)
     
-    def copy(self):
-        """
-        Returns a deep copy of the schema
-        """
-        cxn_copy = self.content.copy()
-        new_cxn_schema = CXN_SCHEMA(cxn_copy, self.init_act)
-        return new_cxn_schema
+#    def copy(self):
+#        """
+#        Returns a deep copy of the schema
+#        """
+#        cxn_copy = self.content.copy()
+#        new_cxn_schema = CXN_SCHEMA(cxn_copy, self.init_act)
+#        return new_cxn_schema
 
 class CXN_SCHEMA_INST(SCHEMA_INST):
     """
@@ -56,17 +56,19 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - id (int): Unique id
             - activity = The current activity level of the schema.
             - activation (INST_ACTIVATION): Handles the activation dynamics.
-            - schema (CXN_SCHEMA):
+            - oontent (CXN_SCHEMA):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
             - alive (bool): status flag
-            - trace ({"nodes":[], "edge"=[]}): Pointer to the elements that triggered the instantiation.
-            - covers ({"nodes":{}, "edge"={}}): maps CXN.SemFrame nodes and edges to SemRep elements (in the trace)
+            - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schema":CXN_SCHEMA }): Pointer to the elements that triggered the instantiation.
+            - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace)
     """
     def __init__(self, cxn_schema, trace, mapping):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
+        (cxn_copy, corr) = cxn_schema.content.copy()
+        self.content = cxn_copy
         self.covers = {}
-        self.set_covers(mapping)
+        self.set_covers(mapping, corr['semframe'])
         self.set_ports()
     
     def set_ports(self, in_ports=None, out_ports=None):
@@ -78,7 +80,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
         self.in_ports = []
         self.out_ports = []
         if in_ports == None:
-            SynForm = self.schema.content.SynForm
+            SynForm = self.content.SynForm
             for f in SynForm.form:
                 if isinstance(f,construction.TP_SLOT): # 1 intput port per slot
                     self.add_port('IN', port_name=f.order, port_data=f)
@@ -94,11 +96,16 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                 self.out_ports.append(port)
                 port.schema=self
     
-    def set_covers(self, mapping):
+    def set_covers(self, mapping, corr):
         """
         Sets covers as mapping (DICT). Mapping should be of the form {t1:s1, t2:s2, ...} mapping each element of the trace to an element of the CXN.SemFrame
         """
-        self.covers = mapping
+        covers = {"nodes":{}, "edges":{}}
+        for k, v in mapping["nodes"].iteritems():
+            covers["nodes"][corr[k]] = v
+        for k, v in mapping["edges"].iteritems():
+            covers["edges"][corr[k]] = v
+        self.covers = covers
 
 ###################################
 ### Language procedural schemas ###
@@ -185,7 +192,7 @@ class GRAMMATICAL_WM(WM):
             winner_idx = activations.index(max(activations))
             print "WINNER ASSEMBLAGE: %i" %winner_idx
             eq_inst = self._assemblage2inst(assemblages[winner_idx])
-            eq_inst.schema.content.SemFrame.draw()
+            eq_inst.content.SemFrame.draw()
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
             self.set_output('to_phonological_WM', phon_form)
             
@@ -242,8 +249,8 @@ class GRAMMATICAL_WM(WM):
             - inst2 (CXN_SCHEMA_INST): A cxn instance
         """
         overlap = {}
-        overlap["nodes"] = [n for n in inst1.trace["nodes"] if n in inst2.trace["nodes"]]
-        overlap["edges"] = [e for e in inst1.trace["edges"] if e in inst2.trace["edges"]]
+        overlap["nodes"] = [n for n in inst1.trace["semrep"]["nodes"] if n in inst2.trace["semrep"]["nodes"]]
+        overlap["edges"] = [e for e in inst1.trace["semrep"]["edges"] if e in inst2.trace["semrep"]["edges"]]
         return overlap
         
     @staticmethod    
@@ -254,9 +261,9 @@ class GRAMMATICAL_WM(WM):
             - inst_c (CXN_SCHEMA_INST): A cxn instance (child)
             - SR_node (): SemRep node on which both instances overlap
         """
-        cxn_p = inst_p.schema.content
+        cxn_p = inst_p.content
         sf_p = [k for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
-        cxn_c = inst_c.schema.content
+        cxn_c = inst_c.content
         sf_c = [k for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
         
         cond1 = (sf_p in cxn_p.SymLinks.SL) and isinstance(cxn_p.SymLinks.SL[sf_p], construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
@@ -377,11 +384,11 @@ class GRAMMATICAL_WM(WM):
         """
         inst_p = coop_link.inst_to
         port_p = coop_link.connect.port_to
-        cxn_p = inst_p.schema.content
+        cxn_p = inst_p.content
         slot_p = port_p.data
         
         inst_c = coop_link.inst_from
-        cxn_c = inst_c.schema.content        
+        cxn_c = inst_c.content        
         
         new_cxn = construction.CXN.unify(cxn_p, slot_p, cxn_c)
         new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
@@ -422,7 +429,7 @@ class GRAMMATICAL_WM(WM):
         def L2R_read(inst, graph, phon_form):
             """
             """
-            cxn = inst.schema.content
+            cxn = inst.content
             SynForm = cxn.SynForm.form
             for f in SynForm:
                 if isinstance(f, construction.TP_PHON):
@@ -508,7 +515,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
             sub_iso = self._SemMatch_cat(SemRep, cxn_schema)
             for a_sub_iso in sub_iso:
                 match_qual = self._SemMatch_qual(a_sub_iso)
-                trace = {"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}
+                trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schema":cxn_schema}
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     

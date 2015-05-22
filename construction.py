@@ -379,24 +379,24 @@ class CXN:
     
     def copy(self):
         """
-        Returns a deep copy of the construction.
+        Returns a deep copy of the construction. Also returns coorespondence table.
         """
         new_cxn = CXN()
         new_cxn.name = self.name
         new_cxn.clss = self.clss
         new_cxn.preference = self.preference
-        copy = {"semframe":{}, "synform":{}}
+        corr = {"semframe":{}, "synform":{}}
         for node in self.SemFrame.nodes:
             new_node = TP_NODE()
             new_node.head = node.head
             new_node.focus = node.focus
-            copy['semframe'][node] = new_node
+            corr['semframe'][node] = new_node
             new_cxn.add_sem_elem(new_node)
         for edge in self.SemFrame.edges:
             new_edge = TP_REL()
-            new_edge.pFrom = copy['semframe'][edge.pFrom]
-            new_edge.pTo = copy['semframe'][edge.pTo]
-            copy['semframe'][edge] = new_edge
+            new_edge.pFrom = corr['semframe'][edge.pFrom]
+            new_edge.pTo = corr['semframe'][edge.pTo]
+            corr['semframe'][edge] = new_edge
             new_cxn.add_sem_elem(new_edge)
         for form in self.SynForm.form:
             if isinstance(form, TP_SLOT):
@@ -406,12 +406,12 @@ class CXN:
                 new_form = TP_PHON()
                 new_form.cxn_phonetics = form.cxn_phonetics
                 new_form.num_syllables = form.num_syllables
-            copy['synform'][form]  = new_form
+            corr['synform'][form]  = new_form
             new_cxn.add_syn_elem(new_form)
         for k,v in self.SymLinks.SL.iteritems():
-            new_cxn.add_sym_link(copy['semframe'][k], copy['synform'][v])
+            new_cxn.add_sym_link(corr['semframe'][k], corr['synform'][v])
             
-        return new_cxn
+        return (new_cxn, corr)
         
     @staticmethod
     def unify(cxn_p, slot_p, cxn_c):
