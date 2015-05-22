@@ -289,14 +289,14 @@
 		"SymLinks" : {"HUMAN" : "S1", "COLOR" : "S3"}		
 	},
 	{
-	"name" : "HIT",
-	"class" : "V",
-	"SemFrame" : {
-				"nodes" : [{"name" : "N1", "concept" : "HIT", "focus" : false, "head" : true}],
-				"edges" : []
-				},
-	"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "hit"}],
-	"SymLinks" : {}
+		"name" : "HIT",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "HIT", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "hit"}],
+		"SymLinks" : {}
 	},
 
 	{

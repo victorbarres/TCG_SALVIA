@@ -73,7 +73,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             SynForm = self.schema.content.SynForm
             for f in SynForm.form:
                 if isinstance(f,construction.TP_SLOT): # 1 intput port per slot
-                    self.add_port('IN', port_name=f.order, port_data=f)
+                    self.add_port('IN', port_name=f.id, port_data=f)
         else:
             for port in in_ports:
                 self.in_ports.append(port)
@@ -158,7 +158,7 @@ class GRAMMATICAL_WM(WM):
         self.add_port('IN', 'from_cxn_retrieval')
         self.add_port('OUT', 'to_phonological_WM')
         self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
-        self.prune_threshold = 0.3
+        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
     
     def update(self):
         """
@@ -175,6 +175,7 @@ class GRAMMATICAL_WM(WM):
             assemblages = self._assemble()
             activations = [a.activation for a in assemblages]
             winner_idx = activations.index(max(activations))
+            print "WINNER ASSEMBLAGE: %i" %winner_idx
             eq_inst = self._assemblage2inst(assemblages[winner_idx])
             eq_inst.schema.content.SemFrame.draw()
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
@@ -201,13 +202,12 @@ class GRAMMATICAL_WM(WM):
     def _cooperate(self, new_inst):
        """
        """
-       weight = 1
        for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
                if match["match"] == 1:
                    for link in match["links"]:
-                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], weight=weight)
+                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"])
 #                       self.add_coop_link(inst_from=link["inst_to"], port_from=link["port_to"], inst_to=link["inst_from"], port_to=link["port_from"], weight=1) # Now the f-link are bidirectional in the propagation of activation.
     
     def _compete(self, new_inst):
@@ -216,12 +216,11 @@ class GRAMMATICAL_WM(WM):
         Competition if they overlap on an edge.
         I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
-        weight = -4
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
                if match["match"] == -1:
-                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst, weight=weight) # BOOSTEDD THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
+                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
 #                   self.add_comp_link(inst_from=old_inst, inst_to=new_inst, weight=-1)  # Now the f-link are bidirectional in the propagation of activation.
         
     
@@ -258,7 +257,7 @@ class GRAMMATICAL_WM(WM):
             slot_p = cxn_p.SymLinks.SL[sf_p]
             cond3 = cxn_c.clss in slot_p.cxn_classes
             if cond3:
-                return {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.order)}
+                return {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.id)}
         return None
     
     @staticmethod
@@ -421,7 +420,7 @@ class GRAMMATICAL_WM(WM):
                 if isinstance(f, construction.TP_PHON):
                     phon_form.append(f.cxn_phonetics)
                 else:
-                    port = inst._find_port(SynForm.index(f))
+                    port = inst._find_port(f.id)
                     child  = graph.predecessors(port)
                     if not(child):
                         print "MISSING INFORMATION!"
@@ -716,7 +715,7 @@ if __name__=='__main__':
         random.seed()
         act0 = 0.6
         for cxn in my_grammar.constructions:
-            new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.prune_threshold))
+            new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
         man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
@@ -788,7 +787,7 @@ if __name__=='__main__':
         random.seed()
         act0 = 0.6
         for cxn in my_grammar.constructions:
-            new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.prune_threshold))
+            new_cxn_schema = CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
         man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")

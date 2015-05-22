@@ -416,7 +416,10 @@ class WM(PROCEDURAL_SCHEMA):
         - comp_links ([COMP_LINK]):
         - t (INT): time (+1 at each update)
         - dyn_params ({'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT})
-        - prune_threshold (float): Below this threshold the instances are considered inactive (Alive=False)
+        - C2_params ({'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT})
+            - coop_weight (FLOAT): weight of cooperation f-links
+            - comp_weight (FLOAT): weight of competition f-links
+            - prune_threshold (FLOAT): Below this threshold the instances are considered inactive (Alive=False)
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
         
         - assemblages ????
@@ -429,7 +432,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.comp_links = []
         self.t = 0
         self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.1}
-        self.prune_threshold = 0.3
+        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3}
         self.save_state = {}
        
     def add_instance(self,schema_inst, act0):
@@ -448,7 +451,9 @@ class WM(PROCEDURAL_SCHEMA):
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
         
-    def add_coop_link(self, inst_from, port_from, inst_to, port_to, weight):
+    def add_coop_link(self, inst_from, port_from, inst_to, port_to, weight=None):
+        if weight == None:
+            weight=self.C2_params['coop_weight']
         new_link = COOP_LINK(inst_from, inst_to, weight)
         new_link.set_connect(port_from, port_to)
         self.coop_links.append(new_link)
@@ -484,7 +489,9 @@ class WM(PROCEDURAL_SCHEMA):
             self.coop_links.remove(f_link)
         
     
-    def add_comp_link(self, inst_from, inst_to, weight):
+    def add_comp_link(self, inst_from, inst_to, weight=None):
+        if weight == None:
+            weight=self.C2_params['comp_weight']
         new_link = COMP_LINK(inst_from, inst_to, weight)
         self.comp_links.append(new_link)
     
@@ -534,7 +541,7 @@ class WM(PROCEDURAL_SCHEMA):
         # Update all instances activation and sets alive=False for instances that fall below threshold.
         for inst in self.schema_insts:
             inst.update_activation()
-            if inst.activity<self.prune_threshold:
+            if inst.activity<self.C2_params['prune_threshold']:
                 inst.alive = False
         
         self.udpate_activity()

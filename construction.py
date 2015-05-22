@@ -29,7 +29,11 @@ class TP_ELEM:
     SYNFORM = 6
     SYMLINKS = 7
     
+    ID_NEXT = 1 # GLOBAL TP_ELEM ID COUNTER
+    
     def __init__(self):
+        self.id = TP_ELEM.ID_NEXT
+        TP_ELEM.ID_NEXT += 1
         self.type = self.UNDEFINED # Element type
         self.parent_cxn = None # Parent construction
     
@@ -181,6 +185,8 @@ class TP_SEMFRAME(TP_ELEM):
     def unify(SF_p, node_p, SF_c, node_c):
         """
         None commutative.
+        
+        NOTE: RIGHT NOW NO COPIES ARE MADE OF TP_ELEMS!!!
         """
         new_SF = TP_SEMFRAME()
         parent_nodes = SF_p.nodes[:]
@@ -216,27 +222,31 @@ class TP_SYNFORM(TP_ELEM):
     def add_syn_elem(self, elem):
         """
         """
-        elem.order = len(self.form)
+#        elem.order = len(self.form)
         self.form.append(elem)
         
     
     @staticmethod
     def unify(SF_p, slot_p, SF_c):
         """
-        None commutative
+        None commutative.
+        
+        NOTE: RIGHT NOW NO COPIES ARE MADE OF TP_ELEMS!!!
         """
         new_synform = TP_SYNFORM()
-        idx = slot_p.order
-        for elem in SF_p.form[:idx]:    
+        idx = SF_p.form.index(slot_p)
+        elems = SF_p.form[:idx] + SF_c.form + SF_p.form[min(idx+1,len(SF_p.form)):]
+        for elem in elems:
             new_synform.add_syn_elem(elem)
-        for elem in SF_c.form:
-            new_synform.add_syn_elem(elem)
-        if idx+1<len(SF_p.form):
-            for elem in SF_p.form[idx+1:]:
-                new_synform.add_syn_elem(elem)   
+#        for elem in SF_p.form[:idx]:    
+#            new_synform.add_syn_elem(elem)
+#        for elem in SF_c.form:
+#            new_synform.add_syn_elem(elem)
+#        if idx+1<len(SF_p.form):
+#            for elem in SF_p.form[idx+1:]:
+#                new_synform.add_syn_elem(elem)   
         return new_synform
     
-
 class TP_SYMLINKS(TP_ELEM):
     """
     SymLinks construction template element.
@@ -261,6 +271,7 @@ class TP_SYMLINKS(TP_ELEM):
         Returns the form associated with the node "node"
         """
         return self.SL[node]
+        
     
     @staticmethod
     def unify(SL_p, node_p, SL_c):
@@ -358,11 +369,14 @@ class CXN:
         self.SymLinks.SL[node] = form
         return True
     
+    
     @staticmethod
     def unify(cxn_p, slot_p, cxn_c):
         """
         None commutative
         """
+        print cxn_p.name
+        print slot_p.id
         node_p = cxn_p.SymLinks.form2node(slot_p)
         node_c = cxn_c.SemFrame.get_head()
         new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p, cxn_c.SemFrame, node_c)
@@ -370,7 +384,7 @@ class CXN:
         new_symlinks = TP_SYMLINKS.unify(cxn_p.SymLinks, node_p, cxn_c.SymLinks)
         
         new_cxn = CXN()
-        new_cxn.name = "%s U[%i] %s" %(cxn_p.name,slot_p.order, cxn_c.name)
+        new_cxn.name = "[%s] U(%i) %s" %(cxn_p.name,slot_p.order, cxn_c.name)
         new_cxn.clss = cxn_p.clss
         new_cxn.preference = 0 # For now does not need to be defined....
         new_cxn.SemFrame = new_semframe
