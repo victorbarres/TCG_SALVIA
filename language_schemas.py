@@ -98,13 +98,16 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
     
     def set_covers(self, mapping, corr):
         """
-        Sets covers as mapping (DICT). Mapping should be of the form {t1:s1, t2:s2, ...} mapping each element of the trace to an element of the CXN.SemFrame
+        Sets covers as mapping (DICT).
+        
+        NOTE: Mapping is the isomorphism between SemRep and the cxn.SemFrame contained by the schema in LTM. The instance carries a copy of the cxn, so the
+        isomorphism needs to be modified using the correspondence table 'corr'
         """
         covers = {"nodes":{}, "edges":{}}
         for k, v in mapping["nodes"].iteritems():
             covers["nodes"][corr[k]] = v
         for k, v in mapping["edges"].iteritems():
-            covers["edges"][corr[k]] = v
+            covers["edges"][(corr[k[0]], corr[k[1]])] = v
         self.covers = covers
 
 ###################################
@@ -392,7 +395,7 @@ class GRAMMATICAL_WM(WM):
         
         new_cxn = construction.CXN.unify(cxn_p, slot_p, cxn_c)
         new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
-        new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=None, mapping=None)
+        new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=None, mapping=None) ## NOW THIS IS PROBLEMAtIC SINCE IT COPIES THE CXN!!
         
         in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
         out_ports = [inst_p.out_ports]
@@ -516,7 +519,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
             for a_sub_iso in sub_iso:
                 match_qual = self._SemMatch_qual(a_sub_iso)
                 trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schema":cxn_schema}
-                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso) ### A few problem here: 1. I need to have access to sub_iso including node AND edge mapping. 2. I need to deal with the Trace better. 3. t0 and tau should be defined by the WM and set when the instances are added to the WM.??
+                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso) 
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
     def _SemMatch_cat(self, SemRep, cxn_schema):

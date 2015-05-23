@@ -419,6 +419,7 @@ class CXN:
         None commutative
         """
         node_p = cxn_p.SymLinks.form2node(slot_p)
+        print cxn_p.SemFrame.nodes
         node_c = cxn_c.SemFrame.get_head()
         new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p, cxn_c.SemFrame, node_c)
         new_synform = TP_SYNFORM.unify(cxn_p.SynForm, slot_p, cxn_c.SynForm)
