@@ -33,7 +33,6 @@ class TP_ELEM:
         self.id = TP_ELEM.ID_NEXT
         TP_ELEM.ID_NEXT += 1
         self.type = self.UNDEFINED # Element type
-        self.parent_cxn = None # Parent construction
     
 class TP_SEM_ELEM(TP_ELEM):
     """
@@ -69,7 +68,6 @@ class TP_NODE(TP_SEM_ELEM):
     
     def copy(self):
         new_node = TP_NODE()
-        new_node.parent_cxn = self.parent_cxn
         new_node.name = self.name
         new_node.concept = self.concept
         new_node.head = self.head
@@ -94,7 +92,6 @@ class TP_REL(TP_SEM_ELEM):
     
     def copy(self):
         new_rel = TP_REL()
-        new_rel.parent_cxn = self.parent_cxn
         new_rel.name = self.name
         new_rel.concept = self.concept
         new_rel.pfrom = self.pFrom
@@ -111,13 +108,7 @@ class TP_SYN_ELEM(TP_ELEM):
     """
     def __init__(self):
         TP_ELEM.__init__(self)
-        self.order = -1
-    
-    def set_order(self):
-        """
-        """
-        self.order = self.parent_cxn.SynForm.form.index(self)
-        
+        self.order = -1  
         
 class TP_SLOT(TP_SYN_ELEM):
     """
@@ -138,7 +129,6 @@ class TP_SLOT(TP_SYN_ELEM):
     
     def copy(self):
         new_slot = TP_SLOT()
-        new_slot.parent_cxn = self.parent_cxn
         new_slot.order = self.order
         new_slot.cxn_classes = self.cxn_classes[:]
         return new_slot
@@ -161,7 +151,6 @@ class TP_PHON(TP_SYN_ELEM):
     
     def copy(self):
         new_phon = TP_PHON()
-        new_phon.parent_cxn = self.parent_cxn
         new_phon.order = self.order
         new_phon.cxn_phonetics = self.cxn_phonetics
         new_phon.num_syllables = self.num_syllables
@@ -259,8 +248,9 @@ class TP_SYNFORM(TP_ELEM):
     def add_syn_elem(self, elem):
         """
         """
+        order = len(self.form)
         self.form.append(elem)
-        elem.set_order()
+        elem.order = order
         
     
     @staticmethod
@@ -370,9 +360,6 @@ class CXN:
         if self.find_sem_elem(sem_elem.name):
             return False
         
-        # Set sem_elem variables
-        sem_elem.parent_cxn = self
-        
         # Add a new Sem-Frame element to either node or edge list.
         if sem_elem.type == TP_ELEM.NODE:
             self.SemFrame.nodes.append(sem_elem)
@@ -389,9 +376,6 @@ class CXN:
         """
         Add syn_elem (TP_SYN_ELEM) to the SynForm.
         """          
-        # Set syn_elem variable
-        syn_elem.parent_cxn = self
-    
         # Add a new Syn-Form element
         self.SynForm.add_syn_elem(syn_elem)        
         return True
