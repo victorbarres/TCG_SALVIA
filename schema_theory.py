@@ -443,8 +443,7 @@ class WM(PROCEDURAL_SCHEMA):
                                     noise_mean=self.dyn_params['noise_mean'],
                                     noise_std=self.dyn_params['noise_std'])
         schema_inst.set_activation_init(t0=self.t, act0=act0)
-        name = "%s_%i" % (schema_inst.name, schema_inst.id)
-        self.save_state[name] = schema_inst.activation.save_vals.copy();
+        self.save_state[schema_inst.name] = schema_inst.activation.save_vals.copy();
     
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
@@ -605,7 +604,7 @@ class WM(PROCEDURAL_SCHEMA):
         plt.title('working memory dynamics')
         plt.xlabel('time', fontsize=16)
         plt.ylabel('activity', fontsize=16)
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True)
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         plt.show()
         
     def show_state(self):

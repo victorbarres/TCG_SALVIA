@@ -66,6 +66,15 @@ class TP_NODE(TP_SEM_ELEM):
         self.type = TP_ELEM.NODE
         self.head = False
         self.focus = False
+    
+    def copy(self):
+        new_node = TP_NODE()
+        new_node.parent_cxn = self.parent_cxn
+        new_node.name = self.name
+        new_node.concept = self.concept
+        new_node.head = self.head
+        new_node.focus = self.focus
+        return new_node
 
 class TP_REL(TP_SEM_ELEM):
     """
@@ -82,6 +91,15 @@ class TP_REL(TP_SEM_ELEM):
         self.type = TP_ELEM.RELATION
         self.pFrom = None
         self.pTo = None
+    
+    def copy(self):
+        new_rel = TP_REL()
+        new_rel.parent_cxn = self.parent_cxn
+        new_rel.name = self.name
+        new_rel.concept = self.concept
+        new_rel.pfrom = self.pFrom
+        new_rel.pTo = self.pTo
+        return new_rel
 
 class TP_SYN_ELEM(TP_ELEM):
     """
@@ -117,6 +135,13 @@ class TP_SLOT(TP_SYN_ELEM):
         TP_SYN_ELEM.__init__(self)
         self.type = TP_ELEM.SLOT
         self.cxn_classes = [] # Construction classes that can fill this slot
+    
+    def copy(self):
+        new_slot = TP_SLOT()
+        new_slot.parent_cxn = self.parent_cxn
+        new_slot.order = self.order
+        new_slot.cxn_classes = self.cxn_classes[:]
+        return new_slot
         
 class TP_PHON(TP_SYN_ELEM):
     """
@@ -133,6 +158,14 @@ class TP_PHON(TP_SYN_ELEM):
         self.type = TP_ELEM.PHONETICS
         self.cxn_phonetics = ''
         self.num_syllables = 0
+    
+    def copy(self):
+        new_phon = TP_PHON()
+        new_phon.parent_cxn = self.parent_cxn
+        new_phon.order = self.order
+        new_phon.cxn_phonetics = self.cxn_phonetics
+        new_phon.num_syllables = self.num_syllables
+        return new_phon
 
 class TP_SEMFRAME(TP_ELEM):
     """
@@ -384,40 +417,30 @@ class CXN:
         new_cxn.preference = self.preference
         corr = {"semframe":{}, "synform":{}}
         for node in self.SemFrame.nodes:
-            new_node = TP_NODE()
-            new_node.head = node.head
-            new_node.focus = node.focus
-            corr['semframe'][node] = new_node
+            new_node = node.copy()
             new_cxn.add_sem_elem(new_node)
+            corr['semframe'][node] = new_node
         for edge in self.SemFrame.edges:
-            new_edge = TP_REL()
+            new_edge = edge.copy()
             new_edge.pFrom = corr['semframe'][edge.pFrom]
             new_edge.pTo = corr['semframe'][edge.pTo]
             corr['semframe'][edge] = new_edge
             new_cxn.add_sem_elem(new_edge)
+
         for form in self.SynForm.form:
-            if isinstance(form, TP_SLOT):
-                new_form= TP_SLOT()
-                new_form.cxn_classes = form.cxn_classes[:]
-            elif isinstance(form, TP_PHON):
-                new_form = TP_PHON()
-                new_form.cxn_phonetics = form.cxn_phonetics
-                new_form.num_syllables = form.num_syllables
+            new_form = form.copy()
             corr['synform'][form]  = new_form
             new_cxn.add_syn_elem(new_form)
         for k,v in self.SymLinks.SL.iteritems():
             new_cxn.add_sym_link(corr['semframe'][k], corr['synform'][v])
-            
         return (new_cxn, corr)
         
     @staticmethod
-    def unify(cxn_p, slot_p, cxn_c):
+    def unify(cxn_p, slot_p, cxn_c): # ERRORS! Eg: PARENT CXN NOT SET!!
         """
         None commutative
         """
         node_p = cxn_p.SymLinks.form2node(slot_p)
-        print cxn_p.SemFrame.nodes
-        print node_p
         node_c = cxn_c.SemFrame.get_head()
         new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p, cxn_c.SemFrame, node_c)
         new_synform = TP_SYNFORM.unify(cxn_p.SynForm, slot_p, cxn_c.SynForm)
