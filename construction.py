@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 22 15:48:47 2014
-
 @author: Victor Barres
 
 Define constructions related classes for TCG1.1
@@ -228,7 +226,6 @@ class TP_SYNFORM(TP_ELEM):
     def add_syn_elem(self, elem):
         """
         """
-#        elem.order = len(self.form)
         self.form.append(elem)
         elem.set_order()
         
@@ -420,6 +417,7 @@ class CXN:
         """
         node_p = cxn_p.SymLinks.form2node(slot_p)
         print cxn_p.SemFrame.nodes
+        print node_p
         node_c = cxn_c.SemFrame.get_head()
         new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p, cxn_c.SemFrame, node_c)
         new_synform = TP_SYNFORM.unify(cxn_p.SynForm, slot_p, cxn_c.SynForm)

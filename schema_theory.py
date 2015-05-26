@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 18 14:14:08 2015
-
 @author: Victor Barres
 
 Defines the based schema theory classes.

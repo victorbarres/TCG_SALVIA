@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 17 16:03:19 2015
-
 @author: Victor Barres
 Defines language schemas for TCG.
 
@@ -51,24 +49,31 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
     """
     Construction instance
     
+    If copy= True, carries a copy of the construction stored in LTM. 
+    Trace contains pointers to both the SemRep subgraphs that triggered the instantiation and to the CXN_SCHEMA in LTM that was instantiated.
+    
     Data:
         SCHEMA_INST:
             - id (int): Unique id
             - activity = The current activity level of the schema.
             - activation (INST_ACTIVATION): Handles the activation dynamics.
-            - oontent (CXN_SCHEMA):
+            - content (CXN):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
             - alive (bool): status flag
-            - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schema":CXN_SCHEMA }): Pointer to the elements that triggered the instantiation.
+            - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schemas":[CXN_SCHEMA]}): Pointer to the elements that triggered the instantiation.
             - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace)
     """
-    def __init__(self, cxn_schema, trace, mapping):
+    def __init__(self, cxn_schema, trace, mapping, copy=True):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
-        (cxn_copy, corr) = cxn_schema.content.copy()
-        self.content = cxn_copy
-        self.covers = {}
-        self.set_covers(mapping, corr['semframe'])
+        if copy:
+                (cxn_copy, corr) = cxn_schema.content.copy()
+                self.content = cxn_copy
+                self.covers = {}
+                self.set_copy_covers(mapping, corr['semframe'])
+        else:
+             SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
+             self.covers = mapping
         self.set_ports()
     
     def set_ports(self, in_ports=None, out_ports=None):
@@ -92,11 +97,11 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
         if out_ports == None:
             self.add_port('OUT','output')
         else:
-             for port in in_ports:
+             for port in out_ports:
                 self.out_ports.append(port)
                 port.schema=self
     
-    def set_covers(self, mapping, corr):
+    def set_copy_covers(self, mapping, corr):
         """
         Sets covers as mapping (DICT).
         
@@ -194,8 +199,9 @@ class GRAMMATICAL_WM(WM):
             activations = [a.activation for a in assemblages]
             winner_idx = activations.index(max(activations))
             print "WINNER ASSEMBLAGE: %i" %winner_idx
-            eq_inst = self._assemblage2inst(assemblages[winner_idx])
-            eq_inst.content.SemFrame.draw()
+#            new_assemblage = self._reduce_assemblage(assemblages[winner_idx], assemblages[winner_idx].coop_links[0])
+#            eq_inst = self._assemblage2inst(assemblages[winner_idx])
+#            eq_inst.content.SemFrame.draw()
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
             self.set_output('to_phonological_WM', phon_form)
             
@@ -378,29 +384,20 @@ class GRAMMATICAL_WM(WM):
         new_assemblage = assemblage.copy()
         coop_links = new_assemblage.coop_links
         while len(coop_links)>0:
-            new_assemblage = self._combine_schemas(new_assemblage, new_assemblage.coop_links[0])
+            new_assemblage = self._reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
             coop_links = new_assemblage.coop_links
         return new_assemblage.schema_insts[0]
             
-    def _combine_schemas(self, assemblage, coop_link):
+    def _reduce_assemblage(self, assemblage, coop_link):
         """
+        Returns a new, reduced, assemblage in which the instances cooperating (as defined by 'coop_link') have been combined.
         """
         inst_p = coop_link.inst_to
-        port_p = coop_link.connect.port_to
-        cxn_p = inst_p.content
-        slot_p = port_p.data
-        
         inst_c = coop_link.inst_from
-        cxn_c = inst_c.content        
+        connect = coop_link.connect
         
-        new_cxn = construction.CXN.unify(cxn_p, slot_p, cxn_c)
-        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
-        new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=None, mapping=None) ## NOW THIS IS PROBLEMAtIC SINCE IT COPIES THE CXN!!
+        (new_cxn_inst, port_corr) = GRAMMATICAL_WM._combine_schemas(inst_p, inst_c, connect)
         
-        in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
-        out_ports = [inst_p.out_ports]
-        
-        new_cxn_inst.set_ports(in_ports=in_ports, out_ports=out_ports)
         new_assemblage = ASSEMBLAGE()
         new_assemblage.activation = assemblage.activation
         
@@ -414,15 +411,53 @@ class GRAMMATICAL_WM(WM):
             new_link = coop_link.copy()
             if new_link.inst_to == inst_p:
                 new_link.inst_to = new_cxn_inst
+                new_link.connect.port_to = port_corr['in_ports'][new_link.connect.port_to]
             if new_link.inst_to == inst_c:
                 new_link.inst_to = new_cxn_inst
+                new_link.connect.port_to = port_corr['in_ports'][new_link.connect.port_to]
             if new_link.inst_from == inst_p:
                 new_link.inst_from = new_cxn_inst
+                new_link.connect.port_from = port_corr['out_ports'][new_link.connect.port_from]
             if new_link.inst_from == inst_c:
                 new_link.inst_to = new_cxn_inst
+                new_link.connect.port_from = port_corr['out_ports'][new_link.connect.port_from]
             new_assemblage.add_link(new_link)
         
         return new_assemblage
+    
+    @staticmethod
+    def _combine_schemas(inst_to, inst_from, connect):
+        """
+        Returns a new cxn_instances and the mapping between inst_to and inst_from ports to new_cxn_inst ports.
+        """
+        inst_p = inst_to
+        port_p = connect.port_to
+        cxn_p = inst_p.content
+        slot_p = port_p.data
+        
+        inst_c = inst_from
+        cxn_c = inst_c.content        
+        
+        new_cxn = construction.CXN.unify(cxn_p, slot_p, cxn_c)
+        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
+        new_trace = {"semrep":{"nodes":list(set(inst_p.trace["semrep"]["nodes"] + inst_c.trace["semrep"]["nodes"])) , "edges":list(set(inst_p.trace["semrep"]["edges"] + inst_c.trace["semrep"]["edges"]))}, 
+                               "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]}
+        new_mapping = {'nodes':{}, 'edges':{}} # TO DEFINE
+        new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False) ## NOW THIS IS PROBLEMAtIC SINCE IT COPIES THE CXN!! PORTS DON"T LINK TO THE CORRECT TP_ELEMS!
+        
+        in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
+              
+        new_cxn_inst.set_ports()
+        
+        port_corr = {'in_ports':{}, 'out_ports':{}}
+        for port in in_ports:
+            for new_port in new_cxn_inst.in_ports:
+                if port.port_data == new_port.port_data:
+                    port_corr['in_ports'][port] = new_port
+                    break
+        port_corr['out_ports'][inst_p._find_port('output')] = new_cxn_inst._find_port('output')
+        
+        return (new_cxn_inst, port_corr)
             
     @staticmethod                
     def _read_out(assemblage):
@@ -518,8 +553,8 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
             sub_iso = self._SemMatch_cat(SemRep, cxn_schema)
             for a_sub_iso in sub_iso:
                 match_qual = self._SemMatch_qual(a_sub_iso)
-                trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schema":cxn_schema}
-                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso) 
+                trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}
+                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
     def _SemMatch_cat(self, SemRep, cxn_schema):

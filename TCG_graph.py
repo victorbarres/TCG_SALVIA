@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Apr 24 10:53:22 2015
-
 @author: Victor Barres
 
 TCG graph operations
