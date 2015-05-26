@@ -62,18 +62,16 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - out_ports ([PORT]):
             - alive (bool): status flag
             - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schemas":[CXN_SCHEMA]}): Pointer to the elements that triggered the instantiation.
-            - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace)
+            - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace) (Maps the names)
     """
     def __init__(self, cxn_schema, trace, mapping, copy=True):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
         if copy:
-                (cxn_copy, corr) = cxn_schema.content.copy()
-                self.content = cxn_copy
-                self.covers = {}
-                self.set_copy_covers(mapping, corr['semframe'])
+                self.content = cxn_schema.content.copy()
         else:
              SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
-             self.covers = mapping
+        
+        self.covers = mapping
         self.set_ports()
     
     def set_ports(self, in_ports=None, out_ports=None):
@@ -100,20 +98,6 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
              for port in out_ports:
                 self.out_ports.append(port)
                 port.schema=self
-    
-    def set_copy_covers(self, mapping, corr):
-        """
-        Sets covers as mapping (DICT).
-        
-        NOTE: Mapping is the isomorphism between SemRep and the cxn.SemFrame contained by the schema in LTM. The instance carries a copy of the cxn, so the
-        isomorphism needs to be modified using the correspondence table 'corr'
-        """
-        covers = {"nodes":{}, "edges":{}}
-        for k, v in mapping["nodes"].iteritems():
-            covers["nodes"][corr[k]] = v
-        for k, v in mapping["edges"].iteritems():
-            covers["edges"][(corr[k[0]], corr[k[1]])] = v
-        self.covers = covers
 
 ###################################
 ### Language procedural schemas ###
@@ -271,14 +255,14 @@ class GRAMMATICAL_WM(WM):
             - SR_node (): SemRep node on which both instances overlap
         """
         cxn_p = inst_p.content
-        sf_p = [k for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
+        sf_p = [cxn_p.find_elem(k) for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
         cxn_c = inst_c.content
-        sf_c = [k for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+        sf_c = [cxn_c.find_elem(k) for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
         
-        cond1 = (sf_p in cxn_p.SymLinks.SL) and isinstance(cxn_p.SymLinks.SL[sf_p], construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
+        cond1 = (sf_p.name in cxn_p.SymLinks.SL) and isinstance(cxn_p.node2form(sf_p), construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
         cond2 = sf_c.head # sf_c is a head node
         if cond1 and cond2:
-            slot_p = cxn_p.SymLinks.SL[sf_p]
+            slot_p = cxn_p.node2form(sf_p)
             cond3 = cxn_c.clss in slot_p.cxn_classes
             if cond3:
                 return {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.order)}
@@ -554,7 +538,10 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
             for a_sub_iso in sub_iso:
                 match_qual = self._SemMatch_qual(a_sub_iso)
                 trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}
-                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso)
+                node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
+                edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
+                mapping = {'nodes':node_mapping, 'edges':edge_mapping}
+                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
     def _SemMatch_cat(self, SemRep, cxn_schema):

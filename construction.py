@@ -17,22 +17,13 @@ class TP_ELEM:
     """
     Template element (base class).
     """
-    # Element types
-    UNDEFINED = 0
-    NODE = 1
-    RELATION = 2
-    SLOT = 3
-    PHONETICS = 4 
-    SEMFRAME = 5
-    SYNFORM = 6
-    SYMLINKS = 7
     
     ID_NEXT = 1 # GLOBAL TP_ELEM ID COUNTER
     
     def __init__(self):
         self.id = TP_ELEM.ID_NEXT
         TP_ELEM.ID_NEXT += 1
-        self.type = self.UNDEFINED # Element type
+        self.name = ''
     
 class TP_SEM_ELEM(TP_ELEM):
     """
@@ -47,7 +38,6 @@ class TP_SEM_ELEM(TP_ELEM):
     """
     def __init__(self):
         TP_ELEM.__init__(self)
-        self.name = ''
         self.concept = None # Representing concept
         
 class TP_NODE(TP_SEM_ELEM):
@@ -56,13 +46,11 @@ class TP_NODE(TP_SEM_ELEM):
     
     Data(inherited):
     Data:
-        - type = TP_ELEM.NODE
         - head (BOOL): 
         - focus (BOOL):
     """
     def __init__(self):
         TP_SEM_ELEM.__init__(self)
-        self.type = TP_ELEM.NODE
         self.head = False
         self.focus = False
     
@@ -80,13 +68,11 @@ class TP_REL(TP_SEM_ELEM):
     
     Data(inherited):
     Data:
-        - type = TP_ELEM.RELATION
         - pFrom (TP_NODE): 
         - pTo (TP_NODE):
     """
     def __init__(self):
         TP_SEM_ELEM.__init__(self)
-        self.type = TP_ELEM.RELATION
         self.pFrom = None
         self.pTo = None
     
@@ -116,7 +102,6 @@ class TP_SLOT(TP_SYN_ELEM):
     
     Data(inherited):
     Data:
-        - type = TP_ELEM.SLOT
         - cxn_classes ([str]): Set of construction classes that can be accepted as filling this slot.
     
     Notes: 
@@ -124,11 +109,11 @@ class TP_SLOT(TP_SYN_ELEM):
     """
     def __init__(self):
         TP_SYN_ELEM.__init__(self)
-        self.type = TP_ELEM.SLOT
         self.cxn_classes = [] # Construction classes that can fill this slot
     
     def copy(self):
         new_slot = TP_SLOT()
+        new_slot.name = self.name
         new_slot.order = self.order
         new_slot.cxn_classes = self.cxn_classes[:]
         return new_slot
@@ -139,18 +124,17 @@ class TP_PHON(TP_SYN_ELEM):
     
     Data(inherited):
     Data:
-        - type = TP_ELEM.PHONETICS
         - cxn_phonetics (str): the phonetic content.
         - num_syllables (int): number of syllables (used to measure utterance length)
     """
     def __init__(self):
         TP_SYN_ELEM.__init__(self)
-        self.type = TP_ELEM.PHONETICS
         self.cxn_phonetics = ''
         self.num_syllables = 0
     
     def copy(self):
         new_phon = TP_PHON()
+        new_phon.name = self.name
         new_phon.order = self.order
         new_phon.cxn_phonetics = self.cxn_phonetics
         new_phon.num_syllables = self.num_syllables
@@ -162,7 +146,6 @@ class TP_SEMFRAME(TP_ELEM):
 
     Data(inherited):
     Data:
-        - type = TP_ELEM.SEMFRAME
         - nodes ([TP_NODES]): Set of template semantic nodes.
         - edges ([TP_REL]): Set of template semantic relations.
         - graph (networkx.DiGraph): A NetworkX implementation of the graph.
@@ -173,7 +156,6 @@ class TP_SEMFRAME(TP_ELEM):
     """
     def __init__(self):
         TP_ELEM.__init__(self)
-        self.type = TP_ELEM.SEMFRAME
         self.nodes = []
         self.edges = []
         self.graph = None
@@ -195,7 +177,26 @@ class TP_SEMFRAME(TP_ELEM):
         
         self.graph = graph
     
+    def copy(self):
+        """
+        """
+        new_semframe = TP_SEMFRAME()
+        corr = {}
+        for node in self.nodes:
+            new_node = node.copy()
+            corr[node] = new_node
+            new_semframe.nodes.append(new_node)
+        for edge in self.edges:
+            new_edge = edge.copy()
+            new_edge.pFrom = corr[edge.pFrom]
+            new_edge.pTo = corr[edge.pTo]
+            new_semframe.edges.append(new_edge)
+        new_semframe._create_NX_graph()
+        
+        return new_semframe
+    
     def draw(self):
+        self._create_NX_graph()
         plt.figure(facecolor='white')
         plt.axis('off')
         title = 'SemFrame'
@@ -242,7 +243,6 @@ class TP_SYNFORM(TP_ELEM):
     """
     def __init__(self):
         TP_ELEM.__init__(self)
-        self.type = TP_ELEM.SYNFORM
         self.form = []
     
     def add_syn_elem(self, elem):
@@ -251,7 +251,15 @@ class TP_SYNFORM(TP_ELEM):
         order = len(self.form)
         self.form.append(elem)
         elem.order = order
+    
+    def copy(self):
+        """
+        """
+        new_synform = TP_SYNFORM()
+        for f in self.form:
+            new_synform.add_syn_elem(f.copy())
         
+        return new_synform
     
     @staticmethod
     def unify(SF_p, slot_p, SF_c):
@@ -280,26 +288,34 @@ class TP_SYMLINKS(TP_ELEM):
     SymLinks construction template element.
     Data (inherited):
     Data:
-        - SL (DICT): Map between SemFrame (TP_NODE) elements and SynForm (TP_SYNFORM) elements.
+        - SL (DICT): Map between SemFrame (TP_NODE) elements and SynForm (TP_SYNFORM) elements. The dictionary define a mapping between the names of the elements.
         
     """
     def __init__(self):
         TP_ELEM.__init__(self)
         self.SL = {}
     
-    def form2node(self, form):
+    def form2node(self, form_name):
         """
-        Returns the node associated with the form "form"
+        Returns the name of node associated with the form name "form_name"
         """
-        res = [n for n,v in self.SL.iteritems() if v==form]
+        res = [n for n,v in self.SL.iteritems() if v==form_name]
         return res[0]
     
-    def node2form(self, node):
+    def node2form(self, node_name):
         """
-        Returns the form associated with the node "node"
+        Returns the name of the form element associated with the node name "node_name"
         """
-        return self.SL[node]
+        return self.SL[node_name]
+    
+    def copy(self):
+        """
+        """
+        new_symlinks = TP_SYMLINKS()
+        for k,v in self.SL.iteritems():
+            new_symlinks.SL[k] = v
         
+        return new_symlinks    
     
     @staticmethod
     def unify(SL_p, node_p, SL_c):
@@ -339,11 +355,11 @@ class CXN:
         self.SynForm = TP_SYNFORM() # Syntactic form
         self.SymLinks = TP_SYMLINKS() # Symbolic links
     
-    def find_sem_elem(self, name):
+    def find_elem(self, name):
         """
-        Find and return SemFrame element with a given name (str).
+        Find and return element with a given name (str).
         """
-        for elem in self.SemFrame.nodes + self.SemFrame.edges:
+        for elem in self.SemFrame.nodes + self.SemFrame.edges + self.SynForm.form:
             if elem.name == name:
                 return elem
         return None
@@ -357,13 +373,13 @@ class CXN:
         OPTION: MAKE SURE THAT THE CONCEPTS DO BELONG TO THE CONCEPTUAL KNOWLEDGE, ELSE RETURN AN ERROR.
         """
         # Check for duplicate
-        if self.find_sem_elem(sem_elem.name):
+        if self.find_elem(sem_elem.name):
             return False
         
         # Add a new Sem-Frame element to either node or edge list.
-        if sem_elem.type == TP_ELEM.NODE:
+        if isinstance(sem_elem, TP_NODE):
             self.SemFrame.nodes.append(sem_elem)
-        elif sem_elem.type == TP_ELEM.RELATION:
+        elif isinstance(sem_elem, TP_REL):
             self.SemFrame.edges.append(sem_elem)
         else:
             return False
@@ -380,16 +396,33 @@ class CXN:
         self.SynForm.add_syn_elem(syn_elem)        
         return True
     
-    def add_sym_link(self, node, form):
+    def add_sym_link(self, node_name, form_name):
         """
         Adds a symbolic link  between the node (TP_NODE) and form (TP_SLOT or TP_PHON)
         """
-        if node.type != TP_ELEM.NODE:
+        if self.SymLinks.SL.has_key(node_name) or (form_name in self.SymLinks.SL.values()):
             return False
-        if self.SymLinks.SL.has_key(node) or (form in self.SymLinks.SL.values()):
-            return False
-        self.SymLinks.SL[node] = form
+        self.SymLinks.SL[node_name] = form_name
         return True
+    
+    def form2node(self, form):
+        """
+        Returns the node associated with the form "form"
+        """
+        res = [n for n,v in self.SymLinks.SL.iteritems() if v==form.name]
+        if not(res):
+            return None
+        node_name = res[0]
+        node = self.find_elem(node_name)
+        return node
+    
+    def node2form(self, node):
+        """
+        Returns the form associated with the node "node"
+        """
+        form_name =  self.SymLinks.SL[node.name]
+        form_elem = self.find_elem(form_name)
+        return form_elem
     
     def copy(self):
         """
@@ -399,25 +432,16 @@ class CXN:
         new_cxn.name = self.name
         new_cxn.clss = self.clss
         new_cxn.preference = self.preference
-        corr = {"semframe":{}, "synform":{}}
-        for node in self.SemFrame.nodes:
-            new_node = node.copy()
-            new_cxn.add_sem_elem(new_node)
-            corr['semframe'][node] = new_node
-        for edge in self.SemFrame.edges:
-            new_edge = edge.copy()
-            new_edge.pFrom = corr['semframe'][edge.pFrom]
-            new_edge.pTo = corr['semframe'][edge.pTo]
-            corr['semframe'][edge] = new_edge
-            new_cxn.add_sem_elem(new_edge)
-
-        for form in self.SynForm.form:
-            new_form = form.copy()
-            corr['synform'][form]  = new_form
-            new_cxn.add_syn_elem(new_form)
-        for k,v in self.SymLinks.SL.iteritems():
-            new_cxn.add_sym_link(corr['semframe'][k], corr['synform'][v])
-        return (new_cxn, corr)
+        
+        new_semframe = self.SemFrame.copy()
+        new_synform = self.SynForm.copy()
+        new_symlinks = self.SymLinks.copy()
+        
+        new_cxn.SemFrame = new_semframe
+        new_cxn.SynForm = new_synform
+        new_cxn.SymLinks = new_symlinks
+        
+        return new_cxn
         
     @staticmethod
     def unify(cxn_p, slot_p, cxn_c): # ERRORS! Eg: PARENT CXN NOT SET!!
@@ -547,5 +571,30 @@ class GRAMMAR:
 ###############################################################################
 
 if __name__=='__main__':
-    print "No test case implemented."
+    import loader as ld
+    my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+    cxn =  my_grammar.constructions[1]
+    semframe= cxn.SemFrame
+    print [n.name for n in semframe.nodes]
+    sfr_copy = semframe.copy()
+    print [n.name for n in sfr_copy.nodes]
+    
+    synform = cxn.SynForm
+    print [f.name for f in synform.form]
+    sfo_copy = synform.copy()
+    print [f.name for f in sfo_copy.form]
+    
+    symlinks = cxn.SymLinks
+    print symlinks.SL
+    sl_copy = symlinks.copy()
+    print sl_copy.SL
+    
+    cxn_copy = cxn.copy()
+    cxn.SemFrame.draw()
+    cxn_copy.SemFrame.draw()
+    node = cxn.node2form(cxn.SemFrame.nodes[0])
+    print node.name
+    node2 = cxn_copy.node2form(cxn.SemFrame.nodes[0])
+    print node2.name
+    
     

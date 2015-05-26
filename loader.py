@@ -77,7 +77,8 @@ def read_node(new_cxn, aNode, name_table): # NEED TO CHECK THE CURRENT STATUS OF
     """
     # Create new node
     new_node = cxn.TP_NODE()
-    new_node.name = aNode['name']
+    name = aNode['name']
+    new_node.name = '%s_%i' %(name, new_node.id)
     
     new_concept = cpt.CONCEPT()
     new_concept.create(meaning = aNode['concept'])
@@ -87,19 +88,18 @@ def read_node(new_cxn, aNode, name_table): # NEED TO CHECK THE CURRENT STATUS OF
     if 'focus' in aNode:
         new_node.focus = aNode['focus']
     
-    # Update construction and name_table
-    if new_cxn.find_sem_elem(new_node.name):
-        return False
-    
+    # Update construction and name_table    
     new_cxn.add_sem_elem(new_node)
-    name_table['SemNames'][new_node.name] = new_node
+    name_table['SemNodes'][name] = new_node
+    name_table['names'][name] = new_node.name
 
 def read_rel(new_cxn, aRel, name_table):
     """
     """    
     # Create new relation
     new_rel = cxn.TP_REL()
-    new_rel.name = aRel['name']
+    name = aRel['name']
+    new_rel.name = '%s_%i' %(name, new_rel.id)
     
     
     new_concept = cpt.CONCEPT()
@@ -116,34 +116,41 @@ def read_rel(new_cxn, aRel, name_table):
     
     # Update construction and name table
     new_cxn.add_sem_elem(new_rel)
-    name_table['SemNames'][new_rel.name] = new_rel
-    name_table['SemEdges'][new_rel.name] = (pFrom, pTo)
+    name_table['SemNodes'][name] = new_rel
+    name_table['SemEdges'][name] = (pFrom, pTo)
+    name_table['names'][name] = new_rel.name
 
 def read_slot(new_cxn, aSlot, name_table):
     """
     """
-    slot_name = aSlot['name']
-    
     new_slot = cxn.TP_SLOT()
+    name = aSlot['name']
+    new_slot.name = '%s_%i' %(name, new_slot.id)
         
     new_slot.cxn_classes = aSlot['classes']
     
     # Update construction and name table
     new_cxn.add_syn_elem(new_slot)
-    name_table['SlotNames'][slot_name] = new_slot
+    name_table['SynForms'][name] = new_slot
+    name_table['names'][name] = new_slot.name
         
 def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER THE PHON TYPE?
     """
     """
     new_phon = cxn.TP_PHON()
+    name = aPhon['name']
+    new_phon.name = '%s_%i' %(name, new_phon.id)
     new_phon.cxn_phonetics = aPhon['phon']
     
     # Temporarily estimates the syllable length (count the number of alphabet characters)
     for char in new_phon.cxn_phonetics:
         if char.isalpha():
             new_phon.num_syllables += 1
-    
+            
+    # Update construction and name table
     new_cxn.add_syn_elem(new_phon)
+    name_table['SynForms'][name] = new_phon
+    name_table['names'][name] = new_phon.name
             
 def read_semframe(new_cxn, SemFrame, name_table):
     """
@@ -156,14 +163,14 @@ def read_semframe(new_cxn, SemFrame, name_table):
     for rel_name, node_pair in name_table['SemEdges'].iteritems(): # Creating SemFrame relations
         from_name = node_pair[0]
         to_name = node_pair[1]
-        if(not(name_table['SemNames'].has_key(rel_name) and 
-            name_table['SemNames'].has_key(from_name) and 
-            name_table['SemNames'].has_key(to_name))):
+        if(not(name_table['SemNodes'].has_key(rel_name) and 
+            name_table['SemNodes'].has_key(from_name) and 
+            name_table['SemNodes'].has_key(to_name))):
             return False
        
-        sem_elem = name_table['SemNames'][rel_name]
-        sem_elem.pFrom = name_table['SemNames'][from_name]
-        sem_elem.pTo = name_table['SemNames'][to_name]
+        sem_elem = name_table['SemNodes'][rel_name]
+        sem_elem.pFrom = name_table['SemNodes'][from_name]
+        sem_elem.pTo = name_table['SemNodes'][to_name]
     
     new_cxn.SemFrame._create_NX_graph() # Creating NetworkX implementation of SemFrame
 
@@ -180,9 +187,9 @@ def read_symlinks(new_cxn, sym_links, name_table):
     """
     """
     for key, val in sym_links.iteritems():
-        sem_elem = name_table['SemNames'][key]
-        slot = name_table['SlotNames'][val]
-        new_cxn.add_sym_link(sem_elem, slot)
+        sem_name = name_table['names'][key]
+        form_name = name_table['names'][val]
+        new_cxn.add_sym_link(sem_name, form_name)
           
 def read_cxn(grammar, aCxn):
     """
@@ -195,7 +202,7 @@ def read_cxn(grammar, aCxn):
         new_cxn.preference = aCxn['preference']
     
     # Name table
-    name_table = {'SemNames':{}, 'SemEdges':{}, 'SlotNames':{}}
+    name_table = {'SemNodes':{}, 'SemEdges':{}, 'SynForms':{}, 'names':{}}
     
     # READ SEMFRAME
     read_semframe(new_cxn, aCxn['SemFrame'], name_table)
