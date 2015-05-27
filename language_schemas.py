@@ -178,13 +178,16 @@ class GRAMMATICAL_WM(WM):
         self.prune()
         if not(self.comp_links) and self.coop_links:
             self.show_state()
-            self._draw_assemblages()
             assemblages = self._assemble()
+#            self._draw_assemblages()
             activations = [a.activation for a in assemblages]
             winner_idx = activations.index(max(activations))
             print "WINNER ASSEMBLAGE: %i" %winner_idx
-            eq_inst = self._assemblage2inst(assemblages[winner_idx])
-            phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
+            winner_assemblage = assemblages[winner_idx]
+            GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
+            eq_inst = self._assemblage2inst(winner_assemblage)
+            eq_inst.content.SemFrame.draw()
+            phon_form = GRAMMATICAL_WM._read_out(winner_assemblage)
             self.set_output('to_phonological_WM', phon_form)
             self.schema_insts = []
             self.coop_links = []
@@ -306,7 +309,12 @@ class GRAMMATICAL_WM(WM):
         
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
         assemblages = []
-        self._get_trees(tops, None, inst_network, assemblages)
+        for t in tops:
+            results = []
+            frontier = [t]
+            assemblage = ASSEMBLAGE()
+            self._get_trees(frontier, assemblage, inst_network, results)
+            assemblages += results
         
         # Compute assemblage activation values
         for assemblage in assemblages:
@@ -339,8 +347,6 @@ class GRAMMATICAL_WM(WM):
         """
         new_frontiers = [[]]
         for node, link in frontier:
-            if assemblage == None:
-                assemblage = ASSEMBLAGE()
             assemblage.add_instance(node)
             if link:
                 assemblage.add_link(link)
@@ -405,8 +411,9 @@ class GRAMMATICAL_WM(WM):
                 new_link.connect.port_from = port_corr['out_ports'][coop_link.connect.port_from]
             new_assemblage.add_link(new_link)
         
-        print "reduce: %s U %s" %(inst_p.name, inst_c.name),
-        print GRAMMATICAL_WM._read_out(new_assemblage)
+        title =  "reduce: %s U %s" %(inst_p.name, inst_c.name)
+        GRAMMATICAL_WM._draw_assemblage(new_assemblage, title)
+        
         return new_assemblage
     
     @staticmethod
@@ -889,8 +896,8 @@ if __name__=='__main__':
             if language_system.outputs['Phonological_WM:14']:
                 output =  language_system.outputs['Phonological_WM:14']
                 print output
-                text2speech.utterance = ' '.join(output)
-                text2speech.utter()
+#                text2speech.utterance = ' '.join(output)
+#                text2speech.utter()
             
         grammaticalWM.plot_dynamics()
     

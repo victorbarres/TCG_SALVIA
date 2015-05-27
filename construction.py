@@ -469,7 +469,7 @@ class CXN:
         new_symlinks = TP_SYMLINKS.unify(cxn_p.SymLinks, node_p.name, cxn_c.SymLinks)
         
         new_cxn = CXN()
-        new_cxn.name = "[%s] U(%i) %s" %(cxn_p.name, slot_p.order, cxn_c.name)
+        new_cxn.name = "[%s U(%i) %s]" %(cxn_p.name, slot_p.order, cxn_c.name)
         new_cxn.clss = cxn_p.clss
         new_cxn.preference = 0 # For now does not need to be defined....
         new_cxn.SemFrame = new_semframe
@@ -611,8 +611,10 @@ if __name__=='__main__':
     node2 = cxn_copy.node2form(cxn.SemFrame.nodes[0])
     print node2.name
     
-    cxn2 = my_grammar.constructions[1]
+    cxn2 = my_grammar.constructions[0]
     
     cxn3 = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
     cxn3.SemFrame.draw()
+    print [f.name for f in cxn3.SynForm.form]
+    print cxn3.SymLinks.SL
     
