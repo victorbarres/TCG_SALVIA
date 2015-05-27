@@ -184,10 +184,8 @@ class GRAMMATICAL_WM(WM):
             winner_idx = activations.index(max(activations))
             print "WINNER ASSEMBLAGE: %i" %winner_idx
             eq_inst = self._assemblage2inst(assemblages[winner_idx])
-            print eq_inst.content.SynForm.form
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
             self.set_output('to_phonological_WM', phon_form)
-            
             self.schema_insts = []
             self.coop_links = []
             self.comp_links = []
