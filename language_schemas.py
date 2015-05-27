@@ -62,7 +62,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - out_ports ([PORT]):
             - alive (bool): status flag
             - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schemas":[CXN_SCHEMA]}): Pointer to the elements that triggered the instantiation.
-            - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace) (Maps the names)
+            - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
     """
     def __init__(self, cxn_schema, trace, mapping, copy=True):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
@@ -183,9 +183,8 @@ class GRAMMATICAL_WM(WM):
             activations = [a.activation for a in assemblages]
             winner_idx = activations.index(max(activations))
             print "WINNER ASSEMBLAGE: %i" %winner_idx
-#            new_assemblage = self._reduce_assemblage(assemblages[winner_idx], assemblages[winner_idx].coop_links[0])
-#            eq_inst = self._assemblage2inst(assemblages[winner_idx])
-#            eq_inst.content.SemFrame.draw()
+            eq_inst = self._assemblage2inst(assemblages[winner_idx])
+            print eq_inst.content.SynForm.form
             phon_form = GRAMMATICAL_WM._read_out(assemblages[winner_idx])
             self.set_output('to_phonological_WM', phon_form)
             
@@ -389,30 +388,33 @@ class GRAMMATICAL_WM(WM):
             if inst != inst_p and inst != inst_c:
                 new_assemblage.add_instance(inst)
         new_assemblage.add_instance(new_cxn_inst)
+        
         coop_links = assemblage.coop_links[:]
         coop_links.remove(coop_link)
         for coop_link in coop_links:
             new_link = coop_link.copy()
             if new_link.inst_to == inst_p:
                 new_link.inst_to = new_cxn_inst
-                new_link.connect.port_to = port_corr['in_ports'][new_link.connect.port_to]
+                new_link.connect.port_to = port_corr['in_ports'][coop_link.connect.port_to]
             if new_link.inst_to == inst_c:
                 new_link.inst_to = new_cxn_inst
-                new_link.connect.port_to = port_corr['in_ports'][new_link.connect.port_to]
+                new_link.connect.port_to = port_corr['in_ports'][coop_link.connect.port_to]
             if new_link.inst_from == inst_p:
                 new_link.inst_from = new_cxn_inst
-                new_link.connect.port_from = port_corr['out_ports'][new_link.connect.port_from]
+                new_link.connect.port_from = port_corr['out_ports'][coop_link.connect.port_from]
             if new_link.inst_from == inst_c:
                 new_link.inst_to = new_cxn_inst
-                new_link.connect.port_from = port_corr['out_ports'][new_link.connect.port_from]
+                new_link.connect.port_from = port_corr['out_ports'][coop_link.connect.port_from]
             new_assemblage.add_link(new_link)
         
+        print "reduce: %s U %s" %(inst_p.name, inst_c.name),
+        print GRAMMATICAL_WM._read_out(new_assemblage)
         return new_assemblage
     
     @staticmethod
     def _combine_schemas(inst_to, inst_from, connect):
         """
-        Returns a new cxn_instances and the mapping between inst_to and inst_from ports to new_cxn_inst ports.
+        Returns a new cxn_instance and the mapping between inst_to and inst_from ports to new_cxn_inst ports.
         """
         inst_p = inst_to
         port_p = connect.port_to
@@ -424,8 +426,9 @@ class GRAMMATICAL_WM(WM):
         
         new_cxn = construction.CXN.unify(cxn_p, slot_p, cxn_c)
         new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
-        new_trace = {"semrep":{"nodes":list(set(inst_p.trace["semrep"]["nodes"] + inst_c.trace["semrep"]["nodes"])) , "edges":list(set(inst_p.trace["semrep"]["edges"] + inst_c.trace["semrep"]["edges"]))}, 
-                               "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]}
+#        new_trace = {"semrep":{"nodes":list(set(inst_p.trace["semrep"]["nodes"] + inst_c.trace["semrep"]["nodes"])) , "edges":list(set(inst_p.trace["semrep"]["edges"] + inst_c.trace["semrep"]["edges"]))}, 
+#                               "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]}
+        new_trace = {'semrep':{'nodes':[], 'edges':[]}, "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} # TO DEFINE PROPERLY
         new_mapping = {'nodes':{}, 'edges':{}} # TO DEFINE
         new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False) ## NOW THIS IS PROBLEMAtIC SINCE IT COPIES THE CXN!! PORTS DON"T LINK TO THE CORRECT TP_ELEMS!
         
@@ -436,11 +439,11 @@ class GRAMMATICAL_WM(WM):
         port_corr = {'in_ports':{}, 'out_ports':{}}
         for port in in_ports:
             for new_port in new_cxn_inst.in_ports:
-                if port.port_data == new_port.port_data:
+                if port.data.name == new_port.data.name:
                     port_corr['in_ports'][port] = new_port
                     break
         port_corr['out_ports'][inst_p._find_port('output')] = new_cxn_inst._find_port('output')
-        
+      
         return (new_cxn_inst, port_corr)
             
     @staticmethod                
@@ -484,6 +487,13 @@ class GRAMMATICAL_WM(WM):
         nx.draw_networkx_edges(graph, pos=pos, edgelist=[e for e in graph.edges() if graph.edge[e[0]][e[1]]['type'] == 'inst2port'], edge_color='r')
         node_labels = dict((n, n.name) for n in graph.nodes())
         nx.draw_networkx_labels(graph, pos=pos, labels=node_labels)
+    
+    @staticmethod
+    def _draw_assemblage(assemblage, title=''):
+        """
+        """
+        graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
+        GRAMMATICAL_WM._draw_instance_network(graph, title)
         
     def _draw_assemblages(self):
         """
@@ -491,9 +501,8 @@ class GRAMMATICAL_WM(WM):
         assemblages = self._assemble()
         i=0
         for assemblage in assemblages:
-            graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
             title = 'Assemblage_%i' % i
-            GRAMMATICAL_WM._draw_instance_network(graph, title)
+            GRAMMATICAL_WM._draw_assemblage(assemblage, title)
             i += 1
         
 class GRAMMATICAL_LTM(LTM):

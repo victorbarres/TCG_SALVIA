@@ -106,6 +106,12 @@ class CONNECT(SCHEMA):
         """
         self.delay = delay
     
+    def copy(self):
+        """
+        """
+        new_connect = CONNECT(name=self.name, port_from = self.port_from, port_to = self.port_to, weight=self.weight, delay=self.delay)
+        return new_connect
+        
     def update(self):
         """
         For now does not involve weight or delay!
@@ -689,7 +695,7 @@ class COOP_LINK(F_LINK):
     
     def copy(self):
         new_flink = COOP_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
-        new_flink.connect = self.connect
+        new_flink.connect = self.connect.copy()
         return new_flink
 
 class COMP_LINK(F_LINK):
