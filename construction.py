@@ -168,6 +168,16 @@ class TP_SEMFRAME(TP_ELEM):
             if node.head:
                 return node
     
+    def find_elem(self, name):
+        """
+        Returns the element with name "name". Returns None if name is not found.
+        """
+        for elem in self.nodes + self.edges:
+            if elem.name == name:
+                return elem
+        
+        return None
+    
     def _create_NX_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
@@ -209,29 +219,29 @@ class TP_SEMFRAME(TP_ELEM):
         nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)
     
     @staticmethod
-    def unify(SF_p, node_p, SF_c, node_c):
+    def unify(SF_p, node_p_name, SF_c, node_c_name):
         """
         None commutative.
-        
-        NOTE: RIGHT NOW NO COPIES ARE MADE OF TP_ELEMS!!!
         """
-        new_SF = TP_SEMFRAME()
-        parent_nodes = SF_p.nodes[:]
-        parent_nodes.remove(node_p)
-        parent_edges = SF_p.edges[:]
-        for rel in parent_edges:
-            if rel.pFrom == node_p:
+        SF_p_copy = SF_p.copy()
+        SF_c_copy = SF_c.copy()
+        
+        # Insert the child graph into the parent graph by substituting node_p by node_c.
+        node_p = SF_p_copy.find_elem(node_p_name)
+        SF_p_copy.nodes.remove(node_p)
+        SF_p_copy.nodes += SF_c_copy.nodes
+        
+        node_c = SF_c_copy.find_elem(node_c_name)                
+        for rel in SF_p_copy.edges:
+            if rel.pFrom.name == node_p_name:
                 rel.pFrom = node_c
-            if rel.pTo == node_p:
+            if rel.pTo.name == node_p_name:
                 rel.pTo = node_c
         
-        new_SF.nodes += SF_c.nodes[:]
-        new_SF.nodes += parent_nodes
-        new_SF.edges += SF_c.edges[:]
-        new_SF.edges += parent_edges
+        SF_p_copy.edges += SF_c_copy.edges
+        SF_p_copy._create_NX_graph()
         
-        new_SF._create_NX_graph()
-        
+        new_SF = SF_p_copy
         return new_SF
         
 class TP_SYNFORM(TP_ELEM):
@@ -252,6 +262,16 @@ class TP_SYNFORM(TP_ELEM):
         self.form.append(elem)
         elem.order = order
     
+    def find_elem(self, name):
+        """
+        Returns the element with name "name". Returns None if name is not found.
+        """
+        for elem in self.form:
+            if elem.name == name:
+                return elem
+        
+        return None
+    
     def copy(self):
         """
         """
@@ -262,25 +282,19 @@ class TP_SYNFORM(TP_ELEM):
         return new_synform
     
     @staticmethod
-    def unify(SF_p, slot_p, SF_c):
+    def unify(SF_p, slot_p_name, SF_c):
         """
         None commutative.
-        
-        NOTE: RIGHT NOW NO COPIES ARE MADE OF TP_ELEMS!!!
         """
         new_synform = TP_SYNFORM()
-        idx = SF_p.form.index(slot_p)
-        elems = SF_p.form[:idx] + SF_c.form + SF_p.form[min(idx+1,len(SF_p.form)):]
+        SF_p_copy = SF_p.copy()
+        SF_c_copy = SF_c.copy()
+        slot_p = SF_p_copy.find_elem(slot_p_name)
+        idx = SF_p_copy.form.index(slot_p)
+        elems = SF_p_copy.form[:idx] + SF_c_copy.form + SF_p_copy.form[min(idx+1,len(SF_p_copy.form)):]
         for elem in elems:
             new_synform.add_syn_elem(elem)
-        
-#        for elem in SF_p.form[:idx]:    
-#            new_synform.add_syn_elem(elem)
-#        for elem in SF_c.form:
-#            new_synform.add_syn_elem(elem)
-#        if idx+1<len(SF_p.form):
-#            for elem in SF_p.form[idx+1:]:
-#                new_synform.add_syn_elem(elem)   
+
         return new_synform
     
 class TP_SYMLINKS(TP_ELEM):
@@ -318,13 +332,13 @@ class TP_SYMLINKS(TP_ELEM):
         return new_symlinks    
     
     @staticmethod
-    def unify(SL_p, node_p, SL_c):
+    def unify(SL_p, node_p_name, SL_c):
         """
         None commutative
         """
-        new_symlinks = TP_SYMLINKS()
+        new_symlinks = TP_SYMLINKS()        
         for k,v in SL_p.SL.iteritems():
-            if k != node_p:
+            if k != node_p_name:
                 new_symlinks.SL[k]=v
         
         for k,v in SL_c.SL.iteritems():
@@ -448,11 +462,11 @@ class CXN:
         """
         None commutative
         """
-        node_p = cxn_p.SymLinks.form2node(slot_p)
+        node_p = cxn_p.form2node(slot_p)
         node_c = cxn_c.SemFrame.get_head()
-        new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p, cxn_c.SemFrame, node_c)
-        new_synform = TP_SYNFORM.unify(cxn_p.SynForm, slot_p, cxn_c.SynForm)
-        new_symlinks = TP_SYMLINKS.unify(cxn_p.SymLinks, node_p, cxn_c.SymLinks)
+        new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p.name, cxn_c.SemFrame, node_c.name)
+        new_synform = TP_SYNFORM.unify(cxn_p.SynForm, slot_p.name, cxn_c.SynForm)
+        new_symlinks = TP_SYMLINKS.unify(cxn_p.SymLinks, node_p.name, cxn_c.SymLinks)
         
         new_cxn = CXN()
         new_cxn.name = "[%s] U(%i) %s" %(cxn_p.name, slot_p.order, cxn_c.name)
@@ -573,7 +587,7 @@ class GRAMMAR:
 if __name__=='__main__':
     import loader as ld
     my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
-    cxn =  my_grammar.constructions[1]
+    cxn =  my_grammar.constructions[0]
     semframe= cxn.SemFrame
     print [n.name for n in semframe.nodes]
     sfr_copy = semframe.copy()
@@ -597,4 +611,8 @@ if __name__=='__main__':
     node2 = cxn_copy.node2form(cxn.SemFrame.nodes[0])
     print node2.name
     
+    cxn2 = my_grammar.constructions[1]
+    
+    cxn3 = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
+    cxn3.SemFrame.draw()
     
