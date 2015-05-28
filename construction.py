@@ -56,11 +56,12 @@ class TP_NODE(TP_SEM_ELEM):
     
     def copy(self):
         new_node = TP_NODE()
-        new_node.name = self.name
+        new_node.name = '%s_%i' %(self.name, new_node.id)
+        name_corr = (self.name, new_node.name)
         new_node.concept = self.concept
         new_node.head = self.head
         new_node.focus = self.focus
-        return new_node
+        return (new_node, name_corr)
 
 class TP_REL(TP_SEM_ELEM):
     """
@@ -78,11 +79,12 @@ class TP_REL(TP_SEM_ELEM):
     
     def copy(self):
         new_rel = TP_REL()
-        new_rel.name = self.name
+        new_rel.name = '%s_%i' %(self.name, new_rel.id)
+        name_corr = (self.name, new_rel.name)
         new_rel.concept = self.concept
         new_rel.pfrom = self.pFrom
         new_rel.pTo = self.pTo
-        return new_rel
+        return (new_rel, name_corr)
 
 class TP_SYN_ELEM(TP_ELEM):
     """
@@ -113,10 +115,11 @@ class TP_SLOT(TP_SYN_ELEM):
     
     def copy(self):
         new_slot = TP_SLOT()
-        new_slot.name = self.name
+        new_slot.name = '%s_%i' %(self.name, new_slot.id)
+        name_corr = (self.name, new_slot.name)
         new_slot.order = self.order
         new_slot.cxn_classes = self.cxn_classes[:]
-        return new_slot
+        return (new_slot, name_corr)
         
 class TP_PHON(TP_SYN_ELEM):
     """
@@ -134,11 +137,12 @@ class TP_PHON(TP_SYN_ELEM):
     
     def copy(self):
         new_phon = TP_PHON()
-        new_phon.name = self.name
+        new_phon.name = '%s_%i' %(self.name, new_phon.id)
+        name_corr = (self.name, new_phon.name)
         new_phon.order = self.order
         new_phon.cxn_phonetics = self.cxn_phonetics
         new_phon.num_syllables = self.num_syllables
-        return new_phon
+        return (new_phon, name_corr)
 
 class TP_SEMFRAME(TP_ELEM):
     """
@@ -191,19 +195,22 @@ class TP_SEMFRAME(TP_ELEM):
         """
         """
         new_semframe = TP_SEMFRAME()
-        corr = {}
+        node_corr = {}
+        name_corr = {}
         for node in self.nodes:
-            new_node = node.copy()
-            corr[node] = new_node
+            (new_node, c) = node.copy()
+            node_corr[node] = new_node
+            name_corr[c[0]] = c[1]
             new_semframe.nodes.append(new_node)
         for edge in self.edges:
-            new_edge = edge.copy()
-            new_edge.pFrom = corr[edge.pFrom]
-            new_edge.pTo = corr[edge.pTo]
+            (new_edge, c) = edge.copy()
+            name_corr[c[0]] = c[1]
+            new_edge.pFrom = node_corr[edge.pFrom]
+            new_edge.pTo = node_corr[edge.pTo]
             new_semframe.edges.append(new_edge)
         new_semframe._create_NX_graph()
         
-        return new_semframe
+        return (new_semframe, name_corr)
     
     def draw(self):
         self._create_NX_graph()
@@ -223,26 +230,37 @@ class TP_SEMFRAME(TP_ELEM):
         """
         None commutative.
         """
-        SF_p_copy = SF_p.copy()
-        SF_c_copy = SF_c.copy()
+        (SF_p_copy, c_p) = SF_p.copy()
+        (SF_c_copy, c_c) = SF_c.copy()
         
         # Insert the child graph into the parent graph by substituting node_p by node_c.
-        node_p = SF_p_copy.find_elem(node_p_name)
+        node_p = SF_p_copy.find_elem(c_p[node_p_name])
         SF_p_copy.nodes.remove(node_p)
         SF_p_copy.nodes += SF_c_copy.nodes
         
-        node_c = SF_c_copy.find_elem(node_c_name)                
+        node_c = SF_c_copy.find_elem(c_c[node_c_name])                
         for rel in SF_p_copy.edges:
-            if rel.pFrom.name == node_p_name:
+            if rel.pFrom.name == c_p[node_p_name]:
                 rel.pFrom = node_c
-            if rel.pTo.name == node_p_name:
+            if rel.pTo.name == c_p[node_p_name]:
                 rel.pTo = node_c
         
         SF_p_copy.edges += SF_c_copy.edges
         SF_p_copy._create_NX_graph()
         
         new_SF = SF_p_copy
-        return new_SF
+        
+        name_corr = {}
+        for n1, n2 in c_p.iteritems():
+            if n1 != node_p_name:
+                name_corr[n1] = n2
+            else:
+                name_corr[n1] = None
+        
+        for n1, n2 in c_c.iteritems():
+            name_corr[n1] = n2
+            
+        return (new_SF, name_corr)
         
 class TP_SYNFORM(TP_ELEM):
     """
@@ -276,10 +294,13 @@ class TP_SYNFORM(TP_ELEM):
         """
         """
         new_synform = TP_SYNFORM()
+        name_corr = {}
         for f in self.form:
-            new_synform.add_syn_elem(f.copy())
+            (new_f, c) = f.copy()
+            name_corr[c[0]] = c[1]
+            new_synform.add_syn_elem(new_f)
         
-        return new_synform
+        return (new_synform, name_corr)
     
     @staticmethod
     def unify(SF_p, slot_p_name, SF_c):
@@ -287,15 +308,25 @@ class TP_SYNFORM(TP_ELEM):
         None commutative.
         """
         new_synform = TP_SYNFORM()
-        SF_p_copy = SF_p.copy()
-        SF_c_copy = SF_c.copy()
-        slot_p = SF_p_copy.find_elem(slot_p_name)
+        (SF_p_copy, c_p)  = SF_p.copy()
+        (SF_c_copy, c_c) = SF_c.copy()
+        slot_p = SF_p_copy.find_elem(c_p[slot_p_name])
         idx = SF_p_copy.form.index(slot_p)
         elems = SF_p_copy.form[:idx] + SF_c_copy.form + SF_p_copy.form[min(idx+1,len(SF_p_copy.form)):]
         for elem in elems:
             new_synform.add_syn_elem(elem)
-
-        return new_synform
+            
+        name_corr = {}
+        for n1, n2 in c_p.iteritems():
+            if n1 != slot_p_name:
+                name_corr[n1] = n2
+            else:
+                name_corr[n1] = None
+        
+        for n1, n2 in c_c.iteritems():
+            name_corr[n1] = n2
+            
+        return (new_synform, name_corr)
     
 class TP_SYMLINKS(TP_ELEM):
     """
@@ -322,29 +353,31 @@ class TP_SYMLINKS(TP_ELEM):
         """
         return self.SL[node_name]
     
-    def copy(self):
-        """
-        """
-        new_symlinks = TP_SYMLINKS()
-        for k,v in self.SL.iteritems():
-            new_symlinks.SL[k] = v
-        
-        return new_symlinks    
-    
-    @staticmethod
-    def unify(SL_p, node_p_name, SL_c):
-        """
-        None commutative
-        """
-        new_symlinks = TP_SYMLINKS()        
-        for k,v in SL_p.SL.iteritems():
-            if k != node_p_name:
-                new_symlinks.SL[k]=v
-        
-        for k,v in SL_c.SL.iteritems():
-            new_symlinks.SL[k]=v
-        
-        return new_symlinks
+#    def copy(self):
+#        """
+#        """
+#        new_symlinks = TP_SYMLINKS()
+#        for k,v in self.SL.iteritems():
+#            new_symlinks.SL[k] = v
+#        
+#        return new_symlinks    
+#    
+#    @staticmethod
+#    def unify(SL_p, node_p_name, SL_c):
+#        """
+#        None commutative
+#        
+#        CANNOT UNIFY ELEMENTs THAT SHARE NAMES (IDENTICAL CXN!!)
+#        """
+#        new_symlinks = TP_SYMLINKS()        
+#        for k,v in SL_p.SL.iteritems():
+#            if k != node_p_name:
+#                new_symlinks.SL[k]=v
+#        
+#        for k,v in SL_c.SL.iteritems():
+#            new_symlinks.SL[k]=v
+#        
+#        return new_symlinks
         
 ############################    
 ### Construction classes ###
@@ -447,26 +480,32 @@ class CXN:
         new_cxn.clss = self.clss
         new_cxn.preference = self.preference
         
-        new_semframe = self.SemFrame.copy()
-        new_synform = self.SynForm.copy()
-        new_symlinks = self.SymLinks.copy()
-        
+        (new_semframe, sem_corr) = self.SemFrame.copy()
+        (new_synform, syn_corr) = self.SynForm.copy()
+        for k, v in self.SymLinks.SL.iteritems():
+            new_cxn.SymLinks.SL[sem_corr[k]] = syn_corr[v]
+
         new_cxn.SemFrame = new_semframe
         new_cxn.SynForm = new_synform
-        new_cxn.SymLinks = new_symlinks
         
-        return new_cxn
+        name_corr = {}
+        for n1, n2 in sem_corr.iteritems():
+            name_corr[n1] = n2
+        
+        for n1, n2 in syn_corr.iteritems():
+            name_corr[n1] = n2
+        
+        return (new_cxn, name_corr)
         
     @staticmethod
-    def unify(cxn_p, slot_p, cxn_c): # ERRORS! Eg: PARENT CXN NOT SET!!
+    def unify(cxn_p, slot_p, cxn_c):
         """
         None commutative
         """
         node_p = cxn_p.form2node(slot_p)
         node_c = cxn_c.SemFrame.get_head()
-        new_semframe = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p.name, cxn_c.SemFrame, node_c.name)
-        new_synform = TP_SYNFORM.unify(cxn_p.SynForm, slot_p.name, cxn_c.SynForm)
-        new_symlinks = TP_SYMLINKS.unify(cxn_p.SymLinks, node_p.name, cxn_c.SymLinks)
+        (new_semframe, sem_corr) = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p.name, cxn_c.SemFrame, node_c.name)
+        (new_synform, syn_corr) = TP_SYNFORM.unify(cxn_p.SynForm, slot_p.name, cxn_c.SynForm)
         
         new_cxn = CXN()
         new_cxn.name = "[%s U(%i) %s]" %(cxn_p.name, slot_p.order, cxn_c.name)
@@ -474,9 +513,22 @@ class CXN:
         new_cxn.preference = 0 # For now does not need to be defined....
         new_cxn.SemFrame = new_semframe
         new_cxn.SynForm = new_synform
-        new_cxn.SymLinks = new_symlinks
+              
+        for k,v in cxn_p.SymLinks.SL.iteritems():
+            if v != slot_p.name:
+                new_cxn.SymLinks.SL[sem_corr[k]]=syn_corr[v]
         
-        return new_cxn
+        for k,v in cxn_c.SymLinks.SL.iteritems():
+            new_cxn.SymLinks.SL[sem_corr[k]]=syn_corr[v]
+        
+        name_corr = {}
+        for n1, n2 in sem_corr.iteritems():
+            name_corr[n1] = n2
+        
+        for n1, n2 in syn_corr.iteritems():
+            name_corr[n1] = n2
+        
+        return (new_cxn, name_corr)
     
 #    def __str__(self): # To rewrite
 #        p = ''
@@ -590,26 +642,21 @@ if __name__=='__main__':
     cxn =  my_grammar.constructions[0]
     semframe= cxn.SemFrame
     print [n.name for n in semframe.nodes]
-    sfr_copy = semframe.copy()
+    (sfr_copy, c) = semframe.copy()
     print [n.name for n in sfr_copy.nodes]
+    print c
     
     synform = cxn.SynForm
     print [f.name for f in synform.form]
-    sfo_copy = synform.copy()
+    (sfo_copy, c) = synform.copy()
     print [f.name for f in sfo_copy.form]
+    print c
     
-    symlinks = cxn.SymLinks
-    print symlinks.SL
-    sl_copy = symlinks.copy()
-    print sl_copy.SL
-    
-    cxn_copy = cxn.copy()
+    (cxn_copy, c) = cxn.copy()
     cxn.SemFrame.draw()
     cxn_copy.SemFrame.draw()
-    node = cxn.node2form(cxn.SemFrame.nodes[0])
-    print node.name
-    node2 = cxn_copy.node2form(cxn.SemFrame.nodes[0])
-    print node2.name
+    print [n.name for n in cxn_copy.SemFrame.nodes]
+    print c
     
     cxn2 = my_grammar.constructions[0]
     

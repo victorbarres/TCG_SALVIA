@@ -67,11 +67,15 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
     def __init__(self, cxn_schema, trace, mapping, copy=True):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
         if copy:
-                self.content = cxn_schema.content.copy()
+                (cxn_copy, c) = cxn_schema.content.copy()
+                self.content = cxn_copy
+                new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
+                new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
+                new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
+                self.covers = new_mapping
         else:
              SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
-        
-        self.covers = mapping
+             self.covers = mapping
         self.set_ports()
     
     def set_ports(self, in_ports=None, out_ports=None):
@@ -429,7 +433,7 @@ class GRAMMATICAL_WM(WM):
         inst_c = inst_from
         cxn_c = inst_c.content        
         
-        new_cxn = construction.CXN.unify(cxn_p, slot_p, cxn_c)
+        (new_cxn, c) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
         new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
 #        new_trace = {"semrep":{"nodes":list(set(inst_p.trace["semrep"]["nodes"] + inst_c.trace["semrep"]["nodes"])) , "edges":list(set(inst_p.trace["semrep"]["edges"] + inst_c.trace["semrep"]["edges"]))}, 
 #                               "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]}
@@ -444,7 +448,7 @@ class GRAMMATICAL_WM(WM):
         port_corr = {'in_ports':{}, 'out_ports':{}}
         for port in in_ports:
             for new_port in new_cxn_inst.in_ports:
-                if port.data.name == new_port.data.name:
+                if c[port.data.name] == new_port.data.name:
                     port_corr['in_ports'][port] = new_port
                     break
         port_corr['out_ports'][inst_p._find_port('output')] = new_cxn_inst._find_port('output')
