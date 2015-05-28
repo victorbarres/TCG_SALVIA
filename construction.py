@@ -256,7 +256,6 @@ class TP_SEMFRAME(TP_ELEM):
                 name_corr[n1] = n2
             else:
                 name_corr[n1] = None
-        
         for n1, n2 in c_c.iteritems():
             name_corr[n1] = n2
             
@@ -352,32 +351,6 @@ class TP_SYMLINKS(TP_ELEM):
         Returns the name of the form element associated with the node name "node_name"
         """
         return self.SL[node_name]
-    
-#    def copy(self):
-#        """
-#        """
-#        new_symlinks = TP_SYMLINKS()
-#        for k,v in self.SL.iteritems():
-#            new_symlinks.SL[k] = v
-#        
-#        return new_symlinks    
-#    
-#    @staticmethod
-#    def unify(SL_p, node_p_name, SL_c):
-#        """
-#        None commutative
-#        
-#        CANNOT UNIFY ELEMENTs THAT SHARE NAMES (IDENTICAL CXN!!)
-#        """
-#        new_symlinks = TP_SYMLINKS()        
-#        for k,v in SL_p.SL.iteritems():
-#            if k != node_p_name:
-#                new_symlinks.SL[k]=v
-#        
-#        for k,v in SL_c.SL.iteritems():
-#            new_symlinks.SL[k]=v
-#        
-#        return new_symlinks
         
 ############################    
 ### Construction classes ###
@@ -508,7 +481,7 @@ class CXN:
         (new_synform, syn_corr) = TP_SYNFORM.unify(cxn_p.SynForm, slot_p.name, cxn_c.SynForm)
         
         new_cxn = CXN()
-        new_cxn.name = "[%s U(%i) %s]" %(cxn_p.name, slot_p.order, cxn_c.name)
+        new_cxn.name = "[%s-U(%i)-%s]" %(cxn_p.name, slot_p.order, cxn_c.name)
         new_cxn.clss = cxn_p.clss
         new_cxn.preference = 0 # For now does not need to be defined....
         new_cxn.SemFrame = new_semframe
@@ -529,6 +502,14 @@ class CXN:
             name_corr[n1] = n2
         
         return (new_cxn, name_corr)
+    
+    def show(self):
+        """
+        Display the construction.
+        Uses the display method defined in TCG_VIEWER class
+        """
+        import viewer
+        viewer.TCG_VIEWER.display_cxn(self)
     
 #    def __str__(self): # To rewrite
 #        p = ''
@@ -638,30 +619,36 @@ class GRAMMAR:
 
 if __name__=='__main__':
     import loader as ld
+    import viewer
+    
     my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
     cxn =  my_grammar.constructions[0]
-    semframe= cxn.SemFrame
-    print [n.name for n in semframe.nodes]
-    (sfr_copy, c) = semframe.copy()
-    print [n.name for n in sfr_copy.nodes]
-    print c
+#    semframe= cxn.SemFrame
+#    print [n.name for n in semframe.nodes]
+#    (sfr_copy, c) = semframe.copy()
+#    print [n.name for n in sfr_copy.nodes]
+#    print c
+#    
+#    synform = cxn.SynForm
+#    print [f.name for f in synform.form]
+#    (sfo_copy, c) = synform.copy()
+#    print [f.name for f in sfo_copy.form]
+#    print c
+#    
+#    (cxn_copy, c) = cxn.copy()
+#    cxn.SemFrame.draw()
+#    cxn_copy.SemFrame.draw()
+#    print [n.name for n in cxn_copy.SemFrame.nodes]
+#    print c
     
-    synform = cxn.SynForm
-    print [f.name for f in synform.form]
-    (sfo_copy, c) = synform.copy()
-    print [f.name for f in sfo_copy.form]
-    print c
+    cxn2 = my_grammar.constructions[1]
     
-    (cxn_copy, c) = cxn.copy()
-    cxn.SemFrame.draw()
-    cxn_copy.SemFrame.draw()
-    print [n.name for n in cxn_copy.SemFrame.nodes]
-    print c
+    (cxn3, c) = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
+#    cxn3.SemFrame.draw()
+#    print [f.name for f in cxn3.SynForm.form]
+#    print cxn3.SymLinks.SL
     
-    cxn2 = my_grammar.constructions[0]
+    cxn.show()
     
-    cxn3 = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
-    cxn3.SemFrame.draw()
-    print [f.name for f in cxn3.SynForm.form]
-    print cxn3.SymLinks.SL
+    
     

@@ -384,7 +384,134 @@ class TCG_VIEWER:
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
+    
+    @staticmethod
+    def display_cxn(cxn):
+        """
+        Create graph images for the construction 'cxn'.
+        Uses graphviz with pydot implementation.
+        
+        Args:
+            - cxn (CXN): the construction object to be displayed.
+        """
+        import subprocess
+        
+        import pydot
+        import matplotlib.pyplot as plt
+        
+        import construction
+        
+        tmp_folder = './tmp/'        
+        
+        prog = 'dot'
+        file_type = 'png'
+        dot_cxn = pydot.Dot(graph_type = 'digraph')
+        dot_cxn.set_rankdir('LR')
+        dot_cxn.set_fontname('consolas')
+
+        font_size = '10'
+        style = 'filled'
+        fill_color = 'white'
+
+        
+        cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame')
+        cluster_SemFrame.set_bgcolor('lightcoral')
+        for node in cxn.SemFrame.nodes:
+            if node.head:
+                node_shape = 'doublecircle'
+            else:
+                node_shape = 'circle'
+            cluster_SemFrame.add_node(pydot.Node(node.name, label=node.concept.meaning, color='black', shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
+        for edge in cxn.SemFrame.edges:
+            cluster_SemFrame.add_edge(pydot.Edge(edge.pFrom.name, edge.pTo.name, label=edge.concept.meaning))
+        
+        dot_cxn.add_subgraph(cluster_SemFrame)
+        
+        cluster_SynForm = pydot.Cluster('SynForm', label='SynForm')
+        cluster_SynForm.set_bgcolor('lightblue')
+        pre_form = None
+        for form in cxn.SynForm.form:
+            if isinstance(form, construction.TP_SLOT):
+                cluster_SynForm.add_node(pydot.Node(form.name, label ="[" +  ", ".join(form.cxn_classes) +"]", shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
+            elif isinstance(form, construction.TP_PHON):
+                cluster_SynForm.add_node(pydot.Node(form.name, label = form.cxn_phonetics, shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
+            if not(pre_form):
+                pre_form = form.name
+            else:
+                cluster_SynForm.add_edge(pydot.Edge(pre_form, form.name, label='next'))
+                pre_form = form.name
+        
+        dot_cxn.add_subgraph(cluster_SynForm)
+        
+        for k, v in cxn.SymLinks.SL.iteritems():
+            dot_cxn.add_edge(pydot.Edge(k, v, color='red', dir='none', penwidth='1'))
+        
+        file_name = tmp_folder + cxn.name + ".gv"
+        dot_cxn.write(file_name)
             
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        img_name = '%s.%s' %(file_name,file_type)
+        
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        title = cxn.name
+        plt.title(title)
+        img = plt.imread(img_name)
+        plt.imshow(img)
+    
+    @staticmethod
+    def display_semrep(semrep, name=''):
+        """
+        Create graph images for the semrep 'semrep'.
+        Uses graphviz with pydot implementation.
+        
+        Args:
+            - semrep (nx.DiGraph): the semrep to be displayed
+        """
+        import subprocess
+        
+        import pydot
+        import matplotlib.pyplot as plt
+        
+        tmp_folder = './tmp/'   
+        if not(name):
+            name = 'SemRep'
+        
+        prog = 'dot'
+        file_type = 'png'
+        dot_semrep = pydot.Dot(graph_type = 'digraph')
+        dot_semrep.set_rankdir('LR')
+        dot_semrep.set_fontname('consolas')
+
+        font_size = '20'
+        style = 'filled'
+        fill_color = 'white'
+        node_shape = 'circle'
+        
+        for n, d in semrep.nodes(data=True):
+            dot_semrep.add_node(pydot.Node(n, label=d['concept'].meaning, color='black', shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
+            
+        for u,v, d in semrep.edges(data=True):
+            dot_semrep.add_edge(pydot.Edge(u, v, label=d['concept'].meaning,  fontsize=font_size))
+        
+        file_name = tmp_folder + name + ".gv"
+        dot_semrep.write(file_name)
+        
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        img_name = '%s.%s' %(file_name,file_type)
+        
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        title = name
+        plt.title(title)
+        img = plt.imread(img_name)
+        plt.imshow(img)
+            
+
 ###############################################################################
 if __name__ == '__main__':
     import os

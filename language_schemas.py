@@ -36,14 +36,6 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     def __init__(self,aCXN, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=aCXN.name, content=aCXN, init_act=init_act)
-    
-#    def copy(self):
-#        """
-#        Returns a deep copy of the schema
-#        """
-#        cxn_copy = self.content.copy()
-#        new_cxn_schema = CXN_SCHEMA(cxn_copy, self.init_act)
-#        return new_cxn_schema
 
 class CXN_SCHEMA_INST(SCHEMA_INST):
     """
@@ -190,7 +182,7 @@ class GRAMMATICAL_WM(WM):
             winner_assemblage = assemblages[winner_idx]
             GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
             eq_inst = self._assemblage2inst(winner_assemblage)
-            eq_inst.content.SemFrame.draw()
+            eq_inst.content.show()
             phon_form = GRAMMATICAL_WM._read_out(winner_assemblage)
             self.set_output('to_phonological_WM', phon_form)
             self.schema_insts = []
@@ -233,7 +225,6 @@ class GRAMMATICAL_WM(WM):
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
                if match["match"] == -1:
                    self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
-#                   self.add_comp_link(inst_from=old_inst, inst_to=new_inst, weight=-1)  # Now the f-link are bidirectional in the propagation of activation.
         
     
     @staticmethod
@@ -701,6 +692,8 @@ if __name__=='__main__':
         ### TEST CXN RETRIEVAL ###
         
         import loader as ld
+        import viewer
+        
         my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
@@ -728,7 +721,8 @@ if __name__=='__main__':
         semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
         
         semanticWM.show_state()
-                
+        
+        viewer.TCG_VIEWER.display_semrep(semanticWM.SemRep)
         
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
