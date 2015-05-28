@@ -296,7 +296,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "hit"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -307,7 +307,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "kick"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -318,7 +318,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "wear"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -329,7 +329,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "laugh"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -340,7 +340,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "watch"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -351,7 +351,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "talk to"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -362,7 +362,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "squirt at"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -373,7 +373,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "blue"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -384,7 +384,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "black"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -395,7 +395,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "green"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -406,7 +406,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "small"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -417,7 +417,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "big"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -428,7 +428,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "handsome"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -439,7 +439,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "pretty"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -450,7 +450,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "woman"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -461,7 +461,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "man"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -472,7 +472,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "girl"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 	{
 		"name" : "BOY",
@@ -482,7 +482,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boy"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -493,7 +493,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "people"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -504,7 +504,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "mouse"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -515,7 +515,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "turtle"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -526,7 +526,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "dress"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -537,7 +537,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "t-shirt"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -548,7 +548,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boxing ring"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
@@ -559,7 +559,7 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "park"}],
-		"SymLinks" : {}
+		"SymLinks" : {"N1" : "S1"}
 	}
 ]
 }

@@ -831,7 +831,7 @@ if __name__=='__main__':
         ###########################################################################
         ### TEST STATIC SEMREP FULL GRAMMAR + TEXT2SPEECH ###
         import loader as ld
-        my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+        my_grammar = ld.load_grammar("TCG_grammar[SymLinks_New].json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
