@@ -536,6 +536,14 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         if cxn_schemas and SemRep:
             self._instantiate_cxns(SemRep, cxn_schemas)
             self.set_output('to_grammatical_WM', self.cxn_instances)
+        
+            # Set all SemRep elements to new=False
+            for n in SemRep.nodes_iter():
+                SemRep.node[n]['new'] = False
+            for e in SemRep.edges_iter():
+                d = SemRep.get_edge_data(e[0], e[1])
+                d['new'] = False
+        
         self.cxn_instances = []
     
     def _instantiate_cxns(self, SemRep, cxn_schemas, WK=None):
@@ -565,8 +573,20 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         edge_concept_match = lambda cpt1,cpt2: cpt.CONCEPT.match(cpt1, cpt2, match_type="equal")
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+        
+        def subgraph_filter(subgraph):
+            """
+            Returns True only if at least one node or edge is tagged as new.
+            """
+            for n,d in subgraph.nodes(data=True):
+                if d['new']:
+                    return True
+            for n1,n2,d in subgraph.edges(data=True):
+                if d['new']:
+                    return True
+            return False
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em)    
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)    
         return sub_iso
     
     def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
@@ -715,11 +735,11 @@ if __name__=='__main__':
         
     
         # Set up Semantic WM content
-        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
-        semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
-        semanticWM.SemRep.add_node("MAN", concept=man_cpt)
-        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
-        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt, new=True)
+        semanticWM.SemRep.add_node("KICK", concept=kick_cpt, new=True)
+        semanticWM.SemRep.add_node("MAN", concept=man_cpt, new=True)
+        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt, new=True)
+        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt, new=True)
         
         semanticWM.show_state()
         
@@ -783,15 +803,15 @@ if __name__=='__main__':
         
     
         # Set up Semantic WM content
-        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
-        semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
-        semanticWM.SemRep.add_node("MAN", concept=man_cpt)
-        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
-        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
+        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt, new=True)
+        semanticWM.SemRep.add_node("KICK", concept=kick_cpt, new=True)
+        semanticWM.SemRep.add_node("MAN", concept=man_cpt, new=True)
+        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt, new=True)
+        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt, new=True)
         
         # A bit more info
-        semanticWM.SemRep.add_node("BLUE", concept=blue_cpt)
-        semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt)
+        semanticWM.SemRep.add_node("BLUE", concept=blue_cpt, new=True)
+        semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt, new=True)
         
 
         semanticWM.show_state()
@@ -814,7 +834,7 @@ if __name__=='__main__':
     
         language_system.update()
         language_system.update()
-        semanticWM.SemRep.clear()
+#        semanticWM.SemRep.clear()
         language_system.update()
         language_system.update()
         language_system.update()
@@ -853,15 +873,15 @@ if __name__=='__main__':
         modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")        
     
         # Set up Semantic WM content
-        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt)
-        semanticWM.SemRep.add_node("KICK", concept=kick_cpt)
-        semanticWM.SemRep.add_node("MAN", concept=man_cpt)
-        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt)
-        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt)
-        semanticWM.SemRep.add_node("BLUE", concept=blue_cpt)
-        semanticWM.SemRep.add_node("BIG", concept=big_cpt) 
-        semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt)
-        semanticWM.SemRep.add_edge("BIG", "MAN", concept=modify_cpt)
+        semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt, new=True)
+        semanticWM.SemRep.add_node("KICK", concept=kick_cpt, new=True)
+        semanticWM.SemRep.add_node("MAN", concept=man_cpt, new=True)
+        semanticWM.SemRep.add_edge("KICK", "WOMAN", concept=agent_cpt, new=True)
+        semanticWM.SemRep.add_edge("KICK", "MAN", concept=patient_cpt, new=True)
+        semanticWM.SemRep.add_node("BLUE", concept=blue_cpt, new=True)
+        semanticWM.SemRep.add_node("BIG", concept=big_cpt, new=True) 
+        semanticWM.SemRep.add_edge("BLUE", "WOMAN", concept=modify_cpt, new=True)
+        semanticWM.SemRep.add_edge("BIG", "MAN", concept=modify_cpt, new=True)
             
         semanticWM.show_state()
                 
