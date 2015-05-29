@@ -547,7 +547,7 @@ class WM(PROCEDURAL_SCHEMA):
             if inst.activity<self.C2_params['prune_threshold']:
                 inst.alive = False
         
-        self.udpate_activity()
+        self.update_activity()
     
     def prune(self):
         """
@@ -579,7 +579,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.comp_links = []
         self.prune()
     
-    def udpate_activity(self):
+    def update_activity(self):
         """
         Computes the overall activity of the working memory.
         The activity reflects the amount of cooperation and competition going on.
@@ -598,20 +598,27 @@ class WM(PROCEDURAL_SCHEMA):
             activity += transfer
         
         self.activity = activity
-            
     
-    def plot_dynamics(self):
+    #######################
+    ### DISPLAY METHODS ###
+    #######################
+    def show_dynamics(self):
         """
         """
         plt.figure(facecolor='white')
+        title = 'WM dynamics \n noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g]' %(self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
+                              self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'])
+        plt.title(title)
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('activity', fontsize=14)
         for inst in self.save_state.keys():
             plt.plot(self.save_state[inst]['t'], self.save_state[inst]['act'], label=inst, linewidth=2)
-        
-        plt.title('working memory dynamics')
-        plt.xlabel('time', fontsize=16)
-        plt.ylabel('activity', fontsize=16)
+        axes = plt.gca()
+        axes.set_ylim([0,1])
+        plt.axhline(y=self.C2_params['prune_threshold'], color='k',ls='dashed')
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         plt.show()
+            
         
     def show_state(self):
         """
@@ -633,6 +640,7 @@ class WM(PROCEDURAL_SCHEMA):
         plt.axis('off')
         title = '%s (state)' %self.name
         plt.title(title)
+            
         nx.draw_networkx_nodes(state, pos=pos, node_color='b', node_shape='s')
         nx.draw_networkx_labels(state, pos=pos)
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('coop'), edge_color='g')
@@ -974,6 +982,6 @@ if __name__=="__main__":
     for step in range(max_step):
         wm.update_activations()
         
-    wm.plot_dynamics()
+    wm.show_dynamics()
     
     

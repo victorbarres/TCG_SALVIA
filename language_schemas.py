@@ -61,10 +61,11 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
         if copy:
                 (cxn_copy, c) = cxn_schema.content.copy()
                 self.content = cxn_copy
-                new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
-                new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
-                new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
-                self.covers = new_mapping
+                if mapping:
+                    new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
+                    new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
+                    new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
+                    self.covers = new_mapping
         else:
              SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
              self.covers = mapping
@@ -406,9 +407,6 @@ class GRAMMATICAL_WM(WM):
                 new_link.connect.port_from = port_corr['out_ports'][coop_link.connect.port_from]
             new_assemblage.add_link(new_link)
         
-        title =  "reduce: %s U %s" %(inst_p.name, inst_c.name)
-        GRAMMATICAL_WM._draw_assemblage(new_assemblage, title)
-        
         return new_assemblage
     
     @staticmethod
@@ -450,6 +448,8 @@ class GRAMMATICAL_WM(WM):
     def _read_out(assemblage):
         """
         Left2right reading of the tree formed byt the assemblage.
+        
+        NOTE: SHOULD BE REPLACED BY ASSEMBLE
         """
         def L2R_read(inst, graph, phon_form):
             """
@@ -504,6 +504,7 @@ class GRAMMATICAL_WM(WM):
             title = 'Assemblage_%i' % i
             GRAMMATICAL_WM._draw_assemblage(assemblage, title)
             i += 1
+            
         
 class GRAMMATICAL_LTM(LTM):
     """
@@ -685,7 +686,7 @@ if __name__=='__main__':
         for step in range(max_step):
             grammaticalWM.update_activations()
         
-        grammaticalWM.plot_dynamics()
+        grammaticalWM.show_dynamics()
     
     elif case == '3': 
         ###########################################################################
@@ -825,7 +826,7 @@ if __name__=='__main__':
             if language_system.outputs['Phonological_WM:14']:
                 print language_system.outputs['Phonological_WM:14']
             
-        grammaticalWM.plot_dynamics()
+        grammaticalWM.show_dynamics()
      
     elif case == '5':
         ###########################################################################
@@ -897,7 +898,7 @@ if __name__=='__main__':
 #                text2speech.utterance = ' '.join(output)
 #                text2speech.utter()
             
-        grammaticalWM.plot_dynamics()
+        grammaticalWM.show_dynamics()
     
     else:
         print "ERROR"
