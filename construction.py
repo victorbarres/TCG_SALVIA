@@ -238,7 +238,8 @@ class TP_SEMFRAME(TP_ELEM):
         SF_p_copy.nodes.remove(node_p)
         SF_p_copy.nodes += SF_c_copy.nodes
         
-        node_c = SF_c_copy.find_elem(c_c[node_c_name])                
+        node_c = SF_c_copy.find_elem(c_c[node_c_name])
+        node_c.head = False
         for rel in SF_p_copy.edges:
             if rel.pFrom.name == c_p[node_p_name]:
                 rel.pFrom = node_c
@@ -255,10 +256,10 @@ class TP_SEMFRAME(TP_ELEM):
             if n1 != node_p_name:
                 name_corr[n1] = n2
             else:
-                name_corr[n1] = None
+                name_corr[n1] = node_c.name
         for n1, n2 in c_c.iteritems():
             name_corr[n1] = n2
-            
+
         return (new_SF, name_corr)
         
 class TP_SYNFORM(TP_ELEM):
@@ -319,8 +320,6 @@ class TP_SYNFORM(TP_ELEM):
         for n1, n2 in c_p.iteritems():
             if n1 != slot_p_name:
                 name_corr[n1] = n2
-            else:
-                name_corr[n1] = None
         
         for n1, n2 in c_c.iteritems():
             name_corr[n1] = n2

@@ -184,6 +184,7 @@ class GRAMMATICAL_WM(WM):
             GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
             eq_inst = self._assemblage2inst(winner_assemblage)
             eq_inst.content.show()
+            print eq_inst.covers
             phon_form = GRAMMATICAL_WM._read_out(winner_assemblage)
             self.set_output('to_phonological_WM', phon_form)
             self.schema_insts = []
@@ -424,14 +425,32 @@ class GRAMMATICAL_WM(WM):
         
         (new_cxn, c) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
         new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
-#        new_trace = {"semrep":{"nodes":list(set(inst_p.trace["semrep"]["nodes"] + inst_c.trace["semrep"]["nodes"])) , "edges":list(set(inst_p.trace["semrep"]["edges"] + inst_c.trace["semrep"]["edges"]))}, 
-#                               "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]}
-        new_trace = {'semrep':{'nodes':[], 'edges':[]}, "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} # TO DEFINE PROPERLY
-        new_mapping = {'nodes':{}, 'edges':{}} # TO DEFINE
-        new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False) ## NOW THIS IS PROBLEMAtIC SINCE IT COPIES THE CXN!! PORTS DON"T LINK TO THE CORRECT TP_ELEMS!
         
+        # Define new_cxn trace
+        new_trace = {'semrep':{'nodes':[], 'edges':[]}, "schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} 
+        nodes = list(set(inst_p.trace['semrep']['nodes'] + inst_c.trace['semrep']['nodes']))
+        edges = list(set(inst_p.trace["semrep"]["edges"] + inst_c.trace["semrep"]["edges"]))
+        new_trace['semrep']['nodes'] = nodes
+        new_trace['semrep']['edges']= edges
+        
+        # Defines new_cxn mapping
+        print 'mapping'
+        new_mapping = {'nodes':{}, 'edges':{}} # TO DEFINE
+        for n,v in inst_p.covers['nodes'].iteritems():
+                new_mapping['nodes'][c[n]] = v
+        for e,v in inst_p.covers['edges'].iteritems():
+            if (e[0] in c.keys()) and (e[1] in c.keys()):# Check the parent node hasn't been removed.
+                new_mapping['edges'][(c[e[0]] , c[e[1]])] = v
+            
+        for n,v in inst_c.covers['nodes'].iteritems():
+            new_mapping['nodes'][c[n]] = v
+        for e,v in inst_c.covers['edges'].iteritems():
+            new_mapping['edges'][(c[e[0]], c[e[1]])] = v
+        
+        new_cxn_inst = CXN_SCHEMA_INST(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False)
+        
+        # Define port correspondence
         in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
-              
         new_cxn_inst.set_ports()
         
         port_corr = {'in_ports':{}, 'out_ports':{}}
