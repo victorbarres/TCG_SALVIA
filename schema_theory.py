@@ -452,7 +452,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.comp_links = []
         self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.1}
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3}
-        self.save_state = {}
+        self.save_state = {'insts':{}}
        
     def add_instance(self,schema_inst, act0):
         self.schema_insts.append(schema_inst) #There is still an issue with TIME! Need to keep track of t0 for each construction instance....
@@ -461,7 +461,7 @@ class WM(PROCEDURAL_SCHEMA):
                       'noise_mean':self.dyn_params['noise_mean'], 'noise_std':self.dyn_params['noise_std']}
         schema_inst.act_params = act_params
         schema_inst.set_activation()
-        self.save_state[schema_inst.name] = schema_inst.activation.save_vals.copy();
+        self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
     
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
@@ -596,23 +596,26 @@ class WM(PROCEDURAL_SCHEMA):
         Computes the overall activity of the working memory.
         The activity reflects the amount of cooperation and competition going on.
         """
-        activity = 0
+        tot_coop = 0
+        tot_comp = 0
         for link in self.coop_links:
             inst_from = link.inst_from
             inst_to = link.inst_to
             transfer = abs(inst_from.activity - inst_to.activity)*link.weight
-            activity += transfer
+            tot_coop += transfer
         
         for link in self.comp_links:
             inst_from = link.inst_from
             inst_to = link.inst_to
             transfer = abs(inst_from.activity - inst_to.activity)*link.weight*-1
-            activity += transfer
+            tot_comp += transfer
         
-        self.activity = activity
+        self.activity = tot_comp + tot_coop
         if not(self.save_state.has_key('total_activity')):
-            self.save_state['total_activity'] = {'t':[], 'act':[]}
+            self.save_state['total_activity'] = {'t':[], 'act':[], 'comp':[], 'coop':[]}
         self.save_state['total_activity']['t'].append(self.t)
+        self.save_state['total_activity']['comp'].append(tot_comp)
+        self.save_state['total_activity']['coop'].append(tot_coop)
         self.save_state['total_activity']['act'].append(self.activity)
         
     
@@ -629,10 +632,11 @@ class WM(PROCEDURAL_SCHEMA):
         plt.title(title)
         plt.xlabel('time', fontsize=14)
         plt.ylabel('activity', fontsize=14)
-        for inst in self.save_state.keys():
-            plt.plot(self.save_state[inst]['t'], self.save_state[inst]['act'], label=inst, linewidth=2)
+        for inst in self.save_state['insts'].keys():
+            plt.plot(self.save_state['insts'][inst]['t'], self.save_state['insts'][inst]['act'], label=inst, linewidth=2)
         axes = plt.gca()
         axes.set_ylim([0,1])
+        axes.set_xlim([0, max(self.save_state['total_activity']['t'])])
         plt.axhline(y=self.C2_params['prune_threshold'], color='k',ls='dashed')
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         
@@ -640,7 +644,10 @@ class WM(PROCEDURAL_SCHEMA):
         plt.title('Total activity')
         plt.xlabel('time', fontsize=14)
         plt.ylabel('activity', fontsize=14)
-        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['act'],  linewidth=2)
+        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['comp'],  linewidth=2, color='r', label='competition')
+        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['coop'],  linewidth=2, color='g', label='cooperation')
+        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['act'], '--',  linewidth=2, color='k', label='total')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         plt.show()
             
         
