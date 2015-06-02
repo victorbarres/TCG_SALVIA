@@ -161,7 +161,7 @@ class GRAMMATICAL_WM(WM):
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_cxn_retrieval')
         self.add_port('OUT', 'to_phonological_WM')
-        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
+        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
     
     def update(self):
@@ -173,22 +173,41 @@ class GRAMMATICAL_WM(WM):
             self._add_new_insts(new_cxn_insts)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
-        if not(self.comp_links) and self.coop_links:
-            self.show_state()
+#        if not(self.comp_links) and self.coop_links:
+#            self.show_state()
+#            assemblages = self._assemble()
+##            self._draw_assemblages()
+#            activations = [a.activation for a in assemblages]
+#            winner_idx = activations.index(max(activations))
+#            print "WINNER ASSEMBLAGE: %i" %winner_idx
+#            winner_assemblage = assemblages[winner_idx]
+#            GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
+#            eq_inst = self._assemblage2inst(winner_assemblage)
+#            eq_inst.content.show()
+#            (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
+#            self.set_output('to_phonological_WM', phon_form)
+#            self.schema_insts = []
+#            self.coop_links = []
+#            self.comp_links = []
+        if self.t > 900:
+            self.end_competitions()
             assemblages = self._assemble()
-#            self._draw_assemblages()
-            activations = [a.activation for a in assemblages]
-            winner_idx = activations.index(max(activations))
-            print "WINNER ASSEMBLAGE: %i" %winner_idx
-            winner_assemblage = assemblages[winner_idx]
-            GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
-            eq_inst = self._assemblage2inst(winner_assemblage)
-            eq_inst.content.show()
-            (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
-            self.set_output('to_phonological_WM', phon_form)
-            self.schema_insts = []
-            self.coop_links = []
-            self.comp_links = []
+            if assemblages:
+    #            self._draw_assemblages()
+                self.show_state()
+                activations = [a.activation for a in assemblages]
+                print activations
+                winner_idx = activations.index(max(activations))
+                print "WINNER ASSEMBLAGE: %i" %winner_idx
+                winner_assemblage = assemblages[winner_idx]
+                GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
+                eq_inst = self._assemblage2inst(winner_assemblage)
+                eq_inst.content.show()
+                (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
+                self.set_output('to_phonological_WM', phon_form)
+                self.schema_insts = []
+                self.coop_links = []
+                self.comp_links = []
     
     def _add_new_insts(self, new_insts):
         """
@@ -545,8 +564,7 @@ class GRAMMATICAL_WM(WM):
             title = 'Assemblage_%i' % i
             GRAMMATICAL_WM._draw_assemblage(assemblage, title)
             i += 1
-            
-        
+                  
 class GRAMMATICAL_LTM(LTM):
     """
     """
@@ -577,7 +595,6 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         if cxn_schemas and SemRep:
             self._instantiate_cxns(SemRep, cxn_schemas)
             self.set_output('to_grammatical_WM', self.cxn_instances)
-        
             # Set all SemRep elements to new=False
             for n in SemRep.nodes_iter():
                 SemRep.node[n]['new'] = False
@@ -1014,17 +1031,8 @@ if __name__=='__main__':
         language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
         language_system.set_output_ports([phonWM._find_port('to_output')])
         
-    
-        language_system.update()
-        language_system.update()
-#        semanticWM.SemRep.clear()
-        language_system.update()
-        language_system.update()
-        language_system.update()
-        grammaticalWM.show_state()
-        
         max_step = 1000
-        add_info_step = 2
+        add_info_step = 500
         for step in range(max_step):
             if step == add_info_step:
                 semanticWM.SemRep.add_node("BIG", concept=big_cpt, new=True) 

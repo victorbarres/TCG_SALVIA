@@ -163,12 +163,16 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         - in_ports ([PORT]):
         - out_ports ([PORT]):
         - activity (float): The activity level of the schema.
+        - t (FLOAT): Time.
+        - dt (FLOAT): Time step.
     """
     def __init__(self, name=''):
         SCHEMA.__init__(self,name)
         self.activity = 0
         self.in_ports = []
         self.out_ports = []
+        self.t = 0
+        self.dt = 1.0
     
     
     def add_port(self,port_type, port_name='', port_data=None, port_value=None):
@@ -259,6 +263,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - schema (KNOWLEDGE_SCHEMA):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation.
+        - act_params (DICT): {t0:FLOAT,act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}
         - activation (INST_ACTIVATION): Activation value of schema instance
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
@@ -269,34 +274,48 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = False
         self.trace = None
         self.activity = 0
-        self.activation = INST_ACTIVATION()
+        self.act_params = {'t0':0, 'act0': 1, 'dt':0.1, 'tau':1, 'act_inf':0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0}
+        self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
         self.instantiate(schema, trace)
-        
-    def set_activation_dyn(self, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5, noise_mean=0, noise_std=0):
+     
+    def set_activation(self):
         """
         Set activation parameters
         """
-        self.activation.dt = dt
-        self.activation.tau = tau
-        self.activation.act_inf = act_inf
-        self.activation.L = L
-        self.activation.k = k
-        self.activation.x0 = x0
-        self.activation.noise_mean=noise_mean
-        self.activation.noise_std = noise_std
-    
-    def set_activation_init(self, t0=0, act0=1):
-        """
-        """
-        self.activation.t0 = t0
-        self.activation.act0 = act0
-        self.activation.act= act0
-        self.activation.save_vals["t"].append(t0)
-        self.activation.save_vals["act"].append(act0)
-        self.activity = act0
+        self.activation = INST_ACTIVATION(t0=self.act_params['t0'], act0=self.act_params['act0'], dt=self.act_params['dt'], tau=self.act_params['tau'],
+                                          act_inf=self.act_params['act_inf'], L=self.act_params['L'], k=self.act_params['k'], x0=self.act_params['x0'],
+                                          noise_mean=self.act_params['noise_mean'], noise_std=self.act_params['noise_std'])
+        
+        self.activation.save_vals["t"].append(self.act_params['t0'])
+        self.activation.save_vals["act"].append(self.act_params['act0'])
+        self.activity = self.act_params['act0']
         self.act_port_out.value = self.activity
+                                          
+#    def set_activation_dyn(self, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5, noise_mean=0, noise_std=0):
+#        """
+#        Set activation parameters
+#        """
+#        self.activation.dt = dt
+#        self.activation.tau = tau
+#        self.activation.act_inf = act_inf
+#        self.activation.L = L
+#        self.activation.k = k
+#        self.activation.x0 = x0
+#        self.activation.noise_mean=noise_mean
+#        self.activation.noise_std = noise_std
+#    
+#    def set_activation_init(self, t0=0, act0=1):
+#        """
+#        """
+#        self.activation.t0 = t0
+#        self.activation.act0 = act0
+#        self.activation.act= act0
+#        self.activation.save_vals["t"].append(t0)
+#        self.activation.save_vals["act"].append(act0)
+#        self.activity = act0
+#        self.act_port_out.value = self.activity
     
     @abc.abstractmethod
     def set_ports(self):
@@ -314,8 +333,8 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = True
         self.trace = trace
         self.set_ports()
-        self.set_activation_dyn()
-        self.set_activation_init(t0=0, act0=schema.init_act)
+        self.act_params['act0'] = schema.init_act
+        self.set_activation()
     
     def update_activation(self):
         """
@@ -358,7 +377,6 @@ class INST_ACTIVATION:
         self.noise_std=noise_std
         self.save_vals = {"t":[], "act":[]}
         
-    
     def update(self, I):
         """
         """
@@ -371,8 +389,7 @@ class INST_ACTIVATION:
     
     def logistic(self, x):
         return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
-    
-
+        
 ## LONG TERM MEMORY ###
 class LTM(PROCEDURAL_SCHEMA):
     """
@@ -418,7 +435,6 @@ class WM(PROCEDURAL_SCHEMA):
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
-        - t (INT): time (+1 at each update)
         - dyn_params ({'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT})
         - C2_params ({'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT})
             - coop_weight (FLOAT): weight of cooperation f-links
@@ -434,21 +450,17 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.t = 0
         self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.1}
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3}
         self.save_state = {}
        
     def add_instance(self,schema_inst, act0):
         self.schema_insts.append(schema_inst) #There is still an issue with TIME! Need to keep track of t0 for each construction instance....
-        schema_inst.set_activation_dyn(tau=self.dyn_params['tau'], 
-                                    act_inf=self.dyn_params['act_inf'], 
-                                    L=self.dyn_params['L'], 
-                                    k=self.dyn_params['k'], 
-                                    x0=self.dyn_params['x0'],
-                                    noise_mean=self.dyn_params['noise_mean'],
-                                    noise_std=self.dyn_params['noise_std'])
-        schema_inst.set_activation_init(t0=self.t, act0=act0)
+        act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.dyn_params['tau'], 'act_inf':self.dyn_params['act_inf'],
+                      'L':self.dyn_params['L'], 'k':self.dyn_params['k'], 'x0':self.dyn_params['x0'],
+                      'noise_mean':self.dyn_params['noise_mean'], 'noise_std':self.dyn_params['noise_std']}
+        schema_inst.act_params = act_params
+        schema_inst.set_activation()
         self.save_state[schema_inst.name] = schema_inst.activation.save_vals.copy();
     
     def remove_instance(self, schema_inst):
@@ -805,6 +817,8 @@ class SCHEMA_SYSTEM:
         - input (): system's input.
         - outputs {'schema:pid':val}: system's outputs.
         - brain_mapping (BRAIN_MAPPING)
+        - t (FLOAT): System global time.
+        - dt (FLOAT): System time increment.
     """
     T0 = 0
     TIME_STEP = 1.0
@@ -837,7 +851,10 @@ class SCHEMA_SYSTEM:
         """
         Add all the procedural schemas in "schemas" ([PROCEDURAL_SCHEMAS]) to the system.
         """
-        self.schemas += schemas
+        for schema in schemas:
+            schema.dt = self.dt
+            schema.t = self.t
+            self.schemas.append(schema)
     
     def set_input_ports(self, ports):
         """
@@ -869,6 +886,9 @@ class SCHEMA_SYSTEM:
             - Propage port values through connections.
             - Update system outputs.
         """
+        # Update time
+        self.t += self.dt
+        
         # Get system input
         for port in self.input_ports:
             port.value = self.input
@@ -876,6 +896,7 @@ class SCHEMA_SYSTEM:
         # Update all the schema states
         for schema in self.schemas:
             schema.update()
+            schema.t = self.t
         
         # Propagate value through connections
         for connection in self.connections:
@@ -883,9 +904,6 @@ class SCHEMA_SYSTEM:
         
         # Update the system output
         self.outputs = {p.schema.name+":"+str(p.id):p.value for p in self.output_ports}
-        
-        # Update time
-        self.t += self.dt
     
     def system2dot(self):
         """
