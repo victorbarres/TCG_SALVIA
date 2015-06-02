@@ -610,6 +610,11 @@ class WM(PROCEDURAL_SCHEMA):
             activity += transfer
         
         self.activity = activity
+        if not(self.save_state.has_key('total_activity')):
+            self.save_state['total_activity'] = {'t':[], 'act':[]}
+        self.save_state['total_activity']['t'].append(self.t)
+        self.save_state['total_activity']['act'].append(self.activity)
+        
     
     #######################
     ### DISPLAY METHODS ###
@@ -618,6 +623,7 @@ class WM(PROCEDURAL_SCHEMA):
         """
         """
         plt.figure(facecolor='white')
+        plt.subplot(2,1,1)
         title = 'WM dynamics \n noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g]' %(self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
                               self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'])
         plt.title(title)
@@ -629,6 +635,12 @@ class WM(PROCEDURAL_SCHEMA):
         axes.set_ylim([0,1])
         plt.axhline(y=self.C2_params['prune_threshold'], color='k',ls='dashed')
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+        
+        plt.subplot(2,1,2)
+        plt.title('Total activity')
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('activity', fontsize=14)
+        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['act'],  linewidth=2)
         plt.show()
             
         
@@ -998,6 +1010,7 @@ if __name__=="__main__":
     
     max_step = 1000
     for step in range(max_step):
+        wm.t = step
         wm.update_activations()
         
     wm.show_dynamics()

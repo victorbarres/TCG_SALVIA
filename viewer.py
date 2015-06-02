@@ -456,7 +456,7 @@ class TCG_VIEWER:
         
         plt.figure(facecolor='white')
         plt.axis('off')
-        title = cxn.name
+        title = cxn.name  + '\n class:' + cxn.clss
         plt.title(title)
         img = plt.imread(img_name)
         plt.imshow(img)
