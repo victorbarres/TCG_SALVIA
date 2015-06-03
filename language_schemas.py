@@ -1006,17 +1006,17 @@ if __name__=='__main__':
         agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
         patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
         modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
-        
         entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
         
     
         # Set up Semantic WM content
         sem_info = {'woman':('node', 'WOMAN', woman_cpt), 'kick':('node', 'KICK', kick_cpt), 'man':('node', 'MAN', man_cpt), 
-                    'agt':('edge', ('KICK', 'WOMAN'), agent_cpt), 'pt':('edge', ('KICK', 'MAN'), patient_cpt),
+                    'agt':('edge', ('KICK', 'WOMAN'), agent_cpt), 'pt':('edge', ('KICK', 'MAN'), patient_cpt), 'pt2':('edge', ('KICK', 'ENTITY'), patient_cpt),
                     'blue':('node', 'BLUE', blue_cpt), 'big':('node', 'BIG', big_cpt), 
-                    'mod1':('edge', ('BLUE', 'WOMAN'), modify_cpt), 'mod2':('edge', ('BIG', 'MAN'), modify_cpt)}
+                    'mod1':('edge', ('BLUE', 'WOMAN'), modify_cpt), 'mod2':('edge', ('BIG', 'MAN'), modify_cpt),
+                    'entity':('node', 'ENTITY', entity_cpt)}
                 
-        sem_timing = {100:['woman'], 200:['mod1', 'blue'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
+        sem_timing = {100:['woman'], 200:['mod1', 'blue'], 300: ['kick'],  400:['agt', 'pt2', 'entity'], 500:['man', 'big', 'mod2']}
       
                         
         # Set up language system
@@ -1044,7 +1044,7 @@ if __name__=='__main__':
                         semanticWM.SemRep.add_node(info[1], concept=info[2], new=True )
                     else:
                         semanticWM.SemRep.add_edge(info[1][0], info[1][1], concept=info[2], new=True)
-#                semanticWM.show_state()
+                semanticWM.show_state()
                 # Show what is retrieved.
             language_system.update()
             if language_system.outputs['Phonological_WM:14']:
