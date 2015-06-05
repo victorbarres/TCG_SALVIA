@@ -189,14 +189,33 @@ class GRAMMATICAL_WM(WM):
 #            self.schema_insts = []
 #            self.coop_links = []
 #            self.comp_links = []
-        if self.t > 900:
+#        if self.t > 900:
+#            self.end_competitions()
+#            assemblages = self._assemble()
+#            if assemblages:
+#    #            self._draw_assemblages()
+#                self.show_state()
+#                activations = [a.activation for a in assemblages]
+#                print activations
+#                winner_idx = activations.index(max(activations))
+#                print "WINNER ASSEMBLAGE: %i" %winner_idx
+#                winner_assemblage = assemblages[winner_idx]
+#                GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
+#                eq_inst = self._assemblage2inst(winner_assemblage)
+#                eq_inst.content.show()
+#                (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
+#                self.set_output('to_phonological_WM', phon_form)
+#                self.schema_insts = []
+#                self.coop_links = []
+#                self.comp_links = []
+        if self.t==900:
+            self.show_state()
             self.end_competitions()
+            self.show_state()
             assemblages = self._assemble()
+            print assemblages
             if assemblages:
-    #            self._draw_assemblages()
-                self.show_state()
                 activations = [a.activation for a in assemblages]
-                print activations
                 winner_idx = activations.index(max(activations))
                 print "WINNER ASSEMBLAGE: %i" %winner_idx
                 winner_assemblage = assemblages[winner_idx]
@@ -208,9 +227,21 @@ class GRAMMATICAL_WM(WM):
                 self.schema_insts = []
                 self.coop_links = []
                 self.comp_links = []
+                
+#    def replace_assemblage(self, assemblage):
+#        """
+#        Replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
+#        """
+#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        for inst in assemblage.schema_insts:
+#            inst.alive = False
+#            self.prune()
+#        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":assemblage.activation}])
     
     def _add_new_insts(self, new_insts):
         """
+        Args:
+            new_insts ([{"cxn_inst":CXN_SCHEMA_INST, "match_qual":FLOAT}]): List of construction instances to be added to grammatical working memory.
         """
         for inst in new_insts:
             match_qual = inst["match_qual"]
@@ -612,7 +643,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         for cxn_schema in cxn_schemas:
             sub_iso = self._SemMatch_cat(SemRep, cxn_schema)
             for a_sub_iso in sub_iso:
-                match_qual = self._SemMatch_qual(a_sub_iso)
+                match_qual = self._SemMatch_qual(SemRep, cxn_schema, a_sub_iso)
                 trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}
                 node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
                 edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
@@ -647,13 +678,13 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)    
         return sub_iso
     
-    def _SemMatch_qual(self,a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
+    def _SemMatch_qual(self,SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
         """
         Computes the quality of match.
         Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
         
         NOTE: I NEED TO THINK ABOUT HOW TO INCORPORATE FOCUS ETC....
-        """            
+        """
         return 1
 
 class PHON_WM(PROCEDURAL_SCHEMA):
@@ -980,7 +1011,7 @@ if __name__=='__main__':
         ###############################################
         ### TEST INCREMENTAL SEMREP (LIGHT GRAMMAR) ###
         import loader as ld
-        my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
+        my_grammar = ld.load_grammar("TCG_grammar_VB_light.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
@@ -1016,7 +1047,11 @@ if __name__=='__main__':
                     'mod1':('edge', ('BLUE', 'WOMAN'), modify_cpt), 'mod2':('edge', ('BIG', 'MAN'), modify_cpt),
                     'entity':('node', 'ENTITY', entity_cpt)}
                 
-        sem_timing = {100:['woman'], 200:['mod1', 'blue'], 300: ['kick'],  400:['agt', 'pt2', 'entity'], 500:['man', 'big', 'mod2']}
+#        sem_timing = {100:['woman'], 200:['mod1', 'blue'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
+                
+#        sem_timing = {100:['woman'], 200:['mod1', 'blue']}
+        
+        sem_timing = {100:['woman','mod1', 'blue', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
       
                         
         # Set up language system
@@ -1041,7 +1076,7 @@ if __name__=='__main__':
                     print s
                     info = sem_info[s]
                     if info[0]=='node':
-                        semanticWM.SemRep.add_node(info[1], concept=info[2], new=True )
+                        semanticWM.SemRep.add_node(info[1], concept=info[2], new=True)
                     else:
                         semanticWM.SemRep.add_edge(info[1][0], info[1][1], concept=info[2], new=True)
                 semanticWM.show_state()
