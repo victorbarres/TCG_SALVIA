@@ -1,0 +1,351 @@
+{"grammar" :[
+	{
+		"name" : "SVO",
+		"class" : "S",
+		"preference" : 1,
+		"SemFrame" :
+		{
+			"nodes" : [	{"name" : "AGT", "concept" : "ENTITY", "focus" : true, "head" : true},
+						{"name" : "PT", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true}],
+			"edges" : [	{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "PT"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["VP", "V"]},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"AGT" : "S1", "ACT" : "S2" , "PT" : "S3"}
+	},
+	
+	{
+		"name" : "PAS_SVO",
+		"class" : "S",
+		"SemFrame" : 
+		{
+			"nodes"  : [{"name" : "AGT", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "PT", "concept" : "ENTITY", "focus" : true, "head" : true },
+						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true }],
+			"edges" : [{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "PT"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S2", "type" : "PHON", "phon" : "is"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["VP", "V"]},
+					{"name" : "S4", "type" : "PHON", "phon" : "-ed by"},
+					{"name" : "S5", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"PT" : "S1", "ACT" : "S3", "AGT" : "S5"}			
+	},
+
+	{
+		"name" : "A_DET_NOUN",
+		"class" : "NP",
+		"SemFrame" : 
+		{
+			"nodes" : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : true}],
+			"edges" : []
+		},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "a"},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" : {"OBJ" : "S2"}		
+	},
+
+	{
+		"name" : "ADJ_NOUN",
+		"class" : "N",
+		"SemFrame" : 
+		{
+			"nodes" : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : true},
+						{"name" : "ATTR", "concept" : "PROPERTY", "focus" : false, "head" : false}],
+			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["A"]},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" : {"ATTR" : "S1", "OBJ" : "S2"}		
+	},
+
+	{
+		"name" : "HIT",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "HIT", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "hit"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "KICK",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "KICK", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "kick"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "WEAR",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "WEAR", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "wear"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "LAUGH",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "LAUGH", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "laugh"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "WATCH",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "WATCH", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "watch"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "TALK",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "TALK", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "talk to"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "SQUIRT",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "SQUIRT", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "squirt at"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "BLUE",
+		"class" : "A",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "BLUE", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "blue"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "BLACK",
+		"class" : "A",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "BLACK", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "black"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "GREEN",
+		"class" : "A",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "GREEN", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "green"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "SMALL",
+		"class" : "A",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "SMALL", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "small"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "BIG",
+		"class" : "A",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "BIG", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "big"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "HANDSOME",
+		"class" : "A",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "HANDSOME", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "handsome"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "PRETTY",
+		"class" : "A",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "PRETTY", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "pretty"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "WOMAN",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "WOMAN", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "woman"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "WOMAN2",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "WOMAN", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "lady"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "MAN",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "MAN", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "man"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "GIRL",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "GIRL", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "girl"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	{
+		"name" : "BOY",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "BOY", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boy"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "PEOPLE",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "PEOPLE", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "people"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "MOUSE",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "MOUSE", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "mouse"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "TURTLE",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "TURTLE", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "turtle"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "DRESS",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "DRESS", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "dress"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "TSHIRT",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "TSHIRT", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "t-shirt"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "BOXINGRING",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "BOXINGRING", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boxing ring"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "PARK",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "PARK", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "park"}],
+		"SymLinks" : {"N1" : "S1"}
+	}
+]
+}

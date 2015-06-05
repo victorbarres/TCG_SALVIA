@@ -215,6 +215,7 @@ class GRAMMATICAL_WM(WM):
             assemblages = self._assemble()
             print assemblages
             if assemblages:
+                self._draw_assemblages()
                 activations = [a.activation for a in assemblages]
                 winner_idx = activations.index(max(activations))
                 print "WINNER ASSEMBLAGE: %i" %winner_idx
@@ -317,6 +318,11 @@ class GRAMMATICAL_WM(WM):
     @staticmethod
     def _match(inst1, inst2):
         """
+        IMPORTANT NOTE: IT IS NOT CLEAR WHY THE ABSENSE OF LINK SHOULD NECESSARILY MEAN COMPETITION....
+            Think about the case of a lexical cxn LEX_CXN linking to a Det_CXN itself linking to a SVO_CXN, we don't want LEX_CXN to enter in competition with
+            SVO_CXN, even though they can't link since the LEX_CXN doesn't match the class restriction of SVO_CXN (LEX_CXN is N, not NP).
+        
+        For now I set the case not(links) to match=0. This is incorrect, since it does not allow to handle properly the case of lexical competition.
         """
         match = 0
         links = []
@@ -339,7 +345,7 @@ class GRAMMATICAL_WM(WM):
                         match = 1
                         links.append(link)
                 if not(links):
-                    match = -1       
+                    match = 0       
         return {"match":match, "links":links}
     
     ##################
@@ -1011,7 +1017,7 @@ if __name__=='__main__':
         ###############################################
         ### TEST INCREMENTAL SEMREP (LIGHT GRAMMAR) ###
         import loader as ld
-        my_grammar = ld.load_grammar("TCG_grammar_VB_light.json", "./data/grammars/")
+        my_grammar = ld.load_grammar("TCG_grammar_VB_light2.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
@@ -1022,6 +1028,7 @@ if __name__=='__main__':
         act_var = 0
         grammaticalWM.dyn_params['tau'] = 30
         grammaticalWM.C2_params['prune_threshold'] = 0.01
+        grammaticalWM.C2_params['comp_weight'] = -1
         
         # Set up grammatical LTM content
         
@@ -1046,13 +1053,16 @@ if __name__=='__main__':
                     'blue':('node', 'BLUE', blue_cpt), 'big':('node', 'BIG', big_cpt), 
                     'mod1':('edge', ('BLUE', 'WOMAN'), modify_cpt), 'mod2':('edge', ('BIG', 'MAN'), modify_cpt),
                     'entity':('node', 'ENTITY', entity_cpt)}
-                
-#        sem_timing = {100:['woman'], 200:['mod1', 'blue'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
-                
-#        sem_timing = {100:['woman'], 200:['mod1', 'blue']}
         
-        sem_timing = {100:['woman','mod1', 'blue', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
-      
+        # Timing options
+        sem_timing_1 = {100:['woman'], 200:['mod1', 'blue'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
+        sem_timing_2 = {100:['woman'], 200:['mod1', 'blue']}
+        sem_timing_3 = {100:['woman','mod1', 'blue', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
+        sem_timing_4 = {100:['woman','mod1', 'blue']}
+        sem_timing_5 = {100:['woman','kick', 'man', 'agt', 'pt']}
+        sem_timing_6 = {100:['woman']}
+        
+        sem_timing = sem_timing_6
                         
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
