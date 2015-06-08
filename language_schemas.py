@@ -261,10 +261,10 @@ class GRAMMATICAL_WM(WM):
        for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
-               if match["match"] == 1:
-                   for link in match["links"]:
-                       self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"])
-#                       self.add_coop_link(inst_from=link["inst_to"], port_from=link["port_to"], inst_to=link["inst_from"], port_to=link["port_from"], weight=1) # Now the f-link are bidirectional in the propagation of activation.
+               if match["match_cat"] == 1:
+                   for match_qual, link in match["links"]:
+                       if match_qual > 0:
+                           self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
     
     def _compete(self, new_inst):
         """
@@ -275,7 +275,7 @@ class GRAMMATICAL_WM(WM):
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
                match = GRAMMATICAL_WM._match(new_inst, old_inst)
-               if match["match"] == -1:
+               if match["match_cat"] == -1:
                    self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
         
     
@@ -311,42 +311,47 @@ class GRAMMATICAL_WM(WM):
         if cond1 and cond2:
             slot_p = cxn_p.node2form(sf_p)
             cond3 = cxn_c.clss in slot_p.cxn_classes
+            # NEED TO ADD A LIGHT_SEM CONDITION (cond4?)
+            link = {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.order)}
             if cond3:
-                return {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(slot_p.order)}
+                match_qual = 1
+            else:
+                match_qual = 0
+            return (match_qual, link)
         return None
     
     @staticmethod
     def _match(inst1, inst2):
         """
-        IMPORTANT NOTE: IT IS NOT CLEAR WHY THE ABSENSE OF LINK SHOULD NECESSARILY MEAN COMPETITION....
+        IMPORTANT NOTE: IT IS NOT CLEAR WHY THE ABSCENSE OF LINK SHOULD NECESSARILY MEAN COMPETITION....
             Think about the case of a lexical cxn LEX_CXN linking to a Det_CXN itself linking to a SVO_CXN, we don't want LEX_CXN to enter in competition with
             SVO_CXN, even though they can't link since the LEX_CXN doesn't match the class restriction of SVO_CXN (LEX_CXN is N, not NP).
         
         For now I set the case not(links) to match=0. This is incorrect, since it does not allow to handle properly the case of lexical competition.
         """
-        match = 0
+        match_cat = 0
         links = []
         if inst1 == inst2:
-           match = -1
+           match_cat = -1 # CHECK THAAT
         else:
             overlap = GRAMMATICAL_WM._overlap(inst1, inst2)
             if not(overlap["nodes"]) and not(overlap["edges"]):
-                match = 0
+                match_cat = 0
             elif overlap["edges"]:
-                match = -1
+                match_cat = -1
             else:
                 for n in overlap["nodes"]:
                     link = GRAMMATICAL_WM._link(inst1, inst2, n)
                     if link:
                         links.append(link)
-                        match = 1
                     link = GRAMMATICAL_WM._link(inst2, inst1, n)
                     if link:
-                        match = 1
                         links.append(link)
-                if not(links):
-                    match = 0       
-        return {"match":match, "links":links}
+                if links:
+                    match_cat = 1
+                else:
+                    match_cat = -1      
+        return {"match_cat":match_cat, "links":links}
     
     ##################
     ### Assemblage ###
@@ -1062,7 +1067,7 @@ if __name__=='__main__':
         sem_timing_5 = {100:['woman','kick', 'man', 'agt', 'pt']}
         sem_timing_6 = {100:['woman']}
         
-        sem_timing = sem_timing_6
+        sem_timing = sem_timing_1
                         
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]

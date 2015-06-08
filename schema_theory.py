@@ -466,10 +466,10 @@ class WM(PROCEDURAL_SCHEMA):
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
         
-    def add_coop_link(self, inst_from, port_from, inst_to, port_to, weight=None):
+    def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1, weight=None):
         if weight == None:
             weight=self.C2_params['coop_weight']
-        new_link = COOP_LINK(inst_from, inst_to, weight)
+        new_link = COOP_LINK(inst_from, inst_to, weight*qual)
         new_link.set_connect(port_from, port_to)
         self.coop_links.append(new_link)
 
