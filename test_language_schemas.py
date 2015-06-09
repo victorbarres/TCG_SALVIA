@@ -23,6 +23,20 @@ def test(seed=None):
     phonWM = ls.PHON_WM()
     control = ls.CONTROL()
     
+    language_mapping = {'Conceptualizer':[], 
+                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
+                    'Grammatical_WM':['left_BA45', 'leftBA44'], 
+                    'Grammatical_LTM':['left_STG', 'left_MTG'],
+                    'Cxn_retrieval':[], 
+                    'Phonological_WM':['left_BA6'],
+                    'Control':['DLPFC']}
+    
+    language_system = st.SCHEMA_SYSTEM('Language_system')
+    
+    language_brain_mapping = st.BRAIN_MAPPING()
+    language_brain_mapping.schema_mapping = language_mapping
+    language_system.brain_mapping = language_brain_mapping
+    
     prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP; 5: TEST STATIC SEMREP (FULL GRAMMAR + TEXT2SPEECH); 6: TEST INCREMENTAL SEMREP; 7: TEST INCREMENTAL + CONTROL"
     print prompt
     case = raw_input("ENTER CASE #: ")
@@ -34,16 +48,8 @@ def test(seed=None):
     if case == '1':
         ###########################################################################
         ### TEST BUILD LANGUAGE SYSTEM ###
-        language_mapping = {'Conceptualizer':[], 
-                            'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
-                            'Grammatical_WM':['left_BA45', 'leftBA44'], 
-                            'Grammatical_LTM':['left_STG', 'left_MTG'],
-                            'Cxn_retrieval':[], 
-                            'Phonological_WM':['left_BA6']}
-                            
         language_schemas = [conceptualizer, grammaticalWM, grammaticalLTM, cxn_retrieval, semanticWM, phonWM]
         
-        language_system = st.SCHEMA_SYSTEM('Language_system')
         language_system.add_schemas(language_schemas)
         
         language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
@@ -55,10 +61,6 @@ def test(seed=None):
         
         language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
         language_system.set_output_ports([phonWM._find_port('to_output')])
-        
-        language_brain_mapping = st.BRAIN_MAPPING()
-        language_brain_mapping.schema_mapping = language_mapping
-        language_system.brain_mapping = language_brain_mapping
         
         language_system.system2dot()
     
@@ -127,7 +129,6 @@ def test(seed=None):
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM]
         
-        language_system = st.SCHEMA_SYSTEM('Language_system')
         language_system.add_schemas(language_schemas)
         language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
         language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
@@ -195,7 +196,6 @@ def test(seed=None):
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
         
-        language_system = st.SCHEMA_SYSTEM('Language_system')
         language_system.add_schemas(language_schemas)
         language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
         language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
@@ -261,7 +261,6 @@ def test(seed=None):
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
         
-        language_system = st.SCHEMA_SYSTEM('Language_system')
         language_system.add_schemas(language_schemas)
         language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
         language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
@@ -345,7 +344,6 @@ def test(seed=None):
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM]
         
-        language_system = st.SCHEMA_SYSTEM('Language_system')
         language_system.add_schemas(language_schemas)
         language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
         language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
@@ -373,6 +371,7 @@ def test(seed=None):
                 print language_system.outputs['Phonological_WM:14']
             
         grammaticalWM.show_dynamics()
+        
     elif case == '7':
         ###############################################
         ### TEST INCREMENTAL SEMREP with CONTROL ######
@@ -424,8 +423,7 @@ def test(seed=None):
                         
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control]
-        
-        language_system = st.SCHEMA_SYSTEM('Language_system')
+
         language_system.add_schemas(language_schemas)
         language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
         language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
@@ -438,6 +436,8 @@ def test(seed=None):
         
         language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
         language_system.set_output_ports([phonWM._find_port('to_output')])
+        
+        language_system.system2dot(image_type='png', disp=True)
     
         
         max_step = 1000

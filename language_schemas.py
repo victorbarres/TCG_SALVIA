@@ -743,7 +743,7 @@ class PHON_WM(PROCEDURAL_SCHEMA):
 class CONTROL(PROCEDURAL_SCHEMA):
     """
     """
-    def __init__(self, name="control"):
+    def __init__(self, name="Control"):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_phonological_WM')

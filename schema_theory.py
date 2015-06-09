@@ -924,10 +924,10 @@ class SCHEMA_SYSTEM:
         # Update the system output
         self.outputs = {p.schema.name+":"+str(p.id):p.value for p in self.output_ports}
     
-    def system2dot(self):
+    def system2dot(self, image_type='svg', disp=False):
         """
         Generates a dot file of the system's graph.
-        Also creates an SVG image.
+        Also creates an image.
         """
         import subprocess
         import pydot
@@ -935,7 +935,7 @@ class SCHEMA_SYSTEM:
         tmp_folder = './tmp/'          
         
         prog = 'dot'
-        file_type = 'svg'
+        file_type = image_type
         dot_sys = pydot.Dot(graph_type = 'digraph', splines = 'ortho')
         dot_sys.set_rankdir('LR')
         dot_sys.set_fontname('consolas')
@@ -974,6 +974,18 @@ class SCHEMA_SYSTEM:
          # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
+        
+        if disp:
+            if image_type != 'png':
+                print 'CANNOT DISPLAY %s TYPE, please use "png"' % image_type
+            else:
+                img_name = '%s.%s' %(file_name,file_type)
+                plt.figure(facecolor='white')
+                plt.axis('off')
+                title = self.name
+                plt.title(title)
+                img = plt.imread(img_name)
+                plt.imshow(img)
         
 ###############################################################################
 if __name__=="__main__":
