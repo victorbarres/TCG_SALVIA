@@ -215,7 +215,7 @@ class GRAMMATICAL_WM(WM):
             assemblages = self._assemble()
             print assemblages
             if assemblages:
-                self._draw_assemblages()
+#                self._draw_assemblages()
                 activations = [a.activation for a in assemblages]
                 winner_idx = activations.index(max(activations))
                 print "WINNER ASSEMBLAGE: %i" %winner_idx
@@ -363,7 +363,7 @@ class GRAMMATICAL_WM(WM):
         NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. THIS IS THE ONE THA SHOULD BE CONSIDERED!!!
         """
         inst_network = GRAMMATICAL_WM._build_instance_network(self.schema_insts, self.coop_links)
-        
+
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
         assemblages = []
         for t in tops:
@@ -412,9 +412,11 @@ class GRAMMATICAL_WM(WM):
                 children = graph.predecessors(port)
                 updated_frontiers = []
                 for child in children:
-                    link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child._find_port("output"), port_to=port)
-                    for f in new_frontiers:
-                        updated_frontiers.append(f[:] + [(child, link[0])])
+                    flag =  child in assemblage.schema_insts
+                    if not(flag):
+                        link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child._find_port("output"), port_to=port)
+                        for f in new_frontiers:
+                            updated_frontiers.append(f[:] + [(child, link[0])])
                 new_frontiers = updated_frontiers
         if new_frontiers == [[]]:
             results.append(assemblage)
@@ -1022,7 +1024,7 @@ if __name__=='__main__':
         ###############################################
         ### TEST INCREMENTAL SEMREP (LIGHT GRAMMAR) ###
         import loader as ld
-        my_grammar = ld.load_grammar("TCG_grammar_VB_light2.json", "./data/grammars/")
+        my_grammar = ld.load_grammar("TCG_grammar_VB_light.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
@@ -1094,8 +1096,7 @@ if __name__=='__main__':
                         semanticWM.SemRep.add_node(info[1], concept=info[2], new=True)
                     else:
                         semanticWM.SemRep.add_edge(info[1][0], info[1][1], concept=info[2], new=True)
-                semanticWM.show_state()
-                # Show what is retrieved.
+#                semanticWM.show_state()
             language_system.update()
             if language_system.outputs['Phonological_WM:14']:
                 print language_system.outputs['Phonological_WM:14']
