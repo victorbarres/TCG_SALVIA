@@ -239,7 +239,7 @@ class TP_SEMFRAME(TP_ELEM):
         SF_p_copy.nodes += SF_c_copy.nodes
         
         node_c = SF_c_copy.find_elem(c_c[node_c_name])
-        node_c.head = False
+        node_c.head = node_p.head
         for rel in SF_p_copy.edges:
             if rel.pFrom.name == c_p[node_p_name]:
                 rel.pFrom = node_c

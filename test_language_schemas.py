@@ -395,14 +395,14 @@ def test(seed=None):
         grammaticalWM.C2_params['coop_weight'] = 1
         grammaticalWM.C2_params['comp_weight'] = -1
         
-        control.task_params['time_pressure'] = 10
+        control.task_params['time_pressure'] = 120
         
         # Set up grammatical LTM content
-        
         for cxn in my_grammar.constructions:
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
+        # Set up Semantic WM content
         man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
         woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
         kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
@@ -413,8 +413,6 @@ def test(seed=None):
         modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
         entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
         
-    
-        # Set up Semantic WM content
         sem_info = {'woman':('node', 'WOMAN', woman_cpt), 'kick':('node', 'KICK', kick_cpt), 'man':('node', 'MAN', man_cpt), 
                     'agt':('edge', ('KICK', 'WOMAN'), agent_cpt), 'pt':('edge', ('KICK', 'MAN'), patient_cpt), 'pt2':('edge', ('KICK', 'ENTITY'), patient_cpt),
                     'pretty':('node', 'PRETTY', pretty_cpt), 'big':('node', 'BIG', big_cpt), 
@@ -426,8 +424,9 @@ def test(seed=None):
         sem_timing_2 = {100:['woman','mod1', 'pretty']}
         sem_timing_3 = {100:['woman','kick', 'man', 'agt', 'pt']}
         sem_timing_4 = {100:['woman','mod1', 'pretty', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
-        sem_timing_5 = {100:['woman'], 200:['mod1', 'pretty']}
-        sem_timing_6 = {100:['woman','mod1', 'pretty', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
+        sem_timing_5 = {100:['woman','mod1', 'pretty', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
+        
+        sem_timing_6 = {100:['woman'], 200:['mod1', 'pretty']}
         
         sem_timing_7 = {100:['woman'], 200:['mod1', 'pretty'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
         sem_timing_8 = {100:['man'], 200:['kick', 'woman', 'agt', 'pt'], 300:['mod1', 'pretty'], 400:['big', 'mod2']}
@@ -435,8 +434,7 @@ def test(seed=None):
         
         sem_timing_10 = {10:['woman'], 300:['mod1', 'pretty'], 500: ['kick'],  700:['agt', 'pt', 'man'], 900:['big', 'mod2']}        
         
-        sem_timing = sem_timing_10
-                        
+        sem_timing = sem_timing_7
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control]
 
@@ -453,7 +451,7 @@ def test(seed=None):
         language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
         language_system.set_output_ports([phonWM._find_port('to_output')])
         
-        language_system.system2dot(image_type='png', disp=True)
+#        language_system.system2dot(image_type='png', disp=True)
     
         
         max_step = 1000

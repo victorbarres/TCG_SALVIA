@@ -209,18 +209,23 @@ class GRAMMATICAL_WM(WM):
             eq_inst.content.show()
             (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
             self.set_output('to_phonological_WM', phon_form)
+            self.replace_assemblages([winner_assemblage])
             self.coop_links = []
             self.comp_links = []
     
-#    def replace_assemblage(self, assemblage):
-#        """
-#        Replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
-#        """
-#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-#        for inst in assemblage.schema_insts:
-#            inst.alive = False
-#            self.prune()
-#        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":assemblage.activation}])
+    def replace_assemblages(self, assemblages):
+        """
+        For each assemblage in the assembalges list, replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
+        Args:
+            - assemblages [ASSEMBLAGE]
+        """
+        for assemblage in assemblages:
+            eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+            for inst in assemblage.schema_insts:
+                inst.alive = False
+            self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
+        
+        self.prune()
             
     ###############################
     ### cooperative computation ###
@@ -403,7 +408,9 @@ class GRAMMATICAL_WM(WM):
         while len(coop_links)>0:
             new_assemblage = GRAMMATICAL_WM._reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
             coop_links = new_assemblage.coop_links
-        return new_assemblage.schema_insts[0]
+        eq_inst = new_assemblage.schema_insts[0]
+        eq_inst.activity = new_assemblage.activation
+        return eq_inst
       
     @staticmethod      
     def _reduce_assemblage(assemblage, coop_link):
