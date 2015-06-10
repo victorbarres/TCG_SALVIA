@@ -375,17 +375,27 @@ def test(seed=None):
     elif case == '7':
         ###############################################
         ### TEST INCREMENTAL SEMREP with CONTROL ######
-        my_grammar = ld.load_grammar("TCG_grammar_VB_light.json", "./data/grammars/")
+        my_grammar = ld.load_grammar("TCG_grammar_VB.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
-        
         
         # Parameters
         act0 = 0.1
         act_var = 0
+        
         grammaticalWM.dyn_params['tau'] = 30
+        grammaticalWM.dyn_params['act_inf'] = 0.0
+        grammaticalWM.dyn_params['L'] = 1.0
+        grammaticalWM.dyn_params['k'] = 10.0
+        grammaticalWM.dyn_params['x0'] = 0.5
+        grammaticalWM.dyn_params['noise_mean'] = 0
+        grammaticalWM.dyn_params['noise_std'] = 0.2
+        
         grammaticalWM.C2_params['prune_threshold'] = 0.01
+        grammaticalWM.C2_params['coop_weight'] = 1
         grammaticalWM.C2_params['comp_weight'] = -1
+        
+        control.task_params['time_pressure'] = 10
         
         # Set up grammatical LTM content
         
@@ -396,7 +406,7 @@ def test(seed=None):
         man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
         woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
         kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-        blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
+        pretty_cpt = cpt.CONCEPT(name="PRETTY", meaning="PRETTY")
         big_cpt = cpt.CONCEPT(name="BIG", meaning="BIG")
         agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
         patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
@@ -407,19 +417,25 @@ def test(seed=None):
         # Set up Semantic WM content
         sem_info = {'woman':('node', 'WOMAN', woman_cpt), 'kick':('node', 'KICK', kick_cpt), 'man':('node', 'MAN', man_cpt), 
                     'agt':('edge', ('KICK', 'WOMAN'), agent_cpt), 'pt':('edge', ('KICK', 'MAN'), patient_cpt), 'pt2':('edge', ('KICK', 'ENTITY'), patient_cpt),
-                    'blue':('node', 'BLUE', blue_cpt), 'big':('node', 'BIG', big_cpt), 
-                    'mod1':('edge', ('BLUE', 'WOMAN'), modify_cpt), 'mod2':('edge', ('BIG', 'MAN'), modify_cpt),
+                    'pretty':('node', 'PRETTY', pretty_cpt), 'big':('node', 'BIG', big_cpt), 
+                    'mod1':('edge', ('PRETTY', 'WOMAN'), modify_cpt), 'mod2':('edge', ('BIG', 'MAN'), modify_cpt),
                     'entity':('node', 'ENTITY', entity_cpt)}
         
         # Timing options
-        sem_timing_1 = {100:['woman'], 200:['mod1', 'blue'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
-        sem_timing_2 = {100:['woman'], 200:['mod1', 'blue']}
-        sem_timing_3 = {100:['woman','mod1', 'blue', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
-        sem_timing_4 = {100:['woman','mod1', 'blue']}
-        sem_timing_5 = {100:['woman','kick', 'man', 'agt', 'pt']}
-        sem_timing_6 = {100:['woman']}
+        sem_timing_1 = {100:['woman']}
+        sem_timing_2 = {100:['woman','mod1', 'pretty']}
+        sem_timing_3 = {100:['woman','kick', 'man', 'agt', 'pt']}
+        sem_timing_4 = {100:['woman','mod1', 'pretty', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
+        sem_timing_5 = {100:['woman'], 200:['mod1', 'pretty']}
+        sem_timing_6 = {100:['woman','mod1', 'pretty', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
         
-        sem_timing = sem_timing_1
+        sem_timing_7 = {100:['woman'], 200:['mod1', 'pretty'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
+        sem_timing_8 = {100:['man'], 200:['kick', 'woman', 'agt', 'pt'], 300:['mod1', 'pretty'], 400:['big', 'mod2']}
+        sem_timing_9 = {100:['man'], 200:['kick', 'woman', 'agt', 'pt'], 300:['big', 'mod2'], 400:['mod1', 'pretty']} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.
+        
+        sem_timing_10 = {10:['woman'], 300:['mod1', 'pretty'], 500: ['kick'],  700:['agt', 'pt', 'man'], 900:['big', 'mod2']}        
+        
+        sem_timing = sem_timing_10
                         
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control]

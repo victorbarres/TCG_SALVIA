@@ -6,19 +6,17 @@ Defines language schemas for TCG.
 Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
 Uses pyttsx for the text to speech implementation (optional!)
 """
-import random
 import matplotlib.pyplot as plt
 
 import networkx as nx
 import pyttsx
 
 
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE, SCHEMA_SYSTEM, BRAIN_MAPPING
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
 import concept as cpt
 import TCG_graph
 
-random.seed(1)
 ##################################
 ### Language knowledge schemas ###
 ##################################
@@ -179,85 +177,8 @@ class GRAMMATICAL_WM(WM):
             self._add_new_insts(new_cxn_insts)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
-#        if not(self.comp_links) and self.coop_links:
-#            self.show_state()
-#            assemblages = self._assemble()
-##            self._draw_assemblages()
-#            activations = [a.activation for a in assemblages]
-#            winner_idx = activations.index(max(activations))
-#            print "WINNER ASSEMBLAGE: %i" %winner_idx
-#            winner_assemblage = assemblages[winner_idx]
-#            GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
-#            eq_inst = self._assemblage2inst(winner_assemblage)
-#            eq_inst.content.show()
-#            (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
-#            self.set_output('to_phonological_WM', phon_form)
-#            self.schema_insts = []
-#            self.coop_links = []
-#            self.comp_links = []
-#        if self.t > 900:
-#            self.end_competitions()
-#            assemblages = self._assemble()
-#            if assemblages:
-#    #            self._draw_assemblages()
-#                self.show_state()
-#                activations = [a.activation for a in assemblages]
-#                print activations
-#                winner_idx = activations.index(max(activations))
-#                print "WINNER ASSEMBLAGE: %i" %winner_idx
-#                winner_assemblage = assemblages[winner_idx]
-#                GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
-#                eq_inst = self._assemblage2inst(winner_assemblage)
-#                eq_inst.content.show()
-#                (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
-#                self.set_output('to_phonological_WM', phon_form)
-#                self.schema_insts = []
-#                self.coop_links = []
-#                self.comp_links = []
-#        if self.t==900:
-#            self.show_state()
-#            self.end_competitions()
-#            self.show_state()
-#            assemblages = self._assemble()
-#            print assemblages
-#            if assemblages:
-##                self._draw_assemblages()
-#                activations = [a.activation for a in assemblages]
-#                winner_idx = activations.index(max(activations))
-#                print "WINNER ASSEMBLAGE: %i" %winner_idx
-#                winner_assemblage = assemblages[winner_idx]
-#                GRAMMATICAL_WM._draw_assemblage(winner_assemblage, 'Winner!')
-#                eq_inst = self._assemblage2inst(winner_assemblage)
-#                eq_inst.content.show()
-#                (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
-#                self.set_output('to_phonological_WM', phon_form)
-#                self.schema_insts = []
-#                self.coop_links = []
-#                self.comp_links = []
         if produce:
-#            self.show_state()
-            self.end_competitions()
-#            self.show_state()
-            assemblages = self._assemble()
-            if assemblages:
-#                self._draw_assemblages()
-                activations = [a.activation for a in assemblages]
-                winner_idx = activations.index(max(activations))
-                winner_assemblage = assemblages[winner_idx]
-                eq_inst = self._assemblage2inst(winner_assemblage)
-                eq_inst.content.show()
-                (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
-                self.set_output('to_phonological_WM', phon_form)
-                            
-#    def replace_assemblage(self, assemblage):
-#        """
-#        Replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
-#        """
-#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-#        for inst in assemblage.schema_insts:
-#            inst.alive = False
-#            self.prune()
-#        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":assemblage.activation}])
+            self._produce_form()
     
     def _add_new_insts(self, new_insts):
         """
@@ -271,6 +192,35 @@ class GRAMMATICAL_WM(WM):
             self.add_instance(new_inst, act*match_qual)
             self._cooperate(new_inst)
             self._compete(new_inst)
+    
+    def _produce_form(self):
+        """
+        """
+#        self.show_state()
+        self.end_competitions()
+#        self.show_state()
+        assemblages = self._assemble()
+        if assemblages:
+#           self._draw_assemblages()
+            activations = [a.activation for a in assemblages]
+            winner_idx = activations.index(max(activations))
+            winner_assemblage = assemblages[winner_idx]
+            eq_inst = self._assemblage2inst(winner_assemblage)
+            eq_inst.content.show()
+            (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
+            self.set_output('to_phonological_WM', phon_form)
+            self.coop_links = []
+            self.comp_links = []
+    
+#    def replace_assemblage(self, assemblage):
+#        """
+#        Replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
+#        """
+#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        for inst in assemblage.schema_insts:
+#            inst.alive = False
+#            self.prune()
+#        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":assemblage.activation}])
             
     ###############################
     ### cooperative computation ###
@@ -712,7 +662,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)    
         return sub_iso
     
-    def _SemMatch_qual(self,SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
+    def _SemMatch_qual(self, SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
         """
         Computes the quality of match.
         Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
@@ -739,7 +689,6 @@ class PHON_WM(PROCEDURAL_SCHEMA):
             print phon_form
             self.set_output('to_control', True)
         
-
 class CONTROL(PROCEDURAL_SCHEMA):
     """
     """
@@ -780,4 +729,4 @@ class TEXT2SPEECH:
 ###############################################################################
 if __name__=='__main__':
     from test_language_schemas import test
-    test(seed=1)
+    test(seed=None)
