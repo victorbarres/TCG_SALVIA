@@ -162,7 +162,7 @@ def test(seed=None):
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Set up grammatical LTM content
-        act0 = 0.6
+        act0 = grammaticalWM.C2_params['prod_threshold']*0.5
         for cxn in my_grammar.constructions:
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
@@ -231,7 +231,7 @@ def test(seed=None):
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Set up grammatical LTM content
-        act0 = 0.6
+        act0 = grammaticalWM.C2_params['prod_threshold']*0.5
         for cxn in my_grammar.constructions:
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
@@ -301,7 +301,7 @@ def test(seed=None):
         
         
         # Parameters
-        act0 = 0.1
+        act0 = grammaticalWM.C2_params['prod_threshold']*0.5
         act_var = 0
         grammaticalWM.dyn_params['tau'] = 30
         grammaticalWM.C2_params['prune_threshold'] = 0.01
@@ -379,10 +379,7 @@ def test(seed=None):
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
-        # Parameters
-        act0 = 0.1
-        act_var = 0
-        
+        # Parameters        
         grammaticalWM.dyn_params['tau'] = 30
         grammaticalWM.dyn_params['act_inf'] = 0.0
         grammaticalWM.dyn_params['L'] = 1.0
@@ -391,15 +388,19 @@ def test(seed=None):
         grammaticalWM.dyn_params['noise_mean'] = 0
         grammaticalWM.dyn_params['noise_std'] = 0.2
         
+        grammaticalWM.C2_params['prod_threshold'] = 0.8
         grammaticalWM.C2_params['prune_threshold'] = 0.01
         grammaticalWM.C2_params['coop_weight'] = 1
         grammaticalWM.C2_params['comp_weight'] = -1
         
         control.task_params['time_pressure'] = 900
         
+        act0 = grammaticalWM.C2_params['prod_threshold']*0.1
+        act_var = 0
+        
         # Set up grammatical LTM content
         for cxn in my_grammar.constructions:
-            new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']))
+            new_cxn_schema = ls.CXN_SCHEMA(cxn, min(max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']),grammaticalWM.C2_params['prod_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
         # Set up Semantic WM content

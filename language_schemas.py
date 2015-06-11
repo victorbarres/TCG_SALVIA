@@ -165,7 +165,7 @@ class GRAMMATICAL_WM(WM):
         self.add_port('OUT', 'to_phonological_WM')
         self.add_port('IN', 'from_control')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
+        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'prod_threshold':0.8}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
     
     def update(self):
         """
@@ -205,7 +205,7 @@ class GRAMMATICAL_WM(WM):
         if assemblages:
 #            self._draw_assemblages()
             winner_assemblage = self._get_winner_assemblage(assemblages)
-            if winner_assemblage.activation > 0.6:
+            if winner_assemblage.activation > self.C2_params['prod_threshold']:
                 print 'Production at time: %i' %self.t
                 (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
                 self.set_output('to_phonological_WM', phon_form)
@@ -264,7 +264,7 @@ class GRAMMATICAL_WM(WM):
         """
         self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
         for inst in assemblage.schema_insts:
-            inst.set_activation(0.2)
+            inst.set_activation(self.C2_params['prod_threshold'])
         
             
     ###############################
