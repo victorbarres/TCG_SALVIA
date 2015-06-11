@@ -178,6 +178,8 @@ class GRAMMATICAL_WM(WM):
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
         if produce:
+            self.end_competitions()
+        if not(self.comp_links):
             self._produce_form()
     
     def _add_new_insts(self, new_insts):
@@ -197,35 +199,73 @@ class GRAMMATICAL_WM(WM):
         """
         """
 #        self.show_state()
-        self.end_competitions()
+#        self.end_competitions()
 #        self.show_state()
         assemblages = self._assemble()
         if assemblages:
-#           self._draw_assemblages()
-            activations = [a.activation for a in assemblages]
-            winner_idx = activations.index(max(activations))
-            winner_assemblage = assemblages[winner_idx]
-            eq_inst = self._assemblage2inst(winner_assemblage)
-            eq_inst.content.show()
-            (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
-            self.set_output('to_phonological_WM', phon_form)
-            self.replace_assemblages([winner_assemblage])
-            self.coop_links = []
-            self.comp_links = []
-    
-    def replace_assemblages(self, assemblages):
+#            self._draw_assemblages()
+            winner_assemblage = self._get_winner_assemblage(assemblages)
+            if winner_assemblage.activation > 0.6:
+                print 'Production at time: %i' %self.t
+                (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
+                self.set_output('to_phonological_WM', phon_form)
+            
+    #            self.replace_assemblage(winner_assemblage) # Need to decide wether or not I want to keep that....
+                self.dismantle_assemblage(winner_assemblage)
+                        
+    #            self.coop_links = []
+    #            self.comp_links = []
+        
+    def _get_winner_assemblage(self, assemblages):
         """
-        For each assemblage in the assembalges list, replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
-        Args:
-            - assemblages [ASSEMBLAGE]
+        Args: assemblages ([ASSEMBLAGE])
+        Returns the winner assemblages and their equivalent instances.
+        
+        Note: Need to discuss the criteria that come into play in choosing the winner assemblages.
+        As for the SemRep covered weight, the constructions should receive activation from the SemRep instances. This could help directly factoring in the SemRep covered factor.
+        The formula is biase by the fact that not all variables have the same range. This needs to be accounted for.        
         """
+        w1 = 1 # Aactivation weight
+        w2 = 2 # SemRep covered weight
+        w3 = -0.5 # SynForm length weight
+        winner = None
+        max_score = None
+        # Computing the equivalent instance for each assemblage.
         for assemblage in assemblages:
-            eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-            for inst in assemblage.schema_insts:
-                inst.alive = False
+            eq_inst = self._assemblage2inst(assemblage)
+            sem_covered = len(eq_inst.content.SemFrame.nodes) + len(eq_inst.content.SemFrame.edges)
+            form_len = len(eq_inst.content.SynForm.form)
+            score = w1*eq_inst.activity + w2*sem_covered + w3*form_len # THIS NEEDS TO BE REVISED.
+            if not(max_score):
+                max_score = score
+                winner = assemblage
+            if score>max_score:
+                max_score = score
+                winner = assemblage
+
+        return winner
+
+        
+    def replace_assemblage(self, assemblage):
+        """
+        Replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
+        Args:
+            - assemblage (ASSEMBLAGE)
+        """
+        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+        for inst in assemblage.schema_insts:
+            inst.alive = False
             self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
         
-        self.prune()
+        self.prune() # All the instances in the assemblage as well as all the f-links invovling them are removed.
+    
+    def dismantle_assemblage(self, assemblage):
+        """
+        """
+        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
+        for inst in assemblage.schema_insts:
+            inst.set_activation(0.2)
+        
             
     ###############################
     ### cooperative computation ###
@@ -266,6 +306,8 @@ class GRAMMATICAL_WM(WM):
         overlap = {}
         overlap["nodes"] = [n for n in inst1.trace["semrep"]["nodes"] if n in inst2.trace["semrep"]["nodes"]]
         overlap["edges"] = [e for e in inst1.trace["semrep"]["edges"] if e in inst2.trace["semrep"]["edges"]]
+        if not(overlap['nodes']) and not(overlap['edges']):
+            return None
         return overlap
         
     @staticmethod    
@@ -310,7 +352,7 @@ class GRAMMATICAL_WM(WM):
            match_cat = -1 # CHECK THAAT
         else:
             overlap = GRAMMATICAL_WM._overlap(inst1, inst2)
-            if not(overlap["nodes"]) and not(overlap["edges"]):
+            if not(overlap):
                 match_cat = 0
             elif overlap["edges"]:
                 match_cat = -1
@@ -389,7 +431,7 @@ class GRAMMATICAL_WM(WM):
                 for child in children:
                     flag =  child in assemblage.schema_insts
                     if not(flag):
-                        link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child._find_port("output"), port_to=port)
+                        link = self.find_coop_links(inst_from=[child], inst_to=[node], port_from=[child._find_port("output")], port_to=[port])
                         for f in new_frontiers:
                             updated_frontiers.append(f[:] + [(child, link[0])])
                 new_frontiers = updated_frontiers

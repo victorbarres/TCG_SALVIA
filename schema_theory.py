@@ -280,7 +280,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
         self.instantiate(schema, trace)
      
-    def set_activation(self):
+    def initialize_activation(self):
         """
         Set activation parameters
         """
@@ -292,30 +292,15 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.activation.save_vals["act"].append(self.act_params['act0'])
         self.activity = self.act_params['act0']
         self.act_port_out.value = self.activity
-                                          
-#    def set_activation_dyn(self, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5, noise_mean=0, noise_std=0):
-#        """
-#        Set activation parameters
-#        """
-#        self.activation.dt = dt
-#        self.activation.tau = tau
-#        self.activation.act_inf = act_inf
-#        self.activation.L = L
-#        self.activation.k = k
-#        self.activation.x0 = x0
-#        self.activation.noise_mean=noise_mean
-#        self.activation.noise_std = noise_std
-#    
-#    def set_activation_init(self, t0=0, act0=1):
-#        """
-#        """
-#        self.activation.t0 = t0
-#        self.activation.act0 = act0
-#        self.activation.act= act0
-#        self.activation.save_vals["t"].append(t0)
-#        self.activation.save_vals["act"].append(act0)
-#        self.activity = act0
-#        self.act_port_out.value = self.activity
+    
+    def set_activation(self, value):
+        """
+        Sets the activation to value (FLOAT).
+        Args:
+            - value (FLOAT)
+        """
+        self.activation.act = value
+        self.activity = value
     
     @abc.abstractmethod
     def set_ports(self):
@@ -334,7 +319,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.trace = trace
         self.set_ports()
         self.act_params['act0'] = schema.init_act
-        self.set_activation()
+        self.initialize_activation()
     
     def update_activation(self):
         """
@@ -460,7 +445,7 @@ class WM(PROCEDURAL_SCHEMA):
                       'L':self.dyn_params['L'], 'k':self.dyn_params['k'], 'x0':self.dyn_params['x0'],
                       'noise_mean':self.dyn_params['noise_mean'], 'noise_std':self.dyn_params['noise_std']}
         schema_inst.act_params = act_params
-        schema_inst.set_activation()
+        schema_inst.initialize_activation()
         self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
     
     def remove_instance(self, schema_inst):
@@ -481,18 +466,18 @@ class WM(PROCEDURAL_SCHEMA):
         results = []
         for flink in self.coop_links:
             match = True
-            if inst_from!='any' and (flink.inst_from != inst_from):
+            if inst_from!='any' and not(flink.inst_from in inst_from):
                 match = False
-            if inst_to!='any' and (flink.inst_to != inst_to):
+            if inst_to!='any' and not(flink.inst_to in inst_to):
                 match = False
-            if port_from!='any' and (flink.connect.port_from != port_from):
+            if port_from!='any' and not(flink.connect.port_from in port_from):
                 match = False
-            if port_to !='any' and (flink.connect.port_to != port_to):
+            if port_to !='any' and not(flink.connect.port_to in port_to):
                 match = False
             
             if match:
                 results.append(flink)
-                
+        results = list(set(results))
         return results
                    
     def remove_coop_links(self,inst_from, inst_to, port_from='any', port_to='any'):
@@ -503,7 +488,6 @@ class WM(PROCEDURAL_SCHEMA):
         for f_link in f_links:
             self.coop_links.remove(f_link)
         
-    
     def add_comp_link(self, inst_from, inst_to, weight=None):
         if weight == None:
             weight=self.C2_params['comp_weight']
@@ -791,8 +775,8 @@ class ASSEMBLAGE:
         FOR NOW SIMPLY THE AVERAGE (or SUM) ACTIVATION OF THE INSTANCES CONTAINED IN THE ASSEMBLAGE.
         """
         
-#        self.activation = sum([inst.activity for inst in self.schema_insts])/len(self.schema_insts) # Average
-        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum
+        self.activation = sum([inst.activity for inst in self.schema_insts])/len(self.schema_insts) # Average
+#        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum
     
     def copy(self):
         """
