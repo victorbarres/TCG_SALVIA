@@ -563,7 +563,7 @@ class WM(PROCEDURAL_SCHEMA):
         """
         Picks a winner for each ongoing competitions. 
         Winner is the instance with the max activatity at the time when the method is called.
-        Loser is set to dead (alive=False). All the dead instances are then pruned.
+            Loser is set to dead (alive=False). All the dead instances are then pruned.
         """
         for link in self.comp_links:
             inst_from = link.inst_from
@@ -574,6 +574,7 @@ class WM(PROCEDURAL_SCHEMA):
                 inst_to.alive = False
         self.comp_links = []
         self.prune()
+        
     
     def update_activity(self):
         """

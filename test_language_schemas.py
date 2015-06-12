@@ -388,12 +388,12 @@ def test(seed=None):
         grammaticalWM.dyn_params['noise_mean'] = 0
         grammaticalWM.dyn_params['noise_std'] = 0.2
         
-        grammaticalWM.C2_params['prod_threshold'] = 0.8
+        grammaticalWM.C2_params['prod_threshold'] = 0.4
         grammaticalWM.C2_params['prune_threshold'] = 0.01
         grammaticalWM.C2_params['coop_weight'] = 1
         grammaticalWM.C2_params['comp_weight'] = -1
         
-        control.task_params['time_pressure'] = 900
+        control.task_params['time_pressure'] = 100
         
         act0 = grammaticalWM.C2_params['prod_threshold']*0.1
         act_var = 0
@@ -436,7 +436,7 @@ def test(seed=None):
         
         sem_timing_11 = {10:['woman'], 300:['mod1', 'pretty'], 500: ['kick'],  700:['agt', 'pt', 'man'], 900:['big', 'mod2']}        
         
-        sem_timing = sem_timing_11
+        sem_timing = sem_timing_9
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control]
 
@@ -456,7 +456,7 @@ def test(seed=None):
 #        language_system.system2dot(image_type='png', disp=True)
     
         
-        max_step = 1000
+        max_step = 2000
         for step in range(max_step):
             if step in sem_timing:
                 for s in sem_timing[step]:
@@ -473,6 +473,7 @@ def test(seed=None):
 #                print language_system.outputs['Phonological_WM:14']
             
         grammaticalWM.show_dynamics()
+        grammaticalWM.show_state()
     
     else:
         print "ERROR"
