@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Apr 29 13:21:41 2014
-
 @author: Victor Barres
 
 Define semantic network related classes for TCG1.1

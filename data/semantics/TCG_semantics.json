@@ -31,26 +31,27 @@
 			{
 				"BOXINGRING" : {},
 				"PARK" : {}
+			},
+
+			"ANIMATE" : 
+			{ 
+				"HUMAN" : {},
+				"ANIMAL" : {} 
+			},
+
+			"MALE" : 
+			{ 
+				"MAN" : {},
+				"BOY" : {}
+			},
+
+			"FEMALE"  : 
+			{ 
+				"WOMAN" : {},
+				"GIRL" : {} 
 			}
 		},
-
-		"ANIMATE" : 
-		{ 
-			"HUMAN" : {},
-			"ANIMAL" : {} 
-		},
-
-		"MALE" : 
-		{ 
-			"MAN" : {},
-			"BOY" : {}
-		},
-
-		"FEMALE"  : 
-		{ 
-			"WOMAN" : {},
-			"GIRL" : {} 
-		},
+		
 		"ACTION" : 
 		{
 			"TRANSITIVE" :
@@ -67,6 +68,7 @@
 				"WATCH" : {}
 			}
 		},
+		
 		"PROPERTY" :
 		{
 			"COLOR" :
@@ -88,6 +90,7 @@
 				"HANDSOME" : {}
 			}
 		},
+		
 		"RELATIONS" : 
 		{
 			"MODIFY" : {},
@@ -98,7 +101,7 @@
 			},
 			"TEMPORAL" :
 			{
-				"SUCCESSIVE" :{},
+				"SUCCESSIVE" : {},
 				"CONCURRENT" : {}
 			},
 			"SPATIAL" : 

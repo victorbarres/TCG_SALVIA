@@ -65,7 +65,6 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                     new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
                     self.covers = new_mapping
         else:
-             SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
              self.covers = mapping
         self.set_ports()
     
@@ -93,6 +92,44 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
              for port in out_ports:
                 self.out_ports.append(port)
                 port.schema=self
+
+class SEM_SCHEMA(KNOWLEDGE_SCHEMA):
+    """
+    Data:
+    - KNOWEDGE SCHEMA data:
+                - id (int): Unique id
+                - name (str): schema name
+                - LTM (LTM): Associated long term memory.
+                - content (CONCEPT):
+                - init_act (float): Initial activation value.   
+    """
+    def __init__(self, a_concept, init_act):
+        KNOWLEDGE_SCHEMA.__init__(self, name=a_concept.name, content=a_concept, init_act=init_act)
+
+class SEM_SCHEMA_INST(SCHEMA_INST):
+    """
+    Semantic schema instance. 
+    """
+    def __init__(self, sem_schema, trace):
+        SCHEMA_INST.__init__(self, schema=sem_schema, trace=trace)
+
+class SEM_NODE_INST(SEM_SCHEMA_INST):
+    """
+    """
+    def __init__(self, sem_schema, trace):
+        SEM_SCHEMA_INST.__init__(self, schema=sem_schema, trace=trace)
+
+class SEM_REL_INST(SEM_SCHEMA_INST):
+    """
+    Data:
+        - node_from (SEM_NODE_INST)
+        - node_to (SEM_NODE_INST)
+    """
+    def __init__(self, sem_schema, trace, node_from, node_to):
+        SEM_SCHEMA_INST.__init__(self, schema=sem_schema, trace=trace)
+        self.node_from = node_from
+        self.node_to = node_to
+        
 
 ###################################
 ### Language procedural schemas ###
