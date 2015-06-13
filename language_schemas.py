@@ -179,7 +179,7 @@ class GRAMMATICAL_WM(WM):
         self.prune()
         if produce:
             self.end_competitions()
-        if produce or not(self.comp_links):
+        if not(self.comp_links):
             self._produce_form()
     
     def _add_new_insts(self, new_insts):
@@ -217,10 +217,13 @@ class GRAMMATICAL_WM(WM):
 #                self.dismantle_assemblage(winner_assemblage)
                 
                  # Option3: Removes coop links + adds the equivalent instance.
-                self.dismantle_assemblage2(winner_assemblage)
+#                self.dismantle_assemblage2(winner_assemblage)
                 
                 # Option4: Keeps all the coop_links but bumps down the activation values of all the isntances that are part of the winner assemblage.
 #                self.reset_assemblage(winner_assemblage)
+                
+                #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
+                self.post_prod_state(winner_assemblage)
 
     def _get_winner_assemblage(self, assemblages):
         """
@@ -229,16 +232,20 @@ class GRAMMATICAL_WM(WM):
         
         Note: Need to discuss the criteria that come into play in choosing the winner assemblages.
         As for the SemRep covered weight, the constructions should receive activation from the SemRep instances. This could help directly factoring in the SemRep covered factor.
-        The formula is biase by the fact that not all variables have the same range. This needs to be accounted for.        
+        The formula is biased by the fact that not all variables have the same range. This needs to be accounted for.   
+        
+        NOTE: NEED TO SOMEHOW ACCOUNT FOR WEATHER OR NOT THE ASSEMBLAGE EXPRESSES NOVEL INFORMATION. Otherwise, I get the situation in which assemblage get reused
+        because they are boosted by new construction while scoring higher that the novel assemblages.
         """
         w1 = 1 # Aactivation weight
-        w2 = 2 # SemRep covered weight
-        w3 = -0.5 # SynForm length weight
+        w2 = 1 # SemRep covered weight
+        w3 = 0 # SynForm length weight
+        
         winner = None
         max_score = None
         # Computing the equivalent instance for each assemblage.
         for assemblage in assemblages:
-            eq_inst = self._assemblage2inst(assemblage)
+            eq_inst = self._assemblage2inst(assemblage)    
             sem_covered = len(eq_inst.content.SemFrame.nodes) + len(eq_inst.content.SemFrame.edges)
             form_len = len(eq_inst.content.SynForm.form)
             score = w1*eq_inst.activity + w2*sem_covered + w3*form_len # THIS NEEDS TO BE REVISED.
@@ -248,7 +255,6 @@ class GRAMMATICAL_WM(WM):
             if score>max_score:
                 max_score = score
                 winner = assemblage
-
         return winner
 
         
@@ -308,7 +314,7 @@ class GRAMMATICAL_WM(WM):
         Args:
             - assemblage (ASSEMBLAGE)
         """
-        r = 0.1
+        r = 0.9
         eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
         # Sets the activation below productoin threshold so that it is not re-used right away. 
         eq_inst.set_activation(self.C2_params['prod_threshold']*r)
@@ -317,6 +323,33 @@ class GRAMMATICAL_WM(WM):
             inst.set_activation(self.C2_params['prod_threshold']*r)
         
         self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
+    
+    def post_prod_state(self, winner_assemblage):
+        """
+        Sets the grammatical state after production given a winner assemblage.
+        """
+        self._set_subthreshold(winner_assemblage.schema_insts)
+        self._deactivate_coop_weigts()
+        
+    def _set_subthreshold(self, insts, r=0.5):
+        """
+        Sets the activation of all the instances in insts to r*production threshold
+        Args:
+            - insts ([CXN_INST])
+            - val (FLOAT)
+        """
+        for inst in insts:
+            inst.set_activation(r*self.C2_params['prod_threshold'])
+            
+    def _deactivate_coop_weigts(self, deact_weight=0):
+        """
+        Sets all the coop_links that in grammatial WM to weight = deact_weight
+        Instances are also placed below production threshold.
+        Args:
+            - assemblage (ASSEMBLAGE)
+        """
+        for coop_links in self.coop_links:
+            coop_links.weight = deact_weight
 
     ###############################
     ### cooperative computation ###

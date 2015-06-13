@@ -775,7 +775,6 @@ class ASSEMBLAGE:
         
         FOR NOW SIMPLY THE AVERAGE (or SUM) ACTIVATION OF THE INSTANCES CONTAINED IN THE ASSEMBLAGE.
         """
-        
         self.activation = sum([inst.activity for inst in self.schema_insts])/len(self.schema_insts) # Average
 #        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum
     

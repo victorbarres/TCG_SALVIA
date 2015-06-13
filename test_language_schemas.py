@@ -388,14 +388,14 @@ def test(seed=None):
         grammaticalWM.dyn_params['noise_mean'] = 0
         grammaticalWM.dyn_params['noise_std'] = 0.2
         
-        grammaticalWM.C2_params['prod_threshold'] = 0.4
+        grammaticalWM.C2_params['prod_threshold'] = 0.2
         grammaticalWM.C2_params['prune_threshold'] = 0.01
         grammaticalWM.C2_params['coop_weight'] = 1
         grammaticalWM.C2_params['comp_weight'] = -1
         
-        control.task_params['time_pressure'] = 100
+        control.task_params['time_pressure'] = 150
         
-        act0 = grammaticalWM.C2_params['prod_threshold']*0.1
+        act0 = grammaticalWM.C2_params['prod_threshold']
         act_var = 0
         
         # Set up grammatical LTM content
@@ -425,18 +425,19 @@ def test(seed=None):
         sem_timing_2 = {100:['woman','mod1', 'pretty']}
         sem_timing_3 = {100:['woman','kick', 'man', 'agt', 'pt']}
         sem_timing_4 = {100:['woman','mod1', 'pretty', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
-        sem_timing_5 = {100:['woman','mod1', 'pretty', 'kick', 'agt', 'pt', 'man','big', 'mod2']}
-        sem_timing_6 = {100:['woman','mod1', 'pretty', 'man','big', 'mod2']} # SemRep contains to unconnected subgraphs.
+        sem_timing_5 = {100:['woman','mod1', 'pretty', 'man','big', 'mod2']} # SemRep contains to unconnected subgraphs.
         
-        sem_timing_7 = {100:['woman'], 200:['mod1', 'pretty']}
+        sem_timing_6 = {100:['woman'], 200:['mod1', 'pretty']}
         
-        sem_timing_8 = {100:['woman'], 200:['mod1', 'pretty'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
-        sem_timing_9 = {100:['man'], 200:['kick', 'woman', 'agt', 'pt'], 300:['mod1', 'pretty'], 400:['big', 'mod2']}
-        sem_timing_10 = {100:['man'], 200:['kick', 'woman', 'agt', 'pt'], 300:['big', 'mod2'], 400:['mod1', 'pretty']} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.
+        sem_timing_7 = {100:['woman'], 200:['mod1', 'pretty'], 300: ['kick'],  400:['agt', 'pt', 'man'], 500:['big', 'mod2']}
+        sem_timing_8 = {100:['man'], 200:['kick', 'woman', 'agt', 'pt'], 300:['mod1', 'pretty'], 400:['big', 'mod2']}
+        sem_timing_9 = {100:['man'], 200:['kick', 'woman', 'agt', 'pt'], 300:['big', 'mod2'], 400:['mod1', 'pretty']} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.
         
-        sem_timing_11 = {10:['woman'], 300:['mod1', 'pretty'], 500: ['kick'],  700:['agt', 'pt', 'man'], 900:['big', 'mod2']}        
+        sem_timing_10 = {10:['woman'], 300:['mod1', 'pretty'], 500: ['kick'],  700:['agt', 'pt', 'man'], 900:['big', 'mod2']}    
         
-        sem_timing = sem_timing_9
+        sem_timing_11 = {100:['woman','mod1', 'pretty'], 200:['man','big', 'mod2'], 300:['kick'], 400:['agt', 'pt']}
+        
+        sem_timing = sem_timing_11
         # Set up language system
         language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control]
 
@@ -456,7 +457,7 @@ def test(seed=None):
 #        language_system.system2dot(image_type='png', disp=True)
     
         
-        max_step = 2000
+        max_step = 600
         for step in range(max_step):
             if step in sem_timing:
                 for s in sem_timing[step]:
@@ -477,6 +478,9 @@ def test(seed=None):
     
     else:
         print "ERROR"
+
+if __name__=='__main__':
+    test(seed=None)
         
 
 
