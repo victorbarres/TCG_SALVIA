@@ -256,73 +256,72 @@ class GRAMMATICAL_WM(WM):
                 max_score = score
                 winner = assemblage
         return winner
-
-        
-    def replace_assemblage(self, assemblage):
-        """
-        Replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
-        Args:
-            - assemblage (ASSEMBLAGE)
-        """
-        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-        # Sets the activation below productoin threshold so that it is not re-used right away. 
-        eq_inst.set_activation(self.C2_params['prod_threshold'])
-        for inst in assemblage.schema_insts:
-            inst.alive = False
-        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
-        self.prune() # All the instances in the assemblage as well as all the f-links invovling them are removed.
-    
-    def dismantle_assemblage(self, assemblage):
-        """
-        Removes all the cooperation links involving instances that are part of the assemblages. Sets the activation of all the instances 
-        that are part of the assemblage to prod_threshold.
-        Args:
-            - assemblage (ASSEMBLAGE)
-            
-        PB: When an assemblage is dismantled, some combinations of cxn instances might be necessary later on, but won't be possible to reconstruct.
-        E.g. "A man" once used will never be rebuilt since it will not involve novel semantic material.
-        The replace_assemblage policy would somewhat take care of this by including the equivalent instance. Same with dismantle assemblage2.
-        However, there is still an issue with removing the cooperation links. For example," There is a woman who is pretty" Then the system cannot utter,
-        given more semantic info, "A woman kicks a man" since it cannot rebuild "a woman" since this was dismantled following the previous utterance.
-        """
-        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
-        for inst in assemblage.schema_insts:
-            inst.set_activation(self.C2_params['prod_threshold'])
-    
-    def dismantle_assemblage2(self, assemblage):
-        """
-        Removes all the cooperation links involving instances that are part of the assemblages. Sets the activation of all the instances 
-        that are part of the assemblage to prod_threshold.
-        Adds the assemblage equivalent cxn instance to the working memory.
-        Args:
-            - assemblage (ASSEMBLAGE)
-        """
-        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-        # Sets the activation below productoin threshold so that it is not re-used right away. 
-        eq_inst.set_activation(self.C2_params['prod_threshold'])
-        
-        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
-        for inst in assemblage.schema_insts:
-            inst.set_activation(self.C2_params['prod_threshold'])
-        
-        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
-    
-    def reset_assemblage(self, assemblage):
-        """
-        Resets the activation of all the instances that are part of the assemblage below prod threshold.
-        Adds the assemblage equivalent cxn instance to the working memory.
-        Args:
-            - assemblage (ASSEMBLAGE)
-        """
-        r = 0.9
-        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-        # Sets the activation below productoin threshold so that it is not re-used right away. 
-        eq_inst.set_activation(self.C2_params['prod_threshold']*r)
-
-        for inst in assemblage.schema_insts:
-            inst.set_activation(self.C2_params['prod_threshold']*r)
-        
-        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
+ 
+#    def replace_assemblage(self, assemblage):
+#        """
+#        Replace all the construction instances contained in the assemblage by the assemblage equivalent cxn_inst.
+#        Args:
+#            - assemblage (ASSEMBLAGE)
+#        """
+#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        # Sets the activation below productoin threshold so that it is not re-used right away. 
+#        eq_inst.set_activation(self.C2_params['prod_threshold'])
+#        for inst in assemblage.schema_insts:
+#            inst.alive = False
+#        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
+#        self.prune() # All the instances in the assemblage as well as all the f-links invovling them are removed.
+#    
+#    def dismantle_assemblage(self, assemblage):
+#        """
+#        Removes all the cooperation links involving instances that are part of the assemblages. Sets the activation of all the instances 
+#        that are part of the assemblage to prod_threshold.
+#        Args:
+#            - assemblage (ASSEMBLAGE)
+#            
+#        PB: When an assemblage is dismantled, some combinations of cxn instances might be necessary later on, but won't be possible to reconstruct.
+#        E.g. "A man" once used will never be rebuilt since it will not involve novel semantic material.
+#        The replace_assemblage policy would somewhat take care of this by including the equivalent instance. Same with dismantle assemblage2.
+#        However, there is still an issue with removing the cooperation links. For example," There is a woman who is pretty" Then the system cannot utter,
+#        given more semantic info, "A woman kicks a man" since it cannot rebuild "a woman" since this was dismantled following the previous utterance.
+#        """
+#        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
+#        for inst in assemblage.schema_insts:
+#            inst.set_activation(self.C2_params['prod_threshold'])
+#    
+#    def dismantle_assemblage2(self, assemblage):
+#        """
+#        Removes all the cooperation links involving instances that are part of the assemblages. Sets the activation of all the instances 
+#        that are part of the assemblage to prod_threshold.
+#        Adds the assemblage equivalent cxn instance to the working memory.
+#        Args:
+#            - assemblage (ASSEMBLAGE)
+#        """
+#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        # Sets the activation below productoin threshold so that it is not re-used right away. 
+#        eq_inst.set_activation(self.C2_params['prod_threshold'])
+#        
+#        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
+#        for inst in assemblage.schema_insts:
+#            inst.set_activation(self.C2_params['prod_threshold'])
+#        
+#        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
+#    
+#    def reset_assemblage(self, assemblage):
+#        """
+#        Resets the activation of all the instances that are part of the assemblage below prod threshold.
+#        Adds the assemblage equivalent cxn instance to the working memory.
+#        Args:
+#            - assemblage (ASSEMBLAGE)
+#        """
+#        r = 0.9
+#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        # Sets the activation below productoin threshold so that it is not re-used right away. 
+#        eq_inst.set_activation(self.C2_params['prod_threshold']*r)
+#
+#        for inst in assemblage.schema_insts:
+#            inst.set_activation(self.C2_params['prod_threshold']*r)
+#        
+#        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
     
     def post_prod_state(self, winner_assemblage):
         """
@@ -461,7 +460,7 @@ class GRAMMATICAL_WM(WM):
         """
         WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
         
-        NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. THIS IS THE ONE THA SHOULD BE CONSIDERED!!!
+        NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. IS THIS IS THE ONE THA SHOULD BE CONSIDERED?
         """
         inst_network = GRAMMATICAL_WM._build_instance_network(self.schema_insts, self.coop_links)
 
@@ -501,6 +500,7 @@ class GRAMMATICAL_WM(WM):
         "Un-superpose" the trees!
 
         DOES NOT HANDLE THE CASE WHERE THERE STILL IS SOME COMPETITION GOING ON.
+        NOTE: I think it does...
         ALSO, it returns sub-optimal trees. (Not only the tree that contains all the cooperating instances in the WM).
         """
         new_frontiers = [[]]
