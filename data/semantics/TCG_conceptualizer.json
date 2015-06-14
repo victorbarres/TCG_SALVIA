@@ -15,6 +15,7 @@
 		"BOXINGRING" : {"FEATURE":"", "TOKENS":["O11_BOXINGRING"]},
 		"PARK" : {"FEATURE":"", "TOKENS":["O12_PARK"]},
 		"PEOPLE" : {"FEATURE":"", "TOKENS":["O13_PEOPLE"]},
+		
 		"SQUIRT" : {"FEATURE":"", "TOKENS":["A1_SQUIRT"]},
 		"TALK" : {"FEATURE":"", "TOKENS":["A2_TALK"]},
 		"HIT" : {"FEATURE":"", "TOKENS":["A3_HIT"]},
@@ -22,6 +23,7 @@
 		"KICK" : {"FEATURE":"", "TOKENS":["A5_KICK"]},
 		"LAUGH" : {"FEATURE":"", "TOKENS":["A6_LAUGH"]},
 		"WATCH" : {"FEATURE":"", "TOKENS":["A7_WATCH"]},
+		
 		"RED" : {"FEATURE":"(200<R<255) and (0<G<100) and (0<B<100)", "TOKENS":["Q1_RED"]},
 		"BLUE" : {"FEATURE":"(0<R<100) and (0<G<100) and (200<B<255)", "TOKENS":["Q2_BLUE"]},
 		"GREEN" : {"FEATURE":"(0<R<255) and (200<G<255) and (0<B<100)", "TOKENS":["Q3_GREEN"]},
@@ -29,6 +31,7 @@
 		"WHITE" : {"FEATURE":"(200<R<255) and (200<G<255) and (200<B<100)", "TOKENS":["Q7_WHITE"]},
 		"BIG" : {"FEATURE":"(110<W<200) or 110<H<200)", "TOKENS":["Q5_BIG"]},
 		"SMALL" : {"FEATURE":"(40<W<80) or 40<H<80)", "TOKENS":["Q4_SMALL"]},
+		
 		"MODIFY" : {"FEATURE":"is_a QUALITY_REL", "TOKENS":["R9_HAS_PARAM"]},
 		"IN" : {"FEATURE":"", "TOKENS":["R8_CONTAIN"]},
 		"SUCCESSIVE" : {"FEATURE":"T_SOURCE > T_TARGET", "TOKENS":["R12_SUCCESSIVE"]},

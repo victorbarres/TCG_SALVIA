@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 17 13:53:03 2015
-
 @author: Victor Barres
 Defines perceptual schemas for TCG.
 
