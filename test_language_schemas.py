@@ -7,6 +7,7 @@ def test(seed=None):
     import random
     import schema_theory as st
     import language_schemas as ls
+    import concept2 as cpt2 # Old concept script.
     import concept as cpt
     import loader as ld
     import viewer
@@ -99,7 +100,7 @@ def test(seed=None):
         
         my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        cpt2.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Set up grammatical LTM content
         act0 = 1
@@ -107,13 +108,13 @@ def test(seed=None):
             new_cxn_schema = ls.CXN_SCHEMA(cxn, act0)
             grammaticalLTM.add_schema(new_cxn_schema)
         
-        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
-        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
-        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
-        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
+        man_cpt = cpt2.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt2.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt2.CONCEPT(name="KICK", meaning="KICK")
+        agent_cpt = cpt2.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt2.CONCEPT(name="PATIENT", meaning="PATIENT")
         
-        entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+        entity_cpt = cpt2.CONCEPT(name="ENTITY", meaning="ENTITY")
         
     
         # Set up Semantic WM content
@@ -160,7 +161,7 @@ def test(seed=None):
         ### TEST STATIC SEMREP###
         my_grammar = ld.load_grammar("TCG_grammar_light.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        cpt2.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Set up grammatical LTM content
         act0 = grammaticalWM.C2_params['confidence_threshold']*0.5
@@ -168,15 +169,15 @@ def test(seed=None):
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
-        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
-        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
-        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-        blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
-        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
-        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
-        modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
+        man_cpt = cpt2.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt2.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt2.CONCEPT(name="KICK", meaning="KICK")
+        blue_cpt = cpt2.CONCEPT(name="BLUE", meaning="BLUE")
+        agent_cpt = cpt2.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt2.CONCEPT(name="PATIENT", meaning="PATIENT")
+        modify_cpt = cpt2.CONCEPT(name="MODIFY", meaning="MODIFY")
         
-        entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+        entity_cpt = cpt2.CONCEPT(name="ENTITY", meaning="ENTITY")
         
     
         # Set up Semantic WM content
@@ -229,7 +230,7 @@ def test(seed=None):
         ### TEST STATIC SEMREP FULL GRAMMAR + TEXT2SPEECH ###
         my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        cpt2.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Set up grammatical LTM content
         act0 = grammaticalWM.C2_params['confidence_threshold']*0.5
@@ -237,14 +238,14 @@ def test(seed=None):
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
-        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
-        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
-        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-        blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
-        big_cpt = cpt.CONCEPT(name="BIG", meaning="BIG")
-        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
-        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
-        modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")        
+        man_cpt = cpt2.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt2.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt2.CONCEPT(name="KICK", meaning="KICK")
+        blue_cpt = cpt2.CONCEPT(name="BLUE", meaning="BLUE")
+        big_cpt = cpt2.CONCEPT(name="BIG", meaning="BIG")
+        agent_cpt = cpt2.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt2.CONCEPT(name="PATIENT", meaning="PATIENT")
+        modify_cpt = cpt2.CONCEPT(name="MODIFY", meaning="MODIFY")        
     
         # Set up Semantic WM content
         semanticWM.SemRep.add_node("WOMAN", concept=woman_cpt, new=True)
@@ -298,7 +299,7 @@ def test(seed=None):
         ### TEST INCREMENTAL SEMREP ###
         my_grammar = ld.load_grammar("TCG_grammar_VB_light.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        cpt2.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         
         # Parameters
@@ -314,15 +315,15 @@ def test(seed=None):
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
-        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
-        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
-        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-        blue_cpt = cpt.CONCEPT(name="BLUE", meaning="BLUE")
-        big_cpt = cpt.CONCEPT(name="BIG", meaning="BIG")
-        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
-        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
-        modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
-        entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+        man_cpt = cpt2.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt2.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt2.CONCEPT(name="KICK", meaning="KICK")
+        blue_cpt = cpt2.CONCEPT(name="BLUE", meaning="BLUE")
+        big_cpt = cpt2.CONCEPT(name="BIG", meaning="BIG")
+        agent_cpt = cpt2.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt2.CONCEPT(name="PATIENT", meaning="PATIENT")
+        modify_cpt = cpt2.CONCEPT(name="MODIFY", meaning="MODIFY")
+        entity_cpt = cpt2.CONCEPT(name="ENTITY", meaning="ENTITY")
         
     
         # Set up Semantic WM content
@@ -378,7 +379,7 @@ def test(seed=None):
         ### TEST INCREMENTAL SEMREP with CONTROL ######
         my_grammar = ld.load_grammar("TCG_grammar_VB.json", "./data/grammars/")
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-        cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+        cpt2.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Parameters        
         grammaticalWM.dyn_params['tau'] = 30
@@ -405,15 +406,15 @@ def test(seed=None):
             grammaticalLTM.add_schema(new_cxn_schema)
         
         # Set up Semantic WM content
-        man_cpt = cpt.CONCEPT(name="MAN", meaning="MAN")
-        woman_cpt = cpt.CONCEPT(name="WOMAN", meaning="WOMAN")
-        kick_cpt = cpt.CONCEPT(name="KICK", meaning="KICK")
-        pretty_cpt = cpt.CONCEPT(name="PRETTY", meaning="PRETTY")
-        big_cpt = cpt.CONCEPT(name="BIG", meaning="BIG")
-        agent_cpt = cpt.CONCEPT(name="AGENT", meaning="AGENT")
-        patient_cpt = cpt.CONCEPT(name="PATIENT", meaning="PATIENT")
-        modify_cpt = cpt.CONCEPT(name="MODIFY", meaning="MODIFY")
-        entity_cpt = cpt.CONCEPT(name="ENTITY", meaning="ENTITY")
+        man_cpt = cpt2.CONCEPT(name="MAN", meaning="MAN")
+        woman_cpt = cpt2.CONCEPT(name="WOMAN", meaning="WOMAN")
+        kick_cpt = cpt2.CONCEPT(name="KICK", meaning="KICK")
+        pretty_cpt = cpt2.CONCEPT(name="PRETTY", meaning="PRETTY")
+        big_cpt = cpt2.CONCEPT(name="BIG", meaning="BIG")
+        agent_cpt = cpt2.CONCEPT(name="AGENT", meaning="AGENT")
+        patient_cpt = cpt2.CONCEPT(name="PATIENT", meaning="PATIENT")
+        modify_cpt = cpt2.CONCEPT(name="MODIFY", meaning="MODIFY")
+        entity_cpt = cpt2.CONCEPT(name="ENTITY", meaning="ENTITY")
         
         sem_info = {'woman':('node', 'WOMAN', woman_cpt), 'kick':('node', 'KICK', kick_cpt), 'man':('node', 'MAN', man_cpt), 
                     'agt':('edge', ('KICK', 'WOMAN'), agent_cpt), 'pt':('edge', ('KICK', 'MAN'), patient_cpt), 'pt2':('edge', ('KICK', 'ENTITY'), patient_cpt),
@@ -480,6 +481,8 @@ def test(seed=None):
     elif case == '8':
         ###############################################
         ### TEST INCREMENTAL SEMREP + SEMANTIC LTM ####
+        
+        # Setting up language schema system.
         language_schemas = [conceptualizer, grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, conceptLTM]
 
         language_system.add_schemas(language_schemas)
@@ -497,7 +500,30 @@ def test(seed=None):
         language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
         language_system.set_output_ports([phonWM._find_port('to_output')])
         
-        language_system.system2dot(image_type='png', disp=True)
+#        language_system.system2dot(image_type='png', disp=True)
+        
+        # Loading data
+        my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
+        my_grammar = ld.load_grammar(my_semnet, "TCG_grammar_VB.json", "./data/grammars/")
+#        
+        
+#        # Set up conceptual LTM content
+#        ls.CPT_SCHEMA.SEMANTIC_NETWORK = my_semnet
+#        conceptLTM.SemNet = ls.CPT_SCHEMA.SEMANTIC_NETWORK
+#        entity = my_semnet.find_meaning('ENTITY')
+#        action = my_semnet.find_meaning('ACTION')
+#        prop = my_semnet.find_meaning('PROPERTY')
+#        rel = my_semnet.find_meaning('RELATION')
+#        for sem_ent in conceptLTM.SemNet.nodes:
+#            if my_semnet.match(sem_ent, entity, match_type="is_a"):
+#                new_schema = ls.CPT_ENTITY_SCHEMA(name=sem_ent.meaning, sem_ent=sem_ent, init_act=1)
+#            
+#            
+#        
+#        # Set up grammatical LTM content
+#        for cxn in my_grammar.constructions:
+#            new_cxn_schema = ls.CXN_SCHEMA(cxn, min(max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']),grammaticalWM.C2_params['confidence_threshold']))
+#            grammaticalLTM.add_schema(new_cxn_schema)
     
     else:
         print "ERROR"

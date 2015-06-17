@@ -44,25 +44,25 @@ def json_read(file_name, path='./'):
 
 ###########
 ### SEM ###
-def read_sem(atype, sup_ent, sem_net, aSemantics):
+def read_sem(atype, sup_cpt, sem_net, aSemantics):
     
     for meaning in aSemantics:
         # Create new semantic entity
-        sub_ent = cpt.SEM_ENT(meaning=meaning)
-        sem_net.add_entity(sub_ent)
+        sub_cpt = cpt.CONCEPT(name=meaning, meaning=meaning)
+        sem_net.add_concept(sub_cpt)
 
         # Create new semantic relation
         new_semrel = cpt.SEM_REL()
         new_semrel.type = atype
-        new_semrel.pFrom = sub_ent
-        new_semrel.pTo = sup_ent
+        new_semrel.pFrom = sub_cpt
+        new_semrel.pTo = sup_cpt
         
         # update sem_net
         flag = sem_net.add_relation(new_semrel)
         if not(flag):
             return False
         
-        flag = read_sem(atype, sub_ent, sem_net, aSemantics[meaning])
+        flag = read_sem(atype, sub_cpt, sem_net, aSemantics[meaning])
         if not(flag):
             return False
     
@@ -70,9 +70,10 @@ def read_sem(atype, sup_ent, sem_net, aSemantics):
 
 ###########
 ### CXN ###
+# CXN CAN ONLY BE LOADED ONCE THE CONCEPTUAL KNOWLEDGE HAS BEEN LOADED IN A SEM_NET.
 # NEED TO ADD PROPER TRUE/FALSE RETURN VALUES FOR ALL THOSE FUNCTIONS
 
-def read_node(new_cxn, aNode, name_table): # NEED TO CHECK THE CURRENT STATUS OF CONCEPT OBJECTS.
+def read_node(new_cxn, aNode, name_table, SemNet):
     """
     """
     # Create new node
@@ -80,9 +81,8 @@ def read_node(new_cxn, aNode, name_table): # NEED TO CHECK THE CURRENT STATUS OF
     name = aNode['name']
     new_node.name = '%s_%i' %(name, new_node.id)
     
-    new_concept = cpt.CONCEPT()
-    new_concept.create(meaning = aNode['concept'])
-    new_node.concept = new_concept
+    concept = SemNet.find_meaning(aNode['concept'])
+    new_node.concept = concept
     
     new_node.head = aNode['head']
     if 'focus' in aNode:
@@ -93,7 +93,7 @@ def read_node(new_cxn, aNode, name_table): # NEED TO CHECK THE CURRENT STATUS OF
     name_table['SemNodes'][name] = new_node
     name_table['names'][name] = new_node.name
 
-def read_rel(new_cxn, aRel, name_table):
+def read_rel(new_cxn, aRel, name_table, SemNet):
     """
     """    
     # Create new relation
@@ -102,9 +102,8 @@ def read_rel(new_cxn, aRel, name_table):
     new_rel.name = '%s_%i' %(name, new_rel.id)
     
     
-    new_concept = cpt.CONCEPT()
-    new_concept.create(meaning = aRel['concept'])
-    new_rel.concept = new_concept
+    concept = SemNet.find_meaning(aRel['concept'])
+    new_rel.concept = concept
 
     
     pFrom = aRel['from']
@@ -152,13 +151,13 @@ def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER TH
     name_table['SynForms'][name] = new_phon
     name_table['names'][name] = new_phon.name
             
-def read_semframe(new_cxn, SemFrame, name_table):
+def read_semframe(new_cxn, SemFrame, name_table, SemNet):
     """
     """
     for node in SemFrame['nodes']:
-        read_node(new_cxn, node, name_table)
+        read_node(new_cxn, node, name_table, SemNet)
     for rel in SemFrame['edges']:
-        read_rel(new_cxn, rel, name_table)
+        read_rel(new_cxn, rel, name_table, SemNet)
     
     for rel_name, node_pair in name_table['SemEdges'].iteritems(): # Creating SemFrame relations
         from_name = node_pair[0]
@@ -191,7 +190,7 @@ def read_symlinks(new_cxn, sym_links, name_table):
         form_name = name_table['names'][val]
         new_cxn.add_sym_link(sem_name, form_name)
           
-def read_cxn(grammar, aCxn):
+def read_cxn(grammar, aCxn, SemNet):
     """
     """
     # Create new cxn  
@@ -205,7 +204,7 @@ def read_cxn(grammar, aCxn):
     name_table = {'SemNodes':{}, 'SemEdges':{}, 'SynForms':{}, 'names':{}}
     
     # READ SEMFRAME
-    read_semframe(new_cxn, aCxn['SemFrame'], name_table)
+    read_semframe(new_cxn, aCxn['SemFrame'], name_table, SemNet)
         
     # READ SYNFORM
     read_synform(new_cxn, aCxn['SynForm'], name_table)
@@ -322,10 +321,30 @@ def read_region(scene, aRgn, name_table):
 ################################           
 ### Public loading functions ###
 ################################
-            
-def load_grammar(file_name, file_path = './'):
+def load_SemNet(file_name, file_path = './'):
+    """
+    Loads and returns the semantic network defined in file_path/file_name. Return None if error.
+    """
+    # Open and read file
+    sem_data = json_read(file_name, path = file_path)
+    
+    # Create scene object
+    my_semnet = cpt.SEM_NET()
+    
+    top = 'CONCEPTUAL_KNOWELDGE'
+    top_cpt = cpt.CONCEPT(name=top, meaning=top)
+    my_semnet.add_concept(top_cpt)
+    
+    flag = read_sem("IS-A", top_cpt, my_semnet, sem_data['CONCEPTUAL_KNOWLEDGE'])
+    if not(flag):
+        return None
+
+    return my_semnet         
+    
+def load_grammar(SemNet, file_name, file_path = './'):
     """
     Loads and returns the TCG grammar defined in file_path\file_name.
+    Requires a SemNet.
     """        
     # Open and read file
     json_data = json_read(file_name, path = file_path)
@@ -335,7 +354,7 @@ def load_grammar(file_name, file_path = './'):
     my_grammar = cxn.GRAMMAR()
     
     for aCxn in gram_data:
-        read_cxn(my_grammar, aCxn)
+        read_cxn(my_grammar, aCxn, SemNet)
 
     return my_grammar
 
@@ -386,25 +405,6 @@ def load_scene(file_name, file_path = './'):
         my_scene.add_schema(sc)
     
     return my_scene
-
-def load_SemNet(file_name, file_path = './'):
-    """
-    Loads and returns the semantic network defined in file_path/file_name. Return None if error.
-    """
-    # Open and read file
-    sem_data = json_read(file_name, path = file_path)
-    
-    # Create scene object
-    my_semnet = cpt.SEM_NET()
-    
-    top_ent = cpt.SEM_ENT('CONCEPTUAL_KNOWLEDGE')
-    my_semnet.add_entity(top_ent)
-    
-    flag = read_sem("IS-A", top_ent, my_semnet, sem_data['CONCEPTUAL_KNOWLEDGE'])
-    if not(flag):
-        return None
-
-    return my_semnet
             
         
 ###############################################################################

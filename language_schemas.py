@@ -103,44 +103,50 @@ class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
     Concept schema
     Data:
     - KNOWEDGE SCHEMA data:
-                - id (int): Unique id
-                - name (str): schema name
-                - LTM (LTM): Associated long term memory.
-                - content (CONCEPT):
-                - init_act (float): Initial activation value.   
+        - id (int): Unique id
+        - name (str): schema name
+        - LTM (LTM): Associated long term memory.
+        - content ({'concept':CONCEPT): concept is a CONCEPT in SEMANTIC_NETWOR
+        - init_act (float): Initial activation value.
     """
-    def __init__(self, a_concept, init_act):
-        KNOWLEDGE_SCHEMA.__init__(self, name=a_concept.name, content=None, init_act=init_act)
-        self.set_content({'concept':a_concept})
+    def __init__(self, name, concept, init_act):
+        """
+        Args:
+            - name (STR):
+            - concept (CONCEPT):
+            - init_act (FLOAT):
+        """
+        KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
+        self.set_content({'concept':concept})
 
 class CPT_ENTITY_SCHEMA(CPT_SCHEMA):
     """
     Conceptual entity schema
     """
-    def __init__(self, a_concept, init_act):
-        CPT_SCHEMA.__init__(self, a_concept, init_act)
+    def __init__(self, name, concept, init_act):
+        CPT_SCHEMA.__init__(self ,name, concept, init_act)
 
 class CPT_ACTION_SCHEMA(CPT_SCHEMA):
     """
     Conceptual action schema
     """
-    def __init__(self, a_concept, init_act):
-        CPT_SCHEMA.__init__(self, a_concept, init_act)
+    def __init__(self, name, concept, init_act):
+        CPT_SCHEMA.__init__(self ,name, concept, init_act)
 
 class CPT_PROPERTY_SCHEMA(CPT_SCHEMA):
     """
     Conceptual property schema
     """
-    def __init__(self, a_concept, init_act):
-        CPT_SCHEMA.__init__(self, a_concept, init_act)
+    def __init__(self, name, concept, init_act):
+        CPT_SCHEMA.__init__(self ,name, concept, init_act)
 
 class CPT_RELATION_SCHEMA(CPT_SCHEMA):
     """
     Conceptual relation schema
     """
-    def __init__(self, a_concept, init_act):
-        CPT_SCHEMA.__init__(self, a_concept, init_act)
-        self.content({'concept':a_concept, 'pFrom':None, 'pTo':None})
+    def __init__(self, name, concept, init_act):
+        CPT_SCHEMA.__init__(self ,name, concept, init_act)
+        self.content({'concept':concept, 'pFrom':None, 'pTo':None})
 
 class CPT_SCHEMA_INST(SCHEMA_INST):
     """
@@ -148,6 +154,22 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
     """
     def __init__(self, cpt_schema, trace):
         SCHEMA_INST.__init__(self, schema=cpt_schema, trace=trace)
+    
+    def match(self, cpt_inst, match_type = "is_a"):
+        """
+        Check if it;s concept matches that of cpt_inst. 
+        Uses SEM_NET.match() method.
+            Type = "is_a":  concept1 matches concept2 if concept1 is a hyponym of concept2 (or equal to concept2)
+            Type = "equal": concept1 matches concept2 if concept1 is equal to concept2.
+        """
+        return self.content['concept'].match(cpt_inst.content['concept'], match_type)
+    
+    def similarity(self, cpt_inst):
+        """
+        Returns a similarity score between it's concept and that of cpt_inst.
+        Uses SEM_NET.similarity() method.
+        """
+        return self.content['concept'].similarity(cpt_inst.content['concept'])
 
 ###################################
 ### Language procedural schemas ###
@@ -467,6 +489,8 @@ class GRAMMATICAL_WM(WM):
             - inst_p (CXN_SCHEMA_INST): A cxn instance (parent)
             - inst_c (CXN_SCHEMA_INST): A cxn instance (child)
             - SR_node (): SemRep node on which both instances overlap
+        NOTE:
+            - NO LIGHT SEMANTICS!!!
         """
         cxn_p = inst_p.content
         sf_p = [cxn_p.find_elem(k) for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
@@ -841,8 +865,8 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         """
         SemFrame_graph = cxn_schema.content.SemFrame.graph 
             
-        node_concept_match = lambda cpt1,cpt2: cpt.CONCEPT.match(cpt1, cpt2, match_type="is_a")
-        edge_concept_match = lambda cpt1,cpt2: cpt.CONCEPT.match(cpt1, cpt2, match_type="equal")
+        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="equal")
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
         
