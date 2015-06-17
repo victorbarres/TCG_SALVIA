@@ -421,7 +421,7 @@ class WM(PROCEDURAL_SCHEMA):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
         - dyn_params ({'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT})
-        - C2_params ({'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT})
+        - C2_params ({'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT})
             - coop_weight (FLOAT): weight of cooperation f-links
             - comp_weight (FLOAT): weight of competition f-links
             - prune_threshold (FLOAT): Below this threshold the instances are considered inactive (Alive=False)
@@ -436,7 +436,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.coop_links = []
         self.comp_links = []
         self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.1}
-        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3}
+        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}
         self.save_state = {'insts':{}}
        
     def add_instance(self,schema_inst, act0):
@@ -612,8 +612,8 @@ class WM(PROCEDURAL_SCHEMA):
         """
         plt.figure(facecolor='white')
         plt.subplot(2,1,1)
-        title = 'WM dynamics \n noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g]' %(self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
-                              self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'])
+        title = 'WM dynamics \n noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
+                              self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'], self.C2_params['confidence_threshold'])
         plt.title(title)
         plt.xlabel('time', fontsize=14)
         plt.ylabel('activity', fontsize=14)
@@ -623,6 +623,7 @@ class WM(PROCEDURAL_SCHEMA):
         axes.set_ylim([0,1])
         axes.set_xlim([0, max(self.save_state['total_activity']['t'])])
         plt.axhline(y=self.C2_params['prune_threshold'], color='k',ls='dashed')
+        plt.axhline(y=self.C2_params['confidence_threshold'], color='r',ls='dashed')
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         
         plt.subplot(2,1,2)

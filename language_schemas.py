@@ -20,6 +20,9 @@ import TCG_graph
 ##################################
 ### Language knowledge schemas ###
 ##################################
+
+##############################
+# GRAMMAITCAL KNOWLEDGE SCHEMA
 class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Construction schema
@@ -92,7 +95,9 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
              for port in out_ports:
                 self.out_ports.append(port)
                 port.schema=self
-
+                
+############################
+# SEMANTIC KNOWLEDGE SCHEMAS
 class SEM_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Data:
@@ -104,7 +109,31 @@ class SEM_SCHEMA(KNOWLEDGE_SCHEMA):
                 - init_act (float): Initial activation value.   
     """
     def __init__(self, a_concept, init_act):
-        KNOWLEDGE_SCHEMA.__init__(self, name=a_concept.name, content=a_concept, init_act=init_act)
+        KNOWLEDGE_SCHEMA.__init__(self, name=a_concept.name, content=None, init_act=init_act)
+        self.set_content({'concept':a_concept})
+
+class SEM_ENTITY_SCHEMA(SEM_SCHEMA):
+    """
+    """
+    def __init__(self, a_concept, init_act):
+        SEM_SCHEMA.__init__(self, a_concept, init_act)
+
+class SEM_ACTION_SCHEMA(SEM_SCHEMA):
+    """
+    """
+    def __init__(self, a_concept, init_act):
+        SEM_SCHEMA.__init__(self, a_concept, init_act)
+
+class SEM_PROPERTY_SCHEMA(SEM_SCHEMA):
+    """
+    """
+    def __init__(self, a_concept, init_act):
+        SEM_SCHEMA.__init__(self, a_concept, init_act)
+
+class SEM_RELATION_SCHEMA(SEM_SCHEMA):
+    def __init__(self, a_concept, init_act):
+        SEM_SCHEMA.__init__(self, a_concept, init_act)
+        self.content({'concept':a_concept, 'pFrom':None, 'pTo':None})
 
 class SEM_SCHEMA_INST(SCHEMA_INST):
     """
@@ -112,24 +141,6 @@ class SEM_SCHEMA_INST(SCHEMA_INST):
     """
     def __init__(self, sem_schema, trace):
         SCHEMA_INST.__init__(self, schema=sem_schema, trace=trace)
-
-class SEM_NODE_INST(SEM_SCHEMA_INST):
-    """
-    """
-    def __init__(self, sem_schema, trace):
-        SEM_SCHEMA_INST.__init__(self, schema=sem_schema, trace=trace)
-
-class SEM_REL_INST(SEM_SCHEMA_INST):
-    """
-    Data:
-        - node_from (SEM_NODE_INST)
-        - node_to (SEM_NODE_INST)
-    """
-    def __init__(self, sem_schema, trace, node_from, node_to):
-        SEM_SCHEMA_INST.__init__(self, schema=sem_schema, trace=trace)
-        self.node_from = node_from
-        self.node_to = node_to
-        
 
 ###################################
 ### Language procedural schemas ###
@@ -140,6 +151,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
     def __init__(self, name='Conceptualizer'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_visual_WM')
+        self.add_port('IN', 'from_semantic_LTM')
         self.add_port('OUT', 'to_semantic_WM')
         self.conceptualization = None
     
@@ -154,6 +166,17 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         """
         """
 
+class SEMANTIC_LTM(LTM):
+    """
+    """
+    def __init__(self, name='Semantic_LTM'):
+        LTM.__init__(self, name)
+        self.add_port('OUT', 'to_conceptualizer')
+        self.SemNet = None
+    
+    def update(self):
+        self.set_output('to_conceptualizer', self.schemas)
+        
 class SEMANTIC_WM(PROCEDURAL_SCHEMA):
     """
     """
@@ -202,7 +225,7 @@ class GRAMMATICAL_WM(WM):
         self.add_port('OUT', 'to_phonological_WM')
         self.add_port('IN', 'from_control')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'prod_threshold':0.8}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
+        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
     
     def update(self):
         """
@@ -242,7 +265,7 @@ class GRAMMATICAL_WM(WM):
         if assemblages:
 #            self._draw_assemblages()
             winner_assemblage = self._get_winner_assemblage(assemblages)
-            if winner_assemblage.activation > self.C2_params['prod_threshold']:
+            if winner_assemblage.activation > self.C2_params['confidence_threshold']:
                 print 'Production at time: %i' %self.t
                 (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
                 self.set_output('to_phonological_WM', phon_form)
@@ -250,7 +273,7 @@ class GRAMMATICAL_WM(WM):
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
                 
-                # Option2: Dismantle the assembalge by removing all the coop_link it involves and setting all composing instances activatoins to prod_threshold.
+                # Option2: Dismantle the assembalge by removing all the coop_link it involves and setting all composing instances activatoins to confidence_threshold.
 #                self.dismantle_assemblage(winner_assemblage)
                 
                  # Option3: Removes coop links + adds the equivalent instance.
@@ -301,8 +324,8 @@ class GRAMMATICAL_WM(WM):
 #            - assemblage (ASSEMBLAGE)
 #        """
 #        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-#        # Sets the activation below productoin threshold so that it is not re-used right away. 
-#        eq_inst.set_activation(self.C2_params['prod_threshold'])
+#        # Sets the activation below confidence threshold so that it is not re-used right away. 
+#        eq_inst.set_activation(self.C2_params['confidence_threshold'])
 #        for inst in assemblage.schema_insts:
 #            inst.alive = False
 #        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
@@ -311,7 +334,7 @@ class GRAMMATICAL_WM(WM):
 #    def dismantle_assemblage(self, assemblage):
 #        """
 #        Removes all the cooperation links involving instances that are part of the assemblages. Sets the activation of all the instances 
-#        that are part of the assemblage to prod_threshold.
+#        that are part of the assemblage to confidence_threshold.
 #        Args:
 #            - assemblage (ASSEMBLAGE)
 #            
@@ -323,40 +346,40 @@ class GRAMMATICAL_WM(WM):
 #        """
 #        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
 #        for inst in assemblage.schema_insts:
-#            inst.set_activation(self.C2_params['prod_threshold'])
+#            inst.set_activation(self.C2_params['confidence_threshold'])
 #    
 #    def dismantle_assemblage2(self, assemblage):
 #        """
 #        Removes all the cooperation links involving instances that are part of the assemblages. Sets the activation of all the instances 
-#        that are part of the assemblage to prod_threshold.
+#        that are part of the assemblage to confidence_threshold.
 #        Adds the assemblage equivalent cxn instance to the working memory.
 #        Args:
 #            - assemblage (ASSEMBLAGE)
 #        """
 #        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-#        # Sets the activation below productoin threshold so that it is not re-used right away. 
-#        eq_inst.set_activation(self.C2_params['prod_threshold'])
+#        # Sets the activation below confidence threshold so that it is not re-used right away. 
+#        eq_inst.set_activation(self.C2_params['confidence_threshold'])
 #        
 #        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
 #        for inst in assemblage.schema_insts:
-#            inst.set_activation(self.C2_params['prod_threshold'])
+#            inst.set_activation(self.C2_params['confidence_threshold'])
 #        
 #        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
 #    
 #    def reset_assemblage(self, assemblage):
 #        """
-#        Resets the activation of all the instances that are part of the assemblage below prod threshold.
+#        Resets the activation of all the instances that are part of the assemblage below confidence threshold.
 #        Adds the assemblage equivalent cxn instance to the working memory.
 #        Args:
 #            - assemblage (ASSEMBLAGE)
 #        """
 #        r = 0.9
 #        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
-#        # Sets the activation below productoin threshold so that it is not re-used right away. 
-#        eq_inst.set_activation(self.C2_params['prod_threshold']*r)
+#        # Sets the activation below confidence threshold so that it is not re-used right away. 
+#        eq_inst.set_activation(self.C2_params['confidence_threshold']*r)
 #
 #        for inst in assemblage.schema_insts:
-#            inst.set_activation(self.C2_params['prod_threshold']*r)
+#            inst.set_activation(self.C2_params['confidence_threshold']*r)
 #        
 #        self._add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
     
@@ -369,18 +392,18 @@ class GRAMMATICAL_WM(WM):
         
     def _set_subthreshold(self, insts, r=0.5):
         """
-        Sets the activation of all the instances in insts to r*production threshold
+        Sets the activation of all the instances in insts to r*confidence_threshold
         Args:
             - insts ([CXN_INST])
             - val (FLOAT)
         """
         for inst in insts:
-            inst.set_activation(r*self.C2_params['prod_threshold'])
+            inst.set_activation(r*self.C2_params['confidence_threshold'])
             
     def _deactivate_coop_weigts(self, deact_weight=0):
         """
         Sets all the coop_links that in grammatial WM to weight = deact_weight
-        Instances are also placed below production threshold.
+        Instances are also placed below confidence threshold.
         Args:
             - assemblage (ASSEMBLAGE)
         """

@@ -127,7 +127,8 @@ class SEMREP_INST(SCHEMA_INST):
         
         self.concept.create(concept=new_concept)        
 
-class NODE_INST(SEMREP_INST):
+
+    """class NODE_INST(SEMREP_INST):
     """
     Node instance
     """
@@ -138,7 +139,6 @@ class NODE_INST(SEMREP_INST):
 class REL_INST(SEMREP_INST):
     """
     Relation instance.
-    """
     def __init__(self):
         SEMREP_INST.__init__(self)
         self.type = SCHEMA_INST.RELATION

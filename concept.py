@@ -15,6 +15,9 @@ class SEM_ENT:
     Data:
         - id (INT): Unique identifier of the entity.
         - meaning (): Meaning associated with the semantic entity.
+    
+    Note:
+        - '==' has to be defined for meaning.
     """
     ID_NEXT = 1 # Global entity counter    
     def __init__(self, meaning=''):
@@ -36,6 +39,8 @@ class SEM_REL:
         - type (STR): Type of relation.
         - pFrom (SemEnt): Name of the source semantic entity.
         - pTo (SemEnt): Name of the target semantic entity.
+    
+    Note: ONLY IS-A IMPLEMENTED FOR NOW.
     """    
     def __init__(self, aType = 'UNDEFINED', from_sem = None, to_sem = None):
         self.type = aType
@@ -146,7 +151,31 @@ class SEM_NET:
                 return n
         
         return None
-    
+     
+    def similarity(self, ent1, ent2):
+        """
+        Returns a similarity score between ent1 and ent2.
+        Uses path similarity.
+        
+        Examples for is-a taxonomy (e.g. Wordnet):
+            Path similarity: 1/(L+1), L=shortest path distance
+            Leackock-Chodrow Similarity: -log(L/2*D) where L=shortest path length, D=taxonomy depth
+            Wu-Palmer Similarlity: 2*depth(lcs)/(depth(s1) + depth(s2)), lcs = Least Common Subsumer.
+            Resnik Similarity (Corpus dependent): IC(lcs)
+            Lin Similarity (Corpus dependent): 2*IC(lcs)/(IC(s1) + IC(s2))
+            Jiang & Conrath Similarity:  1/jcn_distance, jcn_distance =  IC(concept1) + IC(concept2) - 2 * IC(lcs). 
+            See: http://maraca.d.umn.edu/umls_similarity/similarity_measures.html
+        Note:
+            - ONLY PATH SIMILARITY IMPLEMENTED
+            - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...
+        """
+        L = self.shortest_path(ent1, ent2)
+        if L == -1: # Case no path found
+            sim = 0
+        else:
+            sim = 1.0/(1.0 + L)
+        return sim
+            
     def shortest_path(self, from_ent, to_ent):
         """
         Returns the length of the shortest path, if it exists, between from_ent and to_ent in the SemNet graph.
@@ -163,68 +192,6 @@ class SEM_NET:
             return path_len
             
         return path_len
-        
-    
-    ######
-    # TO REWRITE
-    ######
-#    def distance(self, supMean, subMean, relType = SEM_REL.IS_A, heuristic = False):
-#        """
-#        Return the distance in the semantic network between a concept (subMean) and an hypernym (supMean).
-#        Return -1 if supMean is not a hypernym of subMean.
-#        If heuristic = True: -> does not guarantee to find the shortest distance.
-#        
-#        Args:
-#         - supMean (str)
-#         - subMean (str)
-#         - relType (int)
-#         - heuristic (bool)
-#        """
-#        visited = [] # Explored elements of the semantic network
-#        dist = 0
-#        
-#        return self._travel(supMean, subMean, relType, dist, heuristic, visited)
-#    
-#    def _travel(self, supMean, subMean, relType, dist, heuristic, visited):
-#        
-#        if supMean == subMean: # Match found
-#            return dist
-#        
-#        minDist = -1
-#        
-#        for r in self.relations:
-#            if r in visited:
-#                continue
-#            if (r.type != relType) or (r.subMeaning != subMean):
-#                continue
-#            
-#            # Visit the current relation
-#            visited.append(r)
-#            
-#            # Recursively travel
-#            nextDist = self._travel(supMean, r.supMeaning, relType, dist+1, heuristic, visited)
-#            
-#            # Un-visit
-#            if not(heuristic): # if heuristic: path does not have to be the shortest
-#                visited.pop()
-#                     
-#            if nextDist >= 0:
-#                if (minDist < 0) or (minDist > nextDist):
-#                    minDist = nextDist
-#                if minDist <= dist + 1: 
-#                    break # assumed to be the possible minimum distance
-#                
-#                if heuristic:
-#                    break # if heuristicL just find one possible path
-#            
-#        return minDist
-#    
-#    def __str__(self):
-#        p = ''
-#        p += '### SEMANTIC NETWORK ###\n\n'
-#        for r in self.relations:
-#            p += str(r) + '\n'
-#        return p      
             
 ###############################################################################    
 class CONCEPT:

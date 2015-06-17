@@ -228,7 +228,7 @@ class TP_SEMFRAME(TP_ELEM):
     @staticmethod
     def unify(SF_p, node_p_name, SF_c, node_c_name):
         """
-        None commutative.
+        Not commutative.
         """
         (SF_p_copy, c_p) = SF_p.copy()
         (SF_c_copy, c_c) = SF_c.copy()
@@ -305,7 +305,7 @@ class TP_SYNFORM(TP_ELEM):
     @staticmethod
     def unify(SF_p, slot_p_name, SF_c):
         """
-        None commutative.
+        Not commutative.
         """
         new_synform = TP_SYNFORM()
         (SF_p_copy, c_p)  = SF_p.copy()
@@ -472,7 +472,7 @@ class CXN:
     @staticmethod
     def unify(cxn_p, slot_p, cxn_c):
         """
-        None commutative
+        Not commutative
         """
         node_p = cxn_p.form2node(slot_p)
         node_c = cxn_c.SemFrame.get_head()

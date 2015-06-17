@@ -22,6 +22,7 @@ def test(seed=None):
     semanticWM = ls.SEMANTIC_WM()
     phonWM = ls.PHON_WM()
     control = ls.CONTROL()
+    semanticLTM = ls.SEMANTIC_LTM()
     
     language_mapping = {'Conceptualizer':[], 
                     'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
@@ -29,7 +30,7 @@ def test(seed=None):
                     'Grammatical_LTM':['left_STG', 'left_MTG'],
                     'Cxn_retrieval':[], 
                     'Phonological_WM':['left_BA6'],
-                    'Control':['DLPFC']}
+                    'Control':['DLPFC'], 'Semantic_LTM':['aTP']}
     
     language_system = st.SCHEMA_SYSTEM('Language_system')
     
@@ -37,10 +38,10 @@ def test(seed=None):
     language_brain_mapping.schema_mapping = language_mapping
     language_system.brain_mapping = language_brain_mapping
     
-    prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP; 5: TEST STATIC SEMREP (FULL GRAMMAR + TEXT2SPEECH); 6: TEST INCREMENTAL SEMREP; 7: TEST INCREMENTAL + CONTROL"
+    prompt =  "1: TEST BUILD LANGUAGE SYSTEM; 2: TEST GRAMMATICAL WM; 3: TEST CXN RETRIEVAL; 4: TEST STATIC SEMREP; 5: TEST STATIC SEMREP (FULL GRAMMAR + TEXT2SPEECH); 6: TEST INCREMENTAL SEMREP; 7: TEST INCREMENTAL + CONTROL, 8: TEST INCREMENTAL SEMREP + SEMANTIC LTM"
     print prompt
     case = raw_input("ENTER CASE #: ")
-    while case not in ['1','2','3','4','5', '6', '7']:
+    while case not in ['1','2','3','4','5', '6', '7', '8']:
         print "INVALID CHOICE"
         print prompt
         case = raw_input("ENTER CASE #: ")
@@ -162,7 +163,7 @@ def test(seed=None):
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Set up grammatical LTM content
-        act0 = grammaticalWM.C2_params['prod_threshold']*0.5
+        act0 = grammaticalWM.C2_params['confidence_threshold']*0.5
         for cxn in my_grammar.constructions:
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
@@ -231,7 +232,7 @@ def test(seed=None):
         cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
         
         # Set up grammatical LTM content
-        act0 = grammaticalWM.C2_params['prod_threshold']*0.5
+        act0 = grammaticalWM.C2_params['confidence_threshold']*0.5
         for cxn in my_grammar.constructions:
             new_cxn_schema = ls.CXN_SCHEMA(cxn, max(act0 + random.normalvariate(0, 0.2), grammaticalWM.C2_params['prune_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
@@ -301,7 +302,7 @@ def test(seed=None):
         
         
         # Parameters
-        act0 = grammaticalWM.C2_params['prod_threshold']*0.5
+        act0 = grammaticalWM.C2_params['confidence_threshold']*0.5
         act_var = 0
         grammaticalWM.dyn_params['tau'] = 30
         grammaticalWM.C2_params['prune_threshold'] = 0.01
@@ -388,19 +389,19 @@ def test(seed=None):
         grammaticalWM.dyn_params['noise_mean'] = 0
         grammaticalWM.dyn_params['noise_std'] = 0.2
         
-        grammaticalWM.C2_params['prod_threshold'] = 0.2
+        grammaticalWM.C2_params['confidence_threshold'] = 0.2
         grammaticalWM.C2_params['prune_threshold'] = 0.01
         grammaticalWM.C2_params['coop_weight'] = 1
         grammaticalWM.C2_params['comp_weight'] = -1
         
         control.task_params['time_pressure'] = 150
         
-        act0 = grammaticalWM.C2_params['prod_threshold']
+        act0 = grammaticalWM.C2_params['confidence_threshold']
         act_var = 0
         
         # Set up grammatical LTM content
         for cxn in my_grammar.constructions:
-            new_cxn_schema = ls.CXN_SCHEMA(cxn, min(max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']),grammaticalWM.C2_params['prod_threshold']))
+            new_cxn_schema = ls.CXN_SCHEMA(cxn, min(max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']),grammaticalWM.C2_params['confidence_threshold']))
             grammaticalLTM.add_schema(new_cxn_schema)
         
         # Set up Semantic WM content
@@ -475,6 +476,28 @@ def test(seed=None):
             
         grammaticalWM.show_dynamics()
         grammaticalWM.show_state()
+    
+    elif case == '8':
+        ###############################################
+        ### TEST INCREMENTAL SEMREP + SEMANTIC LTM ####
+        language_schemas = [conceptualizer, grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, semanticLTM]
+
+        language_system.add_schemas(language_schemas)
+        language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
+        language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval', cxn_retrieval, 'from_grammatical_LTM')
+        language_system.add_connection(cxn_retrieval, 'to_grammatical_WM', grammaticalWM, 'from_cxn_retrieval')
+        language_system.add_connection(semanticWM, 'to_grammatical_WM', grammaticalWM, 'from_semantic_WM')
+        language_system.add_connection(grammaticalWM, 'to_phonological_WM', phonWM, 'from_grammatical_WM')
+        language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+        language_system.add_connection(phonWM, 'to_control', control, 'from_phonological_WM')
+        language_system.add_connection(control, 'to_grammatical_WM', grammaticalWM, 'from_control')
+        language_system.add_connection(semanticLTM, 'to_conceptualizer', conceptualizer, 'from_semantic_LTM')
+        language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
+        
+        language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
+        language_system.set_output_ports([phonWM._find_port('to_output')])
+        
+        language_system.system2dot(image_type='png', disp=True)
     
     else:
         print "ERROR"
