@@ -22,15 +22,15 @@ def test(seed=None):
     semanticWM = ls.SEMANTIC_WM()
     phonWM = ls.PHON_WM()
     control = ls.CONTROL()
-    semanticLTM = ls.SEMANTIC_LTM()
+    conceptLTM = ls.CONCEPT_LTM()
     
-    language_mapping = {'Conceptualizer':[], 
+    language_mapping = {'Conceptualizer':['aTP'], 
                     'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
                     'Grammatical_WM':['left_BA45', 'leftBA44'], 
                     'Grammatical_LTM':['left_STG', 'left_MTG'],
                     'Cxn_retrieval':[], 
                     'Phonological_WM':['left_BA6'],
-                    'Control':['DLPFC'], 'Semantic_LTM':['aTP']}
+                    'Control':['DLPFC'], 'Concept_LTM':['']}
     
     language_system = st.SCHEMA_SYSTEM('Language_system')
     
@@ -480,7 +480,7 @@ def test(seed=None):
     elif case == '8':
         ###############################################
         ### TEST INCREMENTAL SEMREP + SEMANTIC LTM ####
-        language_schemas = [conceptualizer, grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, semanticLTM]
+        language_schemas = [conceptualizer, grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, conceptLTM]
 
         language_system.add_schemas(language_schemas)
         language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
@@ -491,7 +491,7 @@ def test(seed=None):
         language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
         language_system.add_connection(phonWM, 'to_control', control, 'from_phonological_WM')
         language_system.add_connection(control, 'to_grammatical_WM', grammaticalWM, 'from_control')
-        language_system.add_connection(semanticLTM, 'to_conceptualizer', conceptualizer, 'from_semantic_LTM')
+        language_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
         language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
         
         language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])

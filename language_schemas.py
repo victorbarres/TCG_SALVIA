@@ -97,9 +97,10 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                 port.schema=self
                 
 ############################
-# SEMANTIC KNOWLEDGE SCHEMAS
-class SEM_SCHEMA(KNOWLEDGE_SCHEMA):
+# CONCEPT KNOWLEDGE SCHEMAS
+class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
     """
+    Concept schema
     Data:
     - KNOWEDGE SCHEMA data:
                 - id (int): Unique id
@@ -112,35 +113,41 @@ class SEM_SCHEMA(KNOWLEDGE_SCHEMA):
         KNOWLEDGE_SCHEMA.__init__(self, name=a_concept.name, content=None, init_act=init_act)
         self.set_content({'concept':a_concept})
 
-class SEM_ENTITY_SCHEMA(SEM_SCHEMA):
+class CPT_ENTITY_SCHEMA(CPT_SCHEMA):
     """
+    Conceptual entity schema
     """
     def __init__(self, a_concept, init_act):
-        SEM_SCHEMA.__init__(self, a_concept, init_act)
+        CPT_SCHEMA.__init__(self, a_concept, init_act)
 
-class SEM_ACTION_SCHEMA(SEM_SCHEMA):
+class CPT_ACTION_SCHEMA(CPT_SCHEMA):
     """
+    Conceptual action schema
     """
     def __init__(self, a_concept, init_act):
-        SEM_SCHEMA.__init__(self, a_concept, init_act)
+        CPT_SCHEMA.__init__(self, a_concept, init_act)
 
-class SEM_PROPERTY_SCHEMA(SEM_SCHEMA):
+class CPT_PROPERTY_SCHEMA(CPT_SCHEMA):
     """
+    Conceptual property schema
     """
     def __init__(self, a_concept, init_act):
-        SEM_SCHEMA.__init__(self, a_concept, init_act)
+        CPT_SCHEMA.__init__(self, a_concept, init_act)
 
-class SEM_RELATION_SCHEMA(SEM_SCHEMA):
+class CPT_RELATION_SCHEMA(CPT_SCHEMA):
+    """
+    Conceptual relation schema
+    """
     def __init__(self, a_concept, init_act):
-        SEM_SCHEMA.__init__(self, a_concept, init_act)
+        CPT_SCHEMA.__init__(self, a_concept, init_act)
         self.content({'concept':a_concept, 'pFrom':None, 'pTo':None})
 
-class SEM_SCHEMA_INST(SCHEMA_INST):
+class CPT_SCHEMA_INST(SCHEMA_INST):
     """
-    Semantic schema instance. 
+    Concept schema instance. 
     """
-    def __init__(self, sem_schema, trace):
-        SCHEMA_INST.__init__(self, schema=sem_schema, trace=trace)
+    def __init__(self, cpt_schema, trace):
+        SCHEMA_INST.__init__(self, schema=cpt_schema, trace=trace)
 
 ###################################
 ### Language procedural schemas ###
@@ -151,7 +158,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
     def __init__(self, name='Conceptualizer'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_visual_WM')
-        self.add_port('IN', 'from_semantic_LTM')
+        self.add_port('IN', 'from_concept_LTM')
         self.add_port('OUT', 'to_semantic_WM')
         self.conceptualization = None
     
@@ -166,10 +173,10 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         """
         """
 
-class SEMANTIC_LTM(LTM):
+class CONCEPT_LTM(LTM):
     """
     """
-    def __init__(self, name='Semantic_LTM'):
+    def __init__(self, name='Concept_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_conceptualizer')
         self.SemNet = None
