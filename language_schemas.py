@@ -14,7 +14,6 @@ import pyttsx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
-import concept as cpt
 import TCG_graph
 
 ##################################
@@ -154,7 +153,9 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
     """
     def __init__(self, cpt_schema, trace):
         SCHEMA_INST.__init__(self, schema=cpt_schema, trace=trace)
-    
+        content_copy = cpt_schema.content.copy()
+        self.content = content_copy
+        
     def match(self, cpt_inst, match_type = "is_a"):
         """
         Check if it;s concept matches that of cpt_inst. 
@@ -188,12 +189,14 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         """
         """
         vis_input = self.get_input('from_visual_WM')
-        self._conceptualize(vis_input)
+        self.conceptualize(vis_input)
         self.set_output('to_semantic_WM', self.conceptualization)
+        self.conceptualization = None
     
-    def _conceptualize(self, vis_input):
+    def conceptualize(self, vis_input):
         """
         """
+        return
 
 class CONCEPT_LTM(LTM):
     """
@@ -233,6 +236,9 @@ class SEMANTIC_WM(WM):
         self.prune()
         self.set_output('to_grammatical_WM', self.SemRep)
         self.set_output('to_cxn_retrieval', self.SemRep)
+        
+        if cpt_insts:
+            self.show_SemRep()
     
     def update_SemRep(self, cpt_insts):
         """
@@ -252,22 +258,26 @@ class SEMANTIC_WM(WM):
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace, CPT_RELATION_SCHEMA)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
-                self.SemRep.add_edge(node_from, node_to, concept=inst.content['concept'], activation=0, new=True)
+                self.SemRep.add_edge(node_from, node_to, concept=rel_inst.content['concept'], activation=0, new=True)
+            
         
         # Update activations (should be removed see NOTE)
         for inst in self.schema_insts:
             if isinstance(inst.trace, CPT_RELATION_SCHEMA):
-                self.SemRep.edge[inst.name]['activation'] = inst.activity
+                node_from = inst.content['pFrom'].name
+                node_to = inst.content['pTo'].name
+                d = self.SemRep.get_edge_data(node_from, node_to)
+                d['activation'] = inst.activity  
             else:
-                self.SemRep.node[inst.name]['activation'] = inst.activity    
+                self.SemRep.node[inst.name]['activation'] = inst.activity
     
-    def show_state(self):
+    def show_SemRep(self):
         node_labels = dict((n, d['concept'].meaning) for n,d in self.SemRep.nodes(data=True))
         edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.SemRep.edges(data=True))
         pos = nx.spring_layout(self.SemRep)  
         plt.figure(facecolor='white')
         plt.axis('off')
-        title = '%s (state)' %self.name
+        title = '%s state (t=%i)' %(self.name,self.t)
         plt.title(title)
         nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)

@@ -671,7 +671,7 @@ class WM(PROCEDURAL_SCHEMA):
         
         plt.figure(facecolor='white')
         plt.axis('off')
-        title = '%s (state)' %self.name
+        title = '%s state (t=%i)' %(self.name,self.t)
         plt.title(title)
             
         nx.draw_networkx_nodes(state, pos=pos, node_color='b', node_shape='s')

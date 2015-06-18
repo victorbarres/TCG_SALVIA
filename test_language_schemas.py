@@ -8,7 +8,6 @@ def test(seed=None):
     import schema_theory as st
     import language_schemas as ls
     import concept2 as cpt2 # Old concept script.
-    import concept as cpt
     import loader as ld
     import viewer
     
@@ -502,7 +501,20 @@ def test(seed=None):
         
 #        language_system.system2dot(image_type='png', disp=True)
         
-        # Parameters        
+        # Parameters   
+        semanticWM.dyn_params['tau'] = 300
+        semanticWM.dyn_params['act_inf'] = 0.0
+        semanticWM.dyn_params['L'] = 1.0
+        semanticWM.dyn_params['k'] = 10.0
+        semanticWM.dyn_params['x0'] = 0.5
+        semanticWM.dyn_params['noise_mean'] = 0
+        semanticWM.dyn_params['noise_std'] = 0.2
+        
+        semanticWM.C2_params['confidence_threshold'] = 0
+        semanticWM.C2_params['prune_threshold'] = 0.01
+        semanticWM.C2_params['coop_weight'] = 0
+        semanticWM.C2_params['comp_weight'] = 0
+        
         grammaticalWM.dyn_params['tau'] = 30
         grammaticalWM.dyn_params['act_inf'] = 0.0
         grammaticalWM.dyn_params['L'] = 1.0
@@ -589,7 +601,7 @@ def test(seed=None):
         sem_timing_2 = {100:[woman1, modify1, pretty1]}
         sem_timing_3 = {100:[woman1, kick1, man1, agent1, patient1]}
         sem_timing_4 = {100:[woman1, modify1, pretty1, kick1, agent1, patient1, man1, big1, modify2]}
-        sem_timing_5 = {100:[woman1, modify1, pretty1, man1, big1, modify1]} # SemRep contains to unconnected subgraphs.
+        sem_timing_5 = {100:[woman1, modify1, pretty1, man1, big1, modify2]} # SemRep contains to unconnected subgraphs.
         
         sem_timing_6 = {100:[woman1], 200:[modify1, pretty1]}
         
@@ -599,29 +611,22 @@ def test(seed=None):
         
         sem_timing_10 = {10:[woman1], 300:[modify1, pretty1], 500: [kick1],  700:[agent1, patient1, man1], 900:[big1, modify2]}    
         
-        sem_timing_11 = {100:[woman1,modify1, pretty1], 200:[man1, big1, modify2], 300:[kick1], 400:[agent1, patient1]}
+        sem_timing_11 = {100:[woman1, modify1, pretty1], 200:[man1, big1, modify2], 300:[kick1], 400:[agent1, patient1]}
         
         sem_timing = sem_timing_11
         
-        end_delay = 400
+        end_delay = 500
         max_time = max([time for time in sem_timing.keys()])
         max_time += end_delay
         for step in range(max_time):
             if step in sem_timing:
                 for inst in sem_timing[step]:
-                    print "time:%i, sem:%s" %(step, s)
-                conceptualizer.set_output('to_semantic_wm', sem_timing[step])
-#                    info = sem_info[s]
-#                    if info[0]=='node':
-#                        semanticWM.SemRep.add_node(info[1], concept=info[2], new=True)
-#                    else:
-#                        semanticWM.SemRep.add_edge(info[1][0], info[1][1], concept=info[2], new=True)
+                    print "time:%i, sem:%s" %(step, inst.name)
+                conceptualizer.conceptualization = sem_timing[step]
                 semanticWM.set_output('to_control', True)
-    #                semanticWM.show_state()
             language_system.update()
-#            if language_system.outputs['Phonological_WM:14']:
-#                print language_system.outputs['Phonological_WM:14']
-            
+        
+        semanticWM.show_dynamics()
         grammaticalWM.show_dynamics()
         grammaticalWM.show_state()
     
