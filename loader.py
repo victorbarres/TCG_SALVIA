@@ -321,7 +321,7 @@ def read_region(scene, aRgn, name_table):
 ################################           
 ### Public loading functions ###
 ################################
-def load_SemNet(file_name, file_path = './'):
+def load_SemNet(file_name='', file_path = './'):
     """
     Loads and returns the semantic network defined in file_path/file_name. Return None if error.
     """
@@ -338,10 +338,12 @@ def load_SemNet(file_name, file_path = './'):
     flag = read_sem("IS-A", top_cpt, my_semnet, sem_data['CONCEPTUAL_KNOWLEDGE'])
     if not(flag):
         return None
+    
+    cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
 
     return my_semnet         
     
-def load_grammar(SemNet, file_name, file_path = './'):
+def load_grammar(file_name='', file_path = './', SemNet = None):
     """
     Loads and returns the TCG grammar defined in file_path\file_name.
     Requires a SemNet.
@@ -358,7 +360,7 @@ def load_grammar(SemNet, file_name, file_path = './'):
 
     return my_grammar
 
-def load_scene(file_name, file_path = './'):
+def load_scene(file_name = '', file_path = './'):
     """
     Loads and returns the visual scene defined in file_path\file_name. Return None if error.
     """

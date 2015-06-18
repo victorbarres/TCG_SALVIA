@@ -146,7 +146,7 @@ class CPT_RELATION_SCHEMA(CPT_SCHEMA):
     """
     def __init__(self, name, concept, init_act):
         CPT_SCHEMA.__init__(self ,name, concept, init_act)
-        self.content({'concept':concept, 'pFrom':None, 'pTo':None})
+        self.set_content({'concept':concept, 'pFrom':None, 'pTo':None})
 
 class CPT_SCHEMA_INST(SCHEMA_INST):
     """

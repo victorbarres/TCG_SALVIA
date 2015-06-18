@@ -404,6 +404,20 @@ class LTM(PROCEDURAL_SCHEMA):
     
     def add_connection(self, from_schema, to_schema, weight):
         self.connections.append({'from':from_schema, 'to':to_schema, 'weight':weight})
+    
+    def find_schema(self, name):
+        """
+        Returns the list of schemas with name = name(STR)
+        """
+        res = [schema for schema in self.schemas if schema.name == name]
+        if not(res):
+            return None
+        else:
+            if len(res)==1:
+                return res[0]
+            else:
+                print "%s: Ambiguous schema name" %name
+                return None
         
 ### WORKING MEMORY ###
 class WM(PROCEDURAL_SCHEMA):

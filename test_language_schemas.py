@@ -502,28 +502,128 @@ def test(seed=None):
         
 #        language_system.system2dot(image_type='png', disp=True)
         
+        # Parameters        
+        grammaticalWM.dyn_params['tau'] = 30
+        grammaticalWM.dyn_params['act_inf'] = 0.0
+        grammaticalWM.dyn_params['L'] = 1.0
+        grammaticalWM.dyn_params['k'] = 10.0
+        grammaticalWM.dyn_params['x0'] = 0.5
+        grammaticalWM.dyn_params['noise_mean'] = 0
+        grammaticalWM.dyn_params['noise_std'] = 0.2
+        
+        grammaticalWM.C2_params['confidence_threshold'] = 0.2
+        grammaticalWM.C2_params['prune_threshold'] = 0.01
+        grammaticalWM.C2_params['coop_weight'] = 1
+        grammaticalWM.C2_params['comp_weight'] = -1
+        
+        control.task_params['time_pressure'] = 150
+        
+        act0 = grammaticalWM.C2_params['confidence_threshold']
+        act_var = 0
+        
         # Loading data
         my_semnet = ld.load_SemNet("TCG_semantics.json", "./data/semantics/")
-        my_grammar = ld.load_grammar(my_semnet, "TCG_grammar_VB.json", "./data/grammars/")
-#        
+        my_grammar = ld.load_grammar("TCG_grammar_VB.json", "./data/grammars/", my_semnet)
         
-#        # Set up conceptual LTM content
-#        ls.CPT_SCHEMA.SEMANTIC_NETWORK = my_semnet
-#        conceptLTM.SemNet = ls.CPT_SCHEMA.SEMANTIC_NETWORK
-#        entity = my_semnet.find_meaning('ENTITY')
-#        action = my_semnet.find_meaning('ACTION')
-#        prop = my_semnet.find_meaning('PROPERTY')
-#        rel = my_semnet.find_meaning('RELATION')
-#        for sem_ent in conceptLTM.SemNet.nodes:
-#            if my_semnet.match(sem_ent, entity, match_type="is_a"):
-#                new_schema = ls.CPT_ENTITY_SCHEMA(name=sem_ent.meaning, sem_ent=sem_ent, init_act=1)
-#            
-#            
-#        
-#        # Set up grammatical LTM content
-#        for cxn in my_grammar.constructions:
-#            new_cxn_schema = ls.CXN_SCHEMA(cxn, min(max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']),grammaticalWM.C2_params['confidence_threshold']))
-#            grammaticalLTM.add_schema(new_cxn_schema)
+        
+        # Set up conceptual LTM content
+        conceptLTM.SemNet = my_semnet
+        entity = my_semnet.find_meaning('ENTITY')
+        action = my_semnet.find_meaning('ACTION')
+        prop = my_semnet.find_meaning('PROPERTY')
+        rel = my_semnet.find_meaning('RELATION')
+        for concept in conceptLTM.SemNet.nodes:
+            new_schema = None
+            if my_semnet.match(concept, entity, match_type="is_a"):
+                new_schema = ls.CPT_ENTITY_SCHEMA(name=concept.name, concept=concept, init_act=1)
+            elif my_semnet.match(concept, action, match_type="is_a"):
+                new_schema = ls.CPT_ACTION_SCHEMA(name=concept.name, concept=concept, init_act=1)
+            elif my_semnet.match(concept, prop, match_type="is_a"):
+                new_schema = ls.CPT_PROPERTY_SCHEMA(name=concept.name, concept=concept, init_act=1)
+            elif my_semnet.match(concept, rel, match_type="is_a"):
+                new_schema = ls.CPT_RELATION_SCHEMA(name=concept.name, concept=concept, init_act=1)
+            else:
+                print "%s: unknown concept type" %concept.meaning
+            
+            if new_schema:
+                conceptLTM.add_schema(new_schema)
+            
+        # Set up grammatical LTM content
+        for cxn in my_grammar.constructions:
+            new_cxn_schema = ls.CXN_SCHEMA(cxn, min(max(act0 + random.normalvariate(0, act_var), grammaticalWM.C2_params['prune_threshold']),grammaticalWM.C2_params['confidence_threshold']))
+            grammaticalLTM.add_schema(new_cxn_schema)
+        
+        # Semantic WM content using predefined cpt_schema_instances.
+        man_cpt_schema = conceptLTM.find_schema(name='MAN')
+        woman_cpt_schema = conceptLTM.find_schema(name='WOMAN')
+        kick_cpt_schema = conceptLTM.find_schema(name='KICK')
+        pretty_cpt_schema = conceptLTM.find_schema(name='PRETTY')
+        big_cpt_schema = conceptLTM.find_schema(name='BIG')
+        agent_cpt_schema = conceptLTM.find_schema(name='AGENT')
+        patient_cpt_schema = conceptLTM.find_schema(name='PATIENT')
+        modify_cpt_schema = conceptLTM.find_schema(name='MODIFY')
+        
+        man1 = ls.CPT_SCHEMA_INST(man_cpt_schema, trace=None)
+        woman1 = ls.CPT_SCHEMA_INST(woman_cpt_schema, trace=None)
+        kick1 = ls.CPT_SCHEMA_INST(kick_cpt_schema, trace=None)
+        pretty1 = ls.CPT_SCHEMA_INST(pretty_cpt_schema, trace=None)
+        big1 = ls.CPT_SCHEMA_INST(big_cpt_schema, trace=None)
+        
+        agent1 = ls.CPT_SCHEMA_INST(agent_cpt_schema, trace=None)
+        agent1.content['pFrom'] = kick1
+        agent1.content['pTo'] = woman1
+        patient1 = ls.CPT_SCHEMA_INST(patient_cpt_schema, trace=None)
+        patient1.content['pFrom'] = kick1
+        patient1.content['pTo'] = man1
+        modify1 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace=None)
+        modify1.content['pFrom'] = pretty1
+        modify1.content['pTo'] = woman1
+        modify2 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace=None)
+        modify2.content['pFrom'] = big1
+        modify2.content['pTo'] = man1
+
+        # Timing options:
+        # Define at which time the schema instances should be invoked in semantic working memory
+        # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
+        sem_timing_1 = {100:[woman1]}
+        sem_timing_2 = {100:[woman1, modify1, pretty1]}
+        sem_timing_3 = {100:[woman1, kick1, man1, agent1, patient1]}
+        sem_timing_4 = {100:[woman1, modify1, pretty1, kick1, agent1, patient1, man1, big1, modify2]}
+        sem_timing_5 = {100:[woman1, modify1, pretty1, man1, big1, modify1]} # SemRep contains to unconnected subgraphs.
+        
+        sem_timing_6 = {100:[woman1], 200:[modify1, pretty1]}
+        
+        sem_timing_7 = {100:[woman1], 200:[modify1, pretty1], 300: [kick1],  400:[agent1, patient1, man1], 500:[big1, modify2]}
+        sem_timing_8 = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[modify1, pretty1], 400:[big1, modify2]}
+        sem_timing_9 = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[big1, modify2], 400:[modify1, pretty1]} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.
+        
+        sem_timing_10 = {10:[woman1], 300:[modify1, pretty1], 500: [kick1],  700:[agent1, patient1, man1], 900:[big1, modify2]}    
+        
+        sem_timing_11 = {100:[woman1,modify1, pretty1], 200:[man1, big1, modify2], 300:[kick1], 400:[agent1, patient1]}
+        
+        sem_timing = sem_timing_11
+        
+        end_delay = 400
+        max_time = max([time for time in sem_timing.keys()])
+        max_time += end_delay
+        for step in range(max_time):
+            if step in sem_timing:
+                for inst in sem_timing[step]:
+                    print "time:%i, sem:%s" %(step, s)
+                conceptualizer.set_output('to_semantic_wm', sem_timing[step])
+#                    info = sem_info[s]
+#                    if info[0]=='node':
+#                        semanticWM.SemRep.add_node(info[1], concept=info[2], new=True)
+#                    else:
+#                        semanticWM.SemRep.add_edge(info[1][0], info[1][1], concept=info[2], new=True)
+                semanticWM.set_output('to_control', True)
+    #                semanticWM.show_state()
+            language_system.update()
+#            if language_system.outputs['Phonological_WM:14']:
+#                print language_system.outputs['Phonological_WM:14']
+            
+        grammaticalWM.show_dynamics()
+        grammaticalWM.show_state()
     
     else:
         print "ERROR"
