@@ -206,31 +206,60 @@ class CONCEPT_LTM(LTM):
     def update(self):
         self.set_output('to_conceptualizer', self.schemas)
         
-class SEMANTIC_WM(PROCEDURAL_SCHEMA):
+class SEMANTIC_WM(WM):
     """
     """
     def __init__(self, name='Semantic_WM'):
-        PROCEDURAL_SCHEMA.__init__(self, name)
+        WM.__init__(self, name)
         self.add_port('IN', 'from_conceptualizer')
         self.add_port('OUT', 'to_grammatical_WM')
         self.add_port('OUT', 'to_cxn_retrieval')
         self.add_port('OUT', 'to_control')
-        self.SemRep = nx.DiGraph() ### NEED TO ADD A WAY TO KEEP TRACK OF WHICH SEMREP ELEMENTS HAVE BEEN OR HAVEN'T BEEN ALREADY PASSED THROUGH RETRIEVAL
+        self.dyn_params = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
+        self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
     def update(self):
         """
         """
-        conceptualization = self.get_input('from_conceptualizer')
-        
-        flag = self._update_SemRep(conceptualization)
-        if flag:
+        cpt_insts = self.get_input('from_conceptualizer')
+        if cpt_insts:
+            for inst in cpt_insts:
+               self.add_instance(inst) # Does not deal with updating already existing nodes. Need to add that.
             self.set_output('to_control', True)
+            
+        self.update_activations()
+        self.update_SemRep(cpt_insts)
+        self.prune()
         self.set_output('to_grammatical_WM', self.SemRep)
         self.set_output('to_cxn_retrieval', self.SemRep)
     
-    def _update_SemRep(self, conceptualiztion):
+    def update_SemRep(self, cpt_insts):
         """
+        Updates the SemRep: Adds the nodes and edges needed based on the receivd concept instances.
+        
+        NOTE:
+            - Does not handle the case of concept instance updating.
+            - Rather than simply carrying the concept, and having to update the activation the SemRep node should carry the instance.
+                This require to revise the SemMatch algorithm in the cxn_retrieval proc schema.
         """
+        if cpt_insts:
+            # First process all the instances that are not relations.
+            for inst in [i for i in cpt_insts if not(isinstance(i.trace, CPT_RELATION_SCHEMA))]:
+                self.SemRep.add_node(inst.name, concept=inst.content['concept'], activation=0, new=True)
+            
+            # Then add the relations
+            for rel_inst in [i for i in cpt_insts if isinstance(i.trace, CPT_RELATION_SCHEMA)]:
+                node_from = rel_inst.content['pFrom'].name
+                node_to = rel_inst.content['pTo'].name
+                self.SemRep.add_edge(node_from, node_to, concept=inst.content['concept'], activation=0, new=True)
+        
+        # Update activations (should be removed see NOTE)
+        for inst in self.schema_insts:
+            if isinstance(inst.trace, CPT_RELATION_SCHEMA):
+                self.SemRep.edge[inst.name]['activation'] = inst.activity
+            else:
+                self.SemRep.node[inst.name]['activation'] = inst.activity    
     
     def show_state(self):
         node_labels = dict((n, d['concept'].meaning) for n,d in self.SemRep.nodes(data=True))

@@ -563,22 +563,22 @@ def test(seed=None):
         patient_cpt_schema = conceptLTM.find_schema(name='PATIENT')
         modify_cpt_schema = conceptLTM.find_schema(name='MODIFY')
         
-        man1 = ls.CPT_SCHEMA_INST(man_cpt_schema, trace=None)
-        woman1 = ls.CPT_SCHEMA_INST(woman_cpt_schema, trace=None)
-        kick1 = ls.CPT_SCHEMA_INST(kick_cpt_schema, trace=None)
-        pretty1 = ls.CPT_SCHEMA_INST(pretty_cpt_schema, trace=None)
-        big1 = ls.CPT_SCHEMA_INST(big_cpt_schema, trace=None)
+        man1 = ls.CPT_SCHEMA_INST(man_cpt_schema, trace=man_cpt_schema)
+        woman1 = ls.CPT_SCHEMA_INST(woman_cpt_schema, trace=woman_cpt_schema)
+        kick1 = ls.CPT_SCHEMA_INST(kick_cpt_schema, trace=kick_cpt_schema)
+        pretty1 = ls.CPT_SCHEMA_INST(pretty_cpt_schema, trace=pretty_cpt_schema)
+        big1 = ls.CPT_SCHEMA_INST(big_cpt_schema, trace=big_cpt_schema)
         
-        agent1 = ls.CPT_SCHEMA_INST(agent_cpt_schema, trace=None)
+        agent1 = ls.CPT_SCHEMA_INST(agent_cpt_schema, trace=agent_cpt_schema)
         agent1.content['pFrom'] = kick1
         agent1.content['pTo'] = woman1
-        patient1 = ls.CPT_SCHEMA_INST(patient_cpt_schema, trace=None)
+        patient1 = ls.CPT_SCHEMA_INST(patient_cpt_schema, trace=patient_cpt_schema)
         patient1.content['pFrom'] = kick1
         patient1.content['pTo'] = man1
-        modify1 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace=None)
+        modify1 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace=modify_cpt_schema)
         modify1.content['pFrom'] = pretty1
         modify1.content['pTo'] = woman1
-        modify2 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace=None)
+        modify2 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace=modify_cpt_schema)
         modify2.content['pFrom'] = big1
         modify2.content['pTo'] = man1
 

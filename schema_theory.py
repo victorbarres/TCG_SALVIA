@@ -453,8 +453,10 @@ class WM(PROCEDURAL_SCHEMA):
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}
         self.save_state = {'insts':{}}
        
-    def add_instance(self,schema_inst, act0):
-        self.schema_insts.append(schema_inst) #There is still an issue with TIME! Need to keep track of t0 for each construction instance....
+    def add_instance(self,schema_inst, act0=None):
+        self.schema_insts.append(schema_inst)
+        if not(act0):
+            act0 = schema_inst.activity # Uses the inti_activation defined by the associated schema.
         act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.dyn_params['tau'], 'act_inf':self.dyn_params['act_inf'],
                       'L':self.dyn_params['L'], 'k':self.dyn_params['k'], 'x0':self.dyn_params['x0'],
                       'noise_mean':self.dyn_params['noise_mean'], 'noise_std':self.dyn_params['noise_std']}
