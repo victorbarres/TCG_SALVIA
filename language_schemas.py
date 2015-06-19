@@ -246,34 +246,23 @@ class SEMANTIC_WM(WM):
         
         NOTE:
             - Does not handle the case of concept instance updating.
-            - Rather than simply carrying the concept, and having to update the activation the SemRep node should carry the instance.
-                This require to revise the SemMatch algorithm in the cxn_retrieval proc schema.
+            - SemRep carreies the instance and the concept. The concept field is redundant, but is useful in order to be able to define
+            SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
         """
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace, CPT_RELATION_SCHEMA))]:
-                self.SemRep.add_node(inst.name, concept=inst.content['concept'], activation=0, new=True)
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], new=True)
             
             # Then add the relations
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace, CPT_RELATION_SCHEMA)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
-                self.SemRep.add_edge(node_from, node_to, concept=rel_inst.content['concept'], activation=0, new=True)
-            
-        
-        # Update activations (should be removed see NOTE)
-        for inst in self.schema_insts:
-            if isinstance(inst.trace, CPT_RELATION_SCHEMA):
-                node_from = inst.content['pFrom'].name
-                node_to = inst.content['pTo'].name
-                d = self.SemRep.get_edge_data(node_from, node_to)
-                d['activation'] = inst.activity  
-            else:
-                self.SemRep.node[inst.name]['activation'] = inst.activity
+                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True)
     
     def show_SemRep(self):
-        node_labels = dict((n, d['concept'].meaning) for n,d in self.SemRep.nodes(data=True))
-        edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.SemRep.edges(data=True))
+        node_labels = dict((n, '%s\n(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
+        edge_labels = dict(((u,v), '%s\n(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
         pos = nx.spring_layout(self.SemRep)  
         plt.figure(facecolor='white')
         plt.axis('off')

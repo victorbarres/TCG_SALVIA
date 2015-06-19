@@ -658,7 +658,7 @@ class WM(PROCEDURAL_SCHEMA):
         """
         state = nx.DiGraph()
         for inst in self.schema_insts:
-            state.add_node(inst.name)
+            state.add_node(inst.name, activation= inst.activity)
         for link in self.coop_links:
             state.add_edge(link.inst_from.name, link.inst_to.name, type="coop")
             state.add_edge(link.inst_to.name, link.inst_from.name, type="coop")
@@ -666,7 +666,8 @@ class WM(PROCEDURAL_SCHEMA):
             state.add_edge(link.inst_from.name, link.inst_to.name, type="comp")
             state.add_edge(link.inst_to.name, link.inst_from.name, type="comp")
             
-        pos = nx.spring_layout(state)        
+        pos = nx.spring_layout(state)   
+        node_labels = dict((n, '%s\n(%.1f)' %(n, d['activation'])) for n,d in state.nodes(data=True))
         get_edges = lambda edge_type: [e for e in state.edges() if state.edge[e[0]][e[1]]['type'] == edge_type]
         
         plt.figure(facecolor='white')
@@ -674,8 +675,8 @@ class WM(PROCEDURAL_SCHEMA):
         title = '%s state (t=%i)' %(self.name,self.t)
         plt.title(title)
             
-        nx.draw_networkx_nodes(state, pos=pos, node_color='b', node_shape='s')
-        nx.draw_networkx_labels(state, pos=pos)
+        nx.draw_networkx_nodes(state, pos=pos, node_color='b', node_shape='s', with_labels=False)
+        nx.draw_networkx_labels(state, pos=pos, labels= node_labels)
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('coop'), edge_color='g')
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('comp'), edge_color='r')
              

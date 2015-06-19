@@ -613,7 +613,7 @@ def test(seed=None):
         
         sem_timing_11 = {100:[woman1, modify1, pretty1], 200:[man1, big1, modify2], 300:[kick1], 400:[agent1, patient1]}
         
-        sem_timing = sem_timing_11
+        sem_timing = sem_timing_2
         
         end_delay = 500
         max_time = max([time for time in sem_timing.keys()])
