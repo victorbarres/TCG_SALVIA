@@ -667,7 +667,7 @@ class WM(PROCEDURAL_SCHEMA):
             state.add_edge(link.inst_to.name, link.inst_from.name, type="comp")
             
         pos = nx.spring_layout(state)   
-        node_labels = dict((n, '%s\n(%.1f)' %(n, d['activation'])) for n,d in state.nodes(data=True))
+        node_labels = dict((n, '%s(%.1f)' %(n, d['activation'])) for n,d in state.nodes(data=True))
         get_edges = lambda edge_type: [e for e in state.edges() if state.edge[e[0]][e[1]]['type'] == edge_type]
         
         plt.figure(facecolor='white')

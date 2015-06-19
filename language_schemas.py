@@ -261,8 +261,8 @@ class SEMANTIC_WM(WM):
                 self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True)
     
     def show_SemRep(self):
-        node_labels = dict((n, '%s\n(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
-        edge_labels = dict(((u,v), '%s\n(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
+        node_labels = dict((n, '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
+        edge_labels = dict(((u,v), '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
         pos = nx.spring_layout(self.SemRep)  
         plt.figure(facecolor='white')
         plt.axis('off')
@@ -882,7 +882,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
                 trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}
                 node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
                 edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
-                mapping = {'nodes':node_mapping, 'edges':edge_mapping}
+                mapping = {'nodes':node_mapping, 'edges':edge_mapping}                
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
