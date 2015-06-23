@@ -15,6 +15,7 @@ def test(seed=None):
     ##############################
     ### Language schema system ###
     ##############################
+    # Instantiating all the necessary procedural schemas
     conceptualizer = ls.CONCEPTUALIZER()
     grammaticalWM = ls.GRAMMATICAL_WM()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
@@ -24,6 +25,7 @@ def test(seed=None):
     control = ls.CONTROL()
     conceptLTM = ls.CONCEPT_LTM()
     
+    # Defining schema to brain mappings.
     language_mapping = {'Conceptualizer':['aTP'], 
                     'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
                     'Grammatical_WM':['left_BA45', 'leftBA44'], 
@@ -31,9 +33,11 @@ def test(seed=None):
                     'Cxn_retrieval':[], 
                     'Phonological_WM':['left_BA6'],
                     'Control':['DLPFC'], 'Concept_LTM':['']}
-    
+   
+   # Initializing schema system
     language_system = st.SCHEMA_SYSTEM('Language_system')
     
+    # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     language_system.brain_mapping = language_brain_mapping
