@@ -3,28 +3,27 @@
 
 <html>
 <head>
-<title> TCG SEM </title>
+<title> TCG CZER </title>
 <link rel="shortcut icon", href="../TCG.ico">
-<link rel="stylesheet" href="./TCGConceptViewer.css" type="text/css">
+<link rel="stylesheet" href="./TCGSemanticViewer.css" type="text/css">
 </head>
 <div id="title">
 <img src="../TCG.ico" alt="TCG icon" style="width:50px;height:50px", align="left">
-<h1>Semantic relations Knowledge</h1>
+<h1>Conceptualizations</h1>
 </div>
 
 <body>
-<p><a href='./TCGConceptViewerStatic.html'>Conceptual knowledge</a></p>
-<p><a href='./TCGConceptViewerStaticPER.html'>Perceptual knowledge</a></p>
-<p><a href='./TCGConceptViewerStaticCZER.html'>Conceptualizations</a></p>
+<p><a href='./TCGSemanticViewerCPT.html'>Conceptual knowledge</a></p>
+<p><a href='./TCGSemanticViewerPER.html'>Perceptual knowledge</a></p>
 <div id="display">
 <p><b>Graph View</b></p>
 </div>
 
 <script>
-var data_folder = "../tmp/sem/";
+var data_folder = "../tmp/czer/";
 var width = 1200;
 var height = 700;
-var sem_file = 'TCG_semrels.gv.svg';
+var sem_file = 'TCG_conceptualizer.gv.svg';
 
 var graph_div = document.getElementById('display');
 var sem_img = document.createElement('img');

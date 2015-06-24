@@ -1,24 +1,4 @@
-
 {
-	"SEM_RELATIONS" : 
-	{
-		"MODIFY" : {},
-		"THEMATIC" :
-		{
-			"AGENT" : {},
-			"PATIENT" : {}
-		},
-		"TEMPORAL" :
-		{
-			"SUCCESSIVE" :{},
-			"CONCURRENT" : {}
-		},
-		"SPATIAL" : 
-		{ 
-			"IN" : {} 
-		}
-	},
-
 	"CONCEPTUAL_KNOWLEDGE" : 
 	{
 		"ENTITY" : 
@@ -51,26 +31,27 @@
 			{
 				"BOXINGRING" : {},
 				"PARK" : {}
+			},
+
+			"ANIMATE" : 
+			{ 
+				"HUMAN" : {},
+				"ANIMAL" : {} 
+			},
+
+			"MALE" : 
+			{ 
+				"MAN" : {},
+				"BOY" : {}
+			},
+
+			"FEMALE"  : 
+			{ 
+				"WOMAN" : {},
+				"GIRL" : {} 
 			}
 		},
-
-		"ANIMATE" : 
-		{ 
-			"HUMAN" : {},
-			"ANIMAL" : {} 
-		},
-
-		"MALE" : 
-		{ 
-			"MAN" : {},
-			"BOY" : {}
-		},
-
-		"FEMALE"  : 
-		{ 
-			"WOMAN" : {},
-			"GIRL" : {} 
-		},
+		
 		"ACTION" : 
 		{
 			"TRANSITIVE" :
@@ -87,13 +68,16 @@
 				"WATCH" : {}
 			}
 		},
+		
 		"PROPERTY" :
 		{
 			"COLOR" :
 			{
 				"BLACK" : {},
+				"WHITE" : {},
 				"BLUE" : {},
-				"GREEN" : {}
+				"GREEN" : {},
+				"RED" : {}
 			},
 			"SIZE" :
 			{
@@ -105,7 +89,149 @@
 				"PRETTY" : {},
 				"HANDSOME" : {}
 			}
+		},
+		
+		"RELATION" : 
+		{
+			"MODIFY" : {},
+			"THEMATIC" :
+			{
+				"AGENT" : {},
+				"PATIENT" : {}
+			},
+			"TEMPORAL" :
+			{
+				"SUCCESSIVE" : {},
+				"CONCURRENT" : {}
+			},
+			"SPATIAL" : 
+			{ 
+				"IN" : {} 
+			}
 		}
-	}		
+	},
+
+	"PERCEPTUAL_KNOWLEDGE" :
+	{
+		"OBJECT":
+		[
+			"O1_MAN",
+			"O2_BOY",
+			"O3_WOMAN",
+			"O4_GIRL",
+			"O5_HUMAN",
+			"O6_ANIMAL",
+			"O7_MOUSE",
+			"O8_TURTLE",
+			"O9_DRESS",
+			"O10_TSHIRT",
+			"O11_BOXINGRING",
+			"O12_PARK",
+			"O13_PEOPLE"
+		],
+		
+		"ACTION":
+		[
+			"A1_SQUIRT",
+			"A2_TALK",
+			"A3_HIT",
+			"A4_WEAR",
+			"A5_KICK",
+			"A6_LAUGH",
+			"A7_WATCH"
+		],
+		
+		"QUALITY":
+		{
+			"COLOR":
+			[
+
+				"Q1_RED",
+				"Q2_BLUE",
+				"Q3_GREEN",
+				"Q6_BLACK",
+				"Q7_WHITE"
+			],
+			"SIZE":
+			[
+				"Q4_SMALL",
+				"Q5_BIG"
+			]
+		},
+		
+		"RELATION":
+		{
+			"ACTION_REL":
+			[
+				"R1_SQUIRTER",
+				"R2_TALKER",
+				"R3_HITER",
+				"R4_WEARER",
+				"R5_KICKER",
+				"R6_LAUGHER",
+				"R7_WATCHER",
+				"R8_SQUIRTEE",
+				"R9_HEARER",
+				"R10_HITEE",
+				"R11_WEAREE",
+				"R12_KICKEE",
+				"R13_WATCHEE"
+			],
+			"SPATIAL_REL":
+			[
+				"R8_CONTAIN" 
+			],
+			"QUALITY_REL":
+			[
+				"R9_HAS_PARAM"
+			],
+			"TEMP_REL":
+			[
+				"R11_CONCURRENT",
+				"R12_SUCCESSIVE"
+			]
+		}
+	},
+	
+	"CONCEPTUALIZATION":
+	{
+		"MAN" : ["O1_MAN"],
+		"BOY" : ["O2_BOY"],
+		"WOMAN" : ["O3_WOMAN"],
+		"GIRL" : ["O4_GIRL"],
+		"PEOPLE" : ["O1_MAN"],
+		"HUMAN" : ["O5_HUMAN"],
+		"ANIMAL" : ["O6_ANIMAL"],
+		"MOUSE" : ["O7_MOUSE"],
+		"TURTLE" : ["O8_TURTLE"],
+		"DRESS" : ["O9_DRESS"],
+		"TSHIRT" : ["O10_TSHIRT"],
+		"BOXINGRING" : ["O11_BOXINGRING"],
+		"PARK" : ["O12_PARK"],
+		"PEOPLE" : ["O13_PEOPLE"],
+		
+		"SQUIRT" : ["A1_SQUIRT"],
+		"TALK" : ["A2_TALK"],
+		"HIT" : ["A3_HIT"],
+		"WEAR" : ["A4_WEAR"],
+		"KICK" : ["A5_KICK"],
+		"LAUGH" : ["A6_LAUGH"],
+		"WATCH" : ["A7_WATCH"],
+		
+		"RED" : ["Q1_RED"],
+		"BLUE" : ["Q2_BLUE"],
+		"GREEN" : ["Q3_GREEN"],
+		"BLACK" : ["Q6_BLACK"],
+		"WHITE" : ["Q7_WHITE"],
+		"BIG" : ["Q5_BIG"],
+		"SMALL" : ["Q4_SMALL"],
+		
+		"MODIFY" : ["R9_HAS_PARAM"],
+		"IN" : ["R8_CONTAIN"],
+		"SUCCESSIVE" : ["R12_SUCCESSIVE"],
+		"CONCURRENT" : ["R8_CONCURRENT"],
+		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER"],
+		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE"]
+	}
 }
 
