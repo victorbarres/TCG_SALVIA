@@ -114,111 +114,121 @@
 	"PERCEPTUAL_KNOWLEDGE" :
 	{
 		"OBJECT":
-		{
-			"FEATURE": {"FEATURE_VECTOR":"VECTOR"},
-			"TOKENS":
-			{
-				"O1_MAN" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O2_BOY" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O3_WOMAN" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O4_GIRL" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O5_HUMAN" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O6_ANIMAL" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O7_MOUSE" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O8_TURTLE" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O9_DRESS" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O10_TSHIRT" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O11_BOXINGRING" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O12_PARK" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"O13_PEOPLE" : {"FEATURE":{"FEATURE_VECTOR":[]}}
-			}
-		},
+		[
+			"O1_MAN",
+			"O2_BOY",
+			"O3_WOMAN",
+			"O4_GIRL",
+			"O5_HUMAN",
+			"O6_ANIMAL",
+			"O7_MOUSE",
+			"O8_TURTLE",
+			"O9_DRESS",
+			"O10_TSHIRT",
+			"O11_BOXINGRING",
+			"O12_PARK",
+			"O13_PEOPLE"
+		],
 		"ACTION":
-		{
-			"FEATURE": {"FEATURE_VECTOR":"VECTOR"},
-			"TOKENS":
-			{
-				"A1_SQUIRT" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"A2_TALK" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"A3_HIT" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"A4_WEAR" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"A5_KICK" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"A6_LAUGH" : {"FEATURE":{"FEATURE_VECTOR":[]}},
-				"A7_WATCH" : {"FEATURE":{"FEATURE_VECTOR":[]}}
-			}
-		},
+		[
+			"A1_SQUIRT",
+			"A2_TALK",
+			"A3_HIT",
+			"A4_WEAR",
+			"A5_KICK",
+			"A6_LAUGH",
+			"A7_WATCH"
+		],
 		"QUALITY":
 		{
 			"COLOR":
-			{
-				"FEATURE":{"R":"Int", "G":"Int", "B":"Int"},
-				"TOKENS":
-				{
-					"Q1_RED" : {"FEATURE":{"R":255, "G":0, "B":0}},
-					"Q2_BLUE" : {"FEATURE":{"R":0, "G":0, "B":255}},
-					"Q3_GREEN" : {"FEATURE":{"R":0, "G":255, "B":0}},
-					"Q6_BLACK" : {"FEATURE":{"R":0, "G":0, "B":0}},
-					"Q7_WHITE" : {"FEATURE":{"R":255, "G":255, "B":255}}
-				}
-			},
+			[
+
+				"Q1_RED",
+				"Q2_BLUE",
+				"Q3_GREEN",
+				"Q6_BLACK",
+				"Q7_WHITE"
+			],
 			"SIZE":
-			{	
-				"FEATURE":{"W":"Int", "H":"Int"},
-				"TOKENS":
-				{
-					"Q4_SMALL" : {"FEATURE":{"W":20, "H":20}},
-					"Q5_BIG" : {"FEATURE":{"W":120, "H":100}}
-				}
-			}
+			[
+				"Q4_SMALL",
+				"Q5_BIG"
+			],
 		},
 		"RELATION":
 		{
 			"ACTION_REL":
-			{
-				"FEATURE": {},
-				"TOKENS":
-				{
-					"R1_SQUIRTER" : {},
-					"R2_TALKER" : {},
-					"R3_HITER" : {},
-					"R4_WEARER" : {},
-					"R5_KICKER" : {},
-					"R6_LAUGHER" : {},
-					"R7_WATCHER" : {},
-					"R8_SQUIRTEE" : {},
-					"R9_HEARER" : {},
-					"R10_HITEE" : {},
-					"R11_WEAREE" : {},
-					"R12_KICKEE" : {},
-					"R13_WATCHEE" : {}
-				}
-			},
+			[
+				"R1_SQUIRTER",
+				"R2_TALKER",
+				"R3_HITER",
+				"R4_WEARER",
+				"R5_KICKER",
+				"R6_LAUGHER",
+				"R7_WATCHER",
+				"R8_SQUIRTEE",
+				"R9_HEARER",
+				"R10_HITEE",
+				"R11_WEAREE",
+				"R12_KICKEE",
+				"R13_WATCHEE"
+			],
 			"SPATIAL_REL":
-			{
-				"FEATURE" : {},
-				"TOKENS":
-				{
-					"R8_CONTAIN" : {}
-				}
-			},
+			[
+				"R8_CONTAIN" 
+			],
 			"QUALITY_REL":
-			{
-				"FEATURE" : {},
-				"TOKENS":
-				{
-					"R9_HAS_PARAM" : {}
-				}
-			},
+			[
+				"R9_HAS_PARAM"
+			],
 			"TEMP_REL":
-			{
-				"FEATURE" : {"T_SOURCE":"Time", "T_TARGET":"Time"},
-				"TOKENS":
-				{
-					"R11_CONCURRENT" : {},
-					"R12_SUCCESSIVE" : {}
-				}
-			}
+			[
+				"R11_CONCURRENT",
+				"R12_SUCCESSIVE"
+			]
 		}
+	},
+	
+	"CONCEPTUALIZATION":
+	{
+		"MAN" : ["O1_MAN"],
+		"BOY" : ["O2_BOY"],
+		"WOMAN" : ["O3_WOMAN"],
+		"GIRL" : ["O4_GIRL"],
+		"PEOPLE" : ["O1_MAN"],
+		"HUMAN" : ["O5_HUMAN"],
+		"ANIMAL" : ["O6_ANIMAL"],
+		"MOUSE" : ["O7_MOUSE"],
+		"TURTLE" : ["O8_TURTLE"],
+		"DRESS" : ["O9_DRESS"],
+		"TSHIRT" : ["O10_TSHIRT"],
+		"BOXINGRING" : ["O11_BOXINGRING"],
+		"PARK" : ["O12_PARK"],
+		"PEOPLE" : ["O13_PEOPLE"],
+		
+		"SQUIRT" : ["A1_SQUIRT"],
+		"TALK" : ["A2_TALK"],
+		"HIT" : ["A3_HIT"],
+		"WEAR" : ["A4_WEAR"],
+		"KICK" : ["A5_KICK"],
+		"LAUGH" : ["A6_LAUGH"],
+		"WATCH" : ["A7_WATCH"],
+		
+		"RED" : ["Q1_RED"],
+		"BLUE" : ["Q2_BLUE"],
+		"GREEN" : ["Q3_GREEN"],
+		"BLACK" : ["Q6_BLACK"],
+		"WHITE" : ["Q7_WHITE"],
+		"BIG" : ["Q5_BIG"],
+		"SMALL" : ["Q4_SMALL"],
+		
+		"MODIFY" : ["R9_HAS_PARAM"],
+		"IN" : ["R8_CONTAIN"],
+		"SUCCESSIVE" : ["R12_SUCCESSIVE"],
+		"CONCURRENT" : ["R8_CONCURRENT"],
+		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER"],
+		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE"]
 	}
 }
 
