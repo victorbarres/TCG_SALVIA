@@ -18,7 +18,7 @@ TCG 1.1 data loader module
 """
 import json
 
-import concept as cpt
+import concept2 as cpt
 import construction as cxn
 import scene as scn
 
@@ -321,12 +321,12 @@ def read_region(scene, aRgn, name_table):
 ################################           
 ### Public loading functions ###
 ################################
-def load_SemNet(file_name='', file_path = './'):
+def load_SemNet(file_name='', file_path='./'):
     """
-    Loads and returns the semantic network defined in file_path/file_name. Return None if error.
+    Loads and returns the semantic network defined in file_path\file_name. Return None if error.
     """
     # Open and read file
-    sem_data = json_read(file_name, path = file_path)
+    sem_data = json_read(file_name, path=file_path)
     
     # Create scene object
     my_semnet = cpt.SEM_NET()
@@ -341,9 +341,9 @@ def load_SemNet(file_name='', file_path = './'):
     
     cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
 
-    return my_semnet         
+    return my_semnet
     
-def load_grammar(file_name='', file_path = './', SemNet = None):
+def load_grammar(file_name='', file_path='./', SemNet = None):
     """
     Loads and returns the TCG grammar defined in file_path\file_name.
     Requires a SemNet.
@@ -359,6 +359,14 @@ def load_grammar(file_name='', file_path = './', SemNet = None):
         read_cxn(my_grammar, aCxn, SemNet)
 
     return my_grammar
+
+def load_perceptual_knowledge(file_name='', file_path='./'):
+    """
+    Load and returns the set of perceptual schemas defined in file_path\file_name
+    """
+    #OPen and read file
+    json_data = json_read(file_name, path=file_path)
+    per_data = json_data['PERCEPTUAL_KNOWLEDGE']
 
 def load_scene(file_name = '', file_path = './'):
     """
@@ -411,7 +419,7 @@ def load_scene(file_name = '', file_path = './'):
         
 ###############################################################################
 if __name__=='__main__':
-    my_grammar = load_grammar("TCG_grammar.json", "./data/grammars/")
     my_semnet = load_SemNet("TCG_semantics.json", "./data/semantics/")
+    my_grammar = load_grammar("TCG_grammar.json", "./data/grammars/", my_semnet)
     
     

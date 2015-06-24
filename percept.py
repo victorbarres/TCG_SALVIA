@@ -2,58 +2,41 @@
 """
 @author: Victor Barres
 
-Define semantic network related classes for TCG.
+Define perceptual knowledge related classes for TCG.
 
 Uses NetworkX module to represent the semantic net.
 """
-import networkx as nx
-
 from knowledge_rep import K_ENT, K_REL, K_NET
 
-class CONCEPT(K_ENT):
+class PERCEPT(K_ENT):
     """
-    Semantic entity
+    Perceptual knowledge entity
     
     Data:
         - id (INT): Unique identifier of the entity.
-        - meaning (STR): Meaning associated with the semantic entity. A string for now.
+        - meaning (): Meaning associated with the percept
 
     """
     SEMANTIC_NETWORK = None  
     def __init__(self, name='',  meaning=''):
         K_ENT.__init__(self, name=name, meaning=meaning)
     
-    def match(self, cpt, match_type = "is_a"):
-        """
-        Check if it matches cpt. 
-        Uses SEM_NET.match() method.
-            Type = "is_a":  concept1 matches concept2 if concept1 is a hyponym of concept2 (or equal to concept2)
-            Type = "equal": concept1 matches concept2 if concept1 is equal to concept2.
-        """
-        return CONCEPT.SEMANTIC_NETWORK.match(self, cpt, match_type)
-    
-    def similarity(self, cpt):
-        """
-        Returns a similarity score with cpt.
-        Uses SEM_NET.similarity() method.
-        """
-        return CONCEPT.SEMANTIC_NETWORK.similarity(self ,cpt)
-    
 class SEM_REL(K_REL):
     """
     Semantic Relation
+    Type implemented:
+        - 'is_a'
+        - 'has_token'
     
     Data:
         - type (STR): Type of relation.
-        - pFrom (CONCEPT):  Source concept.
-        - pTo (CONCEPT): Target concept.
-    
-    Note: ONLY IS-A IMPLEMENTED FOR NOW.
+        - pFrom (PERCEPT):  Source percept.
+        - pTo (PERCEPT): Target precept.
     """    
     def __init__(self, aType = 'UNDEFINED', from_sem = None, to_sem = None):
         K_REL.__init__(self,aType = aType, from_ent=from_sem, to_ent = to_sem)
 
-class SEM_NET(K_NET):
+class PERCEPTUAL_KNOWLEDGE(K_NET):
     """
     Semantic network.
     

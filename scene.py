@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 05 12:07:09 2014
-
 @author: Victor Barres
 
 Defines visual scene structure related classes for TCG.
