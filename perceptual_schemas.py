@@ -204,7 +204,7 @@ class VISUAL_WM(WM):
     def __init__(self, name='Visual_WM'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_fixation')
-        self.add_port('IN', 'from_perceptual_LTM')
+        self.add_port('IN', 'from_percept_LTM')
         self.add_port('OUT', 'to_saliency_map')
         self.add_port('OUT', 'to_conceptualizer')
         self.perceptual_schemas = []
@@ -213,7 +213,7 @@ class VISUAL_WM(WM):
         """
         """
         sub_scene= self.get_input('from_fixation')
-        perceptual_knowledge = self.get_input('from_perceptual_LTM')
+        perceptual_knowledge = self.get_input('from_percept_LTM')
         self._update_schemas(sub_scene, perceptual_knowledge)
         self.set_output('to_conceptualizer', self.perceptual_schemas)
     
@@ -222,10 +222,10 @@ class VISUAL_WM(WM):
         """
         return
     
-class PERCEPTUAL_LTM(LTM):
+class PERCEPT_LTM(LTM):
     """
     """
-    def __init__(self, name='Perceptual_LTM'):
+    def __init__(self, name='Percept_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_visual_WM')
         self.perceptual_knowledge = None
