@@ -82,7 +82,7 @@ class K_NET:
         """
         self.nodes = []
         self.edges = []
-        self.create_NX_graph()
+        self._create_NX_graph()
     
     def add_ent(self, k_ent):
         """
@@ -96,12 +96,12 @@ class K_NET:
             return False
         
         # Check duplication
-        if self.find_meaning(k_ent.meaning):
+        if self._find_meaning(k_ent.meaning):
             return False
         
         # Add new semantic entity
         self.nodes.append(k_ent)
-        self.create_NX_graph()
+        self._create_NX_graph()
         return True
         
     def add_relation(self, k_rel):
@@ -124,15 +124,45 @@ class K_NET:
                 return False
         
         # Check that source and target of relation are defined.
-        if not(self.find_meaning(k_rel.pFrom.meaning)) or not(self.find_meaning(k_rel.pTo.meaning)):
+        if not(self._find_meaning(k_rel.pFrom.meaning)) or not(self._find_meaning(k_rel.pTo.meaning)):
             return False
         
         # Add new relation
         self.edges.append(k_rel)
-        self.create_NX_graph()
+        self._create_NX_graph()
         return True
+    
+    def shortest_path(self, from_ent, to_ent, rel_types=['is_a']):
+        """
+        Returns the length of the shortest path, if it exists, between from_cpt and to_cpt in the k_net graph.
+        Only considers the edges of type belonging to rel_types.
         
-    def create_NX_graph(self):
+        If no path exists, returns -1
+        
+        Relies on NetworkX implementation of path length
+        
+        Args:
+            - from_ent (K_ENT): Origin
+            - to_cpt (K_ENT): Target
+        """
+        path_len = -1
+        graph = self.graph.copy() # Not efficient...
+        
+        #Only keep the relevant edges
+        to_remove =[]
+        for u,v,d in graph.edges_iter(data=True):
+            if not(d['type'] in rel_types):
+                to_remove.append((u,v))
+        graph.remove_edges_from(to_remove)
+        
+        try:
+            path_len = nx.shortest_path_length(graph, source=from_ent.id, target=to_ent.id, weight=None)
+        except nx.NetworkXNoPath:
+            return path_len
+            
+        return path_len
+    
+    def _create_NX_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
             graph.add_node(node.id, meaning=node.meaning)
@@ -141,7 +171,7 @@ class K_NET:
         
         self.graph = graph
     
-    def find_meaning(self, meaning):
+    def _find_meaning(self, meaning):
         """
         Find k_ent with meaning "meaning". Returns the entity if found, else returns None.
         
@@ -153,3 +183,87 @@ class K_NET:
                 return n
         
         return None
+    
+    def satisfy_rel(self, ent1, rel_type, ent2):
+        """
+        """
+        if ent1 and ent2:
+            if not(self.graph.has_edge(ent1.id, ent2.id)):
+                return False
+            else:
+                edge_data = self.graph.get_edge_data(ent1.id, ent2.id)
+                if not(rel_type):
+                    return [(ent1, edge_data['type'], ent2)]
+                elif edge_data['type'] == rel_type:
+                    return [(ent1, rel_type, ent2)]
+                else:
+                    return []     
+        elif ent1 and not(ent2):
+            successors = self.graph.successors(ent1.id)
+            res = []
+            for s in successors:
+                res.extend(self.satisfy_rel(ent1, rel_type, ent2))
+            return res
+        elif not(ent1) and ent2:
+            predecessors = self.graph.predecessors(ent2.id)
+            res = []
+            for p in predecessors:
+                res.extend(self.satisfy_rel(ent1, rel_type, ent2))
+            return res
+        else:
+            res = []
+            for ent1 in self.nodes:
+                for ent2 in self.nodes:
+                    res.extend(self.satisfy_rel(ent1, rel_type, ent2))
+            return res
+    
+    def _similarity(self, ent1, ent2):
+        """
+        Returns a similarity score between ent1 and ent2.
+        Uses path similarity.
+        Args:
+            - ent1 (K_ENT):
+            - ent2 (K_ENT):
+        
+        Examples for is-a taxonomy (e.g. Wordnet):
+            Path similarity: 1/(L+1), L=shortest path distance
+            Leackock-Chodrow Similarity: -log(L/2*D) where L=shortest path length, D=taxonomy depth
+            Wu-Palmer Similarlity: 2*depth(lcs)/(depth(s1) + depth(s2)), lcs = Least Common Subsumer.
+            Resnik Similarity (Corpus dependent): IC(lcs)
+            Lin Similarity (Corpus dependent): 2*IC(lcs)/(IC(s1) + IC(s2))
+            Jiang & Conrath Similarity:  1/jcn_distance, jcn_distance =  IC(s1) + IC(s2) - 2 * IC(lcs). 
+            See: http://maraca.d.umn.edu/umls_similarity/similarity_measures.html
+        Note:
+            - ONLY PATH SIMILARITY IMPLEMENTED
+            - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...
+        """
+        L = self.shortest_path(ent1, ent2)
+        if L == -1: # Case no path found
+            sim = 0
+        else:
+            sim = 1.0/(1.0 + L)
+        return sim
+    
+    def _match(self, ent1, ent2, match_type = "is_a"):
+        """        
+        Check if ent1 matches ent2. 
+        Type = "is_a":  ent1 matches ent2 if ent2 is a hyponym of ent2 (or equal to ent2)
+        Type = "equal": ent1 matches ent2 iff ent1 is equal to ent2.
+        
+        Args:
+            - ent1 (K_ENT)
+            - ent2 (K_ENT)
+            - match_type (STR): "is_a" or "equal"
+        
+        Notes:
+            - In the currrent version matching is boolean. No impact of distance on similarity.
+            See similarity()
+        
+        """
+        dist = self.shortest_path(ent1, ent2)
+        if (match_type == "is_a" and dist >= 0):
+            return True
+        elif (match_type == "equal" and dist == 0):
+            return True
+        return False
+        

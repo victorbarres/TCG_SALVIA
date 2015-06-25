@@ -3,191 +3,91 @@
 @author: Victor Barres
 
 Define semantic network related classes for TCG.
-
-Uses NetworkX module to represent the semantic net.
 """
-import networkx as nx
+from knowledge_rep import K_ENT, K_REL, K_NET
 
-class CONCEPT:
+class CONCEPT(K_ENT):
     """
-    Semantic entity
+    Conceptual knowledge entity
     
     Data:
         - id (INT): Unique identifier of the entity.
         - meaning (STR): Meaning associated with the semantic entity. A string for now.
-    
-    Note:
-        - '==' has to be defined for meaning.
+
     """
-    SEMANTIC_NETWORK = None
-    ID_NEXT = 1 # Global concept counter    
+    CONCEPTUAL_KNOWLEDGE= None  
     def __init__(self, name='',  meaning=''):
-        self.id = CONCEPT.ID_NEXT
-        CONCEPT.ID_NEXT += 1
-        self.name = name
-        self.meaning = meaning # Concept meaning
+        K_ENT.__init__(self, name=name, meaning=meaning)
     
     def match(self, cpt, match_type = "is_a"):
         """
         Check if it matches cpt. 
-        Uses SEM_NET.match() method.
+        Uses CONCEPTUAL_KNOWLEDGE.match() method.
             Type = "is_a":  concept1 matches concept2 if concept1 is a hyponym of concept2 (or equal to concept2)
             Type = "equal": concept1 matches concept2 if concept1 is equal to concept2.
         """
-        return CONCEPT.SEMANTIC_NETWORK.match(self, cpt, match_type)
+        return CONCEPT.CONCEPTUAL_KNOWLEDGE.match(self, cpt, match_type)
     
     def similarity(self, cpt):
         """
         Returns a similarity score with cpt.
-        Uses SEM_NET.similarity() method.
+        Uses CONCEPTUAL_KNOWLEDGE.similarity() method.
         """
-        return CONCEPT.SEMANTIC_NETWORK.similarity(self ,cpt)
+        return CONCEPT.CONCEPTUAL_KNOWLEDGE.similarity(self ,cpt)
     
-    def __eq__(self, other):
-        is_equal = (isinstance(other, self.__class__) and 
-            (self.id == other.id) and
-            (self.meaning == other.meaning))
-        return is_equal
-    
-class SEM_REL:
+class SEM_REL(K_REL):
     """
-    Semantic Relation
+    Semantic relation between concept
     
     Data:
         - type (STR): Type of relation.
         - pFrom (CONCEPT):  Source concept.
         - pTo (CONCEPT): Target concept.
     
-    Note: ONLY IS-A IMPLEMENTED FOR NOW.
+    Note: ONLY is_a IMPLEMENTED FOR NOW.
     """    
-    def __init__(self, aType = 'UNDEFINED', from_sem = None, to_sem = None):
-        self.type = aType
-        self.pFrom = from_sem 
-        self.pTo= to_sem
-        
-    def __eq__(self, other):
-        is_equal = (isinstance(other, self.__class__) and 
-            (self.type == other.type) and
-            (self.pFrom == other.pFrom) and 
-            (self.pTo == other.pTo))
-        return is_equal
-    
-    def __str__(self):
-        p = "%s %s %s" % (self.pFrom.meaning, self.type, self.pTo.meaning)
-        return p
+    def __init__(self, aType = 'UNDEFINED', from_cpt = None, to_cpt = None):
+        K_REL.__init__(self,aType = aType, from_ent=from_cpt, to_ent = to_cpt)
 
-class SEM_NET:
+class CONCEPTUAL_KNOWLEDGE(K_NET):
     """
-    Semantic network.
+    Conceptual knowledge. Implemented as a semantic network.
     
-    Data:
+    Data(inherited):
         - nodes ([CONCEPT]): List of concepts.
         - edges ([SEM_REL]): List of semantic relations.
         - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.
             Each node has an additional attributes meaning = concept.meaning
             Each edge has an additional attribute type = sem_rel.type
+    
     """
     def __init__(self, nodes=[], edges=[]):
-        self.nodes = nodes
-        self.edges = edges
-        self.graph = None
+        K_NET.__init__(self, nodes=nodes, edges=edges)
+       
+    def concepts(self):
+        """
+        Returns all the concepts
+        """
+        return self.nodes
     
-    def clear(self):
+    def has_concept(self, concept_name):
         """
-        Clear all.
-        """
-        self.nodes = []
-        self.edges = []
-        self._create_NX_graph()
-    
-    def add_concept(self, concept):
-        """
-        Add a concept to the semantic network
+        Returns true iff there is a concept with name "name".
         
         Args:
-            concept (CONCEPT): A semantic entity
+            - conceot_name (STR):
         """
-        # Check validity        
-        if(not(isinstance(concept, CONCEPT)) or not(concept.meaning)):
-            return False
+        return self._has_entity(concept_name)
         
-        # Check duplication
-        if self.find_meaning(concept.meaning):
-            return False
-        
-        # Add new semantic entity
-        self.nodes.append(concept)
-        self._create_NX_graph()
-        return True
-        
-    def add_relation(self, sem_rel):
-        """
-        Add a relation to the semantic network
-        
-        Args:
-            sem_rel (SEM_REL): A semantic relation
-        """        
-        # Check validity
-        if (not(isinstance(sem_rel, SEM_REL)) or 
-            (sem_rel.type == 'UNDEFINED') or 
-            not(sem_rel.pFrom) or 
-            not(sem_rel.pTo)):
-            return False
-        
-        # Check duplication
-        for r in self.edges:
-            if r == sem_rel:
-                return False
-        
-        # Check that source and target of relation are defined.
-        if not(self.find_meaning(sem_rel.pFrom.meaning)) or not(self.find_meaning(sem_rel.pTo.meaning)):
-            return False
-        
-        # Add new relation
-        self.edges.append(sem_rel)
-        self._create_NX_graph()
-        return True
-        
-    def _create_NX_graph(self):
-        graph = nx.DiGraph()
-        for node in self.nodes:
-            graph.add_node(node.id, meaning=node.meaning)
-        for edge in self.edges:
-            graph.add_edge(edge.pFrom.id, edge.pTo.id, type= edge.type)
-        
-        self.graph = graph
-    
     def find_meaning(self, meaning):
         """
         Find concept with meaning "meaning". Returns the concept if found, else returns None.
         
         Args:
-            - meaning (): Meaning of a concept.
+            - meaning (): Meaning of a concept
         """
-        for n in self.nodes:
-            if n.meaning == meaning:
-                return n
-        
-        return None
-    
-                
-    def shortest_path(self, from_cpt, to_cpt):
-        """
-        Returns the length of the shortest path, if it exists, between from_cpt and to_cpt in the SemNet graph.
-        If no path exists, returns -1
-        
-        Args:
-            - from_cpt (CONCEPT): Origin
-            - to_cpt (CONCEPT): Target
-        """
-        path_len = -1
-        try:
-            path_len = nx.shortest_path_length(self.graph, source=from_cpt.id, target=to_cpt.id, weight=None)
-        except nx.NetworkXNoPath:
-            return path_len
-            
-        return path_len
-     
+        return self._find_meaning(meaning)
+                     
     def similarity(self, cpt1, cpt2):
         """
         Returns a similarity score between cpt1 and cpt2.
@@ -208,18 +108,13 @@ class SEM_NET:
             - ONLY PATH SIMILARITY IMPLEMENTED
             - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...
         """
-        L = self.shortest_path(cpt1, cpt2)
-        if L == -1: # Case no path found
-            sim = 0
-        else:
-            sim = 1.0/(1.0 + L)
-        return sim
+        return self._similarity(cpt1, cpt2)
     
     def match(self, cpt1, cpt2, match_type = "is_a"):
         """        
         Check if cpt1 matches cpt2. 
-        Type = "is_a":  cpt1 matches ent2 if cpt2 is a hyponym of cpt2 (or equal to cpt2)
-        Type = "equal": cpt1 matches cpt2 iff ent1 is equal to cpt2.
+        Type = "is_a":  cpt1 matches cpt2 if cpt2 is a hyponym of cpt2 (or equal to cpt2)
+        Type = "equal": cpt1 matches cpt2 iff cpt1 is equal to cpt2.
         
         Args:
             - cpt1 (CONCEPT)
@@ -231,12 +126,7 @@ class SEM_NET:
             See similarity()
         
         """
-        dist = self.shortest_path(cpt1, cpt2)
-        if (match_type == "is_a" and dist >= 0):
-            return True
-        elif (match_type == "equal" and dist == 0):
-            return True
-        return False
+        return self._match(cpt1, cpt2, match_type=match_type)
 
 ###############################################################################
 if __name__=='__main__':

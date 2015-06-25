@@ -17,24 +17,56 @@ class PERCEPT(K_ENT):
         - meaning (): Meaning associated with the percept
 
     """
-    SEMANTIC_NETWORK = None  
+    PERCEPTUAL_KNOWLEDGE = None  
     def __init__(self, name='',  meaning=''):
         K_ENT.__init__(self, name=name, meaning=meaning)
+        
+class PERCEPT_CAT(PERCEPT):
+    """
+    Perceptual knowledge category
     
+    Data:
+        - id (INT): Unique identifier of the entity.
+        - meaning (): Meaning associated with the category
+
+    """
+    SEMANTIC_NETWORK = None  
+    def __init__(self, name='',  meaning=''):
+        PERCEPT.__init__(self, name=name, meaning=meaning)
+
+class PERCEPT_TOKEN(PERCEPT):
+    """
+    Perceptual knowledge TOKEN PERCEPT
+    
+    Data:
+        - id (INT): Unique identifier of the entity.
+        - meaning (): Meaning associated with the category
+
+    """
+    SEMANTIC_NETWORK = None  
+    def __init__(self, name='',  meaning=''):
+        PERCEPT.__init__(self, name=name, meaning=meaning)
+    
+    def category(self):
+        """
+        Returns the perceptual cateory of the token
+        """
+        
+        
 class SEM_REL(K_REL):
     """
-    Semantic Relation
+    Semantic relation between pecepts.
     Type implemented:
         - 'is_a'
-        - 'has_token'
+        - 'is_token'
     
     Data:
         - type (STR): Type of relation.
         - pFrom (PERCEPT):  Source percept.
         - pTo (PERCEPT): Target precept.
     """    
-    def __init__(self, aType = 'UNDEFINED', from_sem = None, to_sem = None):
-        K_REL.__init__(self,aType = aType, from_ent=from_sem, to_ent = to_sem)
+    def __init__(self, aType = 'UNDEFINED', from_per = None, to_per = None):
+        K_REL.__init__(self,aType = aType, from_ent=from_per, to_ent = to_per)
 
 class PERCEPTUAL_KNOWLEDGE(K_NET):
     """
@@ -50,76 +82,38 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
     def __init__(self, nodes=[], edges=[]):
         K_NET.__init__(self, nodes=nodes, edges=edges)
     
-    def clear(self):
+    def percepts(self, type='ALL'):
         """
-        Clear all.
+        Returns a list of all percepts (type='ALL'), of all perceptual_category (type='CAT'), of all tokens ('type'='TOKEN')
         """
-        self.nodes = []
-        self.edges = []
-        self._create_NX_graph()
-    
-    def add_concept(self, concept):
-        """
-        Add a concept to the semantic network
-        
-        Args:
-            concept (CONCEPT): A semantic entity
-        """
-        self.add_ent(concept)    
-                
-    def shortest_path(self, from_cpt, to_cpt):
-        """
-        Returns the length of the shortest path, if it exists, between from_cpt and to_cpt in the SemNet graph.
-        If no path exists, returns -1
-        
-        Args:
-            - from_cpt (CONCEPT): Origin
-            - to_cpt (CONCEPT): Target
-        """
-        path_len = -1
-        try:
-            path_len = nx.shortest_path_length(self.graph, source=from_cpt.id, target=to_cpt.id, weight=None)
-        except nx.NetworkXNoPath:
-            return path_len
-            
-        return path_len
-     
-    def similarity(self, cpt1, cpt2):
-        """
-        Returns a similarity score between cpt1 and cpt2.
-        Uses path similarity.
-        Args:
-            - cpt1 (CONCEPT):
-            - cpt2 (CONCEPT):
-        
-        Examples for is-a taxonomy (e.g. Wordnet):
-            Path similarity: 1/(L+1), L=shortest path distance
-            Leackock-Chodrow Similarity: -log(L/2*D) where L=shortest path length, D=taxonomy depth
-            Wu-Palmer Similarlity: 2*depth(lcs)/(depth(s1) + depth(s2)), lcs = Least Common Subsumer.
-            Resnik Similarity (Corpus dependent): IC(lcs)
-            Lin Similarity (Corpus dependent): 2*IC(lcs)/(IC(s1) + IC(s2))
-            Jiang & Conrath Similarity:  1/jcn_distance, jcn_distance =  IC(concept1) + IC(concept2) - 2 * IC(lcs). 
-            See: http://maraca.d.umn.edu/umls_similarity/similarity_measures.html
-        Note:
-            - ONLY PATH SIMILARITY IMPLEMENTED
-            - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...
-        """
-        L = self.shortest_path(cpt1, cpt2)
-        if L == -1: # Case no path found
-            sim = 0
+        if type=='ALL':
+            return self.nodes
+        elif type=='CAT':
+            return [per for per in self.nodes if isinstance(per, PERCEPT_CAT)]
+        elif type=='TOKEN':
+            return [per for per in self.nodes if isinstance(per, PERCEPT_TOKEN)]
         else:
-            sim = 1.0/(1.0 + L)
-        return sim
+            print 'invalid type'
+            return None
     
-    def match(self, cpt1, cpt2, match_type = "is_a"):
-        """        
-        Check if cpt1 matches cpt2. 
-        Type = "is_a":  cpt1 matches ent2 if cpt2 is a hyponym of cpt2 (or equal to cpt2)
-        Type = "equal": cpt1 matches cpt2 iff ent1 is equal to cpt2.
+    def has_percept(self, percept_name):
+        """
+        Returns true iff there is a percept with name "name".
         
         Args:
-            - cpt1 (CONCEPT)
-            - cpt2 (CONCEPT)
+            - percept_name (STR):
+        """
+        return self._has_entity(percept_name)
+    
+    def match(self, per1, per2, match_type = "is_a"):
+        """        
+        Check if per1 matches per2. 
+        Type = "is_a":  per1 matches per2 if cpt2 is a hyponym of per2 (or equal to per2)
+        Type = "equal": per1 matches per2 iff per1 is equal to per2.
+        
+        Args:
+            - per1 (PERCEPT)
+            - per2 (PERCEPT)
             - match_type (STR): "is_a" or "equal"
         
         Notes:
@@ -127,13 +121,38 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
             See similarity()
         
         """
-        dist = self.shortest_path(cpt1, cpt2)
-        if (match_type == "is_a" and dist >= 0):
-            return True
-        elif (match_type == "equal" and dist == 0):
-            return True
-        return False
+        return self._match(per1, per2, match_type=match_type)
 
+class CONCEPTUALIZATION:
+    """
+    Knowledge of conceptualization relations mapping percepts onto concepts.
+    
+    Data:
+        - per2cpt (DICT): Mapping from percept to concept.
+    
+    Note:
+        - For now a percept is only associated with a single conept.
+
+    """
+    def __init__(self):
+        self.per2cpt = {}
+    
+    def add_mapping(self, per, cpt):
+        """
+        Add a mapping from per (STR) name of a percept (PERCEPT) to cpt (str) name of concept (CONCEPT)
+        """
+        if not(per in self.per2cpt):
+            self.per2cpt[per] = cpt
+        else:
+            print "Percept %s already associated with concept %s" %(per, self.per2cpt[per])
+        
+    
+    def conceptualize(self, per):
+        """
+        For now simply returns the concept associated with per.
+        """
+        return self.per2cpt[per]
+    
 ###############################################################################
 if __name__=='__main__':
     print "NOTHING IMPLEMENTED"

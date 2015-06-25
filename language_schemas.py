@@ -159,7 +159,7 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
     def match(self, cpt_inst, match_type = "is_a"):
         """
         Check if it;s concept matches that of cpt_inst. 
-        Uses SEM_NET.match() method.
+        Uses CONCEPTUAL_KNOWLEDGe.match() method.
             Type = "is_a":  concept1 matches concept2 if concept1 is a hyponym of concept2 (or equal to concept2)
             Type = "equal": concept1 matches concept2 if concept1 is equal to concept2.
         """
@@ -168,7 +168,7 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
     def similarity(self, cpt_inst):
         """
         Returns a similarity score between it's concept and that of cpt_inst.
-        Uses SEM_NET.similarity() method.
+        Uses CONCEPTUAL_KNOWLEDGE.similarity() method.
         """
         return self.content['concept'].similarity(cpt_inst.content['concept'])
 
@@ -204,7 +204,37 @@ class CONCEPT_LTM(LTM):
     def __init__(self, name='Concept_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_conceptualizer')
-        self.SemNet = None
+        self.cpt_knowledge = None
+        self.init_act = 1
+        
+    def initialize(self, cpt_knowledge):
+        """
+        Initilize the state of the CONCEPTUAL LTM with cpt_schema based on the content of cpt_knowledge
+       
+        Args:
+            - cpt_knowledge (CONCEPTUAL_KNOWLEDGE):
+        """
+        self.cpt_knowledge = cpt_knowledge
+        
+        entity = cpt_knowledge.find_meaning('ENTITY')
+        action = cpt_knowledge.find_meaning('ACTION')
+        prop = cpt_knowledge.find_meaning('PROPERTY')
+        rel = cpt_knowledge.find_meaning('RELATION')
+        for concept in cpt_knowledge.concepts():
+            new_schema = None
+            if cpt_knowledge.match(concept, entity, match_type="is_a"):
+                new_schema = CPT_ENTITY_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+            elif cpt_knowledge.match(concept, action, match_type="is_a"):
+                new_schema = CPT_ACTION_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+            elif cpt_knowledge.match(concept, prop, match_type="is_a"):
+                new_schema = CPT_PROPERTY_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+            elif cpt_knowledge.match(concept, rel, match_type="is_a"):
+                new_schema = CPT_RELATION_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+            else:
+                print "%s: unknown concept type" %concept.meaning
+            
+            if new_schema:
+                self.add_schema(new_schema)
     
     def update(self):
         self.set_output('to_conceptualizer', self.schemas)
@@ -836,7 +866,20 @@ class GRAMMATICAL_LTM(LTM):
     """
     def __init__(self, name='Grammatical_LTM'):
         LTM.__init__(self, name)
+        self.grammar = None
         self.add_port('OUT', 'to_cxn_retrieval')
+        self.init_act = 0.5 #The initial activation value for cxn schema.
+    
+    def initialize(self, grammar):
+        """
+        Initilize the state of the GRAMMATICAL LTM with cxn_schema based on the content of grammar.
+        Args:
+            - grammar (GRAMMAR): A TCG grammar
+        """
+        self.grammar = grammar
+        for cxn in grammar.constructions:
+            new_cxn_schema = CXN_SCHEMA(cxn, self.init_act)
+            self.add_schema(new_cxn_schema)
 
     def update(self):
         """

@@ -1,24 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 10 2014
-
 @author: Victor Barres
 
-TCG 1.1 data loader module
+TCG data loader module
     
     This version requires JSON formatted inputs!
 
-    Loader for grammar, scenes and conceptual knowledge.
+    Loader for world knowledge, grammar, and scenes.
     
+    To load conceptual knowledge use load_conceptual_knowledge function (returns a conceptual_knowledge)
+    To load perceptual knowledge use load_perceptual_knowledge function (returns a perceptual_knowledge)
+    To load conceptualization use function load_conceptualization (returns a conceptualization)
     To load grammar use load_grammar function (returns a grammar)
     To load visual scene use load_scene function (returns a scene)
-    To load conceptual knowledge use function (returns a SemNet)
     
     All other functions should be considered private and are subject to change.
 """
 import json
 
-import concept2 as cpt
+import concept as cpt
+import percept as per
 import construction as cxn
 import scene as scn
 
@@ -42,38 +43,66 @@ def json_read(file_name, path='./'):
 ### Private object reading functions ###
 ########################################
 
-###########
-### SEM ###
-def read_sem(atype, sup_cpt, sem_net, aSemantics):
+###############
+### CONCEPT ###
+def read_concept(atype, sup_cpt, cpt_knowledge, cpt_data):
     
-    for meaning in aSemantics:
-        # Create new semantic entity
-        sub_cpt = cpt.CONCEPT(name=meaning, meaning=meaning)
-        sem_net.add_concept(sub_cpt)
+    for concept in cpt_data:
+        # Create new concept entity
+        sub_cpt = cpt.CONCEPT(name=concept, meaning=concept)
+        cpt_knowledge.add_ent(sub_cpt)
 
-        # Create new semantic relation
-        new_semrel = cpt.SEM_REL()
-        new_semrel.type = atype
-        new_semrel.pFrom = sub_cpt
-        new_semrel.pTo = sup_cpt
+        # Create new concept relation
+        new_semrel = cpt.SEM_REL(aType=atype, from_cpt=sub_cpt, to_cpt=sup_cpt)
         
         # update sem_net
-        flag = sem_net.add_relation(new_semrel)
+        flag = cpt_knowledge.add_relation(new_semrel)
         if not(flag):
             return False
         
-        flag = read_sem(atype, sub_cpt, sem_net, aSemantics[meaning])
+        flag = read_concept(atype, sub_cpt, cpt_knowledge, cpt_data[concept])
         if not(flag):
             return False
     
     return True
 
+###############
+### PERCEPT ###
+def read_percept(atype, sup_per, per_knowledge, per_data):
+    
+    for percept in per_data:
+        # Create new percept entity
+        sub_per = per.PERCEPT_CAT(name=percept, meaning=percept)
+        per_knowledge.add_ent(sub_per)
+
+        # Create new percept relation
+        new_semrel = per.SEM_REL(aType=atype, from_per=sub_per, to_per=sup_per)
+        
+        # update sem_net
+        flag = per_knowledge.add_relation(new_semrel)
+        if not(flag):
+            return False
+        
+        if(isinstance(per_data[percept], list)):
+            for token in per_data[percept]:
+                tok_per = per.PERCEPT_TOKEN(name=token, meaning=token)
+                per_knowledge.add_ent(tok_per)
+                 # Create new percept relation
+                new_semrel = per.SEM_REL(aType='is_token', from_per=tok_per, to_per=sub_per)
+
+        else:
+            flag = read_percept('is_a', sub_per, per_knowledge, per_data[percept])
+            if not(flag):
+                return False
+    
+    return True
+
 ###########
 ### CXN ###
-# CXN CAN ONLY BE LOADED ONCE THE CONCEPTUAL KNOWLEDGE HAS BEEN LOADED IN A SEM_NET.
+# CXN CAN ONLY BE LOADED ONCE THE CONCEPTUAL KNOWLEDGE HAS BEEN LOADED IN A CONCEPTUAL_KNOWLEDGE.
 # NEED TO ADD PROPER TRUE/FALSE RETURN VALUES FOR ALL THOSE FUNCTIONS
 
-def read_node(new_cxn, aNode, name_table, SemNet):
+def read_node(new_cxn, aNode, name_table, cpt_knowledge):
     """
     """
     # Create new node
@@ -81,7 +110,7 @@ def read_node(new_cxn, aNode, name_table, SemNet):
     name = aNode['name']
     new_node.name = '%s_%i' %(name, new_node.id)
     
-    concept = SemNet.find_meaning(aNode['concept'])
+    concept = cpt_knowledge.find_meaning(aNode['concept'])
     new_node.concept = concept
     
     new_node.head = aNode['head']
@@ -93,7 +122,7 @@ def read_node(new_cxn, aNode, name_table, SemNet):
     name_table['SemNodes'][name] = new_node
     name_table['names'][name] = new_node.name
 
-def read_rel(new_cxn, aRel, name_table, SemNet):
+def read_rel(new_cxn, aRel, name_table, cpt_knowledge):
     """
     """    
     # Create new relation
@@ -102,7 +131,7 @@ def read_rel(new_cxn, aRel, name_table, SemNet):
     new_rel.name = '%s_%i' %(name, new_rel.id)
     
     
-    concept = SemNet.find_meaning(aRel['concept'])
+    concept = cpt_knowledge.find_meaning(aRel['concept'])
     new_rel.concept = concept
 
     
@@ -151,13 +180,13 @@ def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER TH
     name_table['SynForms'][name] = new_phon
     name_table['names'][name] = new_phon.name
             
-def read_semframe(new_cxn, SemFrame, name_table, SemNet):
+def read_semframe(new_cxn, SemFrame, name_table, cpt_knowledge):
     """
     """
     for node in SemFrame['nodes']:
-        read_node(new_cxn, node, name_table, SemNet)
+        read_node(new_cxn, node, name_table, cpt_knowledge)
     for rel in SemFrame['edges']:
-        read_rel(new_cxn, rel, name_table, SemNet)
+        read_rel(new_cxn, rel, name_table, cpt_knowledge)
     
     for rel_name, node_pair in name_table['SemEdges'].iteritems(): # Creating SemFrame relations
         from_name = node_pair[0]
@@ -190,7 +219,7 @@ def read_symlinks(new_cxn, sym_links, name_table):
         form_name = name_table['names'][val]
         new_cxn.add_sym_link(sem_name, form_name)
           
-def read_cxn(grammar, aCxn, SemNet):
+def read_cxn(grammar, aCxn, cpt_knowledge):
     """
     """
     # Create new cxn  
@@ -204,7 +233,7 @@ def read_cxn(grammar, aCxn, SemNet):
     name_table = {'SemNodes':{}, 'SemEdges':{}, 'SynForms':{}, 'names':{}}
     
     # READ SEMFRAME
-    read_semframe(new_cxn, aCxn['SemFrame'], name_table, SemNet)
+    read_semframe(new_cxn, aCxn['SemFrame'], name_table, cpt_knowledge)
         
     # READ SYNFORM
     read_synform(new_cxn, aCxn['SynForm'], name_table)
@@ -221,132 +250,177 @@ def read_cxn(grammar, aCxn, SemNet):
 #############
 ### SCENE ###
 
-def read_sc_obj(new_rgn, aObj, name_table):
-    # Create new object
-    new_obj = scn.SC_OBJECT()
-    new_obj.name = aObj['name']
-    new_obj.region = new_rgn
-    
-    new_concept = cpt.CONCEPT()
-    new_concept.create(meaning = aObj['concept'])
-    new_obj.concept = new_concept
-    
-     # Update region and name_table
-    if name_table['schemas'].has_key(new_obj.name):
-        return False
-    
-    name_table['schemas'][new_obj.name] = new_obj
-    return True 
-    
-def read_sc_rel(new_rgn, aRel, name_table):
-    # Create new object
-    new_rel = scn.SC_REL()
-    new_rel.name = aRel['name']
-    new_rel.region = new_rgn
-    
-    new_concept = cpt.CONCEPT()
-    new_concept.create(meaning = aRel['concept'])
-    new_rel.concept = new_concept
-        
-    # Update region and name_table
-    if name_table['schemas'].has_key(new_rel.name):
-        return False
-    
-    name_table['schemas'][new_rel.name] = new_rel
-    name_table['edges'][new_rel.name] = (aRel['from'], aRel['to'])
-    return True
-
-def read_percept(new_rgn, perceive, name_table):
-    for schema_name in perceive:
-         # Create new percept
-        new_per = scn.PERCEPT()
-        # Update region and name table
-        new_rgn.percepts.append(new_per)
-        name_table['percepts'][new_per] = schema_name
-        
-    if not(name_table['percepts'].keys()):
-            return False
-        
-    return True
-
-def read_update(new_rgn, updates, name_table):
-    for sc_name, new_meaning in updates.iteritems():
-        # Create new percept
-        new_per = scn.PERCEPT()
-        new_concept = cpt.CONCEPT(meaning = new_meaning)
-        new_per.concept = new_concept
-        new_per.replace_concept = True
-        # Update region name table
-        new_rgn.percepts.append(new_per)
-        name_table['percepts'][new_per] = sc_name
-            
-def read_region(scene, aRgn, name_table):
-    # Create new region
-    new_rgn = scn.REGION()
-    new_rgn.name = aRgn['name']
-    
-    new_rgn.x = aRgn['location'][0]
-    new_rgn.y = aRgn['location'][1]
-    
-    new_rgn.w = aRgn['size'][0]
-    new_rgn.h = aRgn['size'][1]
-    
-    new_rgn.saliency = aRgn['saliency']
-    new_rgn.uncertainty = aRgn['uncertainty']
-    
-    for schema in aRgn['schemas']:
-        if schema['type']=='OBJ':
-            flag = read_sc_obj(new_rgn, schema, name_table)
-            if not(flag):
-                return False
-        elif schema['type']=='REL':
-            flag = read_sc_rel(new_rgn, schema, name_table)
-            if not(flag):
-                return False
-        else:
-            return False
-    
-    flag = read_percept(new_rgn, aRgn['perceive'], name_table)
-    if not(flag):
-        return False
-    
-    if aRgn.has_key('update'):
-        read_update(new_rgn, aRgn['update'], name_table)
-
-    flag = scene.add_region(new_rgn)
-    if not(flag):
-        return False
-    return True
+#def read_sc_obj(new_rgn, aObj, name_table):
+#    # Create new object
+#    new_obj = scn.SC_OBJECT()
+#    new_obj.name = aObj['name']
+#    new_obj.region = new_rgn
+#    
+#    new_concept = cpt.CONCEPT()
+#    new_concept.create(meaning = aObj['concept'])
+#    new_obj.concept = new_concept
+#    
+#     # Update region and name_table
+#    if name_table['schemas'].has_key(new_obj.name):
+#        return False
+#    
+#    name_table['schemas'][new_obj.name] = new_obj
+#    return True 
+#    
+#def read_sc_rel(new_rgn, aRel, name_table):
+#    # Create new object
+#    new_rel = scn.SC_REL()
+#    new_rel.name = aRel['name']
+#    new_rel.region = new_rgn
+#    
+#    new_concept = cpt.CONCEPT()
+#    new_concept.create(meaning = aRel['concept'])
+#    new_rel.concept = new_concept
+#        
+#    # Update region and name_table
+#    if name_table['schemas'].has_key(new_rel.name):
+#        return False
+#    
+#    name_table['schemas'][new_rel.name] = new_rel
+#    name_table['edges'][new_rel.name] = (aRel['from'], aRel['to'])
+#    return True
+#
+#def read_percept(new_rgn, perceive, name_table):
+#    for schema_name in perceive:
+#         # Create new percept
+#        new_per = scn.PERCEPT()
+#        # Update region and name table
+#        new_rgn.percepts.append(new_per)
+#        name_table['percepts'][new_per] = schema_name
+#        
+#    if not(name_table['percepts'].keys()):
+#            return False
+#        
+#    return True
+#
+#def read_update(new_rgn, updates, name_table):
+#    for sc_name, new_meaning in updates.iteritems():
+#        # Create new percept
+#        new_per = scn.PERCEPT()
+#        new_concept = cpt.CONCEPT(meaning = new_meaning)
+#        new_per.concept = new_concept
+#        new_per.replace_concept = True
+#        # Update region name table
+#        new_rgn.percepts.append(new_per)
+#        name_table['percepts'][new_per] = sc_name
+#            
+#def read_region(scene, aRgn, name_table):
+#    # Create new region
+#    new_rgn = scn.REGION()
+#    new_rgn.name = aRgn['name']
+#    
+#    new_rgn.x = aRgn['location'][0]
+#    new_rgn.y = aRgn['location'][1]
+#    
+#    new_rgn.w = aRgn['size'][0]
+#    new_rgn.h = aRgn['size'][1]
+#    
+#    new_rgn.saliency = aRgn['saliency']
+#    new_rgn.uncertainty = aRgn['uncertainty']
+#    
+#    for schema in aRgn['schemas']:
+#        if schema['type']=='OBJ':
+#            flag = read_sc_obj(new_rgn, schema, name_table)
+#            if not(flag):
+#                return False
+#        elif schema['type']=='REL':
+#            flag = read_sc_rel(new_rgn, schema, name_table)
+#            if not(flag):
+#                return False
+#        else:
+#            return False
+#    
+#    flag = read_percept(new_rgn, aRgn['perceive'], name_table)
+#    if not(flag):
+#        return False
+#    
+#    if aRgn.has_key('update'):
+#        read_update(new_rgn, aRgn['update'], name_table)
+#
+#    flag = scene.add_region(new_rgn)
+#    if not(flag):
+#        return False
+#    return True
             
 ################################           
 ### Public loading functions ###
 ################################
-def load_SemNet(file_name='', file_path='./'):
+def load_conceptual_knowledge(file_name='', file_path='./'):
     """
-    Loads and returns the semantic network defined in file_path\file_name. Return None if error.
+    Loads and returns the conceptual knowledge defined in file_path\file_name. Return None if error.
     """
     # Open and read file
-    sem_data = json_read(file_name, path=file_path)
     
-    # Create scene object
-    my_semnet = cpt.SEM_NET()
+    json_data = json_read(file_name, path=file_path)
+    cpt_data = json_data['CONCEPTUAL_KNOWLEDGE']
+    
+    # Create coneptual knowledge object
+    my_conceptual_knowledge = cpt.CONCEPTUAL_KNOWLEDGE()
     
     top = 'CONCEPTUAL_KNOWELDGE'
     top_cpt = cpt.CONCEPT(name=top, meaning=top)
-    my_semnet.add_concept(top_cpt)
+    my_conceptual_knowledge.add_ent(top_cpt)
     
-    flag = read_sem("IS-A", top_cpt, my_semnet, sem_data['CONCEPTUAL_KNOWLEDGE'])
+    flag = read_concept("is_a", top_cpt, my_conceptual_knowledge, cpt_data)
     if not(flag):
         return None
     
-    cpt.CONCEPT.SEMANTIC_NETWORK = my_semnet
+    cpt.CONCEPT.CONCEPTUAL_KNOWLEDGE = my_conceptual_knowledge
 
-    return my_semnet
+    return my_conceptual_knowledge
     
-def load_grammar(file_name='', file_path='./', SemNet = None):
+def load_perceptual_knowledge(file_name='', file_path='./'):
+    """
+    Load and returns the perceptual knowledge defined in file_path\file_name
+    """
+    #OPen and read file
+    json_data = json_read(file_name, path=file_path)
+    per_data = json_data['PERCEPTUAL_KNOWLEDGE']
+    
+    # Create peceptual_knowledge object
+    my_perceptual_knowledge = per.PERCEPTUAL_KNOWLEDGE()
+    
+    top = 'PERCEPTUAL_KNOWELDGE'
+    top_per = per.PERCEPT_CAT(name=top, meaning=top)
+    my_perceptual_knowledge.add_ent(top_per)
+    
+    flag = read_percept('is_a', top_per, my_perceptual_knowledge, per_data)
+    if not(flag):
+        return None
+    
+    per.PERCEPT.PERCEPTUAL_KNOWLEDGE =  my_perceptual_knowledge
+
+    return my_perceptual_knowledge
+
+def load_conceptualization(file_name='', file_path='./', cpt_knowledge=None, per_knowledge=None):
+    """
+    Load and returns the TCG conceptualization defined in file_path\file_name
+    Requires a cpt_knowledge (CONCEPTUAL_KNOWLEDGE) and a perceptual knowledge (PERCEPTUAL_KNOWLEDGE)
+    """
+    #OPen and read file
+    json_data = json_read(file_name, path=file_path)
+    czer_data = json_data['CONCEPTUALIZATION']
+    my_conceptualization = per.CONCEPTUALIZATION()
+    for cpt in czer_data:
+        if not(cpt_knowledge.has_concept(cpt)):
+            print "%s: concept not found in sem_net" %cpt
+        else:
+            for pcpt in czer_data[cpt]:
+                if not(per_knowledge.has_percept(pcpt)):
+                    print "%s: percept not found in perceptual knowledge" %pcpt
+            my_conceptualization.add_mapping(pcpt, cpt)
+    
+    return my_conceptualization
+    
+def load_grammar(file_name='', file_path='./', cpt_knowledge = None):
     """
     Loads and returns the TCG grammar defined in file_path\file_name.
-    Requires a SemNet.
+    Requires a cpt_knowledge (CONCEPTUAL_KNOWLEDGE).
     """        
     # Open and read file
     json_data = json_read(file_name, path = file_path)
@@ -356,70 +430,64 @@ def load_grammar(file_name='', file_path='./', SemNet = None):
     my_grammar = cxn.GRAMMAR()
     
     for aCxn in gram_data:
-        read_cxn(my_grammar, aCxn, SemNet)
+        read_cxn(my_grammar, aCxn, cpt_knowledge)
 
     return my_grammar
-
-def load_perceptual_knowledge(file_name='', file_path='./'):
-    """
-    Load and returns the set of perceptual schemas defined in file_path\file_name
-    """
-    #OPen and read file
-    json_data = json_read(file_name, path=file_path)
-    per_data = json_data['PERCEPTUAL_KNOWLEDGE']
-
-def load_scene(file_name = '', file_path = './'):
-    """
-    Loads and returns the visual scene defined in file_path\file_name. Return None if error.
-    """
-    # Open and read file
-    json_data = json_read(file_name, path = file_path)
-    scene_data = json_data['scene']
-    
-    # Create scene object
-    my_scene = scn.SCENE()
-    
-    my_scene.width = scene_data['resolution'][0]
-    my_scene.height = scene_data['resolution'][1]
-    
-    # Name table
-    name_table = {'schemas':{}, 'edges':{}, 'percepts':{}}
-    
-    for rgn in scene_data['regions']:
-        flag = read_region(my_scene, rgn, name_table)
-        if not(flag):
-            return None
-
-    # Building relations
-    for edge, pair in name_table['edges'].iteritems():
-        pFrom = pair[0]
-        pTo = pair[1]
-        
-        if(not(name_table['schemas'].has_key(edge) and
-                name_table['schemas'].has_key(pFrom) and
-                name_table['schemas'].has_key(pTo))):
-            return None
-        
-        name_table['schemas'][edge].pFrom = name_table['schemas'][pFrom]
-        name_table['schemas'][edge].pTo = name_table['schemas'][pTo]
-    
-    # Builind percepts
-    for percept, sc_name in name_table['percepts'].iteritems():
-        if not(name_table['schemas'].has_key(sc_name)):
-            return None
-        
-        percept.schema = name_table['schemas'][sc_name]
-    
-    # Storing schemas in the scene
-    for sc in name_table['schemas'].values():
-        my_scene.add_schema(sc)
-    
-    return my_scene
+            
+#def load_scene(file_name = '', file_path = './'):
+#    """
+#    Loads and returns the visual scene defined in file_path\file_name. Return None if error.
+#    """
+#    # Open and read file
+#    json_data = json_read(file_name, path = file_path)
+#    scene_data = json_data['scene']
+#    
+#    # Create scene object
+#    my_scene = scn.SCENE()
+#    
+#    my_scene.width = scene_data['resolution'][0]
+#    my_scene.height = scene_data['resolution'][1]
+#    
+#    # Name table
+#    name_table = {'schemas':{}, 'edges':{}, 'percepts':{}}
+#    
+#    for rgn in scene_data['regions']:
+#        flag = read_region(my_scene, rgn, name_table)
+#        if not(flag):
+#            return None
+#
+#    # Building relations
+#    for edge, pair in name_table['edges'].iteritems():
+#        pFrom = pair[0]
+#        pTo = pair[1]
+#        
+#        if(not(name_table['schemas'].has_key(edge) and
+#                name_table['schemas'].has_key(pFrom) and
+#                name_table['schemas'].has_key(pTo))):
+#            return None
+#        
+#        name_table['schemas'][edge].pFrom = name_table['schemas'][pFrom]
+#        name_table['schemas'][edge].pTo = name_table['schemas'][pTo]
+#    
+#    # Builind percepts
+#    for percept, sc_name in name_table['percepts'].iteritems():
+#        if not(name_table['schemas'].has_key(sc_name)):
+#            return None
+#        
+#        percept.schema = name_table['schemas'][sc_name]
+#    
+#    # Storing schemas in the scene
+#    for sc in name_table['schemas'].values():
+#        my_scene.add_schema(sc)
+#    
+#    return my_scene
             
         
 ###############################################################################
 if __name__=='__main__':
-    my_semnet = load_SemNet("TCG_semantics.json", "./data/semantics/")
-    my_grammar = load_grammar("TCG_grammar.json", "./data/grammars/", my_semnet)
+    my_conceptual_knowledge = load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_perceptual_knowledge = load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptualization = load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
+    my_grammar = load_grammar("TCG_grammar.json", "./data/grammars/", my_conceptual_knowledge)
     
     

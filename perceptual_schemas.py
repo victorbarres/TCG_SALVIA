@@ -75,10 +75,10 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     QUALITY_REL = 'QUALITY_REL'
     TEMP_REL = 'TEMP_REL'
     
-    def __init__(self):
-        KNOWLEDGE_SCHEMA.__init__(self)
+    def __init__(self, name, percept, init_act):
+        KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
         self.type = PERCEPT_SCHEMA.UNDEFINED
-        self.set_content({'features':None, 'area':None, 'saliency':None})
+        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None})
     
     def set_features(self, features):
         self.content['features'] = features
@@ -105,33 +105,33 @@ class PERCEPT_OBJECT(PERCEPT_SCHEMA):
     """
     Object schema
     """
-    def __init__(self):
-        PERCEPT_SCHEMA.__init__(self)
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.OBJECT
 
 class PERCEPT_ACTION(PERCEPT_SCHEMA):
     """
     Action schema. Define relation (edge) between two object schemas (SC_OBJECT) pFrom and pTo.
     """
-    def __init__(self):
-        PERCEPT_SCHEMA.__init__(self)
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.ACTION
 
 class PERCEPT_QUALITY(PERCEPT_SCHEMA):
     """
     Quality schema.
     """
-    def __init__(self):
-        PERCEPT_SCHEMA.__init__(self)
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.QUALITY
 
 class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMAS BY DEFAULT AS FROM and To (A VARIABLE! (unbound), eg. something is red). Think about that....
     """
     Defines relation perceptual schemas.
     """
-    def __init__(self):
-        PERCEPT_SCHEMA.__init__(self)
-        self.set_content({'features':None, 'area':None, 'saliency':None, 'from':None, 'to':None})
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
+        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None, 'from':None, 'to':None})
     
     def set_area(self):
         """
@@ -146,32 +146,32 @@ class PERCEPT_SPATIAL_REL(PERCEPT_SCHEMA_REL):
     """
     Spatial relation schema. Define relation (edge) between two object schemas (PERCEPT_OBJECT) pFrom and pTo.
     """
-    def __init__(self):
-        PERCEPT_SCHEMA_REL.__init__(self)
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.SPATIAL_REL
         
 class PERCEPT_ACTION_REL(PERCEPT_SCHEMA_REL):
     """
     Action relation schema. Define relation (edge) between an action schemas (PERCEPT_ACTION) pFrom and and object schema (PERCEPT_OBJECT) pTo.
     """
-    def __init__(self):
-        PERCEPT_SCHEMA_REL.__init__(self)
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.ACTION_REL
         
 class PERCEPT_QUALITY_REL(PERCEPT_SCHEMA_REL):
     """
     Quality relation schema. Define relation (edge) between a quality schemas (PERCEPT_QUALITY) pFrom and another percept schema (PERCEPT_SCHEMA) pTo.
     """
-    def __init__(self):
-        PERCEPT_SCHEMA_REL.__init__(self)
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.QUALITY_REL
 
 class PERCEPT_TEMP_REL(PERCEPT_SCHEMA_REL):
     """
     Temporal relation schema. Define relation (edge) between two action schemas (PERCEPT_ACTION) pFrom and pTo.
     """
-    def __init__(self):
-        PERCEPT_SCHEMA_REL.__init__(self)
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.TEMP_REL
     
 class PERCEPT_SCHEMA_INST(SCHEMA_INST):
@@ -228,6 +228,49 @@ class PERCEPTUAL_LTM(LTM):
     def __init__(self, name='Perceptual_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_visual_WM')
+        self.perceptual_knowledge = None
+        self.init_act = 0.5
+    
+    def initialize(self, per_knowledge):
+        """
+        Initilize the state of the PERCEPTUAL LTM with percetual_schema based on the content of percetual_knowledge
+       
+        Args:
+            - peceptual_knowledge (PERCEPTUAL_KNOWLEDGE): TCG percetpual knowledge data
+        """
+        self.perceptual_knowledge = per_knowledge
+        
+        obj = per_knowledge.find_meaning('OBJECT')
+        action = per_knowledge.find_meaning('ACTION')
+        qual = per_knowledge.find_meaning('QUALITY')
+        action_rel = per_knowledge.find_meaning('ACTION_REL')
+        spatial_rel = per_knowledge.find_meaning('SPATIAL_REL')
+        qual_rel = per_knowledge.find_meaning('QUALITY_REL')
+        temp_rel = per_knowledge.find_meaning('TEMP_REL')
+        
+        for percept in per_knowledge.percepts(type='TOKEN'):
+            new_schema = None
+            res = per_knowledge.satisfy_rel(percept, 'is_a', None)
+            per_cat = res[2]
+            if per_knowledge.match(per_cat, obj, match_type="is_a"):
+                new_schema = PERCEPT_OBJECT(name=percept.name, percept=percept, init_act=self.init_act)
+            elif per_knowledge.match(per_cat, action, match_type="is_a"):
+                 new_schema = PERCEPT_ACTION(name=percept.name, percept=percept, init_act=self.init_act)
+            elif per_knowledge.match(per_cat, qual, match_type="is_a"):
+                 new_schema = PERCEPT_QUALITY(name=percept.name, percept=percept, init_act=self.init_act)
+            elif per_knowledge.match(per_cat, action_rel, match_type="is_a"):
+                 new_schema = PERCEPT_ACTION_REL(name=percept.name, percept=percept, init_act=self.init_act)
+            elif per_knowledge.match(per_cat, spatial_rel, match_type="is_a"):
+                 new_schema = PERCEPT_SPATIAL_REL(name=percept.name, percept=percept, init_act=self.init_act)
+            elif per_knowledge.match(per_cat, qual_rel, match_type="is_a"):
+                 new_schema = PERCEPT_QUALITY_REL(name=percept.name, percept=percept, init_act=self.init_act)
+            elif per_knowledge.match(per_cat, temp_rel, match_type="is_a"):
+                 new_schema = PERCEPT_TEMP_REL(name=percept.name, percept=percept, init_act=self.init_act)
+            else:
+                print "%s: unknown percept type" %percept.meaning
+            
+            if new_schema:
+                self.add_schema(new_schema)
     
     def update(self):
         """

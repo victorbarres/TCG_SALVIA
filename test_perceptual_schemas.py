@@ -10,6 +10,7 @@ def test():
     import saliency_matlab as smat
     import schema_theory as st
     import perceptual_schemas as ps
+    from language_schemas import CONCEPTUALIZER
     
     ###############################
     ### percepaul schema system ###
@@ -20,15 +21,16 @@ def test():
     saliency_map = ps.SALIENCY_MAP()
     saccade_system = ps.SACCADE_SYSTEM()
     fixation = ps.FIXATION()
+    conceptualizer = CONCEPTUALIZER()
     
     # Defining schema to brain mappings.
     perception_mapping = {'Visual_WM':['ITG'], 
                         'Perceptual_LTM':[], 
                         'Saliency_map':['IPS'], 
                         'Saccade_system':['Basal Ganglia', 'FEF', 'Superior Colliculus'],
-                        'Fixation':['Visual cortex']}
+                        'Fixation':['Visual cortex'], 'Conceptualizer':['aTP']}
                         
-    perceptual_schemas = [fixation, saliency_map, saccade_system, visualWM, perceptualLTM]
+    perceptual_schemas = [fixation, saliency_map, saccade_system, visualWM, perceptualLTM, conceptualizer]
     
     # Creating schema system and adding procedural schemas
     perceptual_system = st.SCHEMA_SYSTEM('Perceptual_system')
@@ -41,11 +43,12 @@ def test():
     perceptual_system.add_connection(saliency_map, 'to_saccade_system', saccade_system , 'from_saliency_map')
     perceptual_system.add_connection(saccade_system, 'to_saliency_map', saliency_map, 'from_saccade_system')
     perceptual_system.add_connection(saccade_system, 'to_fixation', fixation, 'from_saccade_system')
-    perceptual_system.add_connection(fixation, 'to_saccade_system', saccade_system, 'from_fixation', )
+    perceptual_system.add_connection(fixation, 'to_saccade_system', saccade_system, 'from_fixation')
+    perceptual_system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
     
     # Defining input and output ports 
     perceptual_system.set_input_ports([fixation._find_port('from_input'), saliency_map._find_port('from_input')])
-    perceptual_system.set_output_ports([visualWM._find_port('to_conceptualizer')])
+    perceptual_system.set_output_ports([conceptualizer._find_port('to_semantic_WM')])
     
     # Setting up schema to brain mappings
     perception_brain_mapping = st.BRAIN_MAPPING()
@@ -53,7 +56,7 @@ def test():
     perceptual_system.brain_mapping = perception_brain_mapping
     
     # Generating schema system graph visualization
-    perceptual_system.system2dot()
+    perceptual_system.system2dot(image_type='png', disp=True)
     
     # Setting up BU saliency data
     saliency_data = smat.SALIENCY_DATA()
@@ -61,7 +64,7 @@ def test():
     saliency_map.BU_saliency_map = saliency_data.saliency_map.data
     
     # Display and run    
-    plt.figure(1)
+    plt.figure()
     plt.subplot(2,2,1)
     plt.axis('off')
     plt.title('Input scene')
@@ -99,4 +102,7 @@ def test():
             plt.sca(fixation)
             fixation.add_patch(fix)
         plt.pause(0.01)
+
+if __name__=='__main__':
+    test()
     
