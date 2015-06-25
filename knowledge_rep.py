@@ -170,7 +170,20 @@ class K_NET:
             graph.add_edge(edge.pFrom.id, edge.pTo.id, type= edge.type)
         
         self.graph = graph
+        
     
+    def _has_entity(self, ent_name):
+        """
+        Returns true iff there is a entity with name "name".
+        
+        Args:
+            - entt_name (STR):
+        """
+        for n in self.nodes:
+            if n.name == ent_name:
+                return True
+        return False
+            
     def _find_meaning(self, meaning):
         """
         Find k_ent with meaning "meaning". Returns the entity if found, else returns None.
@@ -189,7 +202,7 @@ class K_NET:
         """
         if ent1 and ent2:
             if not(self.graph.has_edge(ent1.id, ent2.id)):
-                return False
+                return []
             else:
                 edge_data = self.graph.get_edge_data(ent1.id, ent2.id)
                 if not(rel_type):
@@ -202,12 +215,16 @@ class K_NET:
             successors = self.graph.successors(ent1.id)
             res = []
             for s in successors:
+                node_data = self.graph.node[s]
+                ent2 = self._find_meaning(node_data['meaning'])
                 res.extend(self.satisfy_rel(ent1, rel_type, ent2))
             return res
         elif not(ent1) and ent2:
             predecessors = self.graph.predecessors(ent2.id)
             res = []
             for p in predecessors:
+                node_data = self.graph.node[p]
+                ent1 = self._find_meaning(node_data['meaning'])
                 res.extend(self.satisfy_rel(ent1, rel_type, ent2))
             return res
         else:

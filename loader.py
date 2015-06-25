@@ -89,6 +89,10 @@ def read_percept(atype, sup_per, per_knowledge, per_data):
                 per_knowledge.add_ent(tok_per)
                  # Create new percept relation
                 new_semrel = per.SEM_REL(aType='is_token', from_per=tok_per, to_per=sub_per)
+                # update sem_net
+                flag = per_knowledge.add_relation(new_semrel)
+                if not(flag):
+                    return False
 
         else:
             flag = read_percept('is_a', sub_per, per_knowledge, per_data[percept])

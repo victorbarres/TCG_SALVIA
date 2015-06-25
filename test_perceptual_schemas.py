@@ -76,7 +76,7 @@ def test():
     visualWM.C2_params['coop_weight'] = 0
     visualWM.C2_params['comp_weight'] = 0
     
-    perceptualLTM.init_act = 1
+    perceptLTM.init_act = 1
     conceptLTM.init_act = 1
     
     # Loading data
@@ -84,7 +84,7 @@ def test():
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     
     # Initialize perceptual LTM content
-    perceptualLTM.initialize(my_perceptual_knowledge)
+    perceptLTM.initialize(my_perceptual_knowledge)
         
     # Initialize conceptuual  LTM content
     conceptLTM.initialize(my_conceptual_knowledge)

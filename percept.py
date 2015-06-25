@@ -105,6 +105,15 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
         """
         return self._has_entity(percept_name)
     
+    def find_meaning(self, meaning):
+        """
+        Find percept with meaning "meaning". Returns the percept if found, else returns None.
+        
+        Args:
+            - meaning (): Meaning of a percept
+        """
+        return self._find_meaning(meaning)
+    
     def match(self, per1, per2, match_type = "is_a"):
         """        
         Check if per1 matches per2. 

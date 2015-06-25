@@ -192,8 +192,10 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
         For now, those schema instances are not used to form assemablages -> so no use for ports... 
         Trace is left empty, one can think that in a more realistic preceptual model, perceptual schemas would be instantiated on the basis of other perceptual schemas (See VISION model)
     """
-    def __init__(self):
-        SCHEMA_INST.__init__(self)
+    def __init__(self, per_schema, trace):
+        SCHEMA_INST.__init__(self, schema=per_schema, trace=trace)
+        content_copy = per_schema.content.copy()
+        self.content = content_copy
 
 #####################################
 ### Perceptual procedural schemas ###
@@ -250,8 +252,8 @@ class PERCEPT_LTM(LTM):
         
         for percept in per_knowledge.percepts(type='TOKEN'):
             new_schema = None
-            res = per_knowledge.satisfy_rel(percept, 'is_a', None)
-            per_cat = res[2]
+            res = per_knowledge.satisfy_rel(percept, 'is_token', None)
+            per_cat = res[0][2]
             if per_knowledge.match(per_cat, obj, match_type="is_a"):
                 new_schema = PERCEPT_OBJECT(name=percept.name, percept=percept, init_act=self.init_act)
             elif per_knowledge.match(per_cat, action, match_type="is_a"):

@@ -75,7 +75,7 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
         Returns true iff there is a concept with name "name".
         
         Args:
-            - conceot_name (STR):
+            - concept_name (STR):
         """
         return self._has_entity(concept_name)
         
