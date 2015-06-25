@@ -181,7 +181,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
     def __init__(self, name='Conceptualizer'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_visual_WM')
-        self.add_port('IN', 'from_concept_LTM')
+        self.add_port('IN', 'from_conceptual_LTM')
         self.add_port('OUT', 'to_semantic_WM')
         self.conceptualization = None
     
@@ -198,10 +198,10 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         """
         return
 
-class CONCEPT_LTM(LTM):
+class CONCEPTUAL_LTM(LTM):
     """
     """
-    def __init__(self, name='Concept_LTM'):
+    def __init__(self, name='Conceptual_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_conceptualizer')
         self.cpt_knowledge = None

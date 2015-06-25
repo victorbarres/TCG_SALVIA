@@ -19,7 +19,7 @@ def test():
     ###############################
     # Instantiating all the necessary procedural schemas
     visualWM = ps.VISUAL_WM()
-    perceptualLTM = ps.PERCEPTUAL_LTM()
+    perceptLTM = ps.PERCEPT_LTM()
     saliency_map = ps.SALIENCY_MAP()
     saccade_system = ps.SACCADE_SYSTEM()
     fixation = ps.FIXATION()
@@ -28,12 +28,12 @@ def test():
     
     # Defining schema to brain mappings.
     perception_mapping = {'Visual_WM':['ITG'], 
-                        'Perceptual_LTM':[], 
+                        'Percept_LTM':[], 
                         'Saliency_map':['IPS'], 
                         'Saccade_system':['Basal Ganglia', 'FEF', 'Superior Colliculus'],
                         'Fixation':['Visual cortex'], 'Conceptualizer':['aTP'], 'Concept_LTM':['']}
                         
-    perceptual_schemas = [fixation, saliency_map, saccade_system, visualWM, perceptualLTM, conceptualizer, conceptLTM]
+    perceptual_schemas = [fixation, saliency_map, saccade_system, visualWM, perceptLTM, conceptualizer, conceptLTM]
     
     # Creating schema system and adding procedural schemas
     perceptual_system = st.SCHEMA_SYSTEM('Perceptual_system')
@@ -41,7 +41,7 @@ def test():
     
     # Defining connections
     perceptual_system.add_connection(visualWM, 'to_saliency_map', saliency_map, 'from_visual_WM')
-    perceptual_system.add_connection(perceptualLTM, 'to_visual_WM', visualWM, 'from_perceptual_LTM')
+    perceptual_system.add_connection(perceptLTM, 'to_visual_WM', visualWM, 'from_percept_LTM')
     perceptual_system.add_connection(fixation, 'to_visual_WM', visualWM, 'from_fixation')
     perceptual_system.add_connection(saliency_map, 'to_saccade_system', saccade_system , 'from_saliency_map')
     perceptual_system.add_connection(saccade_system, 'to_saliency_map', saliency_map, 'from_saccade_system')
