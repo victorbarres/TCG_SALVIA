@@ -7,7 +7,7 @@ Uses numpy for the saliency map.
 """
 import numpy as np
 import random
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM
 
 seed = 0
 random.seed(seed)
@@ -198,11 +198,11 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
 #####################################
 ### Perceptual procedural schemas ###
 #####################################
-class VISUAL_WM(PROCEDURAL_SCHEMA):
+class VISUAL_WM(WM):
     """
     """
     def __init__(self, name='Visual_WM'):
-        PROCEDURAL_SCHEMA.__init__(self, name)
+        WM.__init__(self, name)
         self.add_port('IN', 'from_fixation')
         self.add_port('IN', 'from_perceptual_LTM')
         self.add_port('OUT', 'to_saliency_map')

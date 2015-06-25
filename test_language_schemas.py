@@ -89,19 +89,17 @@ def test(seed=None):
     
     control.task_params['time_pressure'] = 150
     
-    cpt_init_act = 1
-    cxn_init_act = grammaticalWM.C2_params['confidence_threshold']
+    conceptLTM.init_act = 1
+    grammaticalLTM.init_act = grammaticalWM.C2_params['confidence_threshold']
     
     # Loading data
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_grammar = ld.load_grammar("TCG_grammar_VB.json", "./data/grammars/", my_conceptual_knowledge)
     
     # Initialize conceptual LTM content
-    conceptLTM.init_act = cpt_init_act
     conceptLTM.initialize(my_conceptual_knowledge)
         
     # Initialize grammatical LTM content
-    grammaticalLTM.init_act = cxn_init_act
     grammaticalLTM.initialize(my_grammar)
     
     # Semantic WM content using predefined cpt_schema_instances.
