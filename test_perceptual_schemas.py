@@ -22,18 +22,18 @@ def test():
     perceptLTM = ps.PERCEPT_LTM()
     saliency_map = ps.SALIENCY_MAP()
     saccade_system = ps.SACCADE_SYSTEM()
-    fixation = ps.FIXATION()
+    subscene_rec = ps.SUBSCENE_RECOGNITION()
     conceptualizer = ls.CONCEPTUALIZER()
     conceptLTM = ls.CONCEPT_LTM()
     
     # Defining schema to brain mappings.
     perception_mapping = {'Visual_WM':['ITG'], 
-                        'Percept_LTM':[], 
+                        'Percept_LTM':[''], 
                         'Saliency_map':['IPS'], 
-                        'Saccade_system':['Basal Ganglia', 'FEF', 'Superior Colliculus'],
-                        'Fixation':['Visual cortex'], 'Conceptualizer':['aTP'], 'Concept_LTM':['']}
+                        'Saccade_system':[''],
+                        'Subscene_recognition':['Ventral stream'], 'Conceptualizer':['aTP'], 'Concept_LTM':['']}
                         
-    perceptual_schemas = [fixation, saliency_map, saccade_system, visualWM, perceptLTM, conceptualizer, conceptLTM]
+    perceptual_schemas = [subscene_rec, saliency_map, saccade_system, visualWM, perceptLTM, conceptualizer, conceptLTM]
     
     # Creating schema system and adding procedural schemas
     perceptual_system = st.SCHEMA_SYSTEM('Perceptual_system')
@@ -41,17 +41,17 @@ def test():
     
     # Defining connections
     perceptual_system.add_connection(visualWM, 'to_saliency_map', saliency_map, 'from_visual_WM')
-    perceptual_system.add_connection(perceptLTM, 'to_visual_WM', visualWM, 'from_percept_LTM')
-    perceptual_system.add_connection(fixation, 'to_visual_WM', visualWM, 'from_fixation')
+    perceptual_system.add_connection(perceptLTM, 'to_subscene_rec', subscene_rec, 'from_percept_LTM')
+    perceptual_system.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
     perceptual_system.add_connection(saliency_map, 'to_saccade_system', saccade_system , 'from_saliency_map')
     perceptual_system.add_connection(saccade_system, 'to_saliency_map', saliency_map, 'from_saccade_system')
-    perceptual_system.add_connection(saccade_system, 'to_fixation', fixation, 'from_saccade_system')
-    perceptual_system.add_connection(fixation, 'to_saccade_system', saccade_system, 'from_fixation')
+    perceptual_system.add_connection(saccade_system, 'to_subscene_rec', subscene_rec, 'from_saccade_system')
+    perceptual_system.add_connection(subscene_rec, 'to_saccade_system', saccade_system, 'from_subscene_rec')
     perceptual_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
     perceptual_system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
     
     # Defining input and output ports 
-    perceptual_system.set_input_ports([fixation._find_port('from_input'), saliency_map._find_port('from_input')])
+    perceptual_system.set_input_ports([subscene_rec._find_port('from_input'), saliency_map._find_port('from_input')])
     perceptual_system.set_output_ports([conceptualizer._find_port('to_semantic_WM')])
     
     # Setting up schema to brain mappings
@@ -60,7 +60,7 @@ def test():
     perceptual_system.brain_mapping = perception_brain_mapping
     
     # Generating schema system graph visualization
-#    perceptual_system.system2dot(image_type='png', disp=True)
+    perceptual_system.system2dot(image_type='png', disp=True)
     
     # Parameters   
     visualWM.dyn_params['tau'] = 300
@@ -89,50 +89,50 @@ def test():
     # Initialize conceptuual  LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
     
-#    # Setting up BU saliency data
-#    saliency_data = smat.SALIENCY_DATA()
-#    saliency_data.load("./data/scenes/cholitas")
-#    saliency_map.BU_saliency_map = saliency_data.saliency_map.data
-#    
-#    # Display and run    
-#    plt.figure()
-#    plt.subplot(2,2,1)
-#    plt.axis('off')
-#    plt.title('Input scene')
-#    plt.imshow(saliency_data.orig_image.data)
-#    
-#    r = 2**(saliency_data.params.levelParams['mapLevel']-1) # ONly works if pyramidtype = dyadic!
-#    
-#    plt.subplot(2,2,2)
-#    plt.axis('off')
-#    plt.title('Bottom-up saliency map')
-#    plt.imshow(saliency_map.BU_saliency_map, cmap = cm.Greys_r)
-#    
-#    # Running the schema system
-#    fixation = plt.subplot(2,2,3)
-#    plt.axis('off')
-#    plt.title('Fixation')
-#    plt.imshow(saliency_data.orig_image.data)
-#    fix = plt.Circle((0,0), saliency_data.params.foaSize, color='r', alpha=0.3)
-#    fixation.add_patch(fix)
-#    
-#    ior_fig = plt.subplot(2,2,4)
-#    plt.axis('off')
-#    plt.title('IOR')
-#    time = 200
-#    for t in range(time):    
-#        perceptual_system.update()
-#        map = saliency_map.IOR_mask
-#        if map != None:
-#            plt.sca(ior_fig)
-#            ior_fig.cla()
-#            plt.imshow(map, cmap = cm.Greys_r)
-#        if saccade_system.eye_pos:
-#            fix.remove()
-#            fix.center = (saccade_system.eye_pos[1]*r,saccade_system.eye_pos[0]*r)
-#            plt.sca(fixation)
-#            fixation.add_patch(fix)
-#        plt.pause(0.01)
+    # Setting up BU saliency data
+    saliency_data = smat.SALIENCY_DATA()
+    saliency_data.load("./data/scenes/cholitas")
+    saliency_map.BU_saliency_map = saliency_data.saliency_map.data
+    
+    # Display and run    
+    plt.figure()
+    plt.subplot(2,2,1)
+    plt.axis('off')
+    plt.title('Input scene')
+    plt.imshow(saliency_data.orig_image.data)
+    
+    r = 2**(saliency_data.params.levelParams['mapLevel']-1) # ONly works if pyramidtype = dyadic!
+    
+    plt.subplot(2,2,2)
+    plt.axis('off')
+    plt.title('Bottom-up saliency map')
+    plt.imshow(saliency_map.BU_saliency_map, cmap = cm.Greys_r)
+    
+    # Running the schema system
+    fixation = plt.subplot(2,2,3)
+    plt.axis('off')
+    plt.title('Fixation')
+    plt.imshow(saliency_data.orig_image.data)
+    fix = plt.Circle((0,0), saliency_data.params.foaSize, color='r', alpha=0.3)
+    fixation.add_patch(fix)
+    
+    ior_fig = plt.subplot(2,2,4)
+    plt.axis('off')
+    plt.title('IOR')
+    time = 200
+    for t in range(time):    
+        perceptual_system.update()
+        map = saliency_map.IOR_mask
+        if map != None:
+            plt.sca(ior_fig)
+            ior_fig.cla()
+            plt.imshow(map, cmap = cm.Greys_r)
+        if saccade_system.eye_pos:
+            fix.remove()
+            fix.center = (saccade_system.eye_pos[1]*r,saccade_system.eye_pos[0]*r)
+            plt.sca(fixation)
+            fixation.add_patch(fix)
+        plt.pause(0.01)
 
 if __name__=='__main__':
     test()

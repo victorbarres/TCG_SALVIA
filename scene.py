@@ -144,6 +144,7 @@ class SUB_SCENE:
 class SCENE:
     """
     Scene being perceived.
+    Defines the visual input to the model.
     
     Data:
         - width, height (INT): Scene resolution
@@ -158,7 +159,6 @@ class SCENE:
         self.subscenes = []
         self.schemas = []
         self.focus_regions = {}
-    
     
     def clear(self):
         """

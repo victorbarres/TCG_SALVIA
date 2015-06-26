@@ -3,3 +3,4 @@ tmp/*
 output/*
 viewer/tmp/*
 data/scenes/*.mat
+*.mat

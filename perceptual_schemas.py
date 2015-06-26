@@ -60,10 +60,12 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
                     - LTM (LTM): Associated long term memory.
                     - content (): 
                     - init_act (float): Initial activation value.
-        - type (INT): Schema type (UNDEFINED, OBJECT, RELATION, ACTION).
-        - content of schema is defined as: 'feature' and 'area'
-            'features' (): contains the perceptual features
-            'area' (AREA): defines the area of the scene associated with this perceptual schema.
+        - type (STR): Schema type (UNDEFINED, OBJECT, RELATION, ACTION).
+        - content of schema is defined as:
+            - 'percept' (PERCEPT): the percept defining the schema (declarative content) linked to perceptual knowledge.
+            - 'features' (): contains the perceptual features
+            - 'area' (AREA): defines the area of the scene associated with this perceptual schema.
+            - 'saliency' (FLOAT): Saliency of the schema (can difer from the saliency of the area it is associated to.)
     """
     # Schema types
     UNDEFINED = 'UNDEFINED'
@@ -205,8 +207,7 @@ class VISUAL_WM(WM):
     """
     def __init__(self, name='Visual_WM'):
         WM.__init__(self, name)
-        self.add_port('IN', 'from_fixation')
-        self.add_port('IN', 'from_percept_LTM')
+        self.add_port('IN', 'from_subscene_rec')
         self.add_port('OUT', 'to_saliency_map')
         self.add_port('OUT', 'to_conceptualizer')
         self.perceptual_schemas = []
@@ -214,12 +215,11 @@ class VISUAL_WM(WM):
     def update(self):
         """
         """
-        sub_scene= self.get_input('from_fixation')
-        perceptual_knowledge = self.get_input('from_percept_LTM')
-        self._update_schemas(sub_scene, perceptual_knowledge)
+        sub_scene= self.get_input('from_subscene_rec')
+        self._update_schemas(sub_scene)
         self.set_output('to_conceptualizer', self.perceptual_schemas)
     
-    def _update_schemas(self, sub_scene, perceptual_knowledge):
+    def _update_schemas(self, sub_scene):
         """
         """
         return
@@ -229,7 +229,7 @@ class PERCEPT_LTM(LTM):
     """
     def __init__(self, name='Percept_LTM'):
         LTM.__init__(self, name)
-        self.add_port('OUT', 'to_visual_WM')
+        self.add_port('OUT', 'to_subscene_rec')
         self.perceptual_knowledge = None
         self.init_act = 0.5
     
@@ -277,7 +277,7 @@ class PERCEPT_LTM(LTM):
     def update(self):
         """
         """
-        self.set_output('to_visual_WM', self.schemas)
+        self.set_output('to_subscene_rec', self.schemas)
 
 class SALIENCY_MAP(PROCEDURAL_SCHEMA):
     """
@@ -348,8 +348,8 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
     def __init__(self, name='Saccade_system'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_saliency_map')
-        self.add_port('IN', 'from_fixation') # Receives signal to triger next saccade once subscene perception is done.
-        self.add_port('OUT', 'to_fixation')
+        self.add_port('IN', 'from_subscene_rec') # Receives signal to triger next saccade once subscene recognition is done.
+        self.add_port('OUT', 'to_subscene_rec')
         self.add_port('OUT', 'to_saliency_map') # For inhibition of return
         self.eye_pos = None # Crrent  eye position (x,y)
         self.next_fixation = None # Next saccade coordinates (x,y)
@@ -357,13 +357,13 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
     def update(self):
         """
         """
-        self.trigger_saccade = self.get_input('from_fixation')
+        self.trigger_saccade = self.get_input('from_subscene_rec')
         if self.trigger_saccade:
             saliency_map  = self.get_input('from_saliency_map')
             self.next_fixation = self._WTA(saliency_map)
             if self.next_fixation != self.eye_pos: #Updates next-saccedes if the result of the WTA differs from previously computed value.
                 self.eye_pos = self.next_fixation
-                self.set_output('to_fixation', self.eye_pos)
+                self.set_output('to_subscene_rec', self.eye_pos)
                 self.set_output('to_saliency_map', self.eye_pos)
     
     def _WTA(self, saliency_map):
@@ -381,17 +381,18 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
             coord = None
         return coord
 
-class FIXATION(PROCEDURAL_SCHEMA):
+class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
     """
-    Data"
+    Data
         - subscene
         - uncertainty (INT): Remaining uncertainy in subscene perception.
         - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
     """
-    def __init__(self,name='Fixation'):
+    def __init__(self,name='Subscene_recognition'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_saccade_system')
+        self.add_port('IN', 'from_percept_LTM')
         self.add_port('OUT','to_visual_WM')
         self.add_port('OUT', 'to_saccade_system')
         self.subscene = None
