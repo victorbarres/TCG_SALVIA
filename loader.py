@@ -21,7 +21,6 @@ import json
 import concept as cpt
 import percept as per
 import construction as cxn
-import scene as scn
 
 #############################
 ### Data reading function ###
@@ -440,51 +439,54 @@ def load_grammar(file_name='', file_path='./', cpt_knowledge = None):
             
 def load_scene(file_name = '', file_path = './'):
     """
-    Loads and returns the visual scene defined in file_path\file_name. Return None if error.
+    Loads and returns a DICT containing the visual scene data defined in file_path\file_name. Return None if error.
+    
+    Note: Might want to check that the perceptual schemas are indeed defined in perceptual knowledge.
     """
     # Open and read file
     json_data = json_read(file_name, path = file_path)
-    scene_data = json_data['scene']
-    
-    # Create scene object
-    my_scene = scn.SCENE()
-    
-    my_scene.width = scene_data['resolution'][0]
-    my_scene.height = scene_data['resolution'][1]
-    
-    # Name table
-    name_table = {'schemas':{}, 'edges':{}, 'percepts':{}}
-    
-    for rgn in scene_data['regions']:
-        flag = read_region(my_scene, rgn, name_table)
-        if not(flag):
-            return None
-
-    # Building relations
-    for edge, pair in name_table['edges'].iteritems():
-        pFrom = pair[0]
-        pTo = pair[1]
-        
-        if(not(name_table['schemas'].has_key(edge) and
-                name_table['schemas'].has_key(pFrom) and
-                name_table['schemas'].has_key(pTo))):
-            return None
-        
-        name_table['schemas'][edge].pFrom = name_table['schemas'][pFrom]
-        name_table['schemas'][edge].pTo = name_table['schemas'][pTo]
-    
-    # Builind percepts
-    for percept, sc_name in name_table['percepts'].iteritems():
-        if not(name_table['schemas'].has_key(sc_name)):
-            return None
-        
-        percept.schema = name_table['schemas'][sc_name]
-    
-    # Storing schemas in the scene
-    for sc in name_table['schemas'].values():
-        my_scene.add_schema(sc)
-    
+    my_scene = json_data['scene']
     return my_scene
+#    
+#    # Create scene object
+#    my_scene = {'width':0, 'height':0, 'schemas':[]}
+#    
+#    my_scene.width = scene_data['resolution'][0]
+#    my_scene.height = scene_data['resolution'][1]
+#    
+#    # Name table
+#    name_table = {'schemas':{}, 'edges':{}, 'percepts':{}}
+#    
+#    for rgn in scene_data['regions']:
+#        flag = read_region(my_scene, rgn, name_table)
+#        if not(flag):
+#            return None
+#
+#    # Building relations
+#    for edge, pair in name_table['edges'].iteritems():
+#        pFrom = pair[0]
+#        pTo = pair[1]
+#        
+#        if(not(name_table['schemas'].has_key(edge) and
+#                name_table['schemas'].has_key(pFrom) and
+#                name_table['schemas'].has_key(pTo))):
+#            return None
+#        
+#        name_table['schemas'][edge].pFrom = name_table['schemas'][pFrom]
+#        name_table['schemas'][edge].pTo = name_table['schemas'][pTo]
+#    
+#    # Builind percepts
+#    for percept, sc_name in name_table['percepts'].iteritems():
+#        if not(name_table['schemas'].has_key(sc_name)):
+#            return None
+#        
+#        percept.schema = name_table['schemas'][sc_name]
+#    
+#    # Storing schemas in the scene
+#    for sc in name_table['schemas'].values():
+#        my_scene.add_schema(sc)
+#    
+#    return my_scene
             
         
 ###############################################################################
@@ -493,5 +495,6 @@ if __name__=='__main__':
     my_perceptual_knowledge = load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_conceptualization = load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
     my_grammar = load_grammar("TCG_grammar.json", "./data/grammars/", my_conceptual_knowledge)
+    my_scene = load_scene("TCG_scene.json", "./data/scenes/cholitas/")
     
     

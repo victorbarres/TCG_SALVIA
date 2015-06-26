@@ -60,7 +60,7 @@ def test():
     perceptual_system.brain_mapping = perception_brain_mapping
     
     # Generating schema system graph visualization
-    perceptual_system.system2dot(image_type='png', disp=True)
+#    perceptual_system.system2dot(image_type='png', disp=True)
     
     # Parameters   
     visualWM.dyn_params['tau'] = 300
@@ -82,11 +82,12 @@ def test():
     # Loading data
     my_perceptual_knowledge = ld.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_scene = ld.load_scene("TCG_scene.json", "./data/scenes/cholitas/")
     
     # Initialize perceptual LTM content
     perceptLTM.initialize(my_perceptual_knowledge)
         
-    # Initialize conceptuual  LTM content
+    # Initialize concept LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
     
     # Setting up BU saliency data
@@ -94,45 +95,50 @@ def test():
     saliency_data.load("./data/scenes/cholitas")
     saliency_map.BU_saliency_map = saliency_data.saliency_map.data
     
-    # Display and run    
-    plt.figure()
-    plt.subplot(2,2,1)
-    plt.axis('off')
-    plt.title('Input scene')
-    plt.imshow(saliency_data.orig_image.data)
-    
-    r = 2**(saliency_data.params.levelParams['mapLevel']-1) # ONly works if pyramidtype = dyadic!
-    
-    plt.subplot(2,2,2)
-    plt.axis('off')
-    plt.title('Bottom-up saliency map')
-    plt.imshow(saliency_map.BU_saliency_map, cmap = cm.Greys_r)
-    
-    # Running the schema system
-    fixation = plt.subplot(2,2,3)
-    plt.axis('off')
-    plt.title('Fixation')
-    plt.imshow(saliency_data.orig_image.data)
-    fix = plt.Circle((0,0), saliency_data.params.foaSize, color='r', alpha=0.3)
-    fixation.add_patch(fix)
-    
-    ior_fig = plt.subplot(2,2,4)
-    plt.axis('off')
-    plt.title('IOR')
-    time = 200
-    for t in range(time):    
-        perceptual_system.update()
-        map = saliency_map.IOR_mask
-        if map != None:
-            plt.sca(ior_fig)
-            ior_fig.cla()
-            plt.imshow(map, cmap = cm.Greys_r)
-        if saccade_system.eye_pos:
-            fix.remove()
-            fix.center = (saccade_system.eye_pos[1]*r,saccade_system.eye_pos[0]*r)
-            plt.sca(fixation)
-            fixation.add_patch(fix)
-        plt.pause(0.01)
+    # Test schema rec intialization
+    perceptual_system.set_input(my_scene)
+    perceptual_system.update()
+    perceptual_system.update()
+#    
+#    # Display and run    
+#    plt.figure()
+#    plt.subplot(2,2,1)
+#    plt.axis('off')
+#    plt.title('Input scene')
+#    plt.imshow(saliency_data.orig_image.data)
+#    
+#    r = 2**(saliency_data.params.levelParams['mapLevel']-1) # ONly works if pyramidtype = dyadic!
+#    
+#    plt.subplot(2,2,2)
+#    plt.axis('off')
+#    plt.title('Bottom-up saliency map')
+#    plt.imshow(saliency_map.BU_saliency_map, cmap = cm.Greys_r)
+#    
+#    # Running the schema system
+#    fixation = plt.subplot(2,2,3)
+#    plt.axis('off')
+#    plt.title('Fixation')
+#    plt.imshow(saliency_data.orig_image.data)
+#    fix = plt.Circle((0,0), saliency_data.params.foaSize, color='r', alpha=0.3)
+#    fixation.add_patch(fix)
+#    
+#    ior_fig = plt.subplot(2,2,4)
+#    plt.axis('off')
+#    plt.title('IOR')
+#    time = 200
+#    for t in range(time):    
+#        perceptual_system.update()
+#        map = saliency_map.IOR_mask
+#        if map != None:
+#            plt.sca(ior_fig)
+#            ior_fig.cla()
+#            plt.imshow(map, cmap = cm.Greys_r)
+#        if saccade_system.eye_pos:
+#            fix.remove()
+#            fix.center = (saccade_system.eye_pos[1]*r,saccade_system.eye_pos[0]*r)
+#            plt.sca(fixation)
+#            fixation.add_patch(fix)
+#        plt.pause(0.01)
 
 if __name__=='__main__':
     test()

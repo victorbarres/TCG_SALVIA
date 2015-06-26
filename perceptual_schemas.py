@@ -7,7 +7,9 @@ Uses numpy for the saliency map.
 """
 import numpy as np
 import random
+
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM
+import scene as scn
 
 seed = 0
 random.seed(seed)
@@ -41,11 +43,11 @@ class AREA:
         Right now the saliency is defined as the max of both saliency values... NOT SURE IT IS A GOOD WAY OF DOING THIS!
         """
         merge_area = AREA()
-        merge_area.x = min(area1.x, area2.x)
-        merge_area.y = min(area1.y, area2.y)
-        merge_area.w = max(area1.y + area1.w, area2.y + area2.w) - merge_area.y
-        merge_area.h = max(area1.x + area1.h, area2.x + area2.h) - merge_area.x
-        merge_area.saliency = max(area1.saliency + area2.saliency) # THIS MIGHT NOT BE A GOOD IDEA!!
+        merge_area.x = min([area1.x, area2.x])
+        merge_area.y = min([area1.y, area2.y])
+        merge_area.w = max([area1.y + area1.w, area2.y + area2.w]) - merge_area.y
+        merge_area.h = max([area1.x + area1.h, area2.x + area2.h]) - merge_area.x
+        merge_area.saliency = max([area1.saliency + area2.saliency]) # THIS MIGHT NOT BE A GOOD IDEA!!
         return merge_area
         
 
@@ -66,6 +68,7 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
             - 'features' (): contains the perceptual features
             - 'area' (AREA): defines the area of the scene associated with this perceptual schema.
             - 'saliency' (FLOAT): Saliency of the schema (can difer from the saliency of the area it is associated to.)
+            - 'uncertainty' (INT): Uncertainty indexing the difficulty of the recognition process for the schema of the schema.
     """
     # Schema types
     UNDEFINED = 'UNDEFINED'
@@ -80,7 +83,7 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     def __init__(self, name, percept, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
         self.type = PERCEPT_SCHEMA.UNDEFINED
-        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None})
+        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None, 'uncertainty':None})
     
     def set_features(self, features):
         self.content['features'] = features
@@ -113,7 +116,7 @@ class PERCEPT_OBJECT(PERCEPT_SCHEMA):
 
 class PERCEPT_ACTION(PERCEPT_SCHEMA):
     """
-    Action schema. Define relation (edge) between two object schemas (SC_OBJECT) pFrom and pTo.
+    Action schema.
     """
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
@@ -133,15 +136,15 @@ class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMA
     """
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
-        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None, 'from':None, 'to':None})
+        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None, 'uncertainty':None, 'pFrom':None, 'pTo':None})
     
     def set_area(self):
         """
         The area of relation schemas is defines as the hull of the schemas they link.
         """
-        if not(self.content['from']) or not(self.content['to']):
+        if not(self.content['pFrom']) or not(self.content['pTo']):
             return False
-        self.area = AREA.hull(self.content['from'].content['area'], self.content['to'].content['area'])
+        self.area = AREA.hull(self.content['pFrom'].content['area'], self.content['pTo'].content['area'])
         return True
 
 class PERCEPT_SPATIAL_REL(PERCEPT_SCHEMA_REL):
@@ -198,6 +201,13 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
         SCHEMA_INST.__init__(self, schema=per_schema, trace=trace)
         content_copy = per_schema.content.copy()
         self.content = content_copy
+    
+    def set_area(self, x=0, y=0, w=0, h=0, saliency=0):
+        """
+        """
+        area = AREA(x,y,w,h,saliency)
+        self.content['area'] = area
+        self.content['saliency'] = saliency
 
 #####################################
 ### Perceptual procedural schemas ###
@@ -384,6 +394,8 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
 class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
     """
     Data
+        - inputs
+        - scene_data (SCENE): stores data based on scene data received as input (as defined by LOADER)
         - subscene
         - uncertainty (INT): Remaining uncertainy in subscene perception.
         - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
@@ -395,17 +407,30 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.add_port('IN', 'from_percept_LTM')
         self.add_port('OUT','to_visual_WM')
         self.add_port('OUT', 'to_saccade_system')
+        self.inputs = {'scene_input':None, 'per_schemas':None}
+        self.scene_data = None
         self.subscene = None
         self.uncertainty = 0
         self.next_saccade = False 
-    
+            
     def update(self):
         """
         """
-        vis_input = self.get_input('from_input')
+        scene_input = self.get_input('from_input')
+        if scene_input:
+            self.inputs['scene_input'] = scene_input
+        per_schemas = self.get_input('from_percept_LTM')
+        if per_schemas:
+            self.inputs['per_schemas'] = per_schemas
+        
+        if self.inputs['scene_input'] and self.inputs['per_schemas']:
+            self.initialize(self.inputs['scene_input'], self.inputs['per_schemas'])
+            self.inputs['scene_input'] =  None
+            self.inputs['per_schemas'] = None
+            
         eye_pos = self.get_input('from_saccade_system')
         if eye_pos != None:
-            self._get_subscene(vis_input, eye_pos)
+            self._get_subscene(eye_pos)
             if self.subscene != None:
                 self.uncertainty = self.subscene.uncertainty
         
@@ -418,7 +443,55 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.set_output('to_saccade_system', self.next_saccade)
         self.next_saccade = False
     
-    def _get_subscene(self, vis_input, eye_pos):
+        
+    def initialize(self, scene_input, per_schemas):
+        """
+        Creates the scene_data (SCENE) based on the scene_input.
+        Scene_input should be a DICT generated by LOADER.load_scene.
+        """
+        my_scene = scn.SCENE()
+        my_scene.width = scene_input['resolution'][0]
+        my_scene.height = scene_input['resolution'][1]
+            
+        name_table = {}
+        for i in  [s for s in scene_input['schemas'].keys() if scene_input['schemas'][s]['type'] != 'RELATION']: # First instantiate all the schemas that are not relations.
+            dat = scene_input['schemas'][i]
+            schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
+            inst = PERCEPT_SCHEMA_INST(schema, trace=schema)
+            if dat['saliency'] == 'auto':
+                saliency  = random.random() # THIS NEEDS TO BE CHANGED!!!
+            else:
+                saliency = dat['saliency']
+            inst.set_area(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1], saliency=saliency)
+            name_table[dat['name']] = inst
+        
+        for i in  [s for s in scene_input['schemas'].keys() if scene_input['schemas'][s]['type'] == 'RELATION']: # Now dealing with relations
+            dat = scene_input['schemas'][i]
+            schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
+            inst = PERCEPT_SCHEMA_INST(schema, trace=schema)
+            if dat['saliency'] == 'auto':
+                saliency  = random.random() # THIS NEEDS TO BE CHANGED!!!
+            else:
+                saliency = dat['saliency']
+            inst.set_area(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1], saliency=saliency)
+            inst.content['pFrom'] = name_table[dat['from']].name
+            inst.content['pTo'] = name_table[dat['to']].name
+            name_table[dat['name']] = inst
+        
+        # Build subscenes
+        for ss in scene_input['subscenes'].keys():
+            dat = scene_input['subscenes'][ss]
+            subscene = scn.SUB_SCENE(name = dat['name'])
+            for schema in dat['schemas']:
+                subscene.add_per_schema(name_table[schema])
+            
+            my_scene.add_subscene(subscene)
+        
+        self.scene_data = my_scene
+            
+        
+    
+    def _get_subscene(self, eye_pos):
         """
         """
         return

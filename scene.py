@@ -99,9 +99,9 @@ class SUB_SCENE:
         If the perceptual schema instantiates a relation schemas, it is added to edges. Else it is added to nodes.
         """
         # Check duplication
-        if self.find_schema(schema_inst.schema.name):
+        if self.find_schema(schema_inst.name):
             return False
-        if isinstance(schema_inst.schema, ps.PERCEPT_SCHEMA_REL):
+        if isinstance(schema_inst.trace, ps.PERCEPT_SCHEMA_REL):
             self.edges.append(schema_inst)
             self.update_area()
             return True
@@ -123,23 +123,38 @@ class SUB_SCENE:
         Find schema instance with name "name'. If found, return instance, else, return None.
         """
         for schema_inst in self.nodes + self.edges:
-            if schema_inst.schema.name == name:
+            if schema_inst.name == name:
                 return schema_inst
         return None
             
     def update_area(self):
         """
-        Recalculates the area associated wiht the subscene based on associated schema instances.
+        Recalculates the area associated with the subscene based on associated schema instances.
         """
         schema_insts = self.nodes + self.edges
         if len(schema_insts) == 0:
             self.area = None
             return False
-        self.area = self.schema_insts[0].schema.content['area']
+        self.area = schema_insts[0].content['area']
         for schema_inst in schema_insts[1:]:
-            self.area = ps.AREA.hull(self.area, schema_inst.schema.content['area'])
+            self.area = ps.AREA.hull(self.area, schema_inst.content['area'])
         
         self.saliency = self.area.saliency
+        return True
+    
+    def update_uncertainty(self):
+        """
+        Recalculates the uncertainty associated with the subscene based on associated schema instances.
+        """
+        schema_insts = self.nodes + self.edges
+        if len(schema_insts) == 0:
+            self.uncertainty = None
+            return False
+        self.uncertainty = 0
+        for schema_inst in schema_insts:
+            self.uncertainty += schema_inst.content['uncertainty']
+        return True
+        
 
 class SCENE:
     """
@@ -150,7 +165,7 @@ class SCENE:
         - width, height (INT): Scene resolution
         - subscenes ([SUB_SCENE]): List of all subscenes associated with the scene.
         - schemas ([SCHEMA_INST]): List of perceptual schemas instances associated with the scene.
-        - focus_regions (DICT{AREA:SUBSCENE}) Look-up table linking areas to subscenes.
+        - focus_regions ([{AREA:SUBSCENE}]) Look-up table linking areas to subscenes.
     """
     
     def __init__(self):
@@ -158,7 +173,7 @@ class SCENE:
         self.height = 0
         self.subscenes = []
         self.schemas = []
-        self.focus_regions = {}
+        self.focus_regions = []
     
     def clear(self):
         """
@@ -175,7 +190,7 @@ class SCENE:
         Find schema with name 'name' (STR) in scene.
         """
         for s in self.schemas:
-            if s.schema.name == name:
+            if s.name == name:
                 return s
         return None
         
@@ -204,7 +219,7 @@ class SCENE:
         self.subscenes.append(ss)
         self.focus_regions.append({'area':ss.area, 'subscene':ss})
         for schema_inst in ss.nodes + ss.edges:
-            if not(self.find_schema(schema_inst.schema.name)):
+            if not(self.find_schema(schema_inst.name)):
                 self.schemas.append(schema_inst)
         return True
 ###############################################################################
