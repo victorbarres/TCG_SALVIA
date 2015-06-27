@@ -22,6 +22,7 @@ def test():
     perceptLTM = ps.PERCEPT_LTM()
     saliency_map = ps.SALIENCY_MAP()
     saccade_system = ps.SACCADE_SYSTEM()
+    fixation = ps.FIXATION()
     subscene_rec = ps.SUBSCENE_RECOGNITION()
     conceptualizer = ls.CONCEPTUALIZER()
     conceptLTM = ls.CONCEPT_LTM()
@@ -31,9 +32,9 @@ def test():
                         'Percept_LTM':[''], 
                         'Saliency_map':['IPS'], 
                         'Saccade_system':[''],
-                        'Subscene_recognition':['Ventral stream'], 'Conceptualizer':['aTP'], 'Concept_LTM':['']}
+                        'Subscene_recognition':['Ventral stream'], 'Conceptualizer':['aTP'], 'Concept_LTM':[''], 'Fixation':['']}
                         
-    perceptual_schemas = [subscene_rec, saliency_map, saccade_system, visualWM, perceptLTM, conceptualizer, conceptLTM]
+    perceptual_schemas = [subscene_rec, saliency_map, saccade_system, visualWM, perceptLTM, conceptualizer, conceptLTM, fixation]
     
     # Creating schema system and adding procedural schemas
     perceptual_system = st.SCHEMA_SYSTEM('Perceptual_system')
@@ -45,7 +46,8 @@ def test():
     perceptual_system.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
     perceptual_system.add_connection(saliency_map, 'to_saccade_system', saccade_system , 'from_saliency_map')
     perceptual_system.add_connection(saccade_system, 'to_saliency_map', saliency_map, 'from_saccade_system')
-    perceptual_system.add_connection(saccade_system, 'to_subscene_rec', subscene_rec, 'from_saccade_system')
+    perceptual_system.add_connection(saccade_system, 'to_fixation', fixation, 'from_saccade_system')
+    perceptual_system.add_connection(fixation, 'to_subscene_rec', subscene_rec, 'from_fixation')
     perceptual_system.add_connection(subscene_rec, 'to_saccade_system', saccade_system, 'from_subscene_rec')
     perceptual_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
     perceptual_system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
@@ -60,7 +62,7 @@ def test():
     perceptual_system.brain_mapping = perception_brain_mapping
     
     # Generating schema system graph visualization
-#    perceptual_system.system2dot(image_type='png', disp=True)
+    perceptual_system.system2dot(image_type='png', disp=True)
     
     # Parameters   
     visualWM.dyn_params['tau'] = 300

@@ -165,7 +165,6 @@ class SCENE:
         - width, height (INT): Scene resolution
         - subscenes ([SUB_SCENE]): List of all subscenes associated with the scene.
         - schemas ([SCHEMA_INST]): List of perceptual schemas instances associated with the scene.
-        - focus_regions ([{AREA:SUBSCENE}]) Look-up table linking areas to subscenes.
     """
     
     def __init__(self):
@@ -173,7 +172,6 @@ class SCENE:
         self.height = 0
         self.subscenes = []
         self.schemas = []
-        self.focus_regions = []
     
     def clear(self):
         """
@@ -217,7 +215,6 @@ class SCENE:
         
         # Add new schema
         self.subscenes.append(ss)
-        self.focus_regions.append({'area':ss.area, 'subscene':ss})
         for schema_inst in ss.nodes + ss.edges:
             if not(self.find_schema(schema_inst.name)):
                 self.schemas.append(schema_inst)

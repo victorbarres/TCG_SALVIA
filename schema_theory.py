@@ -963,12 +963,12 @@ class SCHEMA_SYSTEM:
         for port in self.input_ports:
             from_schema = 'INPUT'
             to_schema = port.schema.name
-            dot_sys.add_edge(pydot.Edge(from_schema, to_schema))
+            dot_sys.add_edge(pydot.Edge(from_schema, to_schema, style='dotted'))
         
         for port in self.output_ports:
             from_schema =  port.schema.name
             to_schema = 'OUTPUT'
-            dot_sys.add_edge(pydot.Edge(from_schema, to_schema))
+            dot_sys.add_edge(pydot.Edge(from_schema, to_schema, style='dotted'))
         
         file_name = tmp_folder + self.name + ".gv"
         dot_sys.write(file_name)

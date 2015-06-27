@@ -36,6 +36,16 @@ class AREA:
         self.h = h
         self.saliency = saliency
     
+    def contains(self, eye_pos):
+       """
+       Returns True if eye_pos falls in the area.
+       """
+       x = eye_pos[0]
+       y = eye_pos[1]
+       res = (x>=self.x) and (x<=self.x+self.h) and (y>=self.y) and (y<=self.y+self.w)
+       return res
+           
+    
     def hull(area1, area2):
         """
         Class method
@@ -359,9 +369,9 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_saliency_map')
         self.add_port('IN', 'from_subscene_rec') # Receives signal to triger next saccade once subscene recognition is done.
-        self.add_port('OUT', 'to_subscene_rec')
+        self.add_port('OUT', 'to_fixation')
         self.add_port('OUT', 'to_saliency_map') # For inhibition of return
-        self.eye_pos = None # Crrent  eye position (x,y)
+        self.eye_pos = None # Current  eye position (x,y)
         self.next_fixation = None # Next saccade coordinates (x,y)
     
     def update(self):
@@ -373,7 +383,7 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
             self.next_fixation = self._WTA(saliency_map)
             if self.next_fixation != self.eye_pos: #Updates next-saccedes if the result of the WTA differs from previously computed value.
                 self.eye_pos = self.next_fixation
-                self.set_output('to_subscene_rec', self.eye_pos)
+                self.set_output('to_fixation', self.eye_pos)
                 self.set_output('to_saliency_map', self.eye_pos)
     
     def _WTA(self, saliency_map):
@@ -390,6 +400,23 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
         else:
             coord = None
         return coord
+    
+class FIXATION(PROCEDURAL_SCHEMA):
+    """
+    """
+    def __init__(self, name='Fixation'):
+        PROCEDURAL_SCHEMA.__init__(self, name)
+        self.add_port('IN', 'from_saccade_system')
+        self.add_port('OUT', 'to_subscene_rec')
+        self.fixation = (0,0)
+    
+    def update(self):
+        """
+        """
+        eye_pos = self.get_input('from_saccade_system')
+        if eye_pos:
+            self.fixation = eye_pos
+            self.set_output('to_subscene_rec', self.fixation)
 
 class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
     """
@@ -400,10 +427,10 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         - uncertainty (INT): Remaining uncertainy in subscene perception.
         - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
     """
-    def __init__(self,name='Subscene_recognition'):
+    def __init__(self, name='Subscene_recognition'):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_input')
-        self.add_port('IN', 'from_saccade_system')
+        self.add_port('IN', 'from_fixation')
         self.add_port('IN', 'from_percept_LTM')
         self.add_port('OUT','to_visual_WM')
         self.add_port('OUT', 'to_saccade_system')
@@ -412,37 +439,6 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.subscene = None
         self.uncertainty = 0
         self.next_saccade = False 
-            
-    def update(self):
-        """
-        """
-        scene_input = self.get_input('from_input')
-        if scene_input:
-            self.inputs['scene_input'] = scene_input
-        per_schemas = self.get_input('from_percept_LTM')
-        if per_schemas:
-            self.inputs['per_schemas'] = per_schemas
-        
-        if self.inputs['scene_input'] and self.inputs['per_schemas']:
-            self.initialize(self.inputs['scene_input'], self.inputs['per_schemas'])
-            self.inputs['scene_input'] =  None
-            self.inputs['per_schemas'] = None
-            
-        eye_pos = self.get_input('from_saccade_system')
-        if eye_pos != None:
-            self._get_subscene(eye_pos)
-            if self.subscene != None:
-                self.uncertainty = self.subscene.uncertainty
-        
-        if self.uncertainty != None:
-            self.uncertainty -= 1
-            if self.uncertainty <0:
-                self.next_saccade = True
-                self.set_output('to_visual_WM', self.subscene)
-        
-        self.set_output('to_saccade_system', self.next_saccade)
-        self.next_saccade = False
-    
         
     def initialize(self, scene_input, per_schemas):
         """
@@ -489,12 +485,47 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         
         self.scene_data = my_scene
             
+    def update(self):
+        """
+        """
+        scene_input = self.get_input('from_input')
+        if scene_input:
+            self.inputs['scene_input'] = scene_input
+        per_schemas = self.get_input('from_percept_LTM')
+        if per_schemas:
+            self.inputs['per_schemas'] = per_schemas
         
-    
+        if self.inputs['scene_input'] and self.inputs['per_schemas']:
+            self.initialize(self.inputs['scene_input'], self.inputs['per_schemas'])
+            self.inputs['scene_input'] =  None
+            self.inputs['per_schemas'] = None
+            
+        eye_pos = self.get_input('from_fixation')
+        if eye_pos != None:
+            self._get_subscene(eye_pos)
+            if self.subscene != None:
+                self.uncertainty = self.subscene.uncertainty
+        
+        if self.uncertainty != None:
+            self.uncertainty -= 1
+            if self.uncertainty <0:
+                self.next_saccade = True
+                self.set_output('to_visual_WM', self.subscene)
+        
+        self.set_output('to_saccade_system', self.next_saccade)
+        self.next_saccade = False
+
     def _get_subscene(self, eye_pos):
         """
+        Return the perceptual schema instances that are contained in the subscene currently under fixation (defined by eye_pos)
         """
-        return
+        max_saliency = 0
+        self.subscene = None
+        for ss in self.scene_data.subscenes:
+            if ss.area.contains(eye_pos) and ss.saliency > max_saliency:
+                max_saliency = ss.saliency
+                self.subscene = ss
+                ss.saliency = -1 # THIS NEEDS TO BE CHANGED!!                
 
 ###############################################################################
 if __name__=='__main__':
