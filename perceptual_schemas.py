@@ -15,7 +15,7 @@ import networkx as nx
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM
 import scene as scn
 
-seed = 0
+seed = None
 random.seed(seed)
 
 ####################################
@@ -208,13 +208,14 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
     
     Data:
         SCHEMA_INST:
-            - id (int): Unique id
+            - id (INT): Unique id
             - activation (INST_ACTIVATION): Current activation value of schema instance
             - schema (PERCEPT_SCHEMA):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
             - alive (bool): status flag
             - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
+            - covers ({'cpt_insts'=[]}): Pointer to the concept instances associated through conceptualization.
         
     Notes:
         For now, those schema instances are not used to form assemablages -> so no use for ports... 
@@ -224,6 +225,7 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
         SCHEMA_INST.__init__(self, schema=per_schema, trace=trace)
         content_copy = per_schema.content.copy()
         self.content = content_copy
+        self.covers = {'cpt_insts':[]}
     
     def set_area(self, x=0, y=0, w=0, h=0, saliency=0):
         """
@@ -262,7 +264,7 @@ class VISUAL_WM(WM):
 #            self.show_SceneRep()
         self.update_activations()
         self.prune()
-        self.set_output('to_conceptualizer', self.schema_insts)
+        self.set_output('to_conceptualizer', self.SceneRep)
     
     def update_SceneRep(self, per_insts):
         """

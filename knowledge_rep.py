@@ -174,15 +174,15 @@ class K_NET:
     
     def _has_entity(self, ent_name):
         """
-        Returns true iff there is a entity with name "name".
+        Returns entity iff there is a entity with name "name".
         
         Args:
             - entt_name (STR):
         """
         for n in self.nodes:
             if n.name == ent_name:
-                return True
-        return False
+                return n
+        return None
             
     def _find_meaning(self, meaning):
         """

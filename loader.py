@@ -405,7 +405,7 @@ def load_conceptualization(file_name='', file_path='./', cpt_knowledge=None, per
     Load and returns the TCG conceptualization defined in file_path\file_name
     Requires a cpt_knowledge (CONCEPTUAL_KNOWLEDGE) and a perceptual knowledge (PERCEPTUAL_KNOWLEDGE)
     """
-    #OPen and read file
+    #Open and read file
     json_data = json_read(file_name, path=file_path)
     czer_data = json_data['CONCEPTUALIZATION']
     my_conceptualization = per.CONCEPTUALIZATION()
@@ -416,7 +416,8 @@ def load_conceptualization(file_name='', file_path='./', cpt_knowledge=None, per
             for pcpt in czer_data[cpt]:
                 if not(per_knowledge.has_percept(pcpt)):
                     print "%s: percept not found in perceptual knowledge" %pcpt
-            my_conceptualization.add_mapping(pcpt, cpt)
+                else:
+                    my_conceptualization.add_mapping(pcpt, cpt)
     
     return my_conceptualization
     

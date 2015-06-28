@@ -185,18 +185,59 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_semantic_WM')
         self.conceptualization = None
     
+    def initialize(self, conceptualization):
+        """
+        Args:
+            - conceptualization (CONCEPTUALIZATION)
+        """
+        self.conceptualization = conceptualization
+    
     def update(self):
         """
         """
-        vis_input = self.get_input('from_visual_WM')
-        self.conceptualize(vis_input)
-        self.set_output('to_semantic_WM', self.conceptualization)
-        self.conceptualization = None
+        SceneRep = self.get_input('from_visual_WM')
+        cpt_schemas = self.get_input('from_concept_LTM')
+        if cpt_schemas and SceneRep:
+            cpt_insts  = self.conceptualize(SceneRep, cpt_schemas)
+#            self.set_output('to_semantic_WM', cpt_insts)
+        
+            # Set all SceneRep elements to new=False
+            for n in SceneRep.nodes_iter():
+                SceneRep.node[n]['new'] = False
+            for e in SceneRep.edges_iter():
+                d = SceneRep.get_edge_data(e[0], e[1])
+                d['new'] = False
     
-    def conceptualize(self, vis_input):
+    def conceptualize(self, SceneRep, cpt_schemas):
         """
         """
-        return
+        cpt_insts  = []
+        for n,d in SceneRep.nodes(data=True): # First process the nodes.
+            if d['new']:
+                per_name = d['percept'].name
+                per_inst = d['per_inst']
+                cpt_name = self.conceptualization.conceptualize(per_name)
+                cpt_schema = [schema for schema in cpt_schemas if schema.name == cpt_name][0]
+                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace=per_inst)
+                cpt_inst.set_activation(per_inst.activity) # THIS MIGHT NEED TO BE PARAMETRIZED!!
+                per_inst.covers['cpt_inst'] = cpt_inst
+                cpt_insts.append(cpt_inst)
+        
+        for u,v,d in SceneRep.edges(data=True): # Then the relations.
+            if d['new']:
+                per_name = d['percept'].name
+                per_inst = d['per_inst']
+                cpt_name = self.conceptualization.conceptualize(per_name)
+                cpt_schema = [schema for schema in cpt_schemas if schema.name == cpt_name][0]
+                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace=per_inst)
+                cpt_inst.set_activation(per_inst.activity) # THIS MIGHT NEED TO BE PARAMETRIZED!!
+                pFrom = SceneRep.node[u]['per_inst'].covers['cpt_inst']
+                pTo = SceneRep.node[v]['per_inst'].covers['cpt_inst']
+                cpt_inst.content['pFrom'] = pFrom
+                cpt_inst.content['pTo'] = pTo
+                cpt_insts.append(cpt_inst)
+                
+        return cpt_insts
 
 class CONCEPT_LTM(LTM):
     """

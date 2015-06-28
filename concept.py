@@ -72,7 +72,7 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
     
     def has_concept(self, concept_name):
         """
-        Returns true iff there is a concept with name "name".
+        Returns concept iff there is a concept with name "name".
         
         Args:
             - concept_name (STR):

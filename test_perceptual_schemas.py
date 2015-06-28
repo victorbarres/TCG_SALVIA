@@ -85,6 +85,7 @@ def test():
     # Loading data
     my_perceptual_knowledge = ld.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptualization = ld.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
     my_scene = ld.load_scene("TCG_scene.json", "./data/scenes/cholitas/")
     
     # Initialize perceptual LTM content
@@ -92,6 +93,9 @@ def test():
         
     # Initialize concept LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
+    
+    # Initialize conceptualizer
+    conceptualizer.initialize(my_conceptualization)
     
     # Setting up BU saliency data
     saliency_data = smat.SALIENCY_DATA()
@@ -146,7 +150,6 @@ def test():
 #        plt.pause(0.01)
 
     visualWM.show_dynamics(c2_levels=False)
-    visualWM.show_state()
 if __name__=='__main__':
     test()
     

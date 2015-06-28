@@ -159,7 +159,7 @@ def test(seed=None):
         if step in sem_timing:
             for inst in sem_timing[step]:
                 print "time:%i, sem:%s" %(step, inst.name)
-            conceptualizer.conceptualization = sem_timing[step]
+            conceptualizer.set_output('to_semantic_WM', sem_timing[step])
             semanticWM.set_output('to_control', True)
         language_system.update()
     
