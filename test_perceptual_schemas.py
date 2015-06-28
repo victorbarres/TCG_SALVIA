@@ -62,19 +62,20 @@ def test():
     perceptual_system.brain_mapping = perception_brain_mapping
     
     # Generating schema system graph visualization
-    perceptual_system.system2dot(image_type='png', disp=True)
+#    perceptual_system.system2dot(image_type='png', disp=True)
     
     # Parameters   
+    saliency_map.IOR_params = {'IOR_radius': 5, 'IOR_decay': 0.99, 'IOR_max': 100}
     visualWM.dyn_params['tau'] = 300
     visualWM.dyn_params['act_inf'] = 0.0
     visualWM.dyn_params['L'] = 1.0
     visualWM.dyn_params['k'] = 10.0
     visualWM.dyn_params['x0'] = 0.5
     visualWM.dyn_params['noise_mean'] = 0
-    visualWM.dyn_params['noise_std'] = 0.2
+    visualWM.dyn_params['noise_std'] = 1
     
     visualWM.C2_params['confidence_threshold'] = 0
-    visualWM.C2_params['prune_threshold'] = 0.01
+    visualWM.C2_params['prune_threshold'] = 0.3
     visualWM.C2_params['coop_weight'] = 0
     visualWM.C2_params['comp_weight'] = 0
     
@@ -99,8 +100,10 @@ def test():
     
     # Test schema rec intialization
     perceptual_system.set_input(my_scene)
+    for step in range(1000):
+        perceptual_system.update()
     perceptual_system.update()
-    perceptual_system.update()
+    
 #    
 #    # Display and run    
 #    plt.figure()
@@ -127,7 +130,7 @@ def test():
 #    ior_fig = plt.subplot(2,2,4)
 #    plt.axis('off')
 #    plt.title('IOR')
-#    time = 200
+#    time = 1000
 #    for t in range(time):    
 #        perceptual_system.update()
 #        map = saliency_map.IOR_mask
@@ -142,6 +145,8 @@ def test():
 #            fixation.add_patch(fix)
 #        plt.pause(0.01)
 
+    visualWM.show_dynamics(c2_levels=False)
+    visualWM.show_state()
 if __name__=='__main__':
     test()
     

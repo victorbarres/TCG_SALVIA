@@ -163,7 +163,7 @@ def test(seed=None):
             semanticWM.set_output('to_control', True)
         language_system.update()
     
-    semanticWM.show_dynamics()
+    semanticWM.show_dynamics(c2_levels=False)
     grammaticalWM.show_dynamics()
     grammaticalWM.show_state()
 

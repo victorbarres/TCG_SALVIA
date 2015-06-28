@@ -438,7 +438,8 @@
     "name": "Subscene_People_Focus",
     "schemas": [
      "WATCH1",
-     "Schema_26"
+     "Schema_26",
+	 "PEOPLE"
     ]
    },
    "ss_9": {

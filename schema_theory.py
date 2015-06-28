@@ -623,11 +623,14 @@ class WM(PROCEDURAL_SCHEMA):
     #######################
     ### DISPLAY METHODS ###
     #######################
-    def show_dynamics(self):
+    def show_dynamics(self, c2_levels=True):
         """
         """
         plt.figure(facecolor='white')
-        plt.subplot(2,1,1)
+        num_plots = 1
+        if c2_levels:
+            num_plots =2
+        plt.subplot(num_plots,1,1)
         title = 'WM dynamics \n noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
                               self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'], self.C2_params['confidence_threshold'])
         plt.title(title)
@@ -642,15 +645,16 @@ class WM(PROCEDURAL_SCHEMA):
         plt.axhline(y=self.C2_params['confidence_threshold'], color='r',ls='dashed')
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         
-        plt.subplot(2,1,2)
-        plt.title('Total activity')
-        plt.xlabel('time', fontsize=14)
-        plt.ylabel('activity', fontsize=14)
-        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['comp'],  linewidth=2, color='r', label='competition')
-        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['coop'],  linewidth=2, color='g', label='cooperation')
-        plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['act'], '--',  linewidth=2, color='k', label='total')
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
-        plt.show()
+        if c2_levels:
+            plt.subplot(num_plots,1,num_plots)
+            plt.title('Total activity')
+            plt.xlabel('time', fontsize=14)
+            plt.ylabel('activity', fontsize=14)
+            plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['comp'],  linewidth=2, color='r', label='competition')
+            plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['coop'],  linewidth=2, color='g', label='cooperation')
+            plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['act'], '--',  linewidth=2, color='k', label='total')
+            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+            plt.show()
             
         
     def show_state(self):
@@ -913,6 +917,7 @@ class SCHEMA_SYSTEM:
         # Get system input
         for port in self.input_ports:
             port.value = self.input
+            self.input = None
         
         # Update all the schema states
         for schema in self.schemas:

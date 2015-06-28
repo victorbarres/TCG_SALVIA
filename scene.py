@@ -5,65 +5,65 @@
 Defines visual scene structure related classes for TCG.
 """
 import perceptual_schemas as ps  
-##########################
-### Perceptual process ###
-##########################
-class PERCEPT:
-    """
-    Schema perception. ## -> THIS NEEDS TO BE REPLACED!!! It should use the conceptualizer.
-    
-    Data:
-        - schema (SCHEMA): Perceived schema.
-        - concept (CONCEPT): Perceived concept (can be different from original concept carried by schema).
-        - replace_concept (BOOL): Flag for replacing concept.
-    
-    Notes:
-        - If replace_concept = False -> the concept associated with the percept is the one linked to the schema
-        if replace_concept = True -> override schema concept and use the one associated directly with the percept.
-        - This class is a first attempt to represent conceptualization process going from perceptual schemas
-        to semantic reprsentation. Needs to be improved.
-    """
-    def __init__(self):
-        self.schema = None
-        self.concept = None
-        self.replace_concept = False 
-        
-    
-    def __str__(self):
-        p = ''
-        p += 'schema: %s\n' % self.schema.name
-        if self.concept:
-            p += 'concept: %s\n' % self.concept.name
-        else:
-            p += 'concept: %s\n' % self.concept
-        p += 'replace: %s\n' % self.replace_concept
-        return p
-        
-        
-class REGION:
-    """
-    Scene region.
-    
-    Data:
-        - name (STRING): Name of region
-        - x, y (INT): Location
-        - w, h (INT): Size
-        - saliency (INT): Perceptual saliency of region
-        - uncertainty (INT): How uncertain is the perception of this region.
-        - percepts ([PERCEPT]): List of percepts associated with this region.
-    """
-    def __init__(self):
-        self.name = ''
-        
-        self.x = -1 
-        self.y = -1
-        self.w = 0
-        self.h = 0
-        
-        self.saliency = 0
-        self.uncertainty = 0
-        
-        self.percepts = []
+###########################
+#### Perceptual process ###
+###########################
+#class PERCEPT:
+#    """
+#    Schema perception. ## -> THIS NEEDS TO BE REPLACED!!! It should use the conceptualizer.
+#    
+#    Data:
+#        - schema (SCHEMA): Perceived schema.
+#        - concept (CONCEPT): Perceived concept (can be different from original concept carried by schema).
+#        - replace_concept (BOOL): Flag for replacing concept.
+#    
+#    Notes:
+#        - If replace_concept = False -> the concept associated with the percept is the one linked to the schema
+#        if replace_concept = True -> override schema concept and use the one associated directly with the percept.
+#        - This class is a first attempt to represent conceptualization process going from perceptual schemas
+#        to semantic reprsentation. Needs to be improved.
+#    """
+#    def __init__(self):
+#        self.schema = None
+#        self.concept = None
+#        self.replace_concept = False 
+#        
+#    
+#    def __str__(self):
+#        p = ''
+#        p += 'schema: %s\n' % self.schema.name
+#        if self.concept:
+#            p += 'concept: %s\n' % self.concept.name
+#        else:
+#            p += 'concept: %s\n' % self.concept
+#        p += 'replace: %s\n' % self.replace_concept
+#        return p
+#        
+#        
+#class REGION:
+#    """
+#    Scene region.
+#    
+#    Data:
+#        - name (STRING): Name of region
+#        - x, y (INT): Location
+#        - w, h (INT): Size
+#        - saliency (INT): Perceptual saliency of region
+#        - uncertainty (INT): How uncertain is the perception of this region.
+#        - percepts ([PERCEPT]): List of percepts associated with this region.
+#    """
+#    def __init__(self):
+#        self.name = ''
+#        
+#        self.x = -1 
+#        self.y = -1
+#        self.w = 0
+#        self.h = 0
+#        
+#        self.saliency = 0
+#        self.uncertainty = 0
+#        
+#        self.percepts = []
 ####################
 ### Visual scene ###
 ####################    
@@ -104,10 +104,12 @@ class SUB_SCENE:
         if isinstance(schema_inst.trace, ps.PERCEPT_SCHEMA_REL):
             self.edges.append(schema_inst)
             self.update_area()
+            self.update_uncertainty()
             return True
         else:
             self.nodes.append(schema_inst)
             self.update_area()
+            self.update_uncertainty()
             return True
         
         return False
