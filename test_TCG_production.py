@@ -164,8 +164,8 @@ saliency_map.BU_saliency_map = saliency_data.saliency_map.data
 
 # Test schema rec intialization
 production_system.set_input(my_scene)
-production_system.verbose = True
-for step in range(400):
+production_system.verbose = False
+for step in range(100):
     production_system.update()        
 production_system.update()
 

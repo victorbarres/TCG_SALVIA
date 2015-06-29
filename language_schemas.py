@@ -301,15 +301,15 @@ class SEMANTIC_WM(WM):
             for inst in cpt_insts:
                self.add_instance(inst) # Does not deal with updating already existing nodes. Need to add that.
             self.set_output('to_control', True)
-            
         self.update_activations()
-        self.update_SemRep(cpt_insts)
-        self.prune()
+        self.update_SemRep(cpt_insts)        
+        self.prune()        
         self.set_output('to_grammatical_WM', self.SemRep)
-        self.set_output('to_cxn_retrieval', self.SemRep)
         
-#        if cpt_insts:
+        
+        if cpt_insts:
 #            self.show_SemRep()
+            self.set_output('to_cxn_retrieval', self.SemRep)
     
     def update_SemRep(self, cpt_insts):
         """

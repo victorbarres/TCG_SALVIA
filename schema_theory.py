@@ -456,6 +456,9 @@ class WM(PROCEDURAL_SCHEMA):
         self.save_state = {'insts':{}}
        
     def add_instance(self,schema_inst, act0=None):
+        if schema_inst in self.schema_insts:
+            return False
+            
         self.schema_insts.append(schema_inst)
         if not(act0):
             act0 = schema_inst.activity # Uses the inti_activation defined by the associated schema.
@@ -465,6 +468,7 @@ class WM(PROCEDURAL_SCHEMA):
         schema_inst.act_params = act_params
         schema_inst.initialize_activation()
         self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
+        return True
     
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
@@ -860,6 +864,7 @@ class SCHEMA_SYSTEM:
         self.outputs = None
         self.t = SCHEMA_SYSTEM.T0
         self.dt = SCHEMA_SYSTEM.TIME_STEP
+        self.verbose = False
     
     def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
         """
