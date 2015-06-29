@@ -565,7 +565,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         if eye_pos and not(self.subscene):
             self._get_subscene(eye_pos)
             if self.subscene:
-                self.uncertainty = self.subscene.uncertainty*10
+                self.uncertainty = self.subscene.uncertainty*20
         
         if self.subscene:
             print "t: %i,  uncertainty = %i" %(self.t, self.uncertainty)

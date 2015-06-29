@@ -199,7 +199,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         cpt_schemas = self.get_input('from_concept_LTM')
         if cpt_schemas and SceneRep:
             cpt_insts  = self.conceptualize(SceneRep, cpt_schemas)
-#            self.set_output('to_semantic_WM', cpt_insts)
+            self.set_output('to_semantic_WM', cpt_insts)
         
             # Set all SceneRep elements to new=False
             for n in SceneRep.nodes_iter():
@@ -308,8 +308,8 @@ class SEMANTIC_WM(WM):
         self.set_output('to_grammatical_WM', self.SemRep)
         self.set_output('to_cxn_retrieval', self.SemRep)
         
-        if cpt_insts:
-            self.show_SemRep()
+#        if cpt_insts:
+#            self.show_SemRep()
     
     def update_SemRep(self, cpt_insts):
         """

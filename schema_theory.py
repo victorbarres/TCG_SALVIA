@@ -5,12 +5,14 @@
 Defines the based schema theory classes.
 
 Uses abc to define abstract classes
+Uses time only to provide execution timing for procedural schema updating.
 Uses random
 Uses numpy to implement the schema instances activation values.
 Uses matplotlib.plt to visualize WM state dynamics
 Uses networkx to visualize WM state
 """
 import abc
+import time
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -844,6 +846,7 @@ class SCHEMA_SYSTEM:
         - brain_mapping (BRAIN_MAPPING)
         - t (FLOAT): System global time.
         - dt (FLOAT): System time increment.
+        - verbose (BOOL): If True, print execution information.
     """
     T0 = 0
     TIME_STEP = 1.0
@@ -921,8 +924,12 @@ class SCHEMA_SYSTEM:
         
         # Update all the schema states
         for schema in self.schemas:
+            init_t = time.time()
             schema.update()
+            end_t = time.time()
             schema.t = self.t
+            if self.verbose:
+                print 'Update %s, (%f s)' %(schema.name, end_t - init_t)
         
         # Propagate value through connections
         for connection in self.connections:
