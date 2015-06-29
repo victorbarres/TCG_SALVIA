@@ -113,8 +113,8 @@
     "uncertainty": "1",
     "type": "RELATION",
     "schema": "R9_HAS_PARAM",
-    "from": "DRESS1",
-    "to": "Schema_6"
+    "from": "Schema_6",
+    "to": "DRESS1"
    },
    "sc_8": {
     "name": "WOMAN2",
@@ -224,8 +224,8 @@
     "uncertainty": "1",
     "type": "RELATION",
     "schema": "R9_HAS_PARAM",
-    "from": "DRESS2",
-    "to": "Schema_11"
+    "from": "Schema_11",
+    "to": "DRESS2"
    },
    "sc_17": {
     "name": "KICK1",
@@ -320,8 +320,8 @@
     "uncertainty": "1",
     "type": "RELATION",
     "schema": "R8_CONTAIN",
-    "from": "BOXINGRING1",
-    "to": "KICK1"
+    "from": "KICK1",
+    "to": "BOXINGRING1"
    },
    "sc_24": {
     "name": "WATCH1",

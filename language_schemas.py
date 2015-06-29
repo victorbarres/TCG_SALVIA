@@ -218,7 +218,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
                 per_inst = d['per_inst']
                 cpt_name = self.conceptualization.conceptualize(per_name)
                 cpt_schema = [schema for schema in cpt_schemas if schema.name == cpt_name][0]
-                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace=per_inst)
+                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':per_inst, 'cpt_schema':cpt_schema})
                 cpt_inst.set_activation(per_inst.activity) # THIS MIGHT NEED TO BE PARAMETRIZED!!
                 per_inst.covers['cpt_inst'] = cpt_inst
                 cpt_insts.append(cpt_inst)
@@ -229,7 +229,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
                 per_inst = d['per_inst']
                 cpt_name = self.conceptualization.conceptualize(per_name)
                 cpt_schema = [schema for schema in cpt_schemas if schema.name == cpt_name][0]
-                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace=per_inst)
+                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':per_inst, 'cpt_schema':cpt_schema})
                 cpt_inst.set_activation(per_inst.activity) # THIS MIGHT NEED TO BE PARAMETRIZED!!
                 pFrom = SceneRep.node[u]['per_inst'].covers['cpt_inst']
                 pTo = SceneRep.node[v]['per_inst'].covers['cpt_inst']
@@ -322,11 +322,11 @@ class SEMANTIC_WM(WM):
         """
         if cpt_insts:
             # First process all the instances that are not relations.
-            for inst in [i for i in cpt_insts if not(isinstance(i.trace, CPT_RELATION_SCHEMA))]:
+            for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
                 self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], new=True)
             
             # Then add the relations
-            for rel_inst in [i for i in cpt_insts if isinstance(i.trace, CPT_RELATION_SCHEMA)]:
+            for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
                 self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True)

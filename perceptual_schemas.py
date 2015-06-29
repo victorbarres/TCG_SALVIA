@@ -287,7 +287,7 @@ class VISUAL_WM(WM):
                 node_to = rel_inst.content['pTo'].name
                 self.SceneRep.add_edge(node_from, node_to, per_inst=rel_inst, percept=rel_inst.content['percept'],  new=True)
         
-            self.show_SceneRep()
+#            self.show_SceneRep()
     
     def show_SceneRep(self):
         node_labels = dict((n, '%s(%.1f)' %(n, d['per_inst'].activity)) for n,d in self.SceneRep.nodes(data=True))
@@ -565,10 +565,9 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         if eye_pos and not(self.subscene):
             self._get_subscene(eye_pos)
             if self.subscene:
-                self.uncertainty = self.subscene.uncertainty*20
+                self.uncertainty = self.subscene.uncertainty*10
         
         if self.subscene:
-            print "t: %i,  uncertainty = %i" %(self.t, self.uncertainty)
             self.uncertainty -= 1
             if self.uncertainty <0:
                 self.next_saccade = True

@@ -12,7 +12,7 @@ import perceptual_schemas as ps
 import language_schemas as ls 
 import loader as ld
 
-random.seed(seed)
+random.seed(3)
 
 
 ####################################
@@ -135,7 +135,7 @@ grammaticalWM.C2_params['comp_weight'] = -1
 
 grammaticalLTM.init_act = grammaticalWM.C2_params['confidence_threshold']
 
-control.task_params['time_pressure'] = 50
+control.task_params['time_pressure'] = 900
 
 # Loading data
 my_scene = ld.load_scene("TCG_scene.json", "./data/scenes/cholitas/")
@@ -143,7 +143,7 @@ my_scene = ld.load_scene("TCG_scene.json", "./data/scenes/cholitas/")
 my_perceptual_knowledge = ld.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
 my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
 my_conceptualization = ld.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
-my_grammar = ld.load_grammar("TCG_grammar_VB.json", "./data/grammars/", my_conceptual_knowledge)
+my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/", my_conceptual_knowledge)
 
 # Initialize perceptual LTM content
 perceptLTM.initialize(my_perceptual_knowledge)
@@ -165,12 +165,12 @@ saliency_map.BU_saliency_map = saliency_data.saliency_map.data
 # Test schema rec intialization
 production_system.set_input(my_scene)
 production_system.verbose = False
-for step in range(100):
+for step in range(1000):
     production_system.update()        
 production_system.update()
 
-visualWM.show_dynamics(c2_levels=False)
-semanticWM.show_dynamics(c2_levels=False)
+visualWM.show_SceneRep()
+semanticWM.show_SemRep()
 grammaticalWM.show_dynamics()
 grammaticalWM.show_state()
 
