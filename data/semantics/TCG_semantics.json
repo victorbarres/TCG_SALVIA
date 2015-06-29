@@ -11,20 +11,36 @@
 					"BOY" : {}, 
 					"WOMAN" : {}, 
 					"GIRL" : {},
-					"PEOPLE" : {}
+					"PEOPLE" : {},
+					"BALLERINA" : {},
+					"CELLIST" :{},
+					"FENCER" : {},
+					"ROBBER" : {},
+					"POLICEMAN" : {},
+					"HUNTER" : {}
 				},
 				"ITEM" : 
 				{
 					"CLOTHING" : 
 					{
 						"DRESS" : {},
-						"TSHIRT" : {}
-					}
+						"TSHIRT" : {},
+						"SHIRT" : {},
+						"SUIT" : {}
+					},
+					"CELLO" : {},
+					"TREE" : {},
+					"BAG" :{},
+					"WATERING_CAN" : {}, 
+					"HOOK" : {},
+					"BOOKSHELF" :{},
+					"WAGON" : {}
 				},
 				"ANIMAL" : 
 				{
 					"MOUSE" :{},
-					"TURTLE" : {}
+					"TURTLE" : {},
+					"DOG" : {}
 				}
 			},
 			"PLACE" :
@@ -48,7 +64,8 @@
 			"FEMALE"  : 
 			{ 
 				"WOMAN" : {},
-				"GIRL" : {} 
+				"GIRL" : {},
+				"BALLERINA" :{}
 			}
 		},
 		
@@ -60,7 +77,8 @@
 				"TALK" : {},
 				"HIT" : {},
 				"KICK" : {},
-				"WEAR" : {}
+				"WEAR" : {},
+				"SPLASH" : {}
 			},
 			"INTRANSITIVE" :
 			{
@@ -127,7 +145,23 @@
 			"O10_TSHIRT",
 			"O11_BOXINGRING",
 			"O12_PARK",
-			"O13_PEOPLE"
+			"O13_PEOPLE",
+			"O14_BALLERINA",
+			"O15_CELLIST",
+			"O16_FENCER", 
+			"O17_CELLO",
+			"O18_TREE",
+			"O19_BAG",
+			"O20_WATERING_CAN",
+			"O21_SHIRT",
+			"O22_SUIT",
+			"O23_ROBBER",
+			"O24_POLICEMAN",
+			"O25_HUNTER",
+			"O26_DOG",
+			"O27_HOOK",
+			"O28_BOOKSHELF",
+			"O29_WAGON"
 		],
 		"ACTION":
 		[
@@ -137,7 +171,8 @@
 			"A4_WEAR",
 			"A5_KICK",
 			"A6_LAUGH",
-			"A7_WATCH"
+			"A7_WATCH",
+			"A8_SPLASH",
 		],
 		"QUALITY":
 		{
@@ -172,7 +207,9 @@
 				"R10_HITEE",
 				"R11_WEAREE",
 				"R12_KICKEE",
-				"R13_WATCHEE"
+				"R13_WATCHEE",
+				"R14_SPLASHER",
+				"R15_SPLASHEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -206,6 +243,23 @@
 		"BOXINGRING" : ["O11_BOXINGRING"],
 		"PARK" : ["O12_PARK"],
 		"PEOPLE" : ["O13_PEOPLE"],
+		"BALLERINA" : ["O14_BALLERINA"],
+		"CELLIST" : ["O15_CELLIST"],
+		"FENCER" : ["O16_FENCER"],
+		"CELLO" : ["O17_CELLO"],
+		"TREE" : ["O18_TREE"],
+		"BAG" : ["O19_BAG"],
+		"WATERING_CAN" :["O20_WATERING_CAN"],
+		"SHIRT" :["O21_SHIRT"],
+		"SUIT" :["O22_SUIT"],
+		"ROBBER" : ["O23_ROBBER"],
+		"POLICEMAN" : ["O24_POLICEMAN"],
+		"HUNTER" : ["O25_HUNTER"],
+		"DOG" : ["O26_DOG"],
+		"HOOK" : ["O27_HOOK"],
+		"BOOKSHELF" : ["O28_BOOKSHELF"],
+		"WAGON" : ["O29_WAGON"],
+		
 		
 		"SQUIRT" : ["A1_SQUIRT"],
 		"TALK" : ["A2_TALK"],
@@ -214,6 +268,7 @@
 		"KICK" : ["A5_KICK"],
 		"LAUGH" : ["A6_LAUGH"],
 		"WATCH" : ["A7_WATCH"],
+		"SPLASH" : ["A8_SPLASH"],
 		
 		"RED" : ["Q1_RED"],
 		"BLUE" : ["Q2_BLUE"],
@@ -227,8 +282,8 @@
 		"IN" : ["R8_CONTAIN"],
 		"SUCCESSIVE" : ["R12_SUCCESSIVE"],
 		"CONCURRENT" : ["R11_CONCURRENT"],
-		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER"],
-		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE"]
+		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER", "R14_SPLASHER"],
+		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE", "R15_SPLASHEE"]
 	}
 }
 
