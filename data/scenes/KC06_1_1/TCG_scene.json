@@ -1,0 +1,198 @@
+{
+ "scene": {
+  "resolution": [
+   1025,
+   768
+  ],
+  "schemas": {
+   "sc_0": {
+    "name": "BALLERINA",
+    "location": [
+     164,
+     530
+    ],
+    "size": [
+     192,
+     451
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O14_BALLERINA"
+   },
+   "sc_1": {
+    "name": "CELLIST",
+    "location": [
+     197,
+     131
+    ],
+    "size": [
+     171,
+     530
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O15_CELLIST"
+   },
+   "sc_2": {
+    "name": "SPLASH",
+    "location": [
+     316,
+     307
+    ],
+    "size": [
+     255,
+     102
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "A8_SPLASH"
+   },
+   "sc_3": {
+    "name": "SPLASH_AGT",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R14_SPLASHER",
+    "from": "SPLASH",
+    "to": "BALLERINA"
+   },
+   "sc_4": {
+    "name": "SPLASH_PT",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R15_SPLASHEE",
+    "from": "SPLASH",
+    "to": "CELLIST"
+   },
+   "sc_5": {
+    "name": "FENCER",
+    "location": [
+     162,
+     764
+    ],
+    "size": [
+     194,
+     286
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O16_FENCER"
+   },
+   "sc_6": {
+    "name": "BAG",
+    "location": [
+     615,
+     684
+    ],
+    "size": [
+     161,
+     106
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O19_BAG"
+   },
+   "sc_7": {
+    "name": "RED",
+    "location": [
+     631,
+     712
+    ],
+    "size": [
+     142,
+     86
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "QUALITY",
+    "schema": "Q1_RED"
+   },
+   "sc_8": {
+    "name": "RED_MOD",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R9_HAS_PARAM",
+    "from": "RED",
+    "to": "BAG"
+   },
+   "sc_9": {
+    "name": "TREE",
+    "location": [
+     24,
+     31
+    ],
+    "size": [
+     207,
+     275
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O18_TREE"
+   }
+  },
+  "subscenes": {
+   "ss_0": {
+    "name": "SPLASH_EVT",
+    "schemas": [
+     "BALLERINA",
+     "CELLIST",
+     "SPLASH",
+     "SPLASH_AGT",
+     "SPLASH_PT"
+    ]
+   },
+   "ss_1": {
+    "name": "FENCER",
+    "schemas": [
+     "FENCER"
+    ]
+   },
+   "ss_2": {
+    "name": "BAG",
+    "schemas": [
+     "BAG",
+     "RED",
+     "RED_MOD"
+    ]
+   },
+   "ss_3": {
+    "name": "TREE",
+    "schemas": [
+     "TREE"
+    ]
+   }
+  }
+ }
+}

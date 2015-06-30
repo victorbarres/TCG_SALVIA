@@ -6,7 +6,6 @@ Test TCG Production
 """
 import random
 
-import saliency_matlab as smat
 import schema_theory as st
 import perceptual_schemas as ps
 import language_schemas as ls 
@@ -138,12 +137,17 @@ grammaticalLTM.init_act = grammaticalWM.C2_params['confidence_threshold']
 control.task_params['time_pressure'] = 900
 
 # Loading data
-my_scene = ld.load_scene("TCG_scene.json", "./data/scenes/cholitas/")
+scene_name = 'KC06_1_1'
+grammar_name = 'TCG_grammar_VB'
+
+scene_folder = "./data/scenes/%s/" %scene_name
+my_scene = ld.load_scene("TCG_scene.json", scene_folder)
 
 my_perceptual_knowledge = ld.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
 my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
 my_conceptualization = ld.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
-my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/", my_conceptual_knowledge)
+grammar_file = "%s.json" %grammar_name
+my_grammar = ld.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
 
 # Initialize perceptual LTM content
 perceptLTM.initialize(my_perceptual_knowledge)
@@ -158,9 +162,8 @@ conceptualizer.initialize(my_conceptualization)
 grammaticalLTM.initialize(my_grammar)
 
 # Setting up BU saliency data
-saliency_data = smat.SALIENCY_DATA()
-saliency_data.load("./data/scenes/cholitas") # This needs to eb better integrated with the scene data.
-saliency_map.BU_saliency_map = saliency_data.saliency_map.data
+BU_saliency_map = ld.load_BU_saliency(scene_name, scene_folder)
+saliency_map.BU_saliency_map = BU_saliency_map # This needs to eb better integrated with the scene data.
 
 # Test schema rec intialization
 production_system.set_input(my_scene)

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 31 14:48:11 2015
-
 @author: Victor Barres
 
 Defines the interface between the Matlab SaliencyToolbox and TCG
