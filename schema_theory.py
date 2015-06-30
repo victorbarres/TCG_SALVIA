@@ -10,6 +10,7 @@ Uses random
 Uses numpy to implement the schema instances activation values.
 Uses matplotlib.plt to visualize WM state dynamics
 Uses networkx to visualize WM state
+Uses json to save simulation data in json format.
 """
 import abc
 import time
@@ -17,11 +18,12 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+import json
 
 ##################################
 ### SCHEMAS (Functional units) ###
 ##################################
-class SCHEMA:
+class SCHEMA(object):
     """
     Schema (base class)
     
@@ -35,7 +37,7 @@ class SCHEMA:
         SCHEMA.ID_next += 1
         self.name = name
 
-class PORT:
+class PORT(object):
     """
     Port class defining inputs and outputs connections.
     Data:
@@ -122,6 +124,15 @@ class CONNECT(SCHEMA):
         """
         self.port_to.value = self.port_from.value
         self.port_from.value = None
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = {"id":self.id, "name":self.name, "port_from":self.port_from.name, "port_to":self.port_to.name, "weight":self.weight, "delay":self.delay}
+        return json_data
 
 class KNOWLEDGE_SCHEMA(SCHEMA):
     """
@@ -238,7 +249,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             print("ERROR: port %s does not exist or could refer to multiple ports" % port_name)
             return None
         return found[0]
-        
+    
     @abc.abstractmethod    
     def update(self):
         """
@@ -247,6 +258,24 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         and post values at the output ports.
         """
         return
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        Returns a JSON formated string containing the schema's description info.
+        """
+        json_data = {"name":self.name, "type":self.__class__.__name__, "parameters":{"dt":self.dt}, 
+                     "in_ports":[p.name for p in self.in_ports], "out_ports":[p.name for p in self.out_ports]}
+        return json_data
+        
+    def state2json(self):
+        """
+        Returns a JSON formated string containing schema's current state's information.
+        """
+        json_data = {"name":self.name, "t":self.t, "activity":self.activity}
+        return json_data
          
 #################################
 ### PROCEDURAL SCHEMA CLASSES ###
@@ -262,7 +291,6 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - out_ports ([PORT]):
         - activity (float):
     Data:
-        - schema (KNOWLEDGE_SCHEMA):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation.
         - act_params (DICT): {t0:FLOAT,act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}
@@ -344,8 +372,21 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         post values at the output ports.
         """
         return
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def state2json(self):
+        """
+        """
+        json_data = super(SCHEMA_INST, self).state2json()
+        json_data['alive'] = self.alive
+        json_data['content'] = {}
+        json_data['trace'] = {}
+        
+        return json_data
 
-class INST_ACTIVATION:
+class INST_ACTIVATION(object):
     """
     Note: Having dt and Tau is redundant... dt should be defined at the system level.
     """
@@ -624,8 +665,27 @@ class WM(PROCEDURAL_SCHEMA):
         self.save_state['total_activity']['comp'].append(tot_comp)
         self.save_state['total_activity']['coop'].append(tot_coop)
         self.save_state['total_activity']['act'].append(self.activity)
-        
     
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = super(WM, self).params2json()
+        json_data['dyn_params'] = self.dyn_params
+        json_data['C2_params'] = self.C2_params
+        return json_data
+        
+    def state2json(self):
+        """
+        """
+        json_data = super(WM, self).state2json()
+        json_data['schema_insts'] = [s.name for s in self.schema_insts]
+        json_data['coop_links'] = [l.params2json() for l in self.coop_links]
+        json_data['comp_links'] = [l.params2json() for l in self.coop_links]
+        return json_data
+        
     #######################
     ### DISPLAY METHODS ###
     #######################
@@ -690,7 +750,7 @@ class WM(PROCEDURAL_SCHEMA):
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('coop'), edge_color='g')
         nx.draw_networkx_edges(state, pos=pos, edgelist=get_edges('comp'), edge_color='r')
              
-class F_LINK:
+class F_LINK(object):
     """
     Functional links between schema instances in working memory
     Activations propagates in both directions. The asymmetry_coef parameter controls how asymmetrical is the link.
@@ -721,7 +781,16 @@ class F_LINK:
     def copy(self):
         new_flink = F_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
         return new_flink
-
+        
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = {"inst_from":self.inst_from.name, "inst_to":self.inst_to.name, "weight":self.weight, "asymmetry_coef":self.asymmetry_coef}
+        return json_data
+    
 class COOP_LINK(F_LINK):
     """
     Cooperation functional links between schema instances in working memory
@@ -749,6 +818,16 @@ class COOP_LINK(F_LINK):
         new_flink = COOP_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
         new_flink.connect = self.connect.copy()
         return new_flink
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = super(COOP_LINK, self).params2json()
+        json_data['connect'] = self.connect.params2json()
+        return json_data
 
 class COMP_LINK(F_LINK):
     """
@@ -764,7 +843,7 @@ class COMP_LINK(F_LINK):
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
 
-class ASSEMBLAGE:
+class ASSEMBLAGE(object):
     """
     Defines a schema instance assemblage.
     """
@@ -815,28 +894,52 @@ class ASSEMBLAGE:
         new_assemblage.schema_insts = self.schema_insts[:] # neither deep nor shallow copy.
         new_assemblage.coop_links = self.coop_links[:] 
         return new_assemblage
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = {}
+        json_data['schema_insts'] = [s.name for s in self.schema_insts]
+        json_data['coop_links'] = [l.params2json() for l in self.coop_links]
+        json_data['activation'] = self.activation
+        return json_data
 
 #############################
 ### BRAIN MAPPING CLASSES ###
 #############################
-class BRAIN_MAPPING:
+class BRAIN_MAPPING(object):
     """
     Defines the mappings between procedural schemas and brain regions and between schema connections and brain connections.
     
     Data:
         -schema_mapping {schema_name1:[brain_region1, brain_region2,...], schema_name2:[brain_region3, brain_region4,...],...}
-        -connect_mapping {connect_name1:[brain_connecion1, brain_connection2,...], connect_name2:[brain_connection3, brain_connection4,...],...}
+        -connect_mapping {connect_name1:[brain_connection1, brain_connection2,...], connect_name2:[brain_connection3, brain_connection4,...],...}
     """
     BRAIN_REGIONS = []
     BRAIN_CONNECTIONS = []
     def __init__(self):
         self.schema_mapping = {}
         self.connect_mapping = {}
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = {}
+        json_data['schema_mapping'] = self.schema_mapping
+        json_data['connect_mapping'] = self.connect_mapping
+        return json_data
+    
 
 ############################
 ### SCHEMA SYSTEM CLASSES###
 ############################
-class SCHEMA_SYSTEM:
+class SCHEMA_SYSTEM(object):
     """
     Defines a model as a system of procedural schemas.
     Data:
@@ -851,6 +954,7 @@ class SCHEMA_SYSTEM:
         - t (FLOAT): System global time.
         - dt (FLOAT): System time increment.
         - verbose (BOOL): If True, print execution information.
+        - sim_data (DICT): stores the simulation data.
     """
     T0 = 0
     TIME_STEP = 1.0
@@ -865,6 +969,7 @@ class SCHEMA_SYSTEM:
         self.t = SCHEMA_SYSTEM.T0
         self.dt = SCHEMA_SYSTEM.TIME_STEP
         self.verbose = False
+        self.sim_data = {'schema_system':{}, 'system_states':{}}
     
     def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
         """
@@ -942,7 +1047,47 @@ class SCHEMA_SYSTEM:
         
         # Update the system output
         self.outputs = {p.schema.name+":"+str(p.id):p.value for p in self.output_ports}
+        
+        # Save simulation data
+        if not(self.sim_data['schema_system']):
+            self.sim_data['schema_system'] = self.params2json()
+        self.sim_data[self.t] = self.state2json()
     
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = {'name':self.name, 'T0':SCHEMA_SYSTEM.T0, 'TIME_STEP':SCHEMA_SYSTEM.TIME_STEP, 'dt':self.dt}
+        json_data['connections'] = [c.params2json() for c in self.connections]
+        json_data['input_ports'] = [p.name for p in self.input_ports]
+        json_data['output_ports']= [p.name for p in self.output_ports]
+        json_data['brain_mapping'] = self.brain_mapping.params2json()
+        
+        json_data['procedural_schemas'] = {}
+        for schema in self.schemas:
+            json_data['procedural_schemas'][schema.name] = schema.params2json()
+        
+        return json_data
+    
+    def state2json(self):
+        """
+        """
+        json_data = {'schema_states':{}, 'outputs':self.outputs}
+        for schema in self.schemas:
+            json_data['schema_states'][schema.name] = schema.state2json()
+        return json_data
+    
+    def save_sim(self, file_name = 'output.json'):
+        """
+        """
+        with open(file_name, 'wb') as f:
+            json.dump(self.sim_data, f, sort_keys=True, indent=4, separators=(',', ': '))
+    
+    #######################
+    ### DISPLAY METHODS ###
+    #######################
     def system2dot(self, image_type='svg', disp=False):
         """
         Generates a dot file of the system's graph.

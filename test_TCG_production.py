@@ -198,7 +198,7 @@ plt.axis('off')
 plt.title('IOR')
 
 # Running the schema system
-time = 1000
+time = 100
 for t in range(time):
     print t
     production_system.update()
@@ -218,4 +218,6 @@ visualWM.show_SceneRep()
 semanticWM.show_SemRep()
 grammaticalWM.show_dynamics()
 grammaticalWM.show_state()
+
+production_system.save_sim('test_production_output.json')
 

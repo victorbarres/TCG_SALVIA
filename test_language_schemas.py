@@ -93,8 +93,11 @@ def test(seed=None):
     grammaticalLTM.init_act = grammaticalWM.C2_params['confidence_threshold']
     
     # Loading data
+    grammar_name = 'TCG_grammar_VB'
+   
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_grammar = ld.load_grammar("TCG_grammar_VB.json", "./data/grammars/", my_conceptual_knowledge)
+    grammar_file = "%s.json" %grammar_name
+    my_grammar = ld.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
@@ -134,25 +137,29 @@ def test(seed=None):
     # Timing options:
     # Define at which time the schema instances should be invoked in semantic working memory
     # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
-    sem_timing_1 = {100:[woman1]}
-    sem_timing_2 = {100:[woman1, modify1, pretty1]}
-    sem_timing_3 = {100:[woman1, kick1, man1, agent1, patient1]}
-    sem_timing_4 = {100:[woman1, modify1, pretty1, kick1, agent1, patient1, man1, big1, modify2]}
-    sem_timing_5 = {100:[woman1, modify1, pretty1, man1, big1, modify2]} # SemRep contains to unconnected subgraphs.
-    
-    sem_timing_6 = {100:[woman1], 200:[modify1, pretty1]}
-    
-    sem_timing_7 = {100:[woman1], 200:[modify1, pretty1], 300: [kick1],  400:[agent1, patient1, man1], 500:[big1, modify2]}
-    sem_timing_8 = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[modify1, pretty1], 400:[big1, modify2]}
-    sem_timing_9 = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[big1, modify2], 400:[modify1, pretty1]} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.
-    
-    sem_timing_10 = {10:[woman1], 300:[modify1, pretty1], 500: [kick1],  700:[agent1, patient1, man1], 900:[big1, modify2]}    
-    
-    sem_timing_11 = {100:[woman1, modify1, pretty1], 200:[man1, big1, modify2], 300:[kick1], 400:[agent1, patient1]}
-    
-    sem_timing = sem_timing_2
-    
+
+    sem_option = 2
     end_delay = 500
+    
+    sem_timings = {}
+    sem_timings[1] = {100:[woman1]}
+    sem_timings[2] = {100:[woman1, modify1, pretty1]}
+    sem_timings[3] = {100:[woman1, kick1, man1, agent1, patient1]}
+    sem_timings[4] = {100:[woman1, modify1, pretty1, kick1, agent1, patient1, man1, big1, modify2]}
+    sem_timings[5] = {100:[woman1, modify1, pretty1, man1, big1, modify2]} # SemRep contains to unconnected subgraphs.
+    
+    sem_timings[6] = {100:[woman1], 200:[modify1, pretty1]}
+    
+    sem_timings[7] = {100:[woman1], 200:[modify1, pretty1], 300: [kick1],  400:[agent1, patient1, man1], 500:[big1, modify2]}
+    sem_timings[8] = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[modify1, pretty1], 400:[big1, modify2]}
+    sem_timings[9] = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[big1, modify2], 400:[modify1, pretty1]} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.
+    
+    sem_timings[10] = {10:[woman1], 300:[modify1, pretty1], 500: [kick1],  700:[agent1, patient1, man1], 900:[big1, modify2]}    
+    
+    sem_timings[11] = {100:[woman1, modify1, pretty1], 200:[man1, big1, modify2], 300:[kick1], 400:[agent1, patient1]}
+    
+    sem_timing = sem_timings[sem_option]
+    
     max_time = max([time for time in sem_timing.keys()])
     max_time += end_delay
     for step in range(max_time):
