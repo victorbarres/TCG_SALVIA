@@ -456,7 +456,7 @@ def load_BU_saliency(file_name = '', file_path = './'):
     """
     saliency_data = smat.SALIENCY_DATA()
     saliency_data.load(file_path + file_name) # This needs to eb better integrated with the scene data.
-    return saliency_data.saliency_map.data
+    return saliency_data
     
             
         

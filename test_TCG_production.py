@@ -5,6 +5,8 @@
 Test TCG Production
 """
 import random
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 import schema_theory as st
 import perceptual_schemas as ps
@@ -134,11 +136,11 @@ grammaticalWM.C2_params['comp_weight'] = -1
 
 grammaticalLTM.init_act = grammaticalWM.C2_params['confidence_threshold']
 
-control.task_params['time_pressure'] = 900
+control.task_params['time_pressure'] = 500
 
 # Loading data
-scene_name = 'KC06_1_1'
-grammar_name = 'TCG_grammar_VB'
+scene_name = 'TCG_cholitas'
+grammar_name = 'TCG_grammar'
 
 scene_folder = "./data/scenes/%s/" %scene_name
 my_scene = ld.load_scene("TCG_scene.json", scene_folder)
@@ -162,15 +164,55 @@ conceptualizer.initialize(my_conceptualization)
 grammaticalLTM.initialize(my_grammar)
 
 # Setting up BU saliency data
-BU_saliency_map = ld.load_BU_saliency(scene_name, scene_folder)
-saliency_map.BU_saliency_map = BU_saliency_map # This needs to eb better integrated with the scene data.
+saliency_data = ld.load_BU_saliency(scene_name, scene_folder)
+saliency_map.BU_saliency_map = saliency_data.saliency_map.data # This needs to eb better integrated with the scene data.
 
-# Test schema rec intialization
+# Schema rec intialization
 production_system.set_input(my_scene)
 production_system.verbose = False
-for step in range(1000):
-    production_system.update()        
-production_system.update()
+
+    
+# Set up saccade display
+plt.figure()
+plt.subplot(2,2,1)
+plt.axis('off')
+plt.title('Input scene')
+plt.imshow(saliency_data.orig_image.data)
+
+r = 2**(saliency_data.params.levelParams['mapLevel']-1) # Only works if pyramidtype = dyadic!
+
+plt.subplot(2,2,2)
+plt.axis('off')
+plt.title('Bottom-up saliency map')
+plt.imshow(saliency_map.BU_saliency_map, cmap = cm.Greys_r)
+
+fixation_plot = plt.subplot(2,2,3)
+plt.axis('off')
+plt.title('Fixation')
+plt.imshow(saliency_data.orig_image.data)
+fix = plt.Circle((0,0), saliency_data.params.foaSize, color='r', alpha=0.3)
+fixation_plot.add_patch(fix)
+
+ior_fig = plt.subplot(2,2,4)
+plt.axis('off')
+plt.title('IOR')
+
+# Running the schema system
+time = 1000
+for t in range(time):
+    print t
+    production_system.update()
+    map = saliency_map.IOR_mask
+    if map != None:
+        plt.sca(ior_fig)
+        ior_fig.cla()
+        plt.imshow(map, cmap = cm.Greys_r)
+    if saccade_system.eye_pos:
+        fix.remove()
+        fix.center = (saccade_system.eye_pos[1]*r,saccade_system.eye_pos[0]*r)
+        plt.sca(fixation_plot)
+        fixation_plot.add_patch(fix)
+    plt.pause(0.0001)
 
 visualWM.show_SceneRep()
 semanticWM.show_SemRep()
