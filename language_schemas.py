@@ -280,6 +280,16 @@ class CONCEPT_LTM(LTM):
     def update(self):
         self.set_output('to_conceptualizer', self.schemas)
         
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = super(CONCEPT_LTM, self).params2json()
+        json_data['init_act'] = self.init_act
+        return json_data
+        
 class SEMANTIC_WM(WM):
     """
     """
@@ -926,6 +936,16 @@ class GRAMMATICAL_LTM(LTM):
         """
         """
         self.set_output('to_cxn_retrieval', self.schemas)
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = super(GRAMMATICAL_LTM, self).params2json()
+        json_data['init_act'] = self.init_act
+        return json_data
 
 class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
     """
@@ -1005,6 +1025,16 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         NOTE: I NEED TO THINK ABOUT HOW TO INCORPORATE FOCUS ETC....
         """
         return 1
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def state2json(self):
+        """
+        """
+        json_data = super(CXN_RETRIEVAL, self).state2json()
+        json_data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
+        return json_data
 
 class PHON_WM(PROCEDURAL_SCHEMA):
     """
@@ -1014,15 +1044,27 @@ class PHON_WM(PROCEDURAL_SCHEMA):
         self.add_port('IN', 'from_grammatical_WM')
         self.add_port('OUT', 'to_output')
         self.add_port('OUT', 'to_control')
+        self.phon_form = []
     
     def update(self):
         """
         """
         phon_form = self.get_input('from_grammatical_WM')
         if phon_form:
+            self.phon_form = phon_form
             self.set_output('to_output', phon_form)
-            print phon_form
+            print self.phon_form
             self.set_output('to_control', True)
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def state2json(self):
+        """
+        """
+        json_data = super(PHON_WM, self).state2json()
+        json_data['phon_form'] = self.phon_form
+        return json_data
         
 class CONTROL(PROCEDURAL_SCHEMA):
     """
@@ -1045,6 +1087,23 @@ class CONTROL(PROCEDURAL_SCHEMA):
             self.state['last_prod_time'] = self.t
         if self.get_input('from_semantic_WM'):
             self.state['new_sem'] = True
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = super(CONTROL, self).params2json()
+        json_data['task_params'] = self.task_params
+        return json_data
+    
+    def state2json(self):
+        """
+        """
+        json_data = super(CONTROL, self).state2json()
+        json_data['state'] = self.state
+        return json_data
         
 class TEXT2SPEECH:
     """

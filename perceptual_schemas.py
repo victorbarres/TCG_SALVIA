@@ -356,6 +356,16 @@ class PERCEPT_LTM(LTM):
         """
         """
         self.set_output('to_subscene_rec', self.schemas)
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = super(PERCEPT_LTM, self).params2json()
+        json_data['init_act'] = self.init_act
+        return json_data
 
 class SALIENCY_MAP(PROCEDURAL_SCHEMA):
     """
@@ -458,6 +468,17 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
             coord = None
         return coord
     
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def state2json(self):
+        """
+        """
+        json_data = super(SACCADE_SYSTEM, self).state2json()
+        json_data['eye_pos'] = self.eye_pos, 
+        json_data['next_fixation'] = self.next_fixation
+        return json_data
+    
 class FIXATION(PROCEDURAL_SCHEMA):
     """
     """
@@ -475,6 +496,16 @@ class FIXATION(PROCEDURAL_SCHEMA):
             print "t: %i, New fixation at (%i, %i)" %(self.t, eye_pos[0], eye_pos[1])
             self.fixation = eye_pos
             self.set_output('to_subscene_rec', self.fixation)
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def state2json(self):
+        """
+        """
+        json_data = super(FIXATION, self).state2json()
+        json_data['fixation'] = self.fixation
+        return json_data
 
 class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
     """
@@ -588,7 +619,18 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             if ss.area.contains(eye_pos) and ss.saliency > max_saliency:
                 max_saliency = ss.saliency
                 self.subscene = ss
-
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def state2json(self):
+        """
+        """
+        json_data = super(FIXATION, self).state2json()
+        json_data['subscene'] = #TO FINISH
+        jsons_data['uncertainty'] = self.uncertainty
+        json_data['next_saccade'] = self.next_saccade
+        return json_data
 
 ###############################################################################
 if __name__=='__main__':

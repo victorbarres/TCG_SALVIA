@@ -219,5 +219,5 @@ semanticWM.show_SemRep()
 grammaticalWM.show_dynamics()
 grammaticalWM.show_state()
 
-production_system.save_sim('test_production_output.json')
+production_system.save_sim('./tmp/test_production_output.json')
 

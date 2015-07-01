@@ -138,7 +138,7 @@ def test(seed=None):
     # Define at which time the schema instances should be invoked in semantic working memory
     # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
 
-    sem_option = 2
+    sem_option = 9
     end_delay = 500
     
     sem_timings = {}
@@ -173,6 +173,7 @@ def test(seed=None):
     semanticWM.show_dynamics(c2_levels=False)
     grammaticalWM.show_dynamics()
     grammaticalWM.show_state()
+    language_system.save_sim('./tmp/test_language_output.json')
 
 if __name__=='__main__':
     test(seed=None)

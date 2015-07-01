@@ -150,6 +150,7 @@ def test():
 #        plt.pause(0.01)
 
     visualWM.show_dynamics(c2_levels=False)
+    perceptual_system.save_sim('./tmp/test_perception_output.json')
 if __name__=='__main__':
     test()
     
