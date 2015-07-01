@@ -1053,8 +1053,10 @@ class PHON_WM(PROCEDURAL_SCHEMA):
         if phon_form:
             self.phon_form = phon_form
             self.set_output('to_output', phon_form)
-            print self.phon_form
             self.set_output('to_control', True)
+        else:
+            self.set_output('to_output', None)
+            
     
     ####################
     ### JSON METHODS ###

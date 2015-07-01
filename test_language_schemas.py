@@ -14,7 +14,7 @@ def test(seed=None):
     ### Language schema system ###
     ##############################
     # Instantiating all the necessary procedural schemas
-    conceptualizer = ls.CONCEPTUALIZER()
+#    conceptualizer = ls.CONCEPTUALIZER()
     grammaticalWM = ls.GRAMMATICAL_WM()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval = ls.CXN_RETRIEVAL()
@@ -24,8 +24,14 @@ def test(seed=None):
     conceptLTM = ls.CONCEPT_LTM()
     
     # Defining schema to brain mappings.
-    language_mapping = {'Conceptualizer':['aTP'], 
-                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
+#    language_mapping = {'Conceptualizer':['aTP'], 
+#                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
+#                    'Grammatical_WM':['left_BA45', 'leftBA44'], 
+#                    'Grammatical_LTM':['left_STG', 'left_MTG'],
+#                    'Cxn_retrieval':[], 
+#                    'Phonological_WM':['left_BA6'],
+#                    'Control':['DLPFC'], 'Concept_LTM':['']}
+    language_mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
                     'Grammatical_WM':['left_BA45', 'leftBA44'], 
                     'Grammatical_LTM':['left_STG', 'left_MTG'],
                     'Cxn_retrieval':[], 
@@ -41,7 +47,8 @@ def test(seed=None):
     language_system.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-    language_schemas = [conceptualizer, grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, conceptLTM]
+#    language_schemas = [conceptualizer, grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, conceptLTM]
+    language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, conceptLTM]
 
     language_system.add_schemas(language_schemas)
     language_system.add_connection(semanticWM,'to_cxn_retrieval', cxn_retrieval, 'from_semantic_WM')
@@ -52,10 +59,11 @@ def test(seed=None):
     language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system.add_connection(phonWM, 'to_control', control, 'from_phonological_WM')
     language_system.add_connection(control, 'to_grammatical_WM', grammaticalWM, 'from_control')
-    language_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
-    language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
+#    language_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
+#    language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
     
-    language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
+#    language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
+    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
     language_system.set_output_ports([phonWM._find_port('to_output')])
     
 #    language_system.system2dot(image_type='png', disp=True)
@@ -166,9 +174,13 @@ def test(seed=None):
         if step in sem_timing:
             for inst in sem_timing[step]:
                 print "time:%i, sem:%s" %(step, inst.name)
-            conceptualizer.set_output('to_semantic_WM', sem_timing[step])
+#            conceptualizer.set_output('to_semantic_WM', sem_timing[step])
+            language_system.set_input(sem_timing[step])
             semanticWM.set_output('to_control', True)
         language_system.update()
+        output = language_system.get_output()
+        if output[0]:
+            print output[0]
     
     semanticWM.show_dynamics(c2_levels=False)
     grammaticalWM.show_dynamics()

@@ -213,6 +213,9 @@ for t in range(time):
         plt.sca(fixation_plot)
         fixation_plot.add_patch(fix)
     plt.pause(0.0001)
+    output = production_system.get_output()
+    if output[0]:
+        print output[0]
 
 visualWM.show_SceneRep()
 semanticWM.show_SemRep()

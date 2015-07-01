@@ -1046,7 +1046,7 @@ class SCHEMA_SYSTEM(object):
             connection.update()
         
         # Update the system output
-        self.outputs = {p.schema.name+":"+str(p.id):p.value for p in self.output_ports}
+        self.outputs = [p.value for p in self.output_ports]
         
         # Save simulation data
         if not(self.sim_data['schema_system']):
