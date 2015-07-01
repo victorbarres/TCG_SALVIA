@@ -145,7 +145,8 @@ class CPT_RELATION_SCHEMA(CPT_SCHEMA):
     """
     def __init__(self, name, concept, init_act):
         CPT_SCHEMA.__init__(self ,name, concept, init_act)
-        self.set_content({'concept':concept, 'pFrom':None, 'pTo':None})
+        self.content['pFrom'] = None 
+        self.content['pTo'] = None
 
 class CPT_SCHEMA_INST(SCHEMA_INST):
     """
@@ -1107,7 +1108,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         json_data['state'] = self.state
         return json_data
         
-class TEXT2SPEECH:
+class TEXT2SPEECH(object):
     """
     """
     def __init__(self, rate_percent=100):

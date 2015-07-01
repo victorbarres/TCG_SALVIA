@@ -11,7 +11,7 @@ import networkx as nx
 ####################
 ### SEMANTIC NET ###
 ####################
-class K_ENT:
+class K_ENT(object):
     """
     Knowledge entity
     Data:
@@ -34,7 +34,7 @@ class K_ENT:
             (self.meaning == other.meaning))
         return is_equal
     
-class K_REL:
+class K_REL(object):
     """
     Knowledge relation. Only 2 place relations are allowed. Relations are defined as directed.
     
@@ -60,7 +60,7 @@ class K_REL:
         p = "%s %s %s" % (self.pFrom.name, self.type, self.pTo.name)
         return p
 
-class K_NET:
+class K_NET(object):
     """
     Semantic network.
     
@@ -96,7 +96,7 @@ class K_NET:
             return False
         
         # Check duplication
-        if self._find_meaning(k_ent.meaning):
+        if self.find_meaning(k_ent.meaning):
             return False
         
         # Add new semantic entity
@@ -124,7 +124,7 @@ class K_NET:
                 return False
         
         # Check that source and target of relation are defined.
-        if not(self._find_meaning(k_rel.pFrom.meaning)) or not(self._find_meaning(k_rel.pTo.meaning)):
+        if not(self.find_meaning(k_rel.pFrom.meaning)) or not(self.find_meaning(k_rel.pTo.meaning)):
             return False
         
         # Add new relation
@@ -161,30 +161,8 @@ class K_NET:
             return path_len
             
         return path_len
-    
-    def _create_NX_graph(self):
-        graph = nx.DiGraph()
-        for node in self.nodes:
-            graph.add_node(node.id, meaning=node.meaning)
-        for edge in self.edges:
-            graph.add_edge(edge.pFrom.id, edge.pTo.id, type= edge.type)
-        
-        self.graph = graph
-        
-    
-    def _has_entity(self, ent_name):
-        """
-        Returns entity iff there is a entity with name "name".
-        
-        Args:
-            - entt_name (STR):
-        """
-        for n in self.nodes:
-            if n.name == ent_name:
-                return n
-        return None
             
-    def _find_meaning(self, meaning):
+    def find_meaning(self, meaning):
         """
         Find k_ent with meaning "meaning". Returns the entity if found, else returns None.
         
@@ -216,7 +194,7 @@ class K_NET:
             res = []
             for s in successors:
                 node_data = self.graph.node[s]
-                ent2 = self._find_meaning(node_data['meaning'])
+                ent2 = self.find_meaning(node_data['meaning'])
                 res.extend(self.satisfy_rel(ent1, rel_type, ent2))
             return res
         elif not(ent1) and ent2:
@@ -224,7 +202,7 @@ class K_NET:
             res = []
             for p in predecessors:
                 node_data = self.graph.node[p]
-                ent1 = self._find_meaning(node_data['meaning'])
+                ent1 = self.find_meaning(node_data['meaning'])
                 res.extend(self.satisfy_rel(ent1, rel_type, ent2))
             return res
         else:
@@ -234,7 +212,7 @@ class K_NET:
                     res.extend(self.satisfy_rel(ent1, rel_type, ent2))
             return res
     
-    def _similarity(self, ent1, ent2):
+    def similarity(self, ent1, ent2):
         """
         Returns a similarity score between ent1 and ent2.
         Uses path similarity.
@@ -261,7 +239,7 @@ class K_NET:
             sim = 1.0/(1.0 + L)
         return sim
     
-    def _match(self, ent1, ent2, match_type = "is_a"):
+    def match(self, ent1, ent2, match_type = "is_a"):
         """        
         Check if ent1 matches ent2. 
         Type = "is_a":  ent1 matches ent2 if ent2 is a hyponym of ent2 (or equal to ent2)
@@ -283,4 +261,26 @@ class K_NET:
         elif (match_type == "equal" and dist == 0):
             return True
         return False
+
+    def _create_NX_graph(self):
+        graph = nx.DiGraph()
+        for node in self.nodes:
+            graph.add_node(node.id, meaning=node.meaning)
+        for edge in self.edges:
+            graph.add_edge(edge.pFrom.id, edge.pTo.id, type= edge.type)
+        
+        self.graph = graph
+        
+    
+    def _has_entity(self, ent_name):
+        """
+        Returns entity iff there is a entity with name "name".
+        
+        Args:
+            - entt_name (STR):
+        """
+        for n in self.nodes:
+            if n.name == ent_name:
+                return n
+        return None
         

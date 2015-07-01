@@ -21,10 +21,11 @@ random.seed(seed)
 ####################################
 ### Perceptual knowledge schemas ###
 ####################################
-class AREA:
+class AREA(object):
     """
     Simply defines an area in the visual input
     """
+    ID_next = 0 # Global area ID counter
     def __init__(self, x=0, y=0, w=0, h=0, saliency=0):
         """
         Areas are defined as boxes.
@@ -34,6 +35,8 @@ class AREA:
         h = height
         saliency = Bottom-up saliency of the area.
         """
+        self.id  = AREA.ID_next
+        AREA.ID_next += 1
         self.x = x
         self.y = y
         self.w = w
@@ -72,6 +75,15 @@ class AREA:
         merge_area.h = max([area1.x + area1.h, area2.x + area2.h]) - merge_area.x
         merge_area.saliency = max([area1.saliency + area2.saliency]) # THIS MIGHT NOT BE A GOOD IDEA!!
         return merge_area
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def params2json(self):
+        """
+        """
+        json_data = {'id': self.id, 'x':self.x, 'y':self.y, 'w':self.w, 'h':self.h, 'saliency':self.saliency}
+        return json_data
         
 
 class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
@@ -159,7 +171,8 @@ class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMA
     """
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
-        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None, 'uncertainty':None, 'pFrom':None, 'pTo':None})
+        self.content['pFrom'] = None
+        self.content['pTo'] = None
     
     def set_area(self):
         """

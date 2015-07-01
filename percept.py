@@ -112,7 +112,8 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
         Args:
             - meaning (): Meaning of a percept
         """
-        return self._find_meaning(meaning)
+        return super(PERCEPTUAL_KNOWLEDGE, self).find_meaning(meaning)
+#        return self._find_meaning(meaning)
     
     def match(self, per1, per2, match_type = "is_a"):
         """        
@@ -130,7 +131,8 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
             See similarity()
         
         """
-        return self._match(per1, per2, match_type=match_type)
+        return super(PERCEPTUAL_KNOWLEDGE, self).match(per1, per2, match_type = match_type) 
+#        return self._match(per1, per2, match_type=match_type)`
 
 class CONCEPTUALIZATION:
     """

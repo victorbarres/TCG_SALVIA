@@ -67,7 +67,7 @@ import perceptual_schemas as ps
 ####################
 ### Visual scene ###
 ####################    
-class SUB_SCENE:
+class SUB_SCENE(object):
     """
     A subscene represents a structured perceptual units.
     It is defined as a graph of perceptual schemas.
@@ -158,7 +158,7 @@ class SUB_SCENE:
         return True
         
 
-class SCENE:
+class SCENE(object):
     """
     Scene being perceived.
     Defines the visual input to the model.
