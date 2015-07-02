@@ -128,7 +128,7 @@ class CONNECT(SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
         json_data = {"id":self.id, "name":self.name, "port_from":self.port_from.name, "port_to":self.port_to.name, "weight":self.weight, "delay":self.delay}
@@ -262,7 +262,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         Returns a JSON formated string containing the schema's description info.
         """
@@ -270,7 +270,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
                      "in_ports":[p.name for p in self.in_ports], "out_ports":[p.name for p in self.out_ports]}
         return json_data
         
-    def state2json(self):
+    def get_state(self):
         """
         Returns a JSON formated string containing schema's current state's information.
         """
@@ -376,10 +376,10 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(SCHEMA_INST, self).state2json()
+        json_data = super(SCHEMA_INST, self).get_state()
         json_data['alive'] = self.alive
         json_data['content'] = {}
         json_data['trace'] = {}
@@ -669,21 +669,21 @@ class WM(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
-        json_data = super(WM, self).params2json()
+        json_data = super(WM, self).get_info()
         json_data['dyn_params'] = self.dyn_params
         json_data['C2_params'] = self.C2_params
         return json_data
         
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(WM, self).state2json()
+        json_data = super(WM, self).get_state()
         json_data['schema_insts'] = [s.name for s in self.schema_insts]
-        json_data['coop_links'] = [l.params2json() for l in self.coop_links]
-        json_data['comp_links'] = [l.params2json() for l in self.coop_links]
+        json_data['coop_links'] = [l.get_info() for l in self.coop_links]
+        json_data['comp_links'] = [l.get_info() for l in self.coop_links]
         return json_data
         
     #######################
@@ -785,7 +785,7 @@ class F_LINK(object):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
         json_data = {"inst_from":self.inst_from.name, "inst_to":self.inst_to.name, "weight":self.weight, "asymmetry_coef":self.asymmetry_coef}
@@ -822,11 +822,11 @@ class COOP_LINK(F_LINK):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
-        json_data = super(COOP_LINK, self).params2json()
-        json_data['connect'] = self.connect.params2json()
+        json_data = super(COOP_LINK, self).get_info()
+        json_data['connect'] = self.connect.get_info()
         return json_data
 
 class COMP_LINK(F_LINK):
@@ -898,12 +898,12 @@ class ASSEMBLAGE(object):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
         json_data = {}
         json_data['schema_insts'] = [s.name for s in self.schema_insts]
-        json_data['coop_links'] = [l.params2json() for l in self.coop_links]
+        json_data['coop_links'] = [l.get_info() for l in self.coop_links]
         json_data['activation'] = self.activation
         return json_data
 
@@ -927,7 +927,7 @@ class BRAIN_MAPPING(object):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
         json_data = {}
@@ -1050,33 +1050,33 @@ class SCHEMA_SYSTEM(object):
         
         # Save simulation data
         if not(self.sim_data['schema_system']):
-            self.sim_data['schema_system'] = self.params2json()
-        self.sim_data[self.t] = self.state2json()
+            self.sim_data['schema_system'] = self.get_info()
+        self.sim_data[self.t] = self.get_state()
     
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
         json_data = {'name':self.name, 'T0':SCHEMA_SYSTEM.T0, 'TIME_STEP':SCHEMA_SYSTEM.TIME_STEP, 'dt':self.dt}
-        json_data['connections'] = [c.params2json() for c in self.connections]
+        json_data['connections'] = [c.get_info() for c in self.connections]
         json_data['input_ports'] = [p.name for p in self.input_ports]
         json_data['output_ports']= [p.name for p in self.output_ports]
-        json_data['brain_mapping'] = self.brain_mapping.params2json()
+        json_data['brain_mapping'] = self.brain_mapping.get_info()
         
         json_data['procedural_schemas'] = {}
         for schema in self.schemas:
-            json_data['procedural_schemas'][schema.name] = schema.params2json()
+            json_data['procedural_schemas'][schema.name] = schema.get_info()
         
         return json_data
     
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = {'schema_states':{}, 'outputs':self.outputs}
+        json_data = {'schema_states':{}}
         for schema in self.schemas:
-            json_data['schema_states'][schema.name] = schema.state2json()
+            json_data['schema_states'][schema.name] = schema.get_state()
         return json_data
     
     def save_sim(self, file_name = 'output.json'):

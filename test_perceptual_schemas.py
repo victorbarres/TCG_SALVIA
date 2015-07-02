@@ -83,10 +83,13 @@ def test():
     conceptLTM.init_act = 1
     
     # Loading data
+    scene_name = 'TCG_cholitas'
+    
+    scene_folder = "./data/scenes/%s/" %scene_name
+    my_scene = ld.load_scene("TCG_scene.json", scene_folder)
     my_perceptual_knowledge = ld.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_conceptualization = ld.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
-    my_scene = ld.load_scene("TCG_scene.json", "./data/scenes/cholitas/")
     
     # Initialize perceptual LTM content
     perceptLTM.initialize(my_perceptual_knowledge)
@@ -98,9 +101,8 @@ def test():
     conceptualizer.initialize(my_conceptualization)
     
     # Setting up BU saliency data
-    saliency_data = smat.SALIENCY_DATA()
-    saliency_data.load("./data/scenes/cholitas")
-    saliency_map.BU_saliency_map = saliency_data.saliency_map.data
+    saliency_data = ld.load_BU_saliency(scene_name, scene_folder)
+    saliency_map.BU_saliency_map = saliency_data.saliency_map.data # This needs to eb better integrated with the scene data.
     
     # Test schema rec intialization
     perceptual_system.set_input(my_scene)
@@ -150,7 +152,9 @@ def test():
 #        plt.pause(0.01)
 
     visualWM.show_dynamics(c2_levels=False)
+#    print perceptual_system.sim_data
     perceptual_system.save_sim('./tmp/test_perception_output.json')
+    
 if __name__=='__main__':
     test()
     

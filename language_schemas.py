@@ -284,10 +284,10 @@ class CONCEPT_LTM(LTM):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
-        json_data = super(CONCEPT_LTM, self).params2json()
+        json_data = super(CONCEPT_LTM, self).get_info()
         json_data['init_act'] = self.init_act
         return json_data
         
@@ -941,10 +941,10 @@ class GRAMMATICAL_LTM(LTM):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
-        json_data = super(GRAMMATICAL_LTM, self).params2json()
+        json_data = super(GRAMMATICAL_LTM, self).get_info()
         json_data['init_act'] = self.init_act
         return json_data
 
@@ -1030,10 +1030,10 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(CXN_RETRIEVAL, self).state2json()
+        json_data = super(CXN_RETRIEVAL, self).get_state()
         json_data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
         return json_data
 
@@ -1062,10 +1062,10 @@ class PHON_WM(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(PHON_WM, self).state2json()
+        json_data = super(PHON_WM, self).get_state()
         json_data['phon_form'] = self.phon_form
         return json_data
         
@@ -1094,17 +1094,17 @@ class CONTROL(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
-        json_data = super(CONTROL, self).params2json()
+        json_data = super(CONTROL, self).get_info()
         json_data['task_params'] = self.task_params
         return json_data
     
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(CONTROL, self).state2json()
+        json_data = super(CONTROL, self).get_state()
         json_data['state'] = self.state
         return json_data
         

@@ -134,7 +134,7 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
         return super(PERCEPTUAL_KNOWLEDGE, self).match(per1, per2, match_type = match_type) 
 #        return self._match(per1, per2, match_type=match_type)`
 
-class CONCEPTUALIZATION:
+class CONCEPTUALIZATION(object):
     """
     Knowledge of conceptualization relations mapping percepts onto concepts.
     

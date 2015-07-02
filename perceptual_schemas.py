@@ -79,7 +79,7 @@ class AREA(object):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
         json_data = {'id': self.id, 'x':self.x, 'y':self.y, 'w':self.w, 'h':self.h, 'saliency':self.saliency}
@@ -373,10 +373,10 @@ class PERCEPT_LTM(LTM):
     ####################
     ### JSON METHODS ###
     ####################
-    def params2json(self):
+    def get_info(self):
         """
         """
-        json_data = super(PERCEPT_LTM, self).params2json()
+        json_data = super(PERCEPT_LTM, self).get_info()
         json_data['init_act'] = self.init_act
         return json_data
 
@@ -476,7 +476,7 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
             
             # Random tie breaker
             winner_idx = random.randint(0,num_res-1)
-            coord = (max_idx[0][winner_idx], max_idx[1][winner_idx])
+            coord = (float(max_idx[0][winner_idx]), float(max_idx[1][winner_idx]))
         else:
             coord = None
         return coord
@@ -484,14 +484,14 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(SACCADE_SYSTEM, self).state2json()
-        json_data['eye_pos'] = self.eye_pos, 
+        json_data = super(SACCADE_SYSTEM, self).get_state()
+        json_data['eye_pos'] = self.eye_pos
         json_data['next_fixation'] = self.next_fixation
         return json_data
-    
+
 class FIXATION(PROCEDURAL_SCHEMA):
     """
     """
@@ -513,11 +513,14 @@ class FIXATION(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(FIXATION, self).state2json()
-        json_data['fixation'] = self.fixation
+        json_data = super(FIXATION, self).get_state()
+        if self.fixation:    
+            json_data['fixation'] = list(self.fixation)
+        else:
+             json_data['fixation'] = None
         return json_data
 
 class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
@@ -636,12 +639,15 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
     ####################
     ### JSON METHODS ###
     ####################
-    def state2json(self):
+    def get_state(self):
         """
         """
-        json_data = super(FIXATION, self).state2json()
-        json_data['subscene'] = #TO FINISH
-        jsons_data['uncertainty'] = self.uncertainty
+        json_data = super(SUBSCENE_RECOGNITION, self).get_state()
+        if self.subscene:
+            json_data['subscene'] = self.subscene.get_info()
+        else:
+            json_data['subscene'] = None
+        json_data['uncertainty'] = self.uncertainty
         json_data['next_saccade'] = self.next_saccade
         return json_data
 
