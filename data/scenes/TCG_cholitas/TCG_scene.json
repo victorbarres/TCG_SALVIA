@@ -441,14 +441,6 @@
      "Schema_26",
 	 "PEOPLE"
     ]
-   },
-   "ss_9": {
-    "name": "Subscene_Concurrent",
-    "schemas": [
-     "KICK1",
-     "WATCH1",
-     "Schema_25"
-    ]
    }
   }
  }

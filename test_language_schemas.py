@@ -185,7 +185,7 @@ def test(seed=None):
     semanticWM.show_dynamics(c2_levels=False)
     grammaticalWM.show_dynamics()
     grammaticalWM.show_state()
-    language_system.save_sim('./tmp/test_language_output.json')
+#    language_system.save_sim('./tmp/test_language_output.json')
 
 if __name__=='__main__':
     test(seed=None)

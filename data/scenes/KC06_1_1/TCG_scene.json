@@ -163,7 +163,19 @@
    }
   },
   "subscenes": {
-   "ss_0": {
+  "ss_0": {
+    "name": "BALLERINA",
+    "schemas": [
+     "BALLERINA"
+    ]
+   },
+   "ss_1": {
+    "name": "CELLIST",
+    "schemas": [
+     "CELLIST"
+    ]
+   },
+   "ss_2": {
     "name": "SPLASH_EVT",
     "schemas": [
      "BALLERINA",
@@ -173,13 +185,13 @@
      "SPLASH_PT"
     ]
    },
-   "ss_1": {
+   "ss_3": {
     "name": "FENCER",
     "schemas": [
      "FENCER"
     ]
    },
-   "ss_2": {
+   "ss_4": {
     "name": "BAG",
     "schemas": [
      "BAG",
@@ -187,7 +199,7 @@
      "RED_MOD"
     ]
    },
-   "ss_3": {
+   "ss_5": {
     "name": "TREE",
     "schemas": [
      "TREE"

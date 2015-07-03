@@ -163,11 +163,11 @@ class SUB_SCENE(object):
     def get_info(self):
         """
         """
-        json_data = {'name':self.name, 'id':self.id, 'uncertainty':self.uncertainty, 'saliency':self.saliency}
-        json_data['area'] = self.area.get_info()
-        json_data['nodes'] = [p.name for p in self.nodes]
-        json_data['edges'] = [p.name for p in self.edges]
-        return json_data
+        data = {'name':self.name, 'id':self.id, 'uncertainty':self.uncertainty, 'saliency':self.saliency}
+        data['area'] = self.area.get_info()
+        data['nodes'] = [p.name for p in self.nodes]
+        data['edges'] = [p.name for p in self.edges]
+        return data
         
 
 class SCENE(object):

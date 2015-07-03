@@ -287,9 +287,9 @@ class CONCEPT_LTM(LTM):
     def get_info(self):
         """
         """
-        json_data = super(CONCEPT_LTM, self).get_info()
-        json_data['init_act'] = self.init_act
-        return json_data
+        data = super(CONCEPT_LTM, self).get_info()
+        data['init_act'] = self.init_act
+        return data
         
 class SEMANTIC_WM(WM):
     """
@@ -341,9 +341,11 @@ class SEMANTIC_WM(WM):
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
                 self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True)
+            
+            self.show_SemRep()
     
     def show_SemRep(self):
-        node_labels = dict((n, '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
+        node_labels = dict((n, '%s(%.1f)' %(n, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
         edge_labels = dict(((u,v), '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
         pos = nx.spring_layout(self.SemRep)  
         plt.figure(facecolor='white')
@@ -436,8 +438,8 @@ class GRAMMATICAL_WM(WM):
         NOTE: NEED TO SOMEHOW ACCOUNT FOR WEATHER OR NOT THE ASSEMBLAGE EXPRESSES NOVEL INFORMATION. Otherwise, I get the situation in which assemblage get reused
         because they are boosted by new construction while scoring higher that the novel assemblages.
         """
-        w1 = 1 # Aactivation weight
-        w2 = 1 # SemRep covered weight
+        w1 = 1 # Activation weight
+        w2 = 0.2 # SemRep covered weight
         w3 = 0 # SynForm length weight
         
         winner = None
@@ -529,7 +531,7 @@ class GRAMMATICAL_WM(WM):
         self._set_subthreshold(winner_assemblage.schema_insts)
         self._deactivate_coop_weigts()
         
-    def _set_subthreshold(self, insts, r=0.5):
+    def _set_subthreshold(self, insts, r=1):
         """
         Sets the activation of all the instances in insts to r*confidence_threshold
         Args:
@@ -944,9 +946,9 @@ class GRAMMATICAL_LTM(LTM):
     def get_info(self):
         """
         """
-        json_data = super(GRAMMATICAL_LTM, self).get_info()
-        json_data['init_act'] = self.init_act
-        return json_data
+        data = super(GRAMMATICAL_LTM, self).get_info()
+        data['init_act'] = self.init_act
+        return data
 
 class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
     """
@@ -1033,9 +1035,9 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
     def get_state(self):
         """
         """
-        json_data = super(CXN_RETRIEVAL, self).get_state()
-        json_data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
-        return json_data
+        data = super(CXN_RETRIEVAL, self).get_state()
+        data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
+        return data
 
 class PHON_WM(PROCEDURAL_SCHEMA):
     """
@@ -1065,9 +1067,9 @@ class PHON_WM(PROCEDURAL_SCHEMA):
     def get_state(self):
         """
         """
-        json_data = super(PHON_WM, self).get_state()
-        json_data['phon_form'] = self.phon_form
-        return json_data
+        data = super(PHON_WM, self).get_state()
+        data['phon_form'] = self.phon_form
+        return data
         
 class CONTROL(PROCEDURAL_SCHEMA):
     """
@@ -1085,6 +1087,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
             self.set_output('to_grammatical_WM', True)
+            print "TRY TO PRODUCE!"
             self.state['new_sem'] = False
         if self.get_input('from_phonological_WM'):
             self.state['last_prod_time'] = self.t
@@ -1097,16 +1100,16 @@ class CONTROL(PROCEDURAL_SCHEMA):
     def get_info(self):
         """
         """
-        json_data = super(CONTROL, self).get_info()
-        json_data['task_params'] = self.task_params
-        return json_data
+        data = super(CONTROL, self).get_info()
+        data['task_params'] = self.task_params
+        return data
     
     def get_state(self):
         """
         """
-        json_data = super(CONTROL, self).get_state()
-        json_data['state'] = self.state
-        return json_data
+        data = super(CONTROL, self).get_state()
+        data['state'] = self.state
+        return data
         
 class TEXT2SPEECH(object):
     """
