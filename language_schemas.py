@@ -176,6 +176,9 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
 ###################################
 ### Language procedural schemas ###
 ###################################
+
+#################
+### SEMANTICS ###
 class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
     """
     """
@@ -297,8 +300,8 @@ class SEMANTIC_WM(WM):
     def __init__(self, name='Semantic_WM'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_conceptualizer')
-        self.add_port('OUT', 'to_grammatical_WM')
-        self.add_port('OUT', 'to_cxn_retrieval')
+        self.add_port('OUT', 'to_grammatical_WM_P')
+        self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
         self.dyn_params = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
@@ -315,12 +318,12 @@ class SEMANTIC_WM(WM):
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()        
-        self.set_output('to_grammatical_WM', self.SemRep)
+        self.set_output('to_grammatical_WM_P', self.SemRep)
         
         
         if cpt_insts:
 #            self.show_SemRep()
-            self.set_output('to_cxn_retrieval', self.SemRep)
+            self.set_output('to_cxn_retrieval_P', self.SemRep)
     
     def update_SemRep(self, cpt_insts):
         """
@@ -355,15 +358,54 @@ class SEMANTIC_WM(WM):
         nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
+
+###############
+### GRAMMAR ###
+class GRAMMATICAL_LTM(LTM):
+    """
+    """
+    def __init__(self, name='Grammatical_LTM'):
+        LTM.__init__(self, name)
+        self.grammar = None
+        self.add_port('OUT', 'to_cxn_retrieval_P')
+        self.init_act = 0.5 #The initial activation value for cxn schema.
     
-class GRAMMATICAL_WM(WM):
+    def initialize(self, grammar):
+        """
+        Initilize the state of the GRAMMATICAL LTM with cxn_schema based on the content of grammar.
+        Args:
+            - grammar (GRAMMAR): A TCG grammar
+        """
+        self.grammar = grammar
+        for cxn in grammar.constructions:
+            new_cxn_schema = CXN_SCHEMA(cxn, self.init_act)
+            self.add_schema(new_cxn_schema)
+
+    def update(self):
+        """
+        """
+        self.set_output('to_cxn_retrieval_P', self.schemas)
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def get_info(self):
+        """
+        """
+        data = super(GRAMMATICAL_LTM, self).get_info()
+        data['init_act'] = self.init_act
+        return data
+        
+####################
+### GRAMMAR PROD ###  
+class GRAMMATICAL_WM_P(WM):
     """
     """
-    def __init__(self, name='Grammatical_WM'):
+    def __init__(self, name='Grammatical_WM_P'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
-        self.add_port('IN', 'from_cxn_retrieval')
-        self.add_port('OUT', 'to_phonological_WM')
+        self.add_port('IN', 'from_cxn_retrieval_P')
+        self.add_port('OUT', 'to_phonological_WM_P')
         self.add_port('IN', 'from_control')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
@@ -372,7 +414,7 @@ class GRAMMATICAL_WM(WM):
         """
         """
         SemRep = self.get_input('from_semantic_WM')
-        new_cxn_insts= self.get_input('from_cxn_retrieval')
+        new_cxn_insts= self.get_input('from_cxn_retrieval_P')
         produce = self.get_input('from_control')
         if new_cxn_insts:
             self._add_new_insts(new_cxn_insts)
@@ -408,8 +450,8 @@ class GRAMMATICAL_WM(WM):
             winner_assemblage = self._get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.C2_params['confidence_threshold']:
                 print 'Production at time: %i' %self.t
-                (phon_form, missing_info) = GRAMMATICAL_WM._read_out(winner_assemblage)
-                self.set_output('to_phonological_WM', phon_form)
+                (phon_form, missing_info) = GRAMMATICAL_WM_P._read_out(winner_assemblage)
+                self.set_output('to_phonological_WM_P', phon_form)
             
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -464,7 +506,7 @@ class GRAMMATICAL_WM(WM):
 #        Args:
 #            - assemblage (ASSEMBLAGE)
 #        """
-#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        eq_inst = GRAMMATICAL_WM_P._assemblage2inst(assemblage)
 #        # Sets the activation below confidence threshold so that it is not re-used right away. 
 #        eq_inst.set_activation(self.C2_params['confidence_threshold'])
 #        for inst in assemblage.schema_insts:
@@ -497,7 +539,7 @@ class GRAMMATICAL_WM(WM):
 #        Args:
 #            - assemblage (ASSEMBLAGE)
 #        """
-#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        eq_inst = GRAMMATICAL_WM_P._assemblage2inst(assemblage)
 #        # Sets the activation below confidence threshold so that it is not re-used right away. 
 #        eq_inst.set_activation(self.C2_params['confidence_threshold'])
 #        
@@ -515,7 +557,7 @@ class GRAMMATICAL_WM(WM):
 #            - assemblage (ASSEMBLAGE)
 #        """
 #        r = 0.9
-#        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+#        eq_inst = GRAMMATICAL_WM_P._assemblage2inst(assemblage)
 #        # Sets the activation below confidence threshold so that it is not re-used right away. 
 #        eq_inst.set_activation(self.C2_params['confidence_threshold']*r)
 #
@@ -559,7 +601,7 @@ class GRAMMATICAL_WM(WM):
        """
        for old_inst in self.schema_insts:
            if new_inst != old_inst:
-               match = GRAMMATICAL_WM._match(new_inst, old_inst)
+               match = GRAMMATICAL_WM_P._match(new_inst, old_inst)
                if match["match_cat"] == 1:
                    for match_qual, link in match["links"]:
                        if match_qual > 0:
@@ -573,7 +615,7 @@ class GRAMMATICAL_WM(WM):
         """
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
-               match = GRAMMATICAL_WM._match(new_inst, old_inst)
+               match = GRAMMATICAL_WM_P._match(new_inst, old_inst)
                if match["match_cat"] == -1:
                    self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
         
@@ -637,17 +679,17 @@ class GRAMMATICAL_WM(WM):
         if inst1 == inst2:
            match_cat = -1 # CHECK THAAT
         else:
-            overlap = GRAMMATICAL_WM._overlap(inst1, inst2)
+            overlap = GRAMMATICAL_WM_P._overlap(inst1, inst2)
             if not(overlap):
                 match_cat = 0
             elif overlap["edges"]:
                 match_cat = -1
             else:
                 for n in overlap["nodes"]:
-                    link = GRAMMATICAL_WM._link(inst1, inst2, n)
+                    link = GRAMMATICAL_WM_P._link(inst1, inst2, n)
                     if link:
                         links.append(link)
-                    link = GRAMMATICAL_WM._link(inst2, inst1, n)
+                    link = GRAMMATICAL_WM_P._link(inst2, inst1, n)
                     if link:
                         links.append(link)
                 if links:
@@ -665,7 +707,7 @@ class GRAMMATICAL_WM(WM):
         
         NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. IS THIS IS THE ONE THA SHOULD BE CONSIDERED?
         """
-        inst_network = GRAMMATICAL_WM._build_instance_network(self.schema_insts, self.coop_links)
+        inst_network = GRAMMATICAL_WM_P._build_instance_network(self.schema_insts, self.coop_links)
 
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
         assemblages = []
@@ -735,7 +777,7 @@ class GRAMMATICAL_WM(WM):
         new_assemblage = assemblage.copy()
         coop_links = new_assemblage.coop_links
         while len(coop_links)>0:
-            new_assemblage = GRAMMATICAL_WM._reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
+            new_assemblage = GRAMMATICAL_WM_P._reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
             coop_links = new_assemblage.coop_links
         eq_inst = new_assemblage.schema_insts[0]
         eq_inst.activity = new_assemblage.activation
@@ -750,7 +792,7 @@ class GRAMMATICAL_WM(WM):
         inst_c = coop_link.inst_from
         connect = coop_link.connect
         
-        (new_cxn_inst, port_corr) = GRAMMATICAL_WM._combine_schemas(inst_p, inst_c, connect)
+        (new_cxn_inst, port_corr) = GRAMMATICAL_WM_P._combine_schemas(inst_p, inst_c, connect)
         
         new_assemblage = ASSEMBLAGE()
         new_assemblage.activation = assemblage.activation
@@ -855,7 +897,7 @@ class GRAMMATICAL_WM(WM):
 #                    else:
 #                        L2R_read(child[0], graph, phon_form)
 #        
-#        graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
+#        graph = GRAMMATICAL_WM_P._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
 #        tops = [n for n in graph.nodes() if not(graph.successors(n))]
 #        phon_form = []
 #        L2R_read(tops[0], graph, phon_form)
@@ -869,7 +911,7 @@ class GRAMMATICAL_WM(WM):
             - phon_form = the longest consecutive TP_PHON sequence that can be uttered.
             - missing_info = pointer to the SemRep node associated with the first TP_SLOT encountered, represented the missing information.
         """
-        eq_inst = GRAMMATICAL_WM._assemblage2inst(assemblage)
+        eq_inst = GRAMMATICAL_WM_P._assemblage2inst(assemblage)
         phon_form = []
         missing_info = None
         for form in eq_inst.content.SynForm.form:
@@ -902,8 +944,8 @@ class GRAMMATICAL_WM(WM):
     def _draw_assemblage(assemblage, title=''):
         """
         """
-        graph = GRAMMATICAL_WM._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
-        GRAMMATICAL_WM._draw_instance_network(graph, title)
+        graph = GRAMMATICAL_WM_P._build_instance_network(assemblage.schema_insts, assemblage.coop_links)
+        GRAMMATICAL_WM_P._draw_instance_network(graph, title)
         
     def _draw_assemblages(self):
         """
@@ -912,52 +954,18 @@ class GRAMMATICAL_WM(WM):
         i=0
         for assemblage in assemblages:
             title = 'Assemblage_%i' % i
-            GRAMMATICAL_WM._draw_assemblage(assemblage, title)
+            GRAMMATICAL_WM_P._draw_assemblage(assemblage, title)
             i += 1
                   
-class GRAMMATICAL_LTM(LTM):
-    """
-    """
-    def __init__(self, name='Grammatical_LTM'):
-        LTM.__init__(self, name)
-        self.grammar = None
-        self.add_port('OUT', 'to_cxn_retrieval')
-        self.init_act = 0.5 #The initial activation value for cxn schema.
-    
-    def initialize(self, grammar):
-        """
-        Initilize the state of the GRAMMATICAL LTM with cxn_schema based on the content of grammar.
-        Args:
-            - grammar (GRAMMAR): A TCG grammar
-        """
-        self.grammar = grammar
-        for cxn in grammar.constructions:
-            new_cxn_schema = CXN_SCHEMA(cxn, self.init_act)
-            self.add_schema(new_cxn_schema)
 
-    def update(self):
-        """
-        """
-        self.set_output('to_cxn_retrieval', self.schemas)
-    
-    ####################
-    ### JSON METHODS ###
-    ####################
-    def get_info(self):
-        """
-        """
-        data = super(GRAMMATICAL_LTM, self).get_info()
-        data['init_act'] = self.init_act
-        return data
-
-class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
+class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
     """
     """
-    def __init__(self, name="Cxn_retrieval"):
+    def __init__(self, name="Cxn_retrieval_P"):
         PROCEDURAL_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('IN', 'from_semantic_WM')
-        self.add_port('OUT', 'to_grammatical_WM')
+        self.add_port('OUT', 'to_grammatical_WM_P')
         self.cxn_instances = []
     
     def update(self):
@@ -967,7 +975,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         cxn_schemas = self.get_input('from_grammatical_LTM')
         if cxn_schemas and SemRep:
             self._instantiate_cxns(SemRep, cxn_schemas)
-            self.set_output('to_grammatical_WM', self.cxn_instances)
+            self.set_output('to_grammatical_WM_P', self.cxn_instances)
             # Set all SemRep elements to new=False
             for n in SemRep.nodes_iter():
                 SemRep.node[n]['new'] = False
@@ -1035,16 +1043,16 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
     def get_state(self):
         """
         """
-        data = super(CXN_RETRIEVAL, self).get_state()
+        data = super(CXN_RETRIEVAL_P, self).get_state()
         data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
         return data
 
-class PHON_WM(PROCEDURAL_SCHEMA):
+class PHON_WM_P(PROCEDURAL_SCHEMA):
     """
     """
-    def __init__(self, name='Phonological_WM'):
+    def __init__(self, name='Phonological_WM_P'):
         PROCEDURAL_SCHEMA.__init__(self, name)
-        self.add_port('IN', 'from_grammatical_WM')
+        self.add_port('IN', 'from_grammatical_WM_P')
         self.add_port('OUT', 'to_output')
         self.add_port('OUT', 'to_control')
         self.phon_form = []
@@ -1052,7 +1060,7 @@ class PHON_WM(PROCEDURAL_SCHEMA):
     def update(self):
         """
         """
-        phon_form = self.get_input('from_grammatical_WM')
+        phon_form = self.get_input('from_grammatical_WM_P')
         if phon_form:
             self.phon_form = phon_form
             self.set_output('to_output', phon_form)
@@ -1067,18 +1075,20 @@ class PHON_WM(PROCEDURAL_SCHEMA):
     def get_state(self):
         """
         """
-        data = super(PHON_WM, self).get_state()
+        data = super(PHON_WM_P, self).get_state()
         data['phon_form'] = self.phon_form
         return data
         
+####################
+### TASK CONTROL ###      
 class CONTROL(PROCEDURAL_SCHEMA):
     """
     """
     def __init__(self, name="Control"):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
-        self.add_port('IN', 'from_phonological_WM')
-        self.add_port('OUT', 'to_grammatical_WM')
+        self.add_port('IN', 'from_phonological_WM_P')
+        self.add_port('OUT', 'to_grammatical_WM_P')
         self.task_params = {'time_pressure':100}
         self.state = {'last_prod_time':0, 'new_sem':False}
     
@@ -1086,9 +1096,9 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         """
         if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
-            self.set_output('to_grammatical_WM', True)
+            self.set_output('to_grammatical_WM_P', True)
             self.state['new_sem'] = False
-        if self.get_input('from_phonological_WM'):
+        if self.get_input('from_phonological_WM_P'):
             self.state['last_prod_time'] = self.t
         if self.get_input('from_semantic_WM'):
             self.state['new_sem'] = True
