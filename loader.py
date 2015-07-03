@@ -49,8 +49,10 @@ def read_concept(atype, sup_cpt, cpt_knowledge, cpt_data):
     
     for concept in cpt_data:
         # Create new concept entity
-        sub_cpt = cpt.CONCEPT(name=concept, meaning=concept)
-        cpt_knowledge.add_ent(sub_cpt)
+        sub_cpt = cpt_knowledge.find_meaning(concept)
+        if not(sub_cpt):
+            sub_cpt = cpt.CONCEPT(name=concept, meaning=concept)
+            cpt_knowledge.add_ent(sub_cpt)
 
         # Create new concept relation
         new_semrel = cpt.SEM_REL(aType=atype, from_cpt=sub_cpt, to_cpt=sup_cpt)

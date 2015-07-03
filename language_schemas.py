@@ -342,7 +342,7 @@ class SEMANTIC_WM(WM):
                 node_to = rel_inst.content['pTo'].name
                 self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True)
             
-            self.show_SemRep()
+#            self.show_SemRep()
     
     def show_SemRep(self):
         node_labels = dict((n, '%s(%.1f)' %(n, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
@@ -982,7 +982,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
         """
         if not cxn_schemas:
             return
-        for cxn_schema in cxn_schemas:
+        for cxn_schema in cxn_schemas:        
             sub_iso = self._SemMatch_cat(SemRep, cxn_schema)
             for a_sub_iso in sub_iso:
                 match_qual = self._SemMatch_qual(SemRep, cxn_schema, a_sub_iso)
@@ -1017,7 +1017,7 @@ class CXN_RETRIEVAL(PROCEDURAL_SCHEMA):
                     return True
             return False
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)    
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)
         return sub_iso
     
     def _SemMatch_qual(self, SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
@@ -1087,7 +1087,6 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
             self.set_output('to_grammatical_WM', True)
-            print "TRY TO PRODUCE!"
             self.state['new_sem'] = False
         if self.get_input('from_phonological_WM'):
             self.state['last_prod_time'] = self.t

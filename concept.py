@@ -133,7 +133,20 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
 
 ###############################################################################
 if __name__=='__main__':
-    print "NOTHING IMPLEMENTED"
+    import loader as ld
+    my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    clothing = my_conceptual_knowledge.find_meaning('CLOTHING')
+    dress =  my_conceptual_knowledge.find_meaning('DRESS')
+    print dress.match(clothing)
+    
+    color = my_conceptual_knowledge.find_meaning('COLOR')
+    blue =  my_conceptual_knowledge.find_meaning('BLUE')
+    print blue.match(color)
+    
+    human = my_conceptual_knowledge.find_meaning('HUMAN')
+    woman =  my_conceptual_knowledge.find_meaning('WOMAN')
+    obj=  my_conceptual_knowledge.find_meaning('OBJECT')
+    print woman.match(human)
 
     
     

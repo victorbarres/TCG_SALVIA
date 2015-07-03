@@ -6,6 +6,7 @@ For now only implements semantic net.
 
 Uses NetworkX module to represent the semantic net.
 """
+import matplotlib.pyplot as plt
 import networkx as nx
 
 ####################
@@ -143,7 +144,7 @@ class K_NET(object):
         
         Args:
             - from_ent (K_ENT): Origin
-            - to_cpt (K_ENT): Target
+            - to_ent (K_ENT): Target
         """
         path_len = -1
         graph = self.graph.copy() # Not efficient...
@@ -261,6 +262,16 @@ class K_NET(object):
         elif (match_type == "equal" and dist == 0):
             return True
         return False
+    
+    def show(self):
+        """
+        """
+        plt.figure()
+        node_labels = dict((n, d) for n,d in self.graph.nodes(data=True))
+        pos = nx.spring_layout(self.graph)        
+        nx.draw_networkx(self.graph, pos=pos, with_labels= False, node_color='g')
+        nx.draw_networkx_labels(self.graph, pos=pos, labels= node_labels)
+
 
     def _create_NX_graph(self):
         graph = nx.DiGraph()

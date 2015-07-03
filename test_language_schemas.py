@@ -14,7 +14,6 @@ def test(seed=None):
     ### Language schema system ###
     ##############################
     # Instantiating all the necessary procedural schemas
-#    conceptualizer = ls.CONCEPTUALIZER()
     grammaticalWM = ls.GRAMMATICAL_WM()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval = ls.CXN_RETRIEVAL()
@@ -24,13 +23,6 @@ def test(seed=None):
     conceptLTM = ls.CONCEPT_LTM()
     
     # Defining schema to brain mappings.
-#    language_mapping = {'Conceptualizer':['aTP'], 
-#                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
-#                    'Grammatical_WM':['left_BA45', 'leftBA44'], 
-#                    'Grammatical_LTM':['left_STG', 'left_MTG'],
-#                    'Cxn_retrieval':[], 
-#                    'Phonological_WM':['left_BA6'],
-#                    'Control':['DLPFC'], 'Concept_LTM':['']}
     language_mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
                     'Grammatical_WM':['left_BA45', 'leftBA44'], 
                     'Grammatical_LTM':['left_STG', 'left_MTG'],
@@ -47,7 +39,6 @@ def test(seed=None):
     language_system.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-#    language_schemas = [conceptualizer, grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, conceptLTM]
     language_schemas = [grammaticalLTM, cxn_retrieval, semanticWM, grammaticalWM, phonWM, control, conceptLTM]
 
     language_system.add_schemas(language_schemas)
@@ -59,10 +50,6 @@ def test(seed=None):
     language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system.add_connection(phonWM, 'to_control', control, 'from_phonological_WM')
     language_system.add_connection(control, 'to_grammatical_WM', grammaticalWM, 'from_control')
-#    language_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
-#    language_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
-    
-#    language_system.set_input_ports([conceptualizer._find_port('from_visual_WM')])
     language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
     language_system.set_output_ports([phonWM._find_port('to_output')])
     
@@ -95,13 +82,13 @@ def test(seed=None):
     grammaticalWM.C2_params['coop_weight'] = 1
     grammaticalWM.C2_params['comp_weight'] = -1
     
-    control.task_params['time_pressure'] = 150
+    control.task_params['time_pressure'] = 500
     
     conceptLTM.init_act = 1
     grammaticalLTM.init_act = grammaticalWM.C2_params['confidence_threshold']
     
     # Loading data
-    grammar_name = 'TCG_grammar_VB'
+    grammar_name = 'TCG_grammar_VB_light'
    
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
@@ -122,12 +109,18 @@ def test(seed=None):
     agent_cpt_schema = conceptLTM.find_schema(name='AGENT')
     patient_cpt_schema = conceptLTM.find_schema(name='PATIENT')
     modify_cpt_schema = conceptLTM.find_schema(name='MODIFY')
+    blue_cpt_schema = conceptLTM.find_schema(name='BLUE')
+    wear_cpt_schema = conceptLTM.find_schema(name='WEAR')
+    dress_cpt_schema = conceptLTM.find_schema(name='DRESS')
     
     man1 = ls.CPT_SCHEMA_INST(man_cpt_schema, trace={'per_inst':None, 'cpt_schema':man_cpt_schema})
     woman1 = ls.CPT_SCHEMA_INST(woman_cpt_schema, trace={'per_inst':None, 'cpt_schema':woman_cpt_schema})
     kick1 = ls.CPT_SCHEMA_INST(kick_cpt_schema, trace={'per_inst':None, 'cpt_schema':kick_cpt_schema})
     pretty1 = ls.CPT_SCHEMA_INST(pretty_cpt_schema, trace={'per_inst':None, 'cpt_schema':pretty_cpt_schema})
     big1 = ls.CPT_SCHEMA_INST(big_cpt_schema, trace={'per_inst':None, 'cpt_schema':big_cpt_schema})
+    blue1 = ls.CPT_SCHEMA_INST(blue_cpt_schema, trace={'per_inst':None, 'cpt_schema':blue_cpt_schema})
+    wear1 = ls.CPT_SCHEMA_INST(wear_cpt_schema, trace={'per_inst':None, 'cpt_schema':blue_cpt_schema})
+    dress1 = ls.CPT_SCHEMA_INST(dress_cpt_schema, trace={'per_inst':None, 'cpt_schema':blue_cpt_schema})
     
     agent1 = ls.CPT_SCHEMA_INST(agent_cpt_schema, trace={'per_inst':None, 'cpt_schema':agent_cpt_schema})
     agent1.content['pFrom'] = kick1
@@ -141,12 +134,23 @@ def test(seed=None):
     modify2 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace={'per_inst':None, 'cpt_schema':modify_cpt_schema})
     modify2.content['pFrom'] = big1
     modify2.content['pTo'] = man1
+    
+    agent2 = ls.CPT_SCHEMA_INST(agent_cpt_schema, trace={'per_inst':None, 'cpt_schema':agent_cpt_schema})
+    agent2.content['pFrom'] = wear1
+    agent2.content['pTo'] = woman1
+    patient2 = ls.CPT_SCHEMA_INST(patient_cpt_schema, trace={'per_inst':None, 'cpt_schema':patient_cpt_schema})
+    patient2.content['pFrom'] = wear1
+    patient2.content['pTo'] = dress1
+    
+    modify3 = ls.CPT_SCHEMA_INST(modify_cpt_schema, trace={'per_inst':None, 'cpt_schema':modify_cpt_schema})
+    modify3.content['pFrom'] = blue1
+    modify3.content['pTo'] = dress1
 
     # Timing options:
     # Define at which time the schema instances should be invoked in semantic working memory
     # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
 
-    sem_option = 9
+    sem_option = 12
     end_delay = 500
     
     sem_timings = {}
@@ -154,17 +158,19 @@ def test(seed=None):
     sem_timings[2] = {100:[woman1, modify1, pretty1]}
     sem_timings[3] = {100:[woman1, kick1, man1, agent1, patient1]}
     sem_timings[4] = {100:[woman1, modify1, pretty1, kick1, agent1, patient1, man1, big1, modify2]}
-    sem_timings[5] = {100:[woman1, modify1, pretty1, man1, big1, modify2]} # SemRep contains to unconnected subgraphs.
+    sem_timings[5] = {100:[woman1, modify1, pretty1, man1, big1, modify2]} # SemRep contains two unconnected subgraphs.
     
     sem_timings[6] = {100:[woman1], 200:[modify1, pretty1]}
     
     sem_timings[7] = {100:[woman1], 200:[modify1, pretty1], 300: [kick1],  400:[agent1, patient1, man1], 500:[big1, modify2]}
     sem_timings[8] = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[modify1, pretty1], 400:[big1, modify2]}
-    sem_timings[9] = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[big1, modify2], 400:[modify1, pretty1]} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.
+    sem_timings[9] = {100:[man1], 200:[kick1, woman1, agent1, patient1], 300:[big1, modify2], 400:[modify1, pretty1]} # NOTE HOW THE FACT THAT 'big' + 'mod2' are introduced right after the TRA tends to favor man first utterances compared to the previous case.(without time pressure)
     
     sem_timings[10] = {10:[woman1], 300:[modify1, pretty1], 500: [kick1],  700:[agent1, patient1, man1], 900:[big1, modify2]}    
     
     sem_timings[11] = {100:[woman1, modify1, pretty1], 200:[man1, big1, modify2], 300:[kick1], 400:[agent1, patient1]}
+    
+    sem_timings[12] = {100:[woman1, wear1, agent2, patient2, dress1, blue1, modify3, kick1, agent1, patient1, man1]} # Test IN_COLOR
     
     sem_timing = sem_timings[sem_option]
     
@@ -174,7 +180,6 @@ def test(seed=None):
         if step in sem_timing:
             for inst in sem_timing[step]:
                 print "time:%i, sem:%s" %(step, inst.name)
-#            conceptualizer.set_output('to_semantic_WM', sem_timing[step])
             language_system.set_input(sem_timing[step])
             semanticWM.set_output('to_control', True)
         language_system.update()
@@ -182,8 +187,8 @@ def test(seed=None):
         if output[0]:
             print output[0]
     
-    semanticWM.show_dynamics(c2_levels=False)
-    grammaticalWM.show_dynamics()
+#    semanticWM.show_dynamics(c2_levels=False)
+    grammaticalWM.show_dynamics(c2_levels=False)
     grammaticalWM.show_state()
 #    language_system.save_sim('./tmp/test_language_output.json')
 
