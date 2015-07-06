@@ -20,8 +20,8 @@ import TCG_graph
 ### Language knowledge schemas ###
 ##################################
 
-##############################
-# GRAMMAITCAL KNOWLEDGE SCHEMA
+################################
+# GRAMMAITCAL KNOWLEDGE SCHEMA #
 class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Construction schema
@@ -94,9 +94,52 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
              for port in out_ports:
                 self.out_ports.append(port)
                 port.schema=self
+            
+class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
+    """
+    Comprehension construction instance.
+    
+    Added:
+        - phon_form
+        - phon_state
+        - phon_covers
+    """
+    def __init__(self, cxn_schema, trace, mapping={}, copy=True):
+        CXN_SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
+        self.phon_form = [form.copy for form in self.content.SynForm.form]
+        self.phon_form.reverse()
+        self.phon_state = self.phon_form.pop()
+        self.phon_covers = []
+    
+    def cxn_predictions(self):
+        """
+        Return the set of cxn classes that are predicted by this construction given its current phon_state. 
+        Classes that are predicted are those that fit the constraints of next(state) if it is a slot.
+        No predictions are issued if instance is in COMPLETE state or if next(state) is not a slot.
+        """
+        predictions = []
+        if self.phon_state and (isinstance(self.phon_state, construction.TP_SLOT)):
+                predictions.extend(self.phon_state.cxn_classes)
+        return predictions
+    
+    def phon_prediction(self):
+        """
+        Return, if the phon_state is a TP_PHON, the word_form the cxn is exptecting.
+        """
+        word_form = None
+        if self.phon_state and(isinstance(self.phon_state, construction.TP_PHON)):
+            word_form =  self.phon_state.cxn_phonetics
+        return word_form
+        
+    def next_state(self):
+        if self.phon_form:
+            self.phon_state = self.phon_form.pop()
+
+        else:
+            self.phon_state = None
                 
-############################
-# CONCEPT KNOWLEDGE SCHEMAS
+#############################
+# CONCEPT KNOWLEDGE SCHEMAS #
 class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Concept schema
@@ -172,6 +215,52 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
         Uses CONCEPTUAL_KNOWLEDGE.similarity() method.
         """
         return self.content['concept'].similarity(cpt_inst.content['concept'])
+
+#########################
+# PHON KNOWLEDGE SCHEMA #
+class PHON_SCHEMA(KNOWLEDGE_SCHEMA):
+    """
+    Phonological form schemas.
+    NOTE:
+        - For now the model only deals with word level phonological form, ignoring phoneme level processes.
+        - For now, there is no distinction between PHON_SCHEMA used during production and those used during comprehension.
+    """
+    def __init__(self, name, word_form, init_act):
+        """
+        Args:
+            - name (STR):
+            - word_form (STR):
+            - init_act (FLOAT):
+        """
+        KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
+        self.set_content({'word_form':word_form})
+
+class PHON_RELATION_SCHEMA(KNOWLEDGE_SCHEMA):
+    """
+    Temporal relation between phonological form schemas.
+    NOTE:
+        - For now only 'next' is implemented.
+    """
+    def __init__(self, name, word_form, init_act):
+        """
+        Args:
+            - name (STR):
+            - word_form (STR):
+            - init_act (FLOAT):
+        """
+        KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
+        self.set_content({'word_form':word_form})
+        self.content['pFrom'] = None 
+        self.content['pTo'] = None
+
+class PHON_SCHEMA_INST(SCHEMA_INST):
+    """
+    Phonological schema instances.
+    """
+    def __init__(self, phon_schema, trace):
+        SCHEMA_INST.__init__(self, schema=phon_schema, trace=trace)
+        content_copy = phon_schema.content.copy()
+        self.content = content_copy
 
 ###################################
 ### Language procedural schemas ###
@@ -368,6 +457,7 @@ class GRAMMATICAL_LTM(LTM):
         LTM.__init__(self, name)
         self.grammar = None
         self.add_port('OUT', 'to_cxn_retrieval_P')
+        self.add_port('OUT', 'to_cxn_retrieval_C')
         self.init_act = 0.5 #The initial activation value for cxn schema.
     
     def initialize(self, grammar):
@@ -385,6 +475,7 @@ class GRAMMATICAL_LTM(LTM):
         """
         """
         self.set_output('to_cxn_retrieval_P', self.schemas)
+        self.set_output('to_cxn_retrieval_C', self.schemas)
     
     ####################
     ### JSON METHODS ###
@@ -1078,6 +1169,186 @@ class PHON_WM_P(PROCEDURAL_SCHEMA):
         data = super(PHON_WM_P, self).get_state()
         data['phon_form'] = self.phon_form
         return data
+
+
+        
+####################
+### GRAMMAR COMP ###
+class PHON_WM_C(WM):
+    """
+    Receives input one word at a time.
+    """
+    def __init__(self, name='Phonological_WM_C'):
+        WM.__init__(self, name)
+        self.add_port('IN', 'from_input')
+        self.add_port('OUT', 'to_grammatical_WM_C')
+        self.add_port('OUT', 'to_cxn_retrieval_C')
+        self.add_port('OUT', 'to_control')
+        self.dyn_params = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0}
+        self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
+        self.phon_sequence = []
+
+    
+    def update(self):
+        """
+        """
+        phon_form = self.get_input('from_input')
+        if phon_form:
+            phon_schema = PHON_SCHEMA(name=phon_form, word_form=phon_form, init_act=0.6)
+            phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
+            self.add_instance(phon_inst)
+            self.phon_sequence.append(phon_inst)
+            self.set_output('to_cxn_retrieval_C', phon_inst)
+            self.set_output('to_control', True)
+        else:
+            self.set_output('to_cxn_retrieval_C', None)
+        
+        self.update_activations()     
+        self.prune()
+
+class GRAMMATICAL_WM_C(WM):
+    """
+    """
+    def __init__(self, name='Grammatical_WM_C'):
+        WM.__init__(self, name)
+        self.add_port('IN', 'from_phonological_WM_C')
+        self.add_port('IN', 'from_control')
+        self.add_port('IN', 'from_cxn_retrieval_C')
+        self.add_port('OUT', 'to_cxn_retrieval_C')
+        self.add_port('OUT', 'to_semantic_WM')
+        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
+        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}
+        self.state = 0
+        
+    
+    def update(self):
+        """
+        NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
+        """
+        phon_inst = self.get_input('from_phonological_WM_C')
+        if phon_inst:
+            self.predictor()
+            self.state += 1
+            self.scanner(phon_inst)
+            self.completer()
+        
+        self.update_activations()
+        self.prune()
+    
+    def predictor(self):
+        """
+        TCG version of the Earley chart parsing predictor.
+        """
+        # Send all the classes of construction expected to cxn_retrieval. the cxn_retrieval system will then send back the set of all possible predictions based instances.
+        # NEED TO MAKE SURE THAT A INSTANCE DOESN'T SEND IT'S PREDICTION MULTIPLE TIMES.
+        pred_classes = set([])
+        for inst in self.schema_insts:
+            pred_classes= pred_classes.union(inst.cxn_predictions())
+            
+        predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
+            
+        self.set_output('to_cxn_retrieval_C', predictions)
+    
+    def scanner(self, phon_inst):
+        """
+        TCG version of the Earley chart parsing scanner.
+        """
+        # Check the existing instances whose form match th phon_inst.content['word_form']. If there is a match, move dot.
+        # This might be when the competitions are taking place.
+        matching_insts = []
+        for inst in self.schema_insts:
+            phon_prediction = inst.phon_prediction()
+            if phon_prediction:
+                if phon_prediction == phon_inst.word_form:
+                    inst.phon_covers.append(phon_inst)
+                    inst.next_state()
+                    inst.covers[1] = self.state
+                    matching_insts.append(inst)
+                else:
+                    inst.alive = False # Here a cxn whose form is directly disproved by the input is directly removed. Need to revisit this deisgn choice.
+                
+        self._compete(matching_insts)
+    
+    def completer(self):
+        """
+        TCG version of the Earley chart parsing completer.
+        """
+        # Recursively check all the "completed" cxn (dot all the way to the right) and make the appropriate coop links.
+        completed_insts = [inst for inst in self.schema_insts if not(inst.phon_state)]
+        while completed_insts:
+            incomplete_insts = [i for i in self.schema_insts if inst.phon_state]
+            for inst1 in incomplete_insts:
+                for inst2 in completed_insts:
+                    print 'nothing yet!'
+                    # check match between inst1 and inst2
+                    # if there is a match: create a coop link
+                    # update inst1.covers[1] to self.state.
+                    
+            completed_insts = [inst for inst in incomplete_insts if not(inst.phon_state)]
+        
+        
+    
+    ###############################
+    ### cooperative computation ###
+    ###############################
+    def _cooperate(self):
+       """
+       """
+       return
+    
+    def _compete(self, comp_insts):
+        """
+        Adds competition links between each pair of instances in comp_insts [CXN_SCHEMA_INST_C]
+        
+        Args:
+            - comp_insts [CXN_SCHEMA_INST_C]:
+        """
+        for i in range(len(comp_insts)-1):
+            inst_from = comp_insts[i]
+            for j in range(i+1, len(comp_insts)):
+                inst_to = comp_insts[j]
+                self.add_comp_link(inst_from, inst_to)
+        
+class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
+    """
+    THIS NEEDS TO ALLOW FOR THE IMPLEMENTATIN OF A FORM OF CHART PARSING.
+    """
+    def __init__(self, name="Cxn_retrieval_C"):
+        PROCEDURAL_SCHEMA.__init__(self,name)
+        self.add_port('IN', 'from_grammatical_LTM')
+        self.add_port('IN', 'from_phonological_WM_C')
+        self.add_port('IN', 'from_grammatical_WM_C')
+        self.add_port('OUT', 'to_grammatical_WM_C')
+        self.cxn_instances = []
+    
+    def update(self):
+        """
+        """
+        cxn_schemas = self.get_input('from_grammatical_LTM')
+        predictions = self.get_input('from_grammatical_WM_C')
+        if predictions and cxn_schemas:
+           self._instantiate_cxn(predictions, cxn_schemas)
+           self.set_output('to_grammatical_WM_C', self.cxn_instances)
+                    
+    def _instantiate_cxns(self, predictions, cxn_schemas):
+        """
+        """
+        for cxn_schema in cxn_schemas:
+            if cxn_schema.content.clss in predictions['cxn_classes']:
+                trace = {'schemas':[cxn_schema]}
+                cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
+                cxn_inst.covers = predictions['covers']
+                self.cxn_instances.append(cxn_inst)
+
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def get_state(self):
+        """
+        """
+        data = super(CXN_RETRIEVAL_C, self).get_state()
+        data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
+        return data
         
 ####################
 ### TASK CONTROL ###      
@@ -1120,6 +1391,8 @@ class CONTROL(PROCEDURAL_SCHEMA):
         data['state'] = self.state
         return data
         
+#####################
+### EXTRA CLASSES ###         
 class TEXT2SPEECH(object):
     """
     """
@@ -1137,5 +1410,8 @@ class TEXT2SPEECH(object):
             self.utterance = None
 ###############################################################################
 if __name__=='__main__':
-    from test_language_schemas import test
-    test(seed=None)
+    from test_TCG_production import test as test_production
+    from test_TCG_comprehension import test as test_comprehension
+    
+#    test_production(seed=None)
+    test_comprehension(seed=None)

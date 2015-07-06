@@ -5,7 +5,7 @@
 Define constructions related classes for TCG1.1
 The Template Classes define all the basic template elements that are used to build a construction.
 
-Uses NetworkX module to represent construction SemFrame graph.
+Uses NetworkX module to represent construction SemFrame graph and SynForm graph.
 """
 import matplotlib.pyplot as plt
 import networkx as nx

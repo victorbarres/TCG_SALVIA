@@ -697,7 +697,9 @@ class WM(PROCEDURAL_SCHEMA):
         if c2_levels:
             num_plots =2
         plt.subplot(num_plots,1,1)
-        title = 'WM dynamics \n noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
+        title = 'WM dynamics \n dyn: [tau:%g, act_inf:%g, L:%g, k:%g, x0:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(
+                            self.dyn_params['tau'], self.dyn_params['act_inf'], self.dyn_params['L'], self.dyn_params['k'], self.dyn_params['x0'],
+                            self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
                               self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'], self.C2_params['confidence_threshold'])
         plt.title(title)
         plt.xlabel('time', fontsize=14)

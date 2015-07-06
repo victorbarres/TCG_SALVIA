@@ -38,12 +38,23 @@ def test(seed=None):
     language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
     language_system.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
     language_system.set_input_ports([phonWM_C._find_port('from_input')])
-    language_system.set_output_ports([cxn_retrieval_C._find_port('to_grammatical_WM_C')])
+    language_system.set_output_ports([phonWM_C._find_port('to_grammatical_WM_C')])
     
     # Display schema system
 #    language_system.system2dot(image_type='png', disp=True)
     
-    # Parameters   
+    # Parameters
+    phonWM_C.dyn_params['tau'] = 2
+    phonWM_C.dyn_params['act_inf'] = 0.0
+    phonWM_C.dyn_params['L'] = 1.0
+    phonWM_C.dyn_params['k'] = 10.0
+    phonWM_C.dyn_params['x0'] = 0.5
+    phonWM_C.dyn_params['noise_mean'] = 0
+    phonWM_C.dyn_params['noise_std'] = 0.2
+    phonWM_C.C2_params['confidence_threshold'] = 0
+    phonWM_C.C2_params['prune_threshold'] = 0.01
+    phonWM_C.C2_params['coop_weight'] = 0
+    phonWM_C.C2_params['comp_weight'] = 0
     grammaticalLTM.init_act = 1
     
     # Loading data
@@ -57,12 +68,17 @@ def test(seed=None):
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
     
-    lang_input = ['a', 'woman', 'kick', 'a', 'man']
-    language_system.set_input(lang_input)
-    
-    max_time = 2
+    lang_input = {1:'a', 2:'woman', 3:'kick', 4:'a', 5:'man'}
+#    
+    max_time = 10
     for step in range(max_time):
+        if step in lang_input:
+            word_form = lang_input[step]
+            print 't: %i, receive: %s' %(step, word_form)
+            language_system.set_input(word_form)
         language_system.update()
+    
+    print phonWM_C.show_dynamics()
 
 
 if __name__=='__main__':
