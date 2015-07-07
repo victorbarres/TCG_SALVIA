@@ -100,43 +100,46 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
     Comprehension construction instance.
     
     Added:
-        - phon_form
-        - phon_state
-        - phon_covers
+        - form_sequence
+        - form_state
+        - phon_cover
+        - has_predicted
     """
     def __init__(self, cxn_schema, trace, mapping={}, copy=True):
-        CXN_SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
-        self.phon_form = [form.copy for form in self.content.SynForm.form]
-        self.phon_form.reverse()
-        self.phon_state = self.phon_form.pop()
-        self.phon_covers = []
+        CXN_SCHEMA_INST.__init__(self, cxn_schema=cxn_schema, mapping=mapping, trace=trace)
+        self.form_sequence = self.content.SynForm.form[:]
+        self.form_sequence.reverse()
+        self.form_state = self.form_sequence.pop()
+        self.phon_cover = []
+        self.has_predicted = False
     
     def cxn_predictions(self):
         """
-        Return the set of cxn classes that are predicted by this construction given its current phon_state. 
+        Return the set of cxn classes that are predicted by this construction given its current form_state. 
         Classes that are predicted are those that fit the constraints of next(state) if it is a slot.
         No predictions are issued if instance is in COMPLETE state or if next(state) is not a slot.
         """
         predictions = []
-        if self.phon_state and (isinstance(self.phon_state, construction.TP_SLOT)):
-                predictions.extend(self.phon_state.cxn_classes)
+        if self.form_state and (isinstance(self.form_state, construction.TP_SLOT)):
+            predictions.extend(self.form_state.cxn_classes)
+        self.has_predicted = True
         return predictions
     
     def phon_prediction(self):
         """
-        Return, if the phon_state is a TP_PHON, the word_form the cxn is exptecting.
+        Return, if the form_state is a TP_PHON, the word_form the cxn is exptecting.
         """
         word_form = None
-        if self.phon_state and(isinstance(self.phon_state, construction.TP_PHON)):
-            word_form =  self.phon_state.cxn_phonetics
+        if self.form_state and(isinstance(self.form_state, construction.TP_PHON)):
+            word_form =  self.form_state.cxn_phonetics
         return word_form
         
     def next_state(self):
-        if self.phon_form:
-            self.phon_state = self.phon_form.pop()
-
+        if self.form_sequence:
+            self.form_state = self.form_sequence.pop()
+            self.has_predicted = False
         else:
-            self.phon_state = None
+            self.form_state = None
                 
 #############################
 # CONCEPT KNOWLEDGE SCHEMAS #
@@ -768,7 +771,7 @@ class GRAMMATICAL_WM_P(WM):
         match_cat = 0
         links = []
         if inst1 == inst2:
-           match_cat = -1 # CHECK THAAT
+           match_cat = -1 # CHECK THAT
         else:
             overlap = GRAMMATICAL_WM_P._overlap(inst1, inst2)
             if not(overlap):
@@ -1199,6 +1202,7 @@ class PHON_WM_C(WM):
             self.add_instance(phon_inst)
             self.phon_sequence.append(phon_inst)
             self.set_output('to_cxn_retrieval_C', phon_inst)
+            self.set_output('to_grammatical_WM_C', phon_inst)
             self.set_output('to_control', True)
         else:
             self.set_output('to_cxn_retrieval_C', None)
@@ -1208,6 +1212,7 @@ class PHON_WM_C(WM):
 
 class GRAMMATICAL_WM_C(WM):
     """
+    
     """
     def __init__(self, name='Grammatical_WM_C'):
         WM.__init__(self, name)
@@ -1218,33 +1223,47 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('OUT', 'to_semantic_WM')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}
+        self.pred_params = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = 0
+        self.pred_init = self.pred_params['pred_init'][:]
         
     
     def update(self):
         """
         NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
         """
+            
+        pred_cxn_insts = self.get_input('from_cxn_retrieval_C')
+        if pred_cxn_insts:
+            for inst in pred_cxn_insts:
+                self.add_instance(inst, inst.activity)
+                
+        self.predictor()   
         phon_inst = self.get_input('from_phonological_WM_C')
         if phon_inst:
-            self.predictor()
             self.state += 1
             self.scanner(phon_inst)
             self.completer()
         
         self.update_activations()
         self.prune()
-    
+        
     def predictor(self):
         """
         TCG version of the Earley chart parsing predictor.
         """
         # Send all the classes of construction expected to cxn_retrieval. the cxn_retrieval system will then send back the set of all possible predictions based instances.
         # NEED TO MAKE SURE THAT A INSTANCE DOESN'T SEND IT'S PREDICTION MULTIPLE TIMES.
-        pred_classes = set([])
-        for inst in self.schema_insts:
-            pred_classes= pred_classes.union(inst.cxn_predictions())
-            
+        if self.pred_init:
+             pred_classes = set(self.pred_init)
+             self.pred_init = []
+        else:
+            pred_classes = set([])
+            for inst in [i for i in self.schema_insts if not(i.has_predicted)]:
+                inst_pred = inst.cxn_predictions()
+                print '%s predicts: ' %inst.name,
+                print inst_pred
+                pred_classes= pred_classes.union(inst_pred)
         predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
             
         self.set_output('to_cxn_retrieval_C', predictions)
@@ -1252,18 +1271,25 @@ class GRAMMATICAL_WM_C(WM):
     def scanner(self, phon_inst):
         """
         TCG version of the Earley chart parsing scanner.
+        
+        NOTE: 
+            - Covers, to fit with production, should be a mapping between SynForm and PhonRep, while Trace is the part that only keeps track of the element that triggered the instantiation.
+            - A key step is to reset the activation of the instance that is confirmed by an input to that of the Phon instance. Right now it is just set to the value of the phone instance. 
+            But it should be clamped to it or receive a constant input from it.
         """
-        # Check the existing instances whose form match th phon_inst.content['word_form']. If there is a match, move dot.
+        # Check the existing instances whose form match the phon_inst.content['word_form']. If there is a match, move dot.
         # This might be when the competitions are taking place.
         matching_insts = []
         for inst in self.schema_insts:
             phon_prediction = inst.phon_prediction()
             if phon_prediction:
-                if phon_prediction == phon_inst.word_form:
-                    inst.phon_covers.append(phon_inst)
+                if phon_prediction == phon_inst.content['word_form']:
+                    inst.phon_cover.append(phon_inst)
                     inst.next_state()
+                    inst.set_activation(phon_inst.activity) #IMPORTANT STEP
                     inst.covers[1] = self.state
                     matching_insts.append(inst)
+                    print '%s recognized by scanner' %inst.name
                 else:
                     inst.alive = False # Here a cxn whose form is directly disproved by the input is directly removed. Need to revisit this deisgn choice.
                 
@@ -1274,40 +1300,143 @@ class GRAMMATICAL_WM_C(WM):
         TCG version of the Earley chart parsing completer.
         """
         # Recursively check all the "completed" cxn (dot all the way to the right) and make the appropriate coop links.
-        completed_insts = [inst for inst in self.schema_insts if not(inst.phon_state)]
+        completed_insts = [inst for inst in self.schema_insts if not(inst.form_state)]
         while completed_insts:
-            incomplete_insts = [i for i in self.schema_insts if inst.phon_state]
+            print 'completed insts ',
+            print [c.name for c in completed_insts]
+            incomplete_insts = [inst for inst in self.schema_insts if inst.form_state]
             for inst1 in incomplete_insts:
                 for inst2 in completed_insts:
-                    print 'nothing yet!'
                     # check match between inst1 and inst2
                     # if there is a match: create a coop link
                     # update inst1.covers[1] to self.state.
+                    flag = self._cooperate(inst1, inst2)
+                    if flag:
+                        print '%s cooperates with %s' %(inst1.name, inst2.name)
                     
-            completed_insts = [inst for inst in incomplete_insts if not(inst.phon_state)]
+            completed_insts = [inst for inst in incomplete_insts if not(inst.form_state)]
         
         
     
     ###############################
     ### cooperative computation ###
     ###############################
-    def _cooperate(self):
+    def _cooperate(self, inst1, inst2):
        """
        """
-       return
+       match = GRAMMATICAL_WM_C._match(inst1, inst2)
+       if match["match_cat"] == 1:
+           for match_qual, link in match["links"]:
+               if match_qual > 0:
+                   self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
+                   inst1.next_state()
+                   inst1.covers[1] = self.state
+                   return True
+       return False
     
-    def _compete(self, comp_insts):
+    def _compete(self, insts):
         """
-        Adds competition links between each pair of instances in comp_insts [CXN_SCHEMA_INST_C]
+        Adds competition links between each pair of instances in comp_insts [CXN_SCHEMA_INST_C] for which self._match() returns -1.
         
         Args:
             - comp_insts [CXN_SCHEMA_INST_C]:
+            
+        NOTE:
+            - For now it is used in way that all the constructions in insts should be competing.
         """
-        for i in range(len(comp_insts)-1):
-            inst_from = comp_insts[i]
-            for j in range(i+1, len(comp_insts)):
-                inst_to = comp_insts[j]
-                self.add_comp_link(inst_from, inst_to)
+        for i in range(len(insts)-1):
+            inst1 = insts[i]
+            for j in range(i+1, len(insts)):
+                inst2 = insts[j]
+                match = self._match(inst1, inst2)
+                if match == -1:
+                    self.add_comp_link(inst1, inst2)
+    
+    @staticmethod
+    def _overlap(inst1, inst2):
+        """
+        Returns the set of PHON_SCHEMA_INST on which the instances overlap
+        
+        Args:
+            - inst1 (CXN_SCHEMA_INST_C): A cxn instance
+            - inst2 (CXN_SCHEMA_INST_C): A cxn instance
+       
+       NOTES:
+            - Overlap shoudl define the set of constraints that are expressed by both constructions. It should allow to determine whether or not they
+            compete or not.
+            - I need to clean up the notion of trace and cover in both production and comprehension. In particular, it is important to note that a cxn can cover both semantic instances
+            (SemRep) AND phon instances. The notion of trace changes also when cxn can be instantiated on the bases of predictions from other constructions. Should those constructions
+            be part of the trace?
+            - With respect to the previous point, in production, trace contains only pointers to what triggered the instantiation, covers contains a mappping!
+            - Since we are dealing with CFG, one way to define overal, given the notion of covers (as [state1, state2]) can just be the intersection of two such segments, and the competition
+            would occur as soon as the overlap is not null (no crossing branches in CFGs).
+        """
+        s1 = set(range(inst1.covers[0], inst1.covers[1]))
+        s2 = set(range(inst2.covers[0], inst2.covers[1]))
+        overlap = list(s1.intersection(s2))
+        return overlap
+    
+    @staticmethod    
+    def _link(inst_p, inst_c):
+        """
+        Args:
+            - inst_p (CXN_SCHEMA_INST_C): An incomplete cxn instance (parent)
+            - inst_c (CXN_SCHEMA_INST_C): A completed cxn instance (child)
+        NOTE:
+            - NO LIGHT SEMANTICS!!!
+        """
+        cxn_c = inst_c.content
+        form_elem = inst_p.form_state
+
+        cond1 = isinstance(form_elem, construction.TP_SLOT)
+        if cond1:
+            cond2 = cxn_c.clss in form_elem.cxn_classes
+            # NEED TO ADD A LIGHT_SEM CONDITION (cond4?)
+            link = {"inst_from": inst_c, "port_from":inst_c._find_port("output"), "inst_to": inst_p, "port_to":inst_p._find_port(form_elem.order)}
+            if cond2:
+                match_qual = 1
+            else:
+                match_qual = 0
+            return (match_qual, link)
+        return None
+    
+    @staticmethod
+    def _match(inst1, inst2):
+        """
+         Args:
+            - inst1 (CXN_SCHEMA_INST_C): An incomplete cxn instance (parent)
+            - inst2 (CXN_SCHEMA_INST_C): A completed cxn instance (child)
+            
+        NOTE:
+            - Not sure that this method is really necessary.
+        """            
+        match_cat = 0
+        links = []
+        if inst1 == inst2:
+           match_cat = -1 # CHECK THAT
+        else:
+            overlap = GRAMMATICAL_WM_C._overlap(inst1, inst2)
+            if overlap:
+                match_cat = -1
+            else:
+                if inst1.form_state and not(inst2.form_state):
+                    if inst1.covers[1] == inst2.covers[0]:
+                        match_cat = 1
+                        link = GRAMMATICAL_WM_C._link(inst1, inst2)
+                        if link:
+                            links.append(link)
+                    else:
+                        match_cat = 0
+                elif inst2.form_state and not(inst1.form_state):
+                    if inst2.covers[1] == inst1.convers[0]:
+                        match_cat = 1
+                        link = GRAMMATICAL_WM_C._link(inst2, inst1, inst2.form_state)
+                        if link:
+                            links.append(link)
+                    else:
+                        match_cat = 0
+                        
+        return {"match_cat":match_cat, "links":links}
         
 class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
     """
@@ -1327,19 +1456,31 @@ class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
         cxn_schemas = self.get_input('from_grammatical_LTM')
         predictions = self.get_input('from_grammatical_WM_C')
         if predictions and cxn_schemas:
-           self._instantiate_cxn(predictions, cxn_schemas)
-           self.set_output('to_grammatical_WM_C', self.cxn_instances)
+            self._instantiate_cxns(predictions, cxn_schemas)
+            self.set_output('to_grammatical_WM_C', self.cxn_instances)
+            self.cxn_instances = []
                     
     def _instantiate_cxns(self, predictions, cxn_schemas):
         """
         """
-        for cxn_schema in cxn_schemas:
-            if cxn_schema.content.clss in predictions['cxn_classes']:
-                trace = {'schemas':[cxn_schema]}
-                cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
-                cxn_inst.covers = predictions['covers']
-                self.cxn_instances.append(cxn_inst)
+        covers = predictions['covers']
+        pred_classes = set(predictions['cxn_classes'])
+        old_pred_classes = pred_classes
 
+        while pred_classes: # Recursively instantiate the constructions.
+            new_pred_classes = set([])
+            for cxn_schema in cxn_schemas:
+                if cxn_schema.content.clss in pred_classes:
+                    trace = {'schemas':[cxn_schema]}
+                    cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
+                    cxn_inst.covers = covers[:] # That's not really a good "cover", cover should be a mapping between SynForm elements and PhonRep.
+                    self.cxn_instances.append(cxn_inst)
+                    # Recursively add the instances predicted by the newly instantiated cxns.
+                    pred = cxn_inst.cxn_predictions()
+                    new_pred_classes = new_pred_classes.union(set([c for c in pred if c not in old_pred_classes]))
+            old_pred_classes = old_pred_classes.union(new_pred_classes)
+            pred_classes = new_pred_classes
+                        
     ####################
     ### JSON METHODS ###
     ####################

@@ -78,7 +78,7 @@ def test(seed=None):
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
     
     grammaticalWM_P.C2_params['confidence_threshold'] = 0.2
-    grammaticalWM_P.C2_params['prune_threshold'] = 0.01
+    grammaticalWM_P.C2_params['prune_threshold'] = 0.1
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
     
@@ -150,7 +150,7 @@ def test(seed=None):
     # Define at which time the schema instances should be invoked in semantic working memory
     # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
 
-    sem_option = 4
+    sem_option = 1
     end_delay = 500
     
     sem_timings = {}
