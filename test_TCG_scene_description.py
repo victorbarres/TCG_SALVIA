@@ -2,7 +2,7 @@
 """
 @author: Victor Barres
 
-Test TCG Production
+Test TCG description
 """
 import random
 
@@ -15,7 +15,7 @@ random.seed(3)
 
 
 ####################################
-### TCG production schema system ###
+### TCG description schema system ###
 ####################################
 # Instantiating all the necessary procedural schemas
 subscene_rec = ps.SUBSCENE_RECOGNITION()
@@ -48,38 +48,39 @@ brain_mappings = {'Visual_WM':['ITG'],
 schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, control] 
 
 # Creating schema system and adding procedural schemas
-production_system = st.SCHEMA_SYSTEM('Production_system')
-production_system.add_schemas(schemas)
+description_system = st.SCHEMA_SYSTEM('Description_system')
+description_system.add_schemas(schemas)
 
 # Defining connections
-production_system.add_connection(perceptLTM, 'to_subscene_rec', subscene_rec, 'from_percept_LTM')
-production_system.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
+description_system.add_connection(perceptLTM, 'to_subscene_rec', subscene_rec, 'from_percept_LTM')
+description_system.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
 
-production_system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
-production_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
-production_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
+description_system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
+description_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
+description_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
 
-production_system.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
-production_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
-production_system.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
-production_system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
-production_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
-production_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
-production_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
-production_system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
+description_system.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
+description_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
+description_system.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
+description_system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
+description_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
+description_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+description_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
+description_system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
+description_system.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
 
 
 # Defining input and output ports 
-production_system.set_input_ports([subscene_rec.find_port('from_input')])
-production_system.set_output_ports([phonWM_P.find_port('to_output')])
+description_system.set_input_ports([subscene_rec.find_port('from_input')])
+description_system.set_output_ports([phonWM_P.find_port('to_output')])
 
 # Setting up schema to brain mappings
-production_brain_mapping = st.BRAIN_MAPPING()
-production_brain_mapping.schema_mapping = brain_mappings
-production_system.brain_mapping = production_brain_mapping
+description_brain_mapping = st.BRAIN_MAPPING()
+description_brain_mapping.schema_mapping = brain_mappings
+description_system.brain_mapping = description_brain_mapping
 
 # Generating schema system graph visualization
-production_system.system2dot(image_type='png', disp=True)
+description_system.system2dot(image_type='png', disp=True)
 
 # Parameters   
 visualWM.dyn_params['tau'] = 300
@@ -124,6 +125,7 @@ grammaticalWM_P.C2_params['comp_weight'] = -1
 
 grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']
 
+control.task_params['mode'] = 'produce'
 control.task_params['time_pressure'] = 800
 
 # Loading data
@@ -157,14 +159,14 @@ saliency_data = ld.load_BU_saliency(scene_name, scene_folder)
 r = 2**(saliency_data.params.levelParams['mapLevel']-1) # ONly works if pyramidtype = dyadic!
 
 # Schema rec intialization
-production_system.set_input(my_scene)
-production_system.verbose = False
+description_system.set_input(my_scene)
+description_system.verbose = False
 
 # Running the schema system
 time = 1000
 for t in range(time):
-    production_system.update()
-    output = production_system.get_output()
+    description_system.update()
+    output = description_system.get_output()
     if output[0]:
         print output[0]
 
@@ -173,4 +175,4 @@ for t in range(time):
 grammaticalWM_P.show_dynamics()
 grammaticalWM_P.show_state()
 
-#production_system.save_sim('./tmp/test_production_output.json')f
+#description_system.save_sim('./tmp/test_description_output.json')f

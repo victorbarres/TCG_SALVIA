@@ -393,6 +393,7 @@ class SEMANTIC_WM(WM):
         WM.__init__(self, name)
         self.add_port('IN', 'from_conceptualizer')
         self.add_port('IN', 'from_grammatical_WM_C')
+        self.add_port('IN', 'from_control')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
@@ -403,7 +404,15 @@ class SEMANTIC_WM(WM):
     def update(self):
         """
         """
-        cpt_insts = self.get_input('from_conceptualizer')
+        mode = self.get_input('from_control')
+        cpt_insts = None
+        if mode == 'produce':
+            cpt_insts = self.get_input('from_conceptualizer')
+        elif mode == 'listen':
+            cpt_insts = self.get_input('from_grammatical_WM_C')
+        else:
+            cpt_insts = None
+        
         if cpt_insts:
             for inst in cpt_insts:
                self.add_instance(inst) # Does not deal with updating already existing nodes. Need to add that.
@@ -1755,13 +1764,15 @@ class CONTROL(PROCEDURAL_SCHEMA):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_phonological_WM_P')
+        self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_grammatical_WM_P')
-        self.task_params = {'time_pressure':100}
-        self.state = {'last_prod_time':0, 'new_sem':False}
+        self.task_params = {'time_pressure':100, 'mode':'produce'}
+        self.state = {'last_prod_time':0, 'new_sem':False, 'mode':self.task_params['mode']}
     
     def update(self):
         """
         """
+        self.set_output('to_semantic_WM', self.state['mode'])
         if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
             self.set_output('to_grammatical_WM_P', True)
             self.state['new_sem'] = False

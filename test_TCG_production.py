@@ -50,6 +50,7 @@ def test(seed=None):
     language_system_P.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system_P.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     language_system_P.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
+    language_system_P.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     language_system_P.set_input_ports([semanticWM.find_port('from_conceptualizer')])
     language_system_P.set_output_ports([phonWM_P.find_port('to_output')])
     
@@ -83,6 +84,7 @@ def test(seed=None):
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
     
+    control.task_params['mode'] = 'produce'
     control.task_params['time_pressure'] = 500
     
     conceptLTM.init_act = 1
