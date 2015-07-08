@@ -208,7 +208,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         Return the current value of the port with name 'port_name' and resets the port value to None. If the port is not an input port, if multiple ports shared the same name or if the port is 
         not found, returns None.
         """
-        port = self._find_port(port_name)
+        port = self.find_port(port_name)
         if port and (port.type == PORT.TYPE_IN):
             val = port.value
             port.value = None # Resets port value
@@ -225,7 +225,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         Sets the value of the output port with name 'port_name' to 'val'. If the port is not an output port, if multiple ports shared the same name or if the port is 
         not found, returns False, else returns True.
         """
-        port = self._find_port(port_name)
+        port = self.find_port(port_name)
         if port and (port.type == PORT.TYPE_OUT):
             port.value = val
             return True
@@ -235,7 +235,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         else:
             return False
     
-    def _find_port(self, port_name):
+    def find_port(self, port_name):
         """
         Looks for port with name 'port_name'. 
         Returns the port if a single port with this name is found. Else returns None.
@@ -637,8 +637,7 @@ class WM(PROCEDURAL_SCHEMA):
                 inst_to.alive = False
         self.comp_links = []
         self.prune()
-        
-    
+
     def update_activity(self):
         """
         Computes the overall activity of the working memory.
@@ -979,8 +978,8 @@ class SCHEMA_SYSTEM(object):
         Adds connection (CONNECT) between from_schema:from_port (PROCEDURAL_SCHEMA:PORT) to to_schema:to_port (PROCEDURAL_SCHEMA:PORT).
         Returns True if successful, False otherwise.
         """
-        port_from = from_schema._find_port(from_port)
-        port_to = to_schema._find_port(to_port)
+        port_from = from_schema.find_port(from_port)
+        port_to = to_schema.find_port(to_port)
         if port_from and port_to:
             new_connect = CONNECT(name=name, port_from=port_from, port_to=port_to, weight=weight, delay=delay)
             self.connections.append(new_connect)

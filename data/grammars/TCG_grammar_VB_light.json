@@ -1,4 +1,21 @@
 {"grammar" :[
+
+		
+	{
+		"name" : "PP_IN",
+		"class" : "S",
+		"preference" : 1,
+		"SemFrame" : 
+		{
+			"nodes"  : [{"name" : "EVT", "concept" : "ACTION", "focus" : false, "head" : true},
+						{"name" : "PLACE", "concept" : "ENTITY", "focus" : false, "head" : false}],
+			"edges" : [{"name" : "EVT_PP", "concept" : "IN", "from" : "EVT", "to" : "PLACE"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},
+					{"name" : "S2", "type" : "PHON", "phon" : "in"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"EVT" : "S1", "PLACE" : "S3"}		
+	},
 	
 	{
 		"name" : "SVO",
@@ -6,7 +23,7 @@
 		"preference" : 1,
 		"SemFrame" :
 		{
-			"nodes" : [	{"name" : "AGT", "concept" : "ENTITY", "focus" : true, "head" : true},
+			"nodes" : [	{"name" : "AGT", "concept" : "ENTITY", "focus" : true, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "focus" : false, "head" : false},
 						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true}],
 			"edges" : [	{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
@@ -16,6 +33,25 @@
 					{"name" : "S2", "type" : "SLOT", "classes" : ["VP", "V"]},
 					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]}],
 		"SymLinks" : {"AGT" : "S1", "ACT" : "S2" , "PT" : "S3"}
+	},
+	
+	{
+		"name" : "PAS_SVO",
+		"class" : "S",
+		"SemFrame" : 
+		{
+			"nodes"  : [{"name" : "AGT", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "PT", "concept" : "ENTITY", "focus" : true, "head" : false },
+						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true }],
+			"edges" : [{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "PT"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S2", "type" : "PHON", "phon" : "is"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["VP", "V"]},
+					{"name" : "S4", "type" : "PHON", "phon" : "-ed by"},
+					{"name" : "S5", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"PT" : "S1", "ACT" : "S3", "AGT" : "S5"}			
 	},
 	
 	{
@@ -29,6 +65,20 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "a"},
 					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
 		"SymLinks" : {"OBJ" : "S2"}		
+	},
+	
+	{
+		"name" : "ADJ_NOUN",
+		"class" : "N",
+		"SemFrame" : 
+		{
+			"nodes" : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : true},
+						{"name" : "ATTR", "concept" : "PROPERTY", "focus" : false, "head" : false}],
+			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["A"]},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" : {"ATTR" : "S1", "OBJ" : "S2"}		
 	},
 
 	{

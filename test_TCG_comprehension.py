@@ -42,8 +42,8 @@ def test(seed=None):
     language_system.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
     language_system.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
     language_system.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
-    language_system.set_input_ports([phonWM_C._find_port('from_input')])
-    language_system.set_output_ports([phonWM_C._find_port('to_grammatical_WM_C')])
+    language_system.set_input_ports([phonWM_C.find_port('from_input')])
+    language_system.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
     
     # Display schema system
 #    language_system.system2dot(image_type='png', disp=True)
@@ -77,7 +77,7 @@ def test(seed=None):
 
     
     # Loading data
-    grammar_name = 'TCG_grammar_VB_light'
+    grammar_name = 'TCG_grammar_VB_singlehead'
    
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
@@ -87,9 +87,16 @@ def test(seed=None):
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
     
-    lang_input = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
+    option = 2
     
-    max_time = 200
+    lang_inputs = {}
+    lang_inputs[1] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
+    lang_inputs[2] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 65: 'a', 70:'blue', 80:'boxing ring'}
+    lang_inputs[3] = {1:'a', 10:'woman', 13:'who', 14:'is', 15:'pretty', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
+    lang_inputs[4] = {1:'a', 10:'woman', 20:'laugh', 60:'kick', 70:'a', 75:'man', 80:'in', 85:'blue'}
+    
+    lang_input = lang_inputs[option]
+    max_time = 500
     for step in range(max_time):
         if step in lang_input:
             word_form = lang_input[step]
@@ -100,6 +107,8 @@ def test(seed=None):
 #    phonWM_C.show_dynamics()
     grammaticalWM_C.show_dynamics()
     grammaticalWM_C.show_state()
+    
+    grammaticalWM_C.draw_assemblages()
 
 if __name__=='__main__':
     test(seed=None)

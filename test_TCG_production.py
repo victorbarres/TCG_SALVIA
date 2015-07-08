@@ -50,8 +50,8 @@ def test(seed=None):
     language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     language_system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
-    language_system.set_input_ports([semanticWM._find_port('from_conceptualizer')])
-    language_system.set_output_ports([phonWM_P._find_port('to_output')])
+    language_system.set_input_ports([semanticWM.find_port('from_conceptualizer')])
+    language_system.set_output_ports([phonWM_P.find_port('to_output')])
     
     language_system.system2dot(image_type='png', disp=True)
     
@@ -150,7 +150,7 @@ def test(seed=None):
     # Define at which time the schema instances should be invoked in semantic working memory
     # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
 
-    sem_option = 1
+    sem_option = 11
     end_delay = 500
     
     sem_timings = {}

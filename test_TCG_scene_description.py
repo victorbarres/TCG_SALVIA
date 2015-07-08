@@ -70,8 +70,8 @@ production_system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P
 
 
 # Defining input and output ports 
-production_system.set_input_ports([subscene_rec._find_port('from_input')])
-production_system.set_output_ports([phonWM_P._find_port('to_output')])
+production_system.set_input_ports([subscene_rec.find_port('from_input')])
+production_system.set_output_ports([phonWM_P.find_port('to_output')])
 
 # Setting up schema to brain mappings
 production_brain_mapping = st.BRAIN_MAPPING()
