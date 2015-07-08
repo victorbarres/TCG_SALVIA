@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author: Victor Barres
-Test cases for the language schemas defined in language_schemas.py
+Test cases for the language production schemas defined in language_schemas.py
 """
 def test(seed=None):
     import random
@@ -31,29 +31,30 @@ def test(seed=None):
                     'Control':['DLPFC'], 'Concept_LTM':['']}
    
    # Initializing schema system
-    language_system = st.SCHEMA_SYSTEM('Language_system')
+    language_system_P = st.SCHEMA_SYSTEM('language_system_P')
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
-    language_system.brain_mapping = language_brain_mapping
+    language_system_P.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
     language_schemas = [grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, control]
 
-    language_system.add_schemas(language_schemas)
-    language_system.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
-    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
-    language_system.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
-    language_system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
-    language_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
-    language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
-    language_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
-    language_system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
-    language_system.set_input_ports([semanticWM.find_port('from_conceptualizer')])
-    language_system.set_output_ports([phonWM_P.find_port('to_output')])
+    language_system_P.add_schemas(language_schemas)
+    language_system_P.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
+    language_system_P.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
+    language_system_P.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
+    language_system_P.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
+    language_system_P.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
+    language_system_P.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+    language_system_P.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
+    language_system_P.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
+    language_system_P.set_input_ports([semanticWM.find_port('from_conceptualizer')])
+    language_system_P.set_output_ports([phonWM_P.find_port('to_output')])
     
-    language_system.system2dot(image_type='png', disp=True)
+    # Display schema system
+    language_system_P.system2dot(image_type='png', disp=True)
     
     # Parameters   
     semanticWM.dyn_params['tau'] = 300
@@ -180,17 +181,17 @@ def test(seed=None):
         if step in sem_timing:
             for inst in sem_timing[step]:
                 print "time:%i, sem:%s" %(step, inst.name)
-            language_system.set_input(sem_timing[step])
+            language_system_P.set_input(sem_timing[step])
             semanticWM.set_output('to_control', True)
-        language_system.update()
-        output = language_system.get_output()
+        language_system_P.update()
+        output = language_system_P.get_output()
         if output[0]:
             print output[0]
     
 #    semanticWM.show_dynamics(c2_levels=False)
     grammaticalWM_P.show_dynamics(c2_levels=False)
     grammaticalWM_P.show_state()
-#    language_system.save_sim('./tmp/test_language_output.json')
+#    language_system_P.save_sim('./tmp/test_language_output.json')
 
 if __name__=='__main__':
     test(seed=None)

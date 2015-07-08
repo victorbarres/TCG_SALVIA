@@ -8,6 +8,7 @@ def test(seed=None):
     import schema_theory as st
     import language_schemas as ls
     import loader as ld
+    import viewer
     
     random.seed(seed)
     ##############################
@@ -18,35 +19,38 @@ def test(seed=None):
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
     phonWM_C = ls.PHON_WM_C()
     grammaticalWM_C = ls.GRAMMATICAL_WM_C()
+    semanticWM = ls.SEMANTIC_WM()
     
     # Defining schema to brain mappings.
     language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
                     'Cxn_retrieval_C':[], 
                     'Phonological_WM_C':['Wernicke'],
-                    'Grammatical_WM_C':['lBA44, lBA45']}
+                    'Grammatical_WM_C':['lBA44, lBA45'],
+                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus']}
    
    # Initializing schema system
-    language_system = st.SCHEMA_SYSTEM('Language_system')
+    language_system_C = st.SCHEMA_SYSTEM('language_system_C')
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
-    language_system.brain_mapping = language_brain_mapping
+    language_system_C.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C]
+    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM]
 
-    language_system.add_schemas(language_schemas)
-    language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
-    language_system.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
-    language_system.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
-    language_system.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
-    language_system.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
-    language_system.set_input_ports([phonWM_C.find_port('from_input')])
-    language_system.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
+    language_system_C.add_schemas(language_schemas)
+    language_system_C.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
+    language_system_C.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
+    language_system_C.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    language_system_C.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
+    language_system_C.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
+    language_system_C.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
+    language_system_C.set_input_ports([phonWM_C.find_port('from_input')])
+    language_system_C.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
     
     # Display schema system
-#    language_system.system2dot(image_type='png', disp=True)
+    language_system_C.system2dot(image_type='png', disp=True)
     
     # Parameters
     phonWM_C.dyn_params['tau'] = 100
@@ -101,14 +105,17 @@ def test(seed=None):
         if step in lang_input:
             word_form = lang_input[step]
             print 't: %i, receive: %s' %(step, word_form)
-            language_system.set_input(word_form)
-        language_system.update()
+            language_system_C.set_input(word_form)
+        language_system_C.update()
     
 #    phonWM_C.show_dynamics()
-    grammaticalWM_C.show_dynamics()
-    grammaticalWM_C.show_state()
+#    grammaticalWM_C.show_dynamics()
+#    grammaticalWM_C.show_state()
     
-    grammaticalWM_C.draw_assemblages()
+    assemblages = grammaticalWM_C.assemble()
+    assemblage = assemblages[0]
+    inst  = ls.GRAMMATICAL_WM_C.assemblage2inst(assemblage)
+    viewer.TCG_VIEWER.display_cxn(inst.content)
 
 if __name__=='__main__':
     test(seed=None)
