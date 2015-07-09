@@ -83,7 +83,7 @@ def test(seed=None):
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
     
-    control.task_params['mode'] = 'produce'
+    control.set_mode('produce')
     control.task_params['time_pressure'] = 500
     
     conceptLTM.init_act = 1

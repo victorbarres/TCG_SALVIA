@@ -35,7 +35,8 @@ def test(seed=None):
                     'Cxn_retrieval_C':[], 
                     'Phonological_WM_C':['Wernicke'],
                     'Grammatical_WM_C':['lBA44, lBA45'],
-                    'Control':['DLPFC'], 'Concept_LTM':['']}
+                    'Control':['DLPFC'],
+                    'Concept_LTM':['']}
    
    # Initializing schema system
     language_system = st.SCHEMA_SYSTEM('language_system')
@@ -46,7 +47,7 @@ def test(seed=None):
     language_system.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-    language_schemas = [semanticWM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, phonWM_C, grammaticalWM_C, cxn_retrieval_C, control]
+    language_schemas = [semanticWM, conceptLTM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, phonWM_C, grammaticalWM_C, cxn_retrieval_C, control]
 
     language_system.add_schemas(language_schemas)
     language_system.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
@@ -62,7 +63,9 @@ def test(seed=None):
     language_system.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
     language_system.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
     language_system.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
+    language_system.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     language_system.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
+    language_system.add_connection(conceptLTM, 'to_semantic_WM', semanticWM, 'from_concept_LTM')
     language_system.set_input_ports([phonWM_C.find_port('from_input')])
     language_system.set_output_ports([phonWM_P.find_port('to_output')])
     
@@ -97,7 +100,7 @@ def test(seed=None):
     conceptLTM.init_act = 1
     grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']
     
-    control.task_params['time_pressure'] = 500
+    control.task_params['time_pressure'] = 200
     
     phonWM_C.dyn_params['tau'] = 100
     phonWM_C.dyn_params['act_inf'] = 0.0
@@ -136,8 +139,35 @@ def test(seed=None):
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
     
-
-
+    option = 2
+    control.set_mode('listen')
+    
+    lang_inputs = {}
+    lang_inputs[1] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
+    lang_inputs[2] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 65: 'a', 70:'blue', 80:'boxing ring'}
+    lang_inputs[3] = {1:'a', 10:'woman', 13:'who', 14:'is', 15:'pretty', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
+    lang_inputs[4] = {1:'a', 10:'woman', 20:'laugh', 60:'kick', 70:'a', 75:'man', 80:'in', 85:'blue'}
+    
+    lang_input = lang_inputs[option]
+    max_time = 200
+    for step in range(max_time):
+        if step in lang_input:
+            word_form = lang_input[step]
+            print 't: %i, receive: %s' %(step, word_form)
+            language_system.set_input(word_form)
+        language_system.update()
+        
+    semanticWM.show_SemRep()
+    
+    control.set_mode('produce')
+    
+    for step in range(max_time):
+        language_system.update()
+        output = language_system.get_output()
+        if output[0]:
+            print output[0]
+    
+    grammaticalWM_P.show_dynamics()
 
 if __name__=='__main__':
     test(seed=None)

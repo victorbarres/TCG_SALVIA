@@ -8,7 +8,6 @@ def test(seed=None):
     import schema_theory as st
     import language_schemas as ls
     import loader as ld
-    import viewer
     
     random.seed(seed)
     ##############################
@@ -98,7 +97,6 @@ def test(seed=None):
     
     conceptLTM.init_act = 1
     
-    control.task_params['mode'] = 'listen'
     control.task_params['time_pressure'] = 500
     
     
@@ -117,6 +115,7 @@ def test(seed=None):
     conceptLTM.initialize(my_conceptual_knowledge)
     
     option = 2
+    control.set_mode('listen')
     
     lang_inputs = {}
     lang_inputs[1] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
@@ -137,10 +136,8 @@ def test(seed=None):
 #    grammaticalWM_C.show_dynamics()
 #    grammaticalWM_C.show_state()
     
-    assemblages = grammaticalWM_C.assemble()
-    assemblage = assemblages[0]
-    inst  = ls.GRAMMATICAL_WM_C.assemblage2inst(assemblage)
-    viewer.TCG_VIEWER.display_cxn(inst.content)
+    semanticWM.show_dynamics()
+    semanticWM.show_SemRep()
 
 if __name__=='__main__':
     test(seed=None)
