@@ -967,7 +967,7 @@ class SCHEMA_SYSTEM(object):
         self.input_ports = None
         self.output_ports = None
         self.input = None
-        self.outputs = None
+        self.outputs = {}
         self.t = SCHEMA_SYSTEM.T0
         self.dt = SCHEMA_SYSTEM.TIME_STEP
         self.verbose = False
@@ -1016,7 +1016,7 @@ class SCHEMA_SYSTEM(object):
         """
         Returns sysetm output
         """
-        return self.outputs
+        return self.outputs[self.t]
         
     def update(self):
         """
@@ -1048,7 +1048,9 @@ class SCHEMA_SYSTEM(object):
             connection.update()
         
         # Update the system output
-        self.outputs = [p.value for p in self.output_ports]
+        for p in self.output_ports:
+            self.outputs[self.t] = p.value
+            p.value = None
         
         # Save simulation data
         if not(self.sim_data['schema_system']):

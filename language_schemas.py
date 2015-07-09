@@ -1212,26 +1212,34 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
         return data
 
-class PHON_WM_P(PROCEDURAL_SCHEMA):
+class PHON_WM_P(WM):
     """
     """
     def __init__(self, name='Phonological_WM_P'):
-        PROCEDURAL_SCHEMA.__init__(self, name)
+        WM.__init__(self, name)
         self.add_port('IN', 'from_grammatical_WM_P')
-        self.add_port('OUT', 'to_output')
+        self.add_port('OUT', 'to_utter')
         self.add_port('OUT', 'to_control')
-        self.phon_form = []
+        self.dyn_params = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0}
+        self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
+        self.phon_sequence = []
     
     def update(self):
         """
         """
-        phon_form = self.get_input('from_grammatical_WM_P')
-        if phon_form:
-            self.phon_form = phon_form
-            self.set_output('to_output', phon_form)
+        phon_sequence = self.get_input('from_grammatical_WM_P')
+        if phon_sequence:
+            new_phon_sequence = []
+            for phon_form in phon_sequence:
+                phon_schema = PHON_SCHEMA(name=phon_form, word_form=phon_form, init_act=0.6)
+                phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
+                self.add_instance(phon_inst)
+                new_phon_sequence.append(phon_inst)
+            self.phon_sequence.extend(new_phon_sequence)
+            self.set_output('to_utter', [phon_inst.content['word_form'] for phon_inst in new_phon_sequence])
             self.set_output('to_control', True)
         else:
-            self.set_output('to_output', None)
+            self.set_output('to_utter', None)
             
     
     ####################
@@ -1241,11 +1249,29 @@ class PHON_WM_P(PROCEDURAL_SCHEMA):
         """
         """
         data = super(PHON_WM_P, self).get_state()
-        data['phon_form'] = self.phon_form
+        data['phon_sequence'] = [phon_inst.content['word_form'] for phon_inst in self.phon_sequence]
         return data
 
-
-        
+class UTTER(PROCEDURAL_SCHEMA):
+    """
+    """
+    def __init__(self, name='Utter'):
+        PROCEDURAL_SCHEMA.__init__(self,name)
+        self.add_port('IN', 'from_phonological_WM_P')
+        self.add_port('OUT', 'to_output')
+        self.params = {'speech_rate':10}
+        self.utterance_stack = []
+    
+    def update(self):
+        """
+        """
+        new_utterance =  self.get_input('from_phonological_WM_P')
+        if self.utterance_stack and (self.t % self.params['speech_rate']) == 0:
+            word_form = self.utterance_stack.pop()
+            self.set_output('to_output', word_form)
+        if new_utterance:
+            new_utterance.reverse()
+            self.utterance_stack =  new_utterance + self.utterance_stack
 ####################
 ### GRAMMAR COMP ###
 class PHON_WM_C(WM):
@@ -1884,5 +1910,5 @@ if __name__=='__main__':
     from test_TCG_production import test as test_production
     from test_TCG_comprehension import test as test_comprehension
     
-#    test_production(seed=None)
-    test_comprehension(seed=None)
+    test_production(seed=None)
+#    test_comprehension(seed=None)

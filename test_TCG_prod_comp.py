@@ -23,6 +23,7 @@ def test(seed=None):
     grammaticalWM_C = ls.GRAMMATICAL_WM_C()
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
     phonWM_P = ls.PHON_WM_P()
+    utter = ls.UTTER()
     phonWM_C = ls.PHON_WM_C()
     control = ls.CONTROL()
     
@@ -33,6 +34,7 @@ def test(seed=None):
                     'Grammatical_LTM':['left_STG', 'left_MTG'],
                     'Cxn_retrieval_P':[], 
                     'Phonological_WM_P':['left_BA6'],
+                    'Utter':[''],
                     'Cxn_retrieval_C':[], 
                     'Phonological_WM_C':['Wernicke'],
                     'Grammatical_WM_C':['lBA44, lBA45'],
@@ -48,7 +50,7 @@ def test(seed=None):
     language_system.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-    language_schemas = [semanticWM, conceptLTM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, phonWM_C, grammaticalWM_C, cxn_retrieval_C, control]
+    language_schemas = [semanticWM, conceptLTM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, phonWM_C, grammaticalWM_C, cxn_retrieval_C, control]
 
     language_system.add_schemas(language_schemas)
     language_system.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
@@ -58,6 +60,7 @@ def test(seed=None):
     language_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
     language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
+    language_system.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
     language_system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
     
     language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
@@ -68,7 +71,7 @@ def test(seed=None):
     language_system.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
     language_system.add_connection(conceptLTM, 'to_semantic_WM', semanticWM, 'from_concept_LTM')
     language_system.set_input_ports([phonWM_C.find_port('from_input')])
-    language_system.set_output_ports([phonWM_P.find_port('to_output')])
+    language_system.set_output_ports([utter.find_port('to_output')])
     
     # Display schema system
     language_system.system2dot(image_type='png', disp=True)
@@ -98,8 +101,22 @@ def test(seed=None):
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
     
+    phonWM_P.dyn_params['tau'] = 100
+    phonWM_P.dyn_params['act_inf'] = 0.0
+    phonWM_P.dyn_params['L'] = 1.0
+    phonWM_P.dyn_params['k'] = 10.0
+    phonWM_P.dyn_params['x0'] = 0.5
+    phonWM_P.dyn_params['noise_mean'] = 0
+    phonWM_P.dyn_params['noise_std'] = 0.2
+    phonWM_P.C2_params['confidence_threshold'] = 0
+    phonWM_P.C2_params['prune_threshold'] = 0.01
+    phonWM_P.C2_params['coop_weight'] = 0
+    phonWM_P.C2_params['comp_weight'] = 0
+    
     conceptLTM.init_act = 1
     grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']*0.5
+    
+    utter.params['speech_rate'] = 1
     
     control.task_params['time_pressure'] = 600
     
@@ -166,8 +183,8 @@ def test(seed=None):
             control.set_mode('produce')
             flag = False
         output = language_system.get_output()
-        if output[0]:
-            print output[0]     
+        if output:
+            print 't: %i, %s' %(t, output)  
     
     grammaticalWM_P.show_dynamics()
     grammaticalWM_C.show_dynamics()

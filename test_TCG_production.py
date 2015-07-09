@@ -14,22 +14,25 @@ def test(seed=None):
     ### Language schema system ###
     ##############################
     # Instantiating all the necessary procedural schemas
+    semanticWM = ls.SEMANTIC_WM()
+    conceptLTM = ls.CONCEPT_LTM()
     grammaticalWM_P = ls.GRAMMATICAL_WM_P()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval_P = ls.CXN_RETRIEVAL_P()
-    semanticWM = ls.SEMANTIC_WM()
     phonWM_P = ls.PHON_WM_P()
+    utter = ls.UTTER()
     control = ls.CONTROL()
-    conceptLTM = ls.CONCEPT_LTM()
     
     # Defining schema to brain mappings.
-    language_mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
-                    'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
-                    'Grammatical_LTM':['left_STG', 'left_MTG'],
-                    'Cxn_retrieval_P':[], 
-                    'Phonological_WM_P':['left_BA6'],
-                    'Control':['DLPFC'], 
-                    'Concept_LTM':['']}
+    language_mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'],
+                        'Concept_LTM':[''],
+                        'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
+                        'Grammatical_LTM':['left_STG', 'left_MTG'],
+                        'Cxn_retrieval_P':[], 
+                        'Phonological_WM_P':['left_BA6'],
+                        'Control':['DLPFC'],
+                        'Utter':['']
+                        }
    
    # Initializing schema system
     language_system_P = st.SCHEMA_SYSTEM('language_system_P')
@@ -40,7 +43,7 @@ def test(seed=None):
     language_system_P.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-    language_schemas = [grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, control]
+    language_schemas = [semanticWM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, control]
 
     language_system_P.add_schemas(language_schemas)
     language_system_P.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
@@ -49,11 +52,12 @@ def test(seed=None):
     language_system_P.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
     language_system_P.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
     language_system_P.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+    language_system_P.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
     language_system_P.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     language_system_P.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
     language_system_P.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     language_system_P.set_input_ports([semanticWM.find_port('from_conceptualizer')])
-    language_system_P.set_output_ports([phonWM_P.find_port('to_output')])
+    language_system_P.set_output_ports([utter.find_port('to_output')])
     
     # Display schema system
     language_system_P.system2dot(image_type='png', disp=True)
@@ -82,6 +86,20 @@ def test(seed=None):
     grammaticalWM_P.C2_params['prune_threshold'] = 0.1
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
+    
+    phonWM_P.dyn_params['tau'] = 100
+    phonWM_P.dyn_params['act_inf'] = 0.0
+    phonWM_P.dyn_params['L'] = 1.0
+    phonWM_P.dyn_params['k'] = 10.0
+    phonWM_P.dyn_params['x0'] = 0.5
+    phonWM_P.dyn_params['noise_mean'] = 0
+    phonWM_P.dyn_params['noise_std'] = 0.2
+    phonWM_P.C2_params['confidence_threshold'] = 0
+    phonWM_P.C2_params['prune_threshold'] = 0.01
+    phonWM_P.C2_params['coop_weight'] = 0
+    phonWM_P.C2_params['comp_weight'] = 0
+    
+    utter.params['speech_rate'] = 1
     
     control.set_mode('produce')
     control.task_params['time_pressure'] = 500
@@ -186,8 +204,8 @@ def test(seed=None):
             semanticWM.set_output('to_control', True)
         language_system_P.update()
         output = language_system_P.get_output()
-        if output[0]:
-            print output[0]
+        if output:
+            print "t:%i, %s" %(step, output)
     
 #    semanticWM.show_dynamics(c2_levels=False)
     grammaticalWM_P.show_dynamics(c2_levels=False)
