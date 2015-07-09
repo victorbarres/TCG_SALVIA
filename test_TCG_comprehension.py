@@ -54,7 +54,7 @@ def test(seed=None):
     language_system_C.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
     
     # Display schema system
-    language_system_C.system2dot(image_type='png', disp=True)
+#    language_system_C.system2dot(image_type='png', disp=True)
     
     # Parameters
     phonWM_C.dyn_params['tau'] = 100
@@ -76,12 +76,12 @@ def test(seed=None):
     grammaticalWM_C.dyn_params['x0'] = 0.5
     grammaticalWM_C.dyn_params['noise_mean'] = 0
     grammaticalWM_C.dyn_params['noise_std'] = 0.2
-    grammaticalWM_C.C2_params['confidence_threshold'] = 0.2
+    grammaticalWM_C.C2_params['confidence_threshold'] = 0.5
     grammaticalWM_C.C2_params['prune_threshold'] = 0.1
     grammaticalWM_C.C2_params['coop_weight'] = 1
     grammaticalWM_C.C2_params['comp_weight'] = -1
     
-    grammaticalLTM.init_act = grammaticalWM_C.C2_params['confidence_threshold']
+    grammaticalLTM.init_act = grammaticalWM_C.C2_params['confidence_threshold']*0.5
     
     semanticWM.dyn_params['tau'] = 300
     semanticWM.dyn_params['act_inf'] = 0.0
@@ -95,9 +95,9 @@ def test(seed=None):
     semanticWM.C2_params['coop_weight'] = 0
     semanticWM.C2_params['comp_weight'] = 0
     
-    conceptLTM.init_act = 1
+    conceptLTM.init_act = 0.8
     
-    control.task_params['time_pressure'] = 500
+    control.task_params['time_pressure'] = 200
     
     
     # Loading data
@@ -132,9 +132,9 @@ def test(seed=None):
             language_system_C.set_input(word_form)
         language_system_C.update()
     
-#    phonWM_C.show_dynamics()
-#    grammaticalWM_C.show_dynamics()
-#    grammaticalWM_C.show_state()
+    phonWM_C.show_dynamics()
+    grammaticalWM_C.show_dynamics()
+    grammaticalWM_C.show_state()
     
     semanticWM.show_dynamics()
     semanticWM.show_SemRep()

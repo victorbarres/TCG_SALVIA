@@ -1301,7 +1301,7 @@ class GRAMMATICAL_WM_C(WM):
         self.update_activations()
         self.prune()
         
-        if self.t>100:
+        if not(self.comp_links):
             self.produce_meaning()
         
         
@@ -1800,6 +1800,7 @@ class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
 ### TASK CONTROL ###      
 class CONTROL(PROCEDURAL_SCHEMA):
     """
+    This needs to be reformatted to better handle comprehension.
     """
     def __init__(self, name="Control"):
         PROCEDURAL_SCHEMA.__init__(self, name)
