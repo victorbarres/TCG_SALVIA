@@ -5,6 +5,7 @@ Test cases for a system that incoporates production and comprehension
 """
 def test(seed=None):
     import random
+    import numpy as np
     import schema_theory as st
     import language_schemas as ls
     import loader as ld
@@ -92,15 +93,15 @@ def test(seed=None):
     grammaticalWM_P.dyn_params['x0'] = 0.5
     grammaticalWM_P.dyn_params['noise_mean'] = 0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
-    grammaticalWM_P.C2_params['confidence_threshold'] = 0.2
-    grammaticalWM_P.C2_params['prune_threshold'] = 0.1
+    grammaticalWM_P.C2_params['confidence_threshold'] = 0.5
+    grammaticalWM_P.C2_params['prune_threshold'] = 0.01
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
     
     conceptLTM.init_act = 1
-    grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']
+    grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']*0.5
     
-    control.task_params['time_pressure'] = 200
+    control.task_params['time_pressure'] = 600
     
     phonWM_C.dyn_params['tau'] = 100
     phonWM_C.dyn_params['act_inf'] = 0.0
@@ -121,7 +122,7 @@ def test(seed=None):
     grammaticalWM_C.dyn_params['x0'] = 0.5
     grammaticalWM_C.dyn_params['noise_mean'] = 0
     grammaticalWM_C.dyn_params['noise_std'] = 0.2
-    grammaticalWM_C.C2_params['confidence_threshold'] = 0.2
+    grammaticalWM_C.C2_params['confidence_threshold'] = 0.5
     grammaticalWM_C.C2_params['prune_threshold'] = 0.1
     grammaticalWM_C.C2_params['coop_weight'] = 1
     grammaticalWM_C.C2_params['comp_weight'] = -1
@@ -139,35 +140,37 @@ def test(seed=None):
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
     
-    option = 2
+    option = 3
     control.set_mode('listen')
     
+    prod_rate = 10
     lang_inputs = {}
-    lang_inputs[1] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
-    lang_inputs[2] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 65: 'a', 70:'blue', 80:'boxing ring'}
-    lang_inputs[3] = {1:'a', 10:'woman', 13:'who', 14:'is', 15:'pretty', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
-    lang_inputs[4] = {1:'a', 10:'woman', 20:'laugh', 60:'kick', 70:'a', 75:'man', 80:'in', 85:'blue'}
+    lang_inputs[0] = ['a', 'woman', 'kick', 'a', 'man', 'in', 'blue']
+    lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing ring']
+    lang_inputs[2] = ['a', 'woman', 'who', 'is', 'pretty', 'kick', 'a', 'man', 'in', 'blue']
+    lang_inputs[3] = ['a', 'woman', 'kick', 'a', 'man', 'in', 'blue']
     
     lang_input = lang_inputs[option]
-    max_time = 200
-    for step in range(max_time):
-        if step in lang_input:
-            word_form = lang_input[step]
-            print 't: %i, receive: %s' %(step, word_form)
+    lang_input.reverse()
+    max_time = 1000
+    flag = True
+    
+    for t in range(max_time):
+        if t>10 and np.mod(t, prod_rate) == 0 and lang_input: # Need some time to have the system set up before it receives the first input.
+            word_form = lang_input.pop()
+            print 't: %i, receive: %s' %(t, word_form)
             language_system.set_input(word_form)
         language_system.update()
-        
-    semanticWM.show_SemRep()
-    
-    control.set_mode('produce')
-    
-    for step in range(max_time):
-        language_system.update()
+        if semanticWM.schema_insts and flag: #Switching from comprehension to production
+            semanticWM.show_SemRep()
+            control.set_mode('produce')
+            flag = False
         output = language_system.get_output()
         if output[0]:
-            print output[0]
+            print output[0]     
     
     grammaticalWM_P.show_dynamics()
+    grammaticalWM_C.show_dynamics()
 
 if __name__=='__main__':
     test(seed=None)

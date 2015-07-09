@@ -411,15 +411,20 @@ class SEMANTIC_WM(WM):
         """
         mode = self.get_input('from_control')
         cpt_insts = None
-        if mode == 'produce':
-            cpt_insts = self.get_input('from_conceptualizer')
-        elif mode == 'listen':
-            sem_frame = self.get_input('from_grammatical_WM_C')
-            cpt_schemas = self.get_input('from_concept_LTM')
-            if cpt_schemas and sem_frame:
-                cpt_insts  = self.instantiate_cpts(sem_frame, cpt_schemas)    
+        
+        cpt_insts1 = self.get_input('from_conceptualizer')
+
+        sem_frame = self.get_input('from_grammatical_WM_C')
+        cpt_schemas = self.get_input('from_concept_LTM')
+        if cpt_schemas and sem_frame:
+            cpt_insts2  = self.instantiate_cpts(sem_frame, cpt_schemas)
         else:
-            cpt_insts = None
+            cpt_insts2 = None
+        
+        if mode == 'produce':
+            cpt_insts = cpt_insts1
+        if mode == 'listen':
+            cpt_insts = cpt_insts2
         
         if cpt_insts:
             for inst in cpt_insts:
@@ -431,8 +436,7 @@ class SEMANTIC_WM(WM):
         self.set_output('to_grammatical_WM_P', self.SemRep)
         
         
-        if cpt_insts:
-#            self.show_SemRep()
+        if mode=='produce' and self.has_new_sem():
             self.set_output('to_cxn_retrieval_P', self.SemRep)
     
     def instantiate_cpts(self, SemFrame, cpt_schemas):
@@ -487,6 +491,19 @@ class SEMANTIC_WM(WM):
             
 #            self.show_SemRep()
     
+    def has_new_sem(self):
+        """
+        Returns true if there is at least 1 new element in the SemRep. False otherwise.
+        """
+        for n,d in self.SemRep.nodes(data=True):
+            if d['new']:
+                return True
+        
+        for u,v,d in self.SemRep.edges(data=True):
+            if d['new']:
+                return True
+        return False
+        
     #######################
     ### DISPLAY METHODS ###
     #######################
