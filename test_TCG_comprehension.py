@@ -20,13 +20,17 @@ def test(seed=None):
     phonWM_C = ls.PHON_WM_C()
     grammaticalWM_C = ls.GRAMMATICAL_WM_C()
     semanticWM = ls.SEMANTIC_WM()
+    conceptLTM = ls.CONCEPT_LTM()
+    control = ls.CONTROL()
     
     # Defining schema to brain mappings.
     language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
                     'Cxn_retrieval_C':[], 
                     'Phonological_WM_C':['Wernicke'],
                     'Grammatical_WM_C':['lBA44, lBA45'],
-                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus']}
+                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'],
+                    'Concept_LTM':[''],
+                    'Control':['DLPFC']}
    
    # Initializing schema system
     language_system_C = st.SCHEMA_SYSTEM('language_system_C')
@@ -37,15 +41,16 @@ def test(seed=None):
     language_system_C.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM]
+    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM, conceptLTM, control]
 
     language_system_C.add_schemas(language_schemas)
     language_system_C.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
-    language_system_C.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
     language_system_C.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
     language_system_C.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
     language_system_C.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
     language_system_C.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
+    language_system_C.add_connection(conceptLTM, 'to_semantic_WM', semanticWM, 'from_concept_LTM')
+    language_system_C.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     language_system_C.set_input_ports([phonWM_C.find_port('from_input')])
     language_system_C.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
     
@@ -78,7 +83,24 @@ def test(seed=None):
     grammaticalWM_C.C2_params['comp_weight'] = -1
     
     grammaticalLTM.init_act = grammaticalWM_C.C2_params['confidence_threshold']
-
+    
+    semanticWM.dyn_params['tau'] = 300
+    semanticWM.dyn_params['act_inf'] = 0.0
+    semanticWM.dyn_params['L'] = 1.0
+    semanticWM.dyn_params['k'] = 10.0
+    semanticWM.dyn_params['x0'] = 0.5
+    semanticWM.dyn_params['noise_mean'] = 0
+    semanticWM.dyn_params['noise_std'] = 0.2
+    semanticWM.C2_params['confidence_threshold'] = 0
+    semanticWM.C2_params['prune_threshold'] = 0.01
+    semanticWM.C2_params['coop_weight'] = 0
+    semanticWM.C2_params['comp_weight'] = 0
+    
+    conceptLTM.init_act = 1
+    
+    control.task_params['mode'] = 'listen'
+    control.task_params['time_pressure'] = 500
+    
     
     # Loading data
     grammar_name = 'TCG_grammar_VB_singlehead'
@@ -90,6 +112,9 @@ def test(seed=None):
         
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
+    
+    # Initialize conceptual LTM content
+    conceptLTM.initialize(my_conceptual_knowledge)
     
     option = 2
     

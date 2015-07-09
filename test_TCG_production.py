@@ -28,7 +28,8 @@ def test(seed=None):
                     'Grammatical_LTM':['left_STG', 'left_MTG'],
                     'Cxn_retrieval_P':[], 
                     'Phonological_WM_P':['left_BA6'],
-                    'Control':['DLPFC'], 'Concept_LTM':['']}
+                    'Control':['DLPFC'], 
+                    'Concept_LTM':['']}
    
    # Initializing schema system
     language_system_P = st.SCHEMA_SYSTEM('language_system_P')
@@ -65,7 +66,6 @@ def test(seed=None):
     semanticWM.dyn_params['x0'] = 0.5
     semanticWM.dyn_params['noise_mean'] = 0
     semanticWM.dyn_params['noise_std'] = 0.2
-    
     semanticWM.C2_params['confidence_threshold'] = 0
     semanticWM.C2_params['prune_threshold'] = 0.01
     semanticWM.C2_params['coop_weight'] = 0
@@ -78,7 +78,6 @@ def test(seed=None):
     grammaticalWM_P.dyn_params['x0'] = 0.5
     grammaticalWM_P.dyn_params['noise_mean'] = 0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
-    
     grammaticalWM_P.C2_params['confidence_threshold'] = 0.2
     grammaticalWM_P.C2_params['prune_threshold'] = 0.1
     grammaticalWM_P.C2_params['coop_weight'] = 1

@@ -135,12 +135,14 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
         return word_form
         
     def next_state(self):
+        """
+        Move to next state along the form sequence (defined by the SynForm).
+        """
         if self.form_sequence:
             self.form_state = self.form_sequence.pop()
             self.has_predicted = False
         else:
             self.form_state = None
-                
 #############################
 # CONCEPT KNOWLEDGE SCHEMAS #
 class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
@@ -341,6 +343,7 @@ class CONCEPT_LTM(LTM):
     def __init__(self, name='Concept_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_conceptualizer')
+        self.add_port('OUT', 'to_semantic_WM')
         self.cpt_knowledge = None
         self.init_act = 1
         
@@ -392,6 +395,7 @@ class SEMANTIC_WM(WM):
     def __init__(self, name='Semantic_WM'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_conceptualizer')
+        self.add_port('IN', 'from_concept_LTM')
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('IN', 'from_control')
         self.add_port('OUT', 'to_grammatical_WM_P')
@@ -409,7 +413,10 @@ class SEMANTIC_WM(WM):
         if mode == 'produce':
             cpt_insts = self.get_input('from_conceptualizer')
         elif mode == 'listen':
-            cpt_insts = self.get_input('from_grammatical_WM_C')
+            SemFrame = self.get_input('from_grammatical_WM_C')
+            cpt_schemas = self.get_input('from_concept_LTM')
+            if cpt_schemas and SemFrame:
+                cpt_insts  = self.instantiate_cpts(SemFrame, cpt_schemas)    
         else:
             cpt_insts = None
         
@@ -426,6 +433,36 @@ class SEMANTIC_WM(WM):
         if cpt_insts:
 #            self.show_SemRep()
             self.set_output('to_cxn_retrieval_P', self.SemRep)
+    
+    def instantiate_cpts(SemFrame, cpt_schemas):
+        """
+        Builds SemRep based on the received SemFrame.
+        
+        Args:
+            - SemFrame (TP_SEMFRAME)
+            - cpt_schemas ([CPT_SCHEMAS])
+        
+        NOTE: 
+            - Because I only used the SemFrame, there is 1: no notion of how to set the initial activity of the SemRep based on the constructions.
+            - Also, because the SemFrame is derived from the eq_inst, it is not clear how I can define the SemRep covers of cxn_instances (or, the cxn_inst cover of the SemRep).
+            - This, later on, should evolve into a function that should possibly find already existing nodes and, rather than creating new instances, generate the proper bindings.
+        """
+        cpt_insts = []
+        name_table = {}
+        for node in SemFrame.nodes:
+            cpt_schema = [schema for schema in cpt_schemas if schema.name == node.concept.name][0]
+            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
+            cpt_insts.append(cpt_inst)
+            name_table[node] = cpt_inst
+        
+        for edge in SemFrame.edges:
+            cpt_schema = [schema for schema in cpt_schemas if schema.name == edge.concept.name][0]
+            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
+            cpt_inst.content['pFrom'] = name_table[edge.pFrom]
+            cpt_inst.content['pTo'] = name_table[edge.pTo]
+            cpt_insts.append(cpt_inst)
+        return cpt_insts
+            
     
     def update_SemRep(self, cpt_insts):
         """
@@ -1331,7 +1368,9 @@ class GRAMMATICAL_WM_C(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.C2_params['confidence_threshold']:
                 print 'Comprehension at time: %i' %self.t
-                sem_rep =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
+                sem_frame =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
+                sem_rep = []
+                name_table = {}
                 self.set_output('to_semantic_WM', sem_rep)
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
