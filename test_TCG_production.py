@@ -69,7 +69,7 @@ def test(seed=None):
     # Define at which time the schema instances should be invoked in semantic working memory
     # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
 
-    sem_option = 11
+    sem_option = 3
     end_delay = 500
     
     sem_timings = {}

@@ -387,8 +387,6 @@ class TCG_LOADER(object):
         flag = TCG_LOADER.read_concept("is_a", top_cpt, my_conceptual_knowledge, cpt_data)
         if not(flag):
             return None
-        
-        cpt.CONCEPT.CONCEPTUAL_KNOWLEDGE = my_conceptual_knowledge # BAD SIDE EFFECT!!! PREVENTS FROM GENERATING INDEPENDENT MODELS FOR DIFFERENT AGENTS!
     
         return my_conceptual_knowledge
         
@@ -411,8 +409,6 @@ class TCG_LOADER(object):
         flag = TCG_LOADER.read_percept('is_a', top_per, my_perceptual_knowledge, per_data)
         if not(flag):
             return None
-        
-        per.PERCEPT.PERCEPTUAL_KNOWLEDGE =  my_perceptual_knowledge
     
         return my_perceptual_knowledge
     

@@ -25,8 +25,10 @@ def test(seed=None):
     language_system_2.schemas['Control'].set_mode('listen')
     
     option = 3
+    speech_rate = 40
     
-    speech_rate = language_system_1.schemas['Utter'].params['speech_rate']
+    language_system_1.schemas['Utter'].params['speech_rate'] = speech_rate
+    language_system_2.schemas['Utter'].params['speech_rate'] = speech_rate
     lang_inputs = {}
     lang_inputs[0] = ['a', 'woman', 'kick', 'a', 'man', 'in', 'blue']
     lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing ring']
@@ -58,13 +60,16 @@ def test(seed=None):
             language_system_2.set_input(word_form)
         
         if language_system_2.schemas['Semantic_WM'].schema_insts and flag2: #Switching from comprehension to production
-            language_system_1.schemas['Semantic_WM'].show_SemRep()
-            language_system_1.schemas['Control'].set_mode('produce')
+            language_system_2.schemas['Semantic_WM'].show_SemRep()
+            language_system_2.schemas['Control'].set_mode('produce')
             flag2 = False
             print "Agt2 speaks."
             
         language_system_1.update()
         language_system_2.update()
+        
+    
+    language_system_2.schemas['Grammatical_WM_C'].show_dynamics()
             
 
 if __name__=='__main__':

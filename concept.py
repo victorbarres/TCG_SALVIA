@@ -13,11 +13,13 @@ class CONCEPT(K_ENT):
     Data:
         - id (INT): Unique identifier of the entity.
         - meaning (STR): Meaning associated with the semantic entity. A string for now.
+        - conceptual_knowledge (CONCEPTUAL_KNOWLEDGE): The conceptual knowledge instance the concept is part of.
 
     """
     CONCEPTUAL_KNOWLEDGE= None  
-    def __init__(self, name='',  meaning=''):
+    def __init__(self, name='',  meaning='', conceptual_knowledge=None):
         K_ENT.__init__(self, name=name, meaning=meaning)
+        self.conceptual_knowledge = conceptual_knowledge
     
     def match(self, cpt, match_type = "is_a"):
         """
@@ -26,14 +28,20 @@ class CONCEPT(K_ENT):
             Type = "is_a":  concept1 matches concept2 if concept1 is a hyponym of concept2 (or equal to concept2)
             Type = "equal": concept1 matches concept2 if concept1 is equal to concept2.
         """
-        return CONCEPT.CONCEPTUAL_KNOWLEDGE.match(self, cpt, match_type)
+        if self.conceptual_knowledge:
+            return self.conceptual_knowledge.match(self, cpt, match_type)
+        else:
+            print "ERROR: The concept is not linked to any conceptual knowledge."
     
     def similarity(self, cpt):
         """
         Returns a similarity score with cpt.
         Uses CONCEPTUAL_KNOWLEDGE.similarity() method.
         """
-        return CONCEPT.CONCEPTUAL_KNOWLEDGE.similarity(self ,cpt)
+        if self.conceptual_knowledge:
+            return self.conceptual_knowledge.similarity(self ,cpt)
+        else:
+            print "ERROR: The concept is not linked to any conceptual knowledge."
     
 class SEM_REL(K_REL):
     """
@@ -63,6 +71,15 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
     """
     def __init__(self, nodes=[], edges=[]):
         K_NET.__init__(self, nodes=nodes[:], edges=edges[:])
+    
+    def add_ent(self, concept):
+        """
+        Adds a concept to the the conceptual knowlege while also linking the conceptual knowledge back to the concept.
+        """
+        flag  = super(CONCEPTUAL_KNOWLEDGE, self).add_ent(concept)
+        if flag:
+            concept.conceptual_knowledge = self
+        return flag
        
     def concepts(self):
         """

@@ -15,11 +15,12 @@ class PERCEPT(K_ENT):
     Data:
         - id (INT): Unique identifier of the entity.
         - meaning (): Meaning associated with the percept
+        - perceptual_knowledge (PERCEPTUAL_KNOWLEDGE): The perceptual knowledge instance the precept is part of.
 
     """
-    PERCEPTUAL_KNOWLEDGE = None  
-    def __init__(self, name='',  meaning=''):
+    def __init__(self, name='',  meaning='', perceptual_knowledge=None):
         K_ENT.__init__(self, name=name, meaning=meaning)
+        self.perceptual_knowledge = perceptual_knowledge
         
 class PERCEPT_CAT(PERCEPT):
     """
@@ -81,6 +82,15 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
     """
     def __init__(self, nodes=[], edges=[]):
         K_NET.__init__(self, nodes=nodes[:], edges=edges[:])
+    
+    def add_ent(self, percept):
+        """
+        Adds a percept to the the perceptual knowlege while also linking the perceptual knowledge back to the concept.
+        """
+        flag  = super(PERCEPTUAL_KNOWLEDGE, self).add_ent(percept)
+        if flag:
+            percept.conceptual_knowledge = self
+        return flag
     
     def percepts(self, type='ALL'):
         """
