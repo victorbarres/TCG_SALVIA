@@ -3,122 +3,21 @@
 @author: Victor Barres
 Test cases for the language production schemas defined in language_schemas.py
 """
+import random
+
+import language_schemas as ls
+from TCG_models import TCG_production_system
+    
 def test(seed=None):
-    import random
-    import schema_theory as st
-    import language_schemas as ls
-    import loader as ld
     
     random.seed(seed)
-    ##############################
-    ### Language schema system ###
-    ##############################
-    # Instantiating all the necessary procedural schemas
-    semanticWM = ls.SEMANTIC_WM()
-    conceptLTM = ls.CONCEPT_LTM()
-    grammaticalWM_P = ls.GRAMMATICAL_WM_P()
-    grammaticalLTM = ls.GRAMMATICAL_LTM()
-    cxn_retrieval_P = ls.CXN_RETRIEVAL_P()
-    phonWM_P = ls.PHON_WM_P()
-    utter = ls.UTTER()
-    control = ls.CONTROL()
-    
-    # Defining schema to brain mappings.
-    language_mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'],
-                        'Concept_LTM':[''],
-                        'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
-                        'Grammatical_LTM':['left_STG', 'left_MTG'],
-                        'Cxn_retrieval_P':[], 
-                        'Phonological_WM_P':['left_BA6'],
-                        'Control':['DLPFC'],
-                        'Utter':['']
-                        }
    
-   # Initializing schema system
-    language_system_P = st.SCHEMA_SYSTEM('language_system_P')
-    
-    # Setting up schema to brain mappings
-    language_brain_mapping = st.BRAIN_MAPPING()
-    language_brain_mapping.schema_mapping = language_mapping
-    language_system_P.brain_mapping = language_brain_mapping
-    
-    # Setting up language schema system.
-    language_schemas = [semanticWM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, control]
-
-    language_system_P.add_schemas(language_schemas)
-    language_system_P.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
-    language_system_P.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
-    language_system_P.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
-    language_system_P.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
-    language_system_P.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
-    language_system_P.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
-    language_system_P.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
-    language_system_P.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
-    language_system_P.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
-    language_system_P.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
-    language_system_P.set_input_ports([semanticWM.find_port('from_conceptualizer')])
-    language_system_P.set_output_ports([utter.find_port('to_output')])
+    language_system_P = TCG_production_system()
     
     # Display schema system
     language_system_P.system2dot(image_type='png', disp=True)
     
-    # Parameters   
-    semanticWM.dyn_params['tau'] = 300
-    semanticWM.dyn_params['act_inf'] = 0.0
-    semanticWM.dyn_params['L'] = 1.0
-    semanticWM.dyn_params['k'] = 10.0
-    semanticWM.dyn_params['x0'] = 0.5
-    semanticWM.dyn_params['noise_mean'] = 0
-    semanticWM.dyn_params['noise_std'] = 0.2
-    semanticWM.C2_params['confidence_threshold'] = 0
-    semanticWM.C2_params['prune_threshold'] = 0.01
-    semanticWM.C2_params['coop_weight'] = 0
-    semanticWM.C2_params['comp_weight'] = 0
-    
-    grammaticalWM_P.dyn_params['tau'] = 30
-    grammaticalWM_P.dyn_params['act_inf'] = 0.0
-    grammaticalWM_P.dyn_params['L'] = 1.0
-    grammaticalWM_P.dyn_params['k'] = 10.0
-    grammaticalWM_P.dyn_params['x0'] = 0.5
-    grammaticalWM_P.dyn_params['noise_mean'] = 0
-    grammaticalWM_P.dyn_params['noise_std'] = 0.2
-    grammaticalWM_P.C2_params['confidence_threshold'] = 0.2
-    grammaticalWM_P.C2_params['prune_threshold'] = 0.1
-    grammaticalWM_P.C2_params['coop_weight'] = 1
-    grammaticalWM_P.C2_params['comp_weight'] = -1
-    
-    phonWM_P.dyn_params['tau'] = 100
-    phonWM_P.dyn_params['act_inf'] = 0.0
-    phonWM_P.dyn_params['L'] = 1.0
-    phonWM_P.dyn_params['k'] = 10.0
-    phonWM_P.dyn_params['x0'] = 0.5
-    phonWM_P.dyn_params['noise_mean'] = 0
-    phonWM_P.dyn_params['noise_std'] = 0.2
-    phonWM_P.C2_params['confidence_threshold'] = 0
-    phonWM_P.C2_params['prune_threshold'] = 0.01
-    phonWM_P.C2_params['coop_weight'] = 0
-    phonWM_P.C2_params['comp_weight'] = 0
-    
-    utter.params['speech_rate'] = 1
-    
-    control.set_mode('produce')
-    control.task_params['time_pressure'] = 500
-    
-    conceptLTM.init_act = 1
-    grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']
-    
-    # Loading data
-    grammar_name = 'TCG_grammar_VB'
-   
-    my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    grammar_file = "%s.json" %grammar_name
-    my_grammar = ld.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
-    
-    # Initialize conceptual LTM content
-    conceptLTM.initialize(my_conceptual_knowledge)
-        
-    # Initialize grammatical LTM content
-    grammaticalLTM.initialize(my_grammar)
+    conceptLTM = language_system_P.schemas['Concept_LTM']
     
     # Semantic WM content using predefined cpt_schema_instances.
     man_cpt_schema = conceptLTM.find_schema(name='MAN')
@@ -201,15 +100,15 @@ def test(seed=None):
             for inst in sem_timing[step]:
                 print "time:%i, sem:%s" %(step, inst.name)
             language_system_P.set_input(sem_timing[step])
-            semanticWM.set_output('to_control', True)
+            language_system_P.schemas['Semantic_WM'].set_output('to_control', True)
         language_system_P.update()
         output = language_system_P.get_output()
         if output:
             print "t:%i, %s" %(step, output)
     
 #    semanticWM.show_dynamics(c2_levels=False)
-    grammaticalWM_P.show_dynamics(c2_levels=False)
-    grammaticalWM_P.show_state()
+    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=False)
+    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')
 
 if __name__=='__main__':

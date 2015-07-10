@@ -80,7 +80,7 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
             Each edge has an additional attribute type = sem_rel.type
     """
     def __init__(self, nodes=[], edges=[]):
-        K_NET.__init__(self, nodes=nodes, edges=edges)
+        K_NET.__init__(self, nodes=nodes[:], edges=edges[:])
     
     def percepts(self, type='ALL'):
         """

@@ -62,7 +62,7 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
     
     """
     def __init__(self, nodes=[], edges=[]):
-        K_NET.__init__(self, nodes=nodes, edges=edges)
+        K_NET.__init__(self, nodes=nodes[:], edges=edges[:])
        
     def concepts(self):
         """
@@ -87,7 +87,6 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             - meaning (): Meaning of a concept
         """
         return super(CONCEPTUAL_KNOWLEDGE, self).find_meaning(meaning)
-#        return self._find_meaning(meaning)
                      
     def similarity(self, cpt1, cpt2):
         """
@@ -110,7 +109,6 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...
         """
         return super(CONCEPTUAL_KNOWLEDGE, self).similarity(cpt1, cpt2)        
-#        return self._similarity(cpt1, cpt2)`
     
     def match(self, cpt1, cpt2, match_type = "is_a"):
         """        
@@ -128,8 +126,7 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             See similarity()
         
         """
-        return super(CONCEPTUAL_KNOWLEDGE, self).match(cpt1, cpt2, match_type = match_type)   
-#        return self._match(cpt1, cpt2, match_type=match_type)
+        return super(CONCEPTUAL_KNOWLEDGE, self).match(cpt1, cpt2, match_type = match_type)
 
 ###############################################################################
 if __name__=='__main__':

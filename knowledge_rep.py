@@ -73,8 +73,8 @@ class K_NET(object):
             Each edge has an additional attribute type = k_rel.type
     """
     def __init__(self, nodes=[], edges=[]):
-        self.nodes = nodes
-        self.edges = edges
+        self.nodes = nodes[:]
+        self.edges = edges[:]
         self.graph = None
     
     def clear(self):
