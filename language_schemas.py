@@ -435,7 +435,6 @@ class SEMANTIC_WM(WM):
         self.prune()        
         self.set_output('to_grammatical_WM_P', self.SemRep)
         
-        
         if mode=='produce' and self.has_new_sem():
             self.set_output('to_cxn_retrieval_P', self.SemRep)
     
@@ -584,7 +583,7 @@ class GRAMMATICAL_WM_P(WM):
         self.prune()
         if produce:
             self.end_competitions()
-        if not(self.comp_links):
+        if produce and not(self.comp_links):
             self.produce_form()
     
     def add_new_insts(self, new_insts):
@@ -603,12 +602,9 @@ class GRAMMATICAL_WM_P(WM):
     def produce_form(self):
         """
         """
-#        self.show_state()
 #        self.end_competitions()
-#        self.show_state()
         assemblages = self.assemble()
         if assemblages:
-#            self.draw_assemblages()
             winner_assemblage = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.C2_params['confidence_threshold']:
                 (phon_form, missing_info) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
@@ -631,8 +627,9 @@ class GRAMMATICAL_WM_P(WM):
 
     def get_winner_assemblage(self, assemblages):
         """
-        Args: assemblages ([ASSEMBLAGE])
         Returns the winner assemblages and their equivalent instances.
+        Args: 
+            - assemblages ([ASSEMBLAGE])
         
         Note: Need to discuss the criteria that come into play in choosing the winner assemblages.
         As for the SemRep covered weight, the constructions should receive activation from the SemRep instances. This could help directly factoring in the SemRep covered factor.
@@ -1320,15 +1317,20 @@ class GRAMMATICAL_WM_C(WM):
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}
         self.pred_params = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
-        self.state = 0
-        self.pred_init = self.pred_params['pred_init'][:]
+        self.state = -1
+        self.pred_init = None
         
     
     def update(self):
         """
-        NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
+        NOTES:
+            - NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
         """
-            
+        listen = self.get_input('from_control')
+        if listen and self.state==-1:
+            self.state = 0
+            self.set_pred_init()
+        
         pred_cxn_insts = self.get_input('from_cxn_retrieval_C')
         if pred_cxn_insts:
             for inst in pred_cxn_insts:
@@ -1340,6 +1342,7 @@ class GRAMMATICAL_WM_C(WM):
             self.state += 1
             self.scanner(phon_inst)
             self.completer()
+            self.set_pred_init()
         self.update_activations()
         self.prune()
         
@@ -1350,10 +1353,13 @@ class GRAMMATICAL_WM_C(WM):
     def predictor(self):
         """
         TCG version of the Earley chart parsing predictor.
+        
+        NOTES: 
+            - Send all the classes of construction expected to cxn_retrieval. 
+            - The cxn_retrieval system will then send back the set of all possible predictions based instances.
         """
-        # Send all the classes of construction expected to cxn_retrieval. the cxn_retrieval system will then send back the set of all possible predictions based instances.
-        # NEED TO MAKE SURE THAT A INSTANCE DOESN'T SEND IT'S PREDICTION MULTIPLE TIMES.
-        if self.pred_init:
+
+        if self.state==0 and self.pred_init:
              pred_classes = set(self.pred_init)
              self.pred_init = []
         else:
@@ -1369,13 +1375,13 @@ class GRAMMATICAL_WM_C(WM):
         """
         TCG version of the Earley chart parsing scanner.
         
-        NOTE: 
+        NOTES: 
+            - Check the existing instances whose form match the phon_inst.content['word_form']. If there is a match, move dot.
+            - This is when the competitions are taking place.
             - Covers, to fit with production, should be a mapping between SynForm and PhonRep, while Trace is the part that only keeps track of the element that triggered the instantiation.
             - A key step is to reset the activation of the instance that is confirmed by an input to that of the Phon instance. Right now it is just set to the value of the phone instance. 
             But it should be clamped to it or receive a constant input from it.
         """
-        # Check the existing instances whose form match the phon_inst.content['word_form']. If there is a match, move dot.
-        # This might be when the competitions are taking place.
         matching_insts = []
         for inst in self.schema_insts:
             phon_prediction = inst.phon_prediction()
@@ -1393,16 +1399,14 @@ class GRAMMATICAL_WM_C(WM):
     def completer(self):
         """
         TCG version of the Earley chart parsing completer.
+        NOTES:
+            -  Recursively check all the "completed" cxn (dot all the way to the right) and make the appropriate coop links.
         """
-        # Recursively check all the "completed" cxn (dot all the way to the right) and make the appropriate coop links.
         completed_insts = [inst for inst in self.schema_insts if not(inst.form_state)]
         while completed_insts:
             incomplete_insts = [inst for inst in self.schema_insts if inst.form_state]
             for inst1 in incomplete_insts:
                 for inst2 in completed_insts:
-                    # check match between inst1 and inst2
-                    # if there is a match: create a coop link
-                    # update inst1.covers[1] to self.state.
                     self.cooperate(inst1, inst2)                    
             completed_insts = [inst for inst in incomplete_insts if not(inst.form_state)]
     
@@ -1472,12 +1476,23 @@ class GRAMMATICAL_WM_C(WM):
         for coop_links in self.coop_links:
             coop_links.weight = deact_weight
     
+    def set_pred_init(self):
+        """
+        Sets the stack of TD initial predictions pred_init.
+        The stacks is refilled as soon a state != 0.
+        Reinitialize state to state == 0 will then trigger the init predictions.
+        """
+        self.pred_init = self.pred_params['pred_init'][:]
+    
     ###############################
     ### cooperative computation ###
     ###############################
     def cooperate(self, inst1, inst2):
        """
        NOTE:
+           - Check match between inst1 and inst2
+           - If there is a match: create a coop link
+           - Update inst1.covers[1] to self.state.
            - Compare to production, here C2 operations cannot simply be applied only once to new instances. this is due to the fact that the state of the instances changes. 
            The state change is required by the fact that production includes predictions, predictions which are absent from production.
        """
@@ -1849,6 +1864,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_grammatical_WM_P')
+        self.add_port('OUT', 'to_grammatical_WM_C')
         self.task_params = {'time_pressure':100}
         self.state = {'last_prod_time':0, 'new_sem':False, 'mode':'produce'}
     
@@ -1856,19 +1872,30 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         """
         self.state['mode'] = mode
+        self.state['last_prod_time'] = self.t
     
     def update(self):
         """
         """
+        # Communicating with  semantic_WM
         self.set_output('to_semantic_WM', self.state['mode'])
-        if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
-            self.set_output('to_grammatical_WM_P', True)
-            self.state['new_sem'] = False
-        if self.get_input('from_phonological_WM_P'):
-            self.state['last_prod_time'] = self.t
-        if self.get_input('from_semantic_WM'):
-            self.state['new_sem'] = True
-    
+        
+        # Communicating with  grammatical_WM_P
+        if self.state['mode'] == 'produce':
+            if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
+                self.set_output('to_grammatical_WM_P', True)
+                self.state['new_sem'] = False
+            if self.get_input('from_phonological_WM_P'):
+                self.state['last_prod_time'] = self.t
+            if self.get_input('from_semantic_WM'):
+                self.state['new_sem'] = True
+                
+        # Communicating with  grammatical_WM_C
+        if self.state['mode'] == 'listen':
+            self.set_output('to_grammatical_WM_C', True)
+        else:
+            self.set_output('to_grammatical_WM_C', False)
+                
     ####################
     ### JSON METHODS ###
     ####################
@@ -1907,6 +1934,8 @@ class TEXT2SPEECH(object):
 if __name__=='__main__':
     from test_TCG_production import test as test_production
     from test_TCG_comprehension import test as test_comprehension
+    from test_TCG_dyad import test as test_dyad
     
 #    test_production(seed=None)
-    test_comprehension(seed=None)
+#    test_comprehension(seed=None)
+    test_dyad(seed=0)

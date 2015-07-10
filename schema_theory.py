@@ -30,12 +30,14 @@ class SCHEMA(object):
     Data:
         - id (int): Unique id
         - name (str): schema name
+        - schema_system (SCHEMA_SYSTEM): Schema system to which the instance belongs.
     """
     ID_next = 1 # Global schema ID counter
     def __init__(self, name=""):
         self.id = SCHEMA.ID_next
         SCHEMA.ID_next += 1
         self.name = name
+        self.schema_system = None
 
 class PORT(object):
     """
@@ -983,6 +985,7 @@ class SCHEMA_SYSTEM(object):
         if port_from and port_to:
             new_connect = CONNECT(name=name, port_from=port_from, port_to=port_to, weight=weight, delay=delay)
             self.connections.append(new_connect)
+            new_connect.schema_system = self
             return True
         else:
             return False
@@ -998,6 +1001,7 @@ class SCHEMA_SYSTEM(object):
                 print "ERROR: There is already a schema named %s" % schema.name
             else:
                 self.schemas[schema.name] = schema
+                schema.schema_system = self
     
     def set_input_ports(self, ports):
         """

@@ -15,15 +15,15 @@ def test(seed=None):
     ##############################
     language_system_C = TCG_comprehension_system()
     # Display schema system
-#    language_system_C.system2dot(image_type='png', disp=True)
+    language_system_C.system2dot(image_type='png', disp=True)
     
     option = 2
     
     lang_inputs = {}
-    lang_inputs[1] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
-    lang_inputs[2] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 65: 'a', 70:'blue', 80:'boxing ring'}
-    lang_inputs[3] = {1:'a', 10:'woman', 13:'who', 14:'is', 15:'pretty', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
-    lang_inputs[4] = {1:'a', 10:'woman', 20:'laugh', 60:'kick', 70:'a', 75:'man', 80:'in', 85:'blue'}
+    lang_inputs[1] = {6:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
+    lang_inputs[2] = {6:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 65: 'a', 70:'blue', 80:'boxing ring'}
+    lang_inputs[3] = {6:'a', 10:'woman', 13:'who', 14:'is', 15:'pretty', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
+    lang_inputs[4] = {6:'a', 10:'woman', 20:'laugh', 60:'kick', 70:'a', 75:'man', 80:'in', 85:'blue'}
     
     lang_input = lang_inputs[option]
     max_time = 500

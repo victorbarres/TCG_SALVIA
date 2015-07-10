@@ -9,6 +9,7 @@ Uses NetworkX module to represent construction SemFrame graph and SynForm graph.
 """
 import matplotlib.pyplot as plt
 import networkx as nx
+import viewer
 
 ########################
 ### Template Classes ###
@@ -507,7 +508,6 @@ class CXN:
         Display the construction.
         Uses the display method defined in TCG_VIEWER class
         """
-        import viewer
         viewer.TCG_VIEWER.display_cxn(self)
     
 #    def __str__(self): # To rewrite
@@ -618,7 +618,6 @@ class GRAMMAR:
 
 if __name__=='__main__':
     import loader as ld
-    import viewer
     
     my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
     cxn =  my_grammar.constructions[0]

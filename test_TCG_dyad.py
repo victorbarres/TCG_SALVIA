@@ -8,6 +8,8 @@ import numpy as np
 
 from TCG_models import TCG_language_system
 
+import viewer
+
     
 def test(seed=None):
     """
@@ -18,15 +20,16 @@ def test(seed=None):
     """
     random.seed(seed)
 
-    language_system_1 = TCG_language_system()
-    language_system_2 = TCG_language_system()
+    language_system_1 = TCG_language_system('Agent1')
+    language_system_2 = TCG_language_system('Agent2')
+    
+#    language_system_1.system2dot(image_type='png', disp=True)
     
     language_system_1.schemas['Control'].set_mode('listen')
-    language_system_2.schemas['Control'].set_mode('listen')
+    language_system_2.schemas['Control'].set_mode(None)
     
-    option = 3
-    speech_rate = 40
-    
+    option = 4
+    speech_rate = 100
     language_system_1.schemas['Utter'].params['speech_rate'] = speech_rate
     language_system_2.schemas['Utter'].params['speech_rate'] = speech_rate
     lang_inputs = {}
@@ -34,10 +37,11 @@ def test(seed=None):
     lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing ring']
     lang_inputs[2] = ['a', 'woman', 'who', 'is', 'pretty', 'kick', 'a', 'man', 'in', 'blue']
     lang_inputs[3] = ['a', 'woman', 'kick', 'a', 'man']
+    lang_inputs[4] = ['a', 'woman']
     
     lang_input = lang_inputs[option]
     lang_input.reverse()
-    max_time = 2000
+    max_time = 2500
     
     flag1 = True
     flag2 = True
@@ -54,22 +58,29 @@ def test(seed=None):
             flag1 = False
             print "Agt1 speaks. Agt2 listens"
             
-        word_form = language_system_1.get_output()
-        if word_form:
-            print 't: %i, Agt1 says: %s' %(t, word_form)  
-            language_system_2.set_input(word_form)
+        word_form1 = language_system_1.get_output()
+        if word_form1 and flag2:
+            language_system_2.schemas['Control'].set_mode('listen')
+            print 't: %i, Agt1 says: %s' %(t, word_form1)  
+            language_system_2.set_input(word_form1)
         
         if language_system_2.schemas['Semantic_WM'].schema_insts and flag2: #Switching from comprehension to production
             language_system_2.schemas['Semantic_WM'].show_SemRep()
             language_system_2.schemas['Control'].set_mode('produce')
+            language_system_1.schemas['Control'].set_mode(None)
             flag2 = False
             print "Agt2 speaks."
+        
+        word_form2 = language_system_2.get_output()
+        if word_form2:
+            print 't: %i, Agt2 says: %s' %(t, word_form2)  
             
         language_system_1.update()
         language_system_2.update()
-        
     
-    language_system_2.schemas['Grammatical_WM_C'].show_dynamics()
+    language_system_1.schemas['Grammatical_WM_P'].show_dynamics()
+    language_system_2.schemas['Grammatical_WM_P'].show_dynamics()
+    
             
 
 if __name__=='__main__':

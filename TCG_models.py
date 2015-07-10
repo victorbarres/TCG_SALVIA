@@ -9,7 +9,7 @@ import language_schemas as ls
 import perceptual_schemas as ps
 from loader import TCG_LOADER
 
-def TCG_production_system():
+def TCG_production_system(name='language_system_P'):
     """
     Creates and returns the TCG production schema system.
     """
@@ -35,7 +35,7 @@ def TCG_production_system():
                         }
    
    # Initializing schema system
-    language_system_P = st.SCHEMA_SYSTEM('language_system_P')
+    language_system_P = st.SCHEMA_SYSTEM(name)
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
@@ -121,7 +121,7 @@ def TCG_production_system():
     return language_system_P
 
 
-def TCG_comprehension_system():
+def TCG_comprehension_system(name='language_system_C'):
     """
     Creates and returns the TCG comprehension schema system.
     """
@@ -144,7 +144,7 @@ def TCG_comprehension_system():
                     'Control':['DLPFC']}
     
     # Initializing schema system
-    language_system_C = st.SCHEMA_SYSTEM('language_system_C')
+    language_system_C = st.SCHEMA_SYSTEM(name)
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
@@ -162,6 +162,7 @@ def TCG_comprehension_system():
     language_system_C.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
     language_system_C.add_connection(conceptLTM, 'to_semantic_WM', semanticWM, 'from_concept_LTM')
     language_system_C.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    language_system_C.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     language_system_C.set_input_ports([phonWM_C.find_port('from_input')])
     language_system_C.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
     
@@ -224,7 +225,7 @@ def TCG_comprehension_system():
     
     return language_system_C
 
-def TCG_language_system():
+def TCG_language_system(name='language_system'):
     """
     Creates and returns the TCG language schema system, including both production and comprehension.
     """
@@ -256,7 +257,7 @@ def TCG_language_system():
                     'Concept_LTM':['']}
    
    # Initializing schema system
-    language_system = st.SCHEMA_SYSTEM('language_system')
+    language_system = st.SCHEMA_SYSTEM(name)
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
@@ -282,6 +283,7 @@ def TCG_language_system():
     language_system.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
     language_system.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
     language_system.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    language_system.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     language_system.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
     language_system.add_connection(conceptLTM, 'to_semantic_WM', semanticWM, 'from_concept_LTM')
     language_system.set_input_ports([phonWM_C.find_port('from_input')])
@@ -370,7 +372,7 @@ def TCG_language_system():
     
     return language_system
     
-def TCG_description_system():
+def TCG_description_system(name='description_system'):
     """
     Creates and returns the TCG production schema system.
     """
@@ -407,7 +409,7 @@ def TCG_description_system():
                         
     schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
     # Creating schema system and adding procedural schemas
-    description_system = st.SCHEMA_SYSTEM('Description_system')
+    description_system = st.SCHEMA_SYSTEM(name)
     description_system.add_schemas(schemas)
     
     # Defining connections
