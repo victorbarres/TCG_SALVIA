@@ -34,7 +34,7 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
                     - content (CXN):
                     - init_act (float): Initial activation value.        
     """
-    def __init__(self,aCXN, init_act):
+    def __init__(self, aCXN, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=aCXN.name, content=aCXN, init_act=init_act)
 
 class CXN_SCHEMA_INST(SCHEMA_INST):
@@ -105,7 +105,7 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
         - phon_cover
         - has_predicted
     """
-    def __init__(self, cxn_schema, trace, mapping={}, copy=True):
+    def __init__(self, cxn_schema, trace, mapping=None, copy=True):
         CXN_SCHEMA_INST.__init__(self, cxn_schema=cxn_schema, mapping=mapping, trace=trace, copy=copy)
         self.form_sequence = self.content.SynForm.form[:]
         self.form_sequence.reverse()
@@ -611,7 +611,6 @@ class GRAMMATICAL_WM_P(WM):
 #            self.draw_assemblages()
             winner_assemblage = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.C2_params['confidence_threshold']:
-                print 'Production at time: %i' %self.t
                 (phon_form, missing_info) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
                 self.set_output('to_phonological_WM_P', phon_form)
             
@@ -1414,7 +1413,6 @@ class GRAMMATICAL_WM_C(WM):
         if assemblages:
             winner_assemblage = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.C2_params['confidence_threshold']:
-                print 'Comprehension at time: %i' %self.t
                 sem_frame =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
                 self.set_output('to_semantic_WM', sem_frame)
                 
@@ -1910,5 +1908,5 @@ if __name__=='__main__':
     from test_TCG_production import test as test_production
     from test_TCG_comprehension import test as test_comprehension
     
-    test_production(seed=None)
-#    test_comprehension(seed=None)
+#    test_production(seed=None)
+    test_comprehension(seed=None)

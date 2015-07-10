@@ -1019,7 +1019,10 @@ class SCHEMA_SYSTEM(object):
         """
         Returns sysetm output
         """
-        return self.outputs[self.t]
+        if self.t in self.outputs:
+            return self.outputs[self.t]
+        else:
+            return None
         
     def update(self):
         """
