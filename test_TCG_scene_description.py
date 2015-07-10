@@ -23,8 +23,7 @@ def test(seed=None):
     scene_name = 'KC06_1_1'
     scene_folder = "./data/scenes/%s/" %scene_name
     
-    TCG_loader = TCG_LOADER()
-    my_scene = TCG_loader.load_scene("TCG_scene.json", scene_folder)
+    my_scene = TCG_LOADER.load_scene("TCG_scene.json", scene_folder)
     
     # Schema rec intialization
     description_system.set_input(my_scene)

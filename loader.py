@@ -28,7 +28,8 @@ class TCG_LOADER(object):
     ############################
     ### Data reading methods ###
     ############################
-    def json_read(self, file_name, path='./'):
+    @staticmethod
+    def json_read(file_name, path='./'):
         file_name = path+file_name
         try:
             f = open(file_name, 'r')
@@ -47,7 +48,8 @@ class TCG_LOADER(object):
     
     ###############
     ### CONCEPT ###
-    def read_concept(self, atype, sup_cpt, cpt_knowledge, cpt_data):
+    @staticmethod
+    def read_concept(atype, sup_cpt, cpt_knowledge, cpt_data):
         
         for concept in cpt_data:
             # Create new concept entity
@@ -64,7 +66,7 @@ class TCG_LOADER(object):
             if not(flag):
                 return False
             
-            flag = self.read_concept(atype, sub_cpt, cpt_knowledge, cpt_data[concept])
+            flag = TCG_LOADER.read_concept(atype, sub_cpt, cpt_knowledge, cpt_data[concept])
             if not(flag):
                 return False
         
@@ -72,7 +74,8 @@ class TCG_LOADER(object):
     
     ###############
     ### PERCEPT ###
-    def read_percept(self, atype, sup_per, per_knowledge, per_data):
+    @staticmethod
+    def read_percept(atype, sup_per, per_knowledge, per_data):
         
         for percept in per_data:
             # Create new percept entity
@@ -99,7 +102,7 @@ class TCG_LOADER(object):
                         return False
     
             else:
-                flag = self.read_percept('is_a', sub_per, per_knowledge, per_data[percept])
+                flag = TCG_LOADER.read_percept('is_a', sub_per, per_knowledge, per_data[percept])
                 if not(flag):
                     return False
         
@@ -109,8 +112,8 @@ class TCG_LOADER(object):
     ### CXN ###
     # CXN CAN ONLY BE LOADED ONCE THE CONCEPTUAL KNOWLEDGE HAS BEEN LOADED IN A CONCEPTUAL_KNOWLEDGE.
     # NEED TO ADD PROPER TRUE/FALSE RETURN VALUES FOR ALL THOSE FUNCTIONS
-    
-    def read_node(self, new_cxn, aNode, name_table, cpt_knowledge):
+    @staticmethod
+    def read_node(new_cxn, aNode, name_table, cpt_knowledge):
         """
         """
         # Create new node
@@ -129,8 +132,9 @@ class TCG_LOADER(object):
         new_cxn.add_sem_elem(new_node)
         name_table['SemNodes'][name] = new_node
         name_table['names'][name] = new_node.name
-    
-    def read_rel(self, new_cxn, aRel, name_table, cpt_knowledge):
+        
+    @staticmethod
+    def read_rel(new_cxn, aRel, name_table, cpt_knowledge):
         """
         """    
         # Create new relation
@@ -156,7 +160,8 @@ class TCG_LOADER(object):
         name_table['SemEdges'][name] = (pFrom, pTo)
         name_table['names'][name] = new_rel.name
     
-    def read_slot(self, new_cxn, aSlot, name_table):
+    @staticmethod
+    def read_slot(new_cxn, aSlot, name_table):
         """
         """
         new_slot = cxn.TP_SLOT()
@@ -169,8 +174,9 @@ class TCG_LOADER(object):
         new_cxn.add_syn_elem(new_slot)
         name_table['SynForms'][name] = new_slot
         name_table['names'][name] = new_slot.name
-            
-    def read_phon(self, new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER THE PHON TYPE?
+    
+    @staticmethod       
+    def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER THE PHON TYPE?
         """
         """
         new_phon = cxn.TP_PHON()
@@ -187,14 +193,15 @@ class TCG_LOADER(object):
         new_cxn.add_syn_elem(new_phon)
         name_table['SynForms'][name] = new_phon
         name_table['names'][name] = new_phon.name
-                
-    def read_semframe(self, new_cxn, SemFrame, name_table, cpt_knowledge):
+    
+    @staticmethod           
+    def read_semframe(new_cxn, SemFrame, name_table, cpt_knowledge):
         """
         """
         for node in SemFrame['nodes']:
-            self.read_node(new_cxn, node, name_table, cpt_knowledge)
+            TCG_LOADER.read_node(new_cxn, node, name_table, cpt_knowledge)
         for rel in SemFrame['edges']:
-            self.read_rel(new_cxn, rel, name_table, cpt_knowledge)
+            TCG_LOADER.read_rel(new_cxn, rel, name_table, cpt_knowledge)
         
         for rel_name, node_pair in name_table['SemEdges'].iteritems(): # Creating SemFrame relations
             from_name = node_pair[0]
@@ -209,25 +216,28 @@ class TCG_LOADER(object):
             sem_elem.pTo = name_table['SemNodes'][to_name]
         
         new_cxn.SemFrame._create_NX_graph() # Creating NetworkX implementation of SemFrame
-    
-    def read_synform(self, new_cxn, SynForm, name_table):
+        
+    @staticmethod   
+    def read_synform(new_cxn, SynForm, name_table):
         """
         """
         for form_elem in SynForm:
             if form_elem['type'] == 'SLOT':
-                self.read_slot(new_cxn, form_elem, name_table)
+                TCG_LOADER.read_slot(new_cxn, form_elem, name_table)
             elif form_elem['type'] == 'PHON':
-                self.read_phon(new_cxn, form_elem, name_table)
-        
-    def read_symlinks(self, new_cxn, sym_links, name_table):
+                TCG_LOADER.read_phon(new_cxn, form_elem, name_table)
+                
+    @staticmethod      
+    def read_symlinks(new_cxn, sym_links, name_table):
         """
         """
         for key, val in sym_links.iteritems():
             sem_name = name_table['names'][key]
             form_name = name_table['names'][val]
             new_cxn.add_sym_link(sem_name, form_name)
-              
-    def read_cxn(self, grammar, aCxn, cpt_knowledge):
+            
+    @staticmethod             
+    def read_cxn(grammar, aCxn, cpt_knowledge):
         """
         """
         # Create new cxn  
@@ -241,13 +251,13 @@ class TCG_LOADER(object):
         name_table = {'SemNodes':{}, 'SemEdges':{}, 'SynForms':{}, 'names':{}}
         
         # READ SEMFRAME
-        self.read_semframe(new_cxn, aCxn['SemFrame'], name_table, cpt_knowledge)
+        TCG_LOADER.read_semframe(new_cxn, aCxn['SemFrame'], name_table, cpt_knowledge)
             
         # READ SYNFORM
-        self.read_synform(new_cxn, aCxn['SynForm'], name_table)
+        TCG_LOADER.read_synform(new_cxn, aCxn['SynForm'], name_table)
                 
         # READ SYMLINKS
-        self. read_symlinks(new_cxn, aCxn['SymLinks'], name_table)
+        TCG_LOADER.read_symlinks(new_cxn, aCxn['SymLinks'], name_table)
         
         flag = grammar.add_construction(new_cxn)
         if not(flag):
@@ -358,12 +368,13 @@ class TCG_LOADER(object):
     ###############################          
     ### Public loading methods ###
     ###############################
-    def load_conceptual_knowledge(self, file_name='', file_path='./'):
+    @staticmethod   
+    def load_conceptual_knowledge(file_name='', file_path='./'):
         """
         Loads and returns the conceptual knowledge defined in file_path\file_name. Return None if error.
         """
         # Open and read file
-        json_data = self.json_read(file_name, path=file_path)
+        json_data = TCG_LOADER.json_read(file_name, path=file_path)
         cpt_data = json_data['CONCEPTUAL_KNOWLEDGE']
         
         # Create conceptual knowledge object
@@ -373,7 +384,7 @@ class TCG_LOADER(object):
         top_cpt = cpt.CONCEPT(name=top, meaning=top)
         my_conceptual_knowledge.add_ent(top_cpt)
         
-        flag = self.read_concept("is_a", top_cpt, my_conceptual_knowledge, cpt_data)
+        flag = TCG_LOADER.read_concept("is_a", top_cpt, my_conceptual_knowledge, cpt_data)
         if not(flag):
             return None
         
@@ -381,12 +392,13 @@ class TCG_LOADER(object):
     
         return my_conceptual_knowledge
         
-    def load_perceptual_knowledge(self, file_name='', file_path='./'):
+    @staticmethod       
+    def load_perceptual_knowledge(file_name='', file_path='./'):
         """
         Load and returns the perceptual knowledge defined in file_path\file_name
         """
         #OPen and read file
-        json_data = self.json_read(file_name, path=file_path)
+        json_data = TCG_LOADER.json_read(file_name, path=file_path)
         per_data = json_data['PERCEPTUAL_KNOWLEDGE']
         
         # Create peceptual_knowledge object
@@ -396,7 +408,7 @@ class TCG_LOADER(object):
         top_per = per.PERCEPT_CAT(name=top, meaning=top)
         my_perceptual_knowledge.add_ent(top_per)
         
-        flag = self.read_percept('is_a', top_per, my_perceptual_knowledge, per_data)
+        flag = TCG_LOADER.read_percept('is_a', top_per, my_perceptual_knowledge, per_data)
         if not(flag):
             return None
         
@@ -404,13 +416,14 @@ class TCG_LOADER(object):
     
         return my_perceptual_knowledge
     
-    def load_conceptualization(self, file_name='', file_path='./', cpt_knowledge=None, per_knowledge=None):
+    @staticmethod   
+    def load_conceptualization(file_name='', file_path='./', cpt_knowledge=None, per_knowledge=None):
         """
         Load and returns the TCG conceptualization defined in file_path\file_name
         Requires a cpt_knowledge (CONCEPTUAL_KNOWLEDGE) and a perceptual knowledge (PERCEPTUAL_KNOWLEDGE)
         """
         #Open and read file
-        json_data = self.json_read(file_name, path=file_path)
+        json_data = TCG_LOADER.json_read(file_name, path=file_path)
         czer_data = json_data['CONCEPTUALIZATION']
         my_conceptualization = per.CONCEPTUALIZATION()
         for cpt in czer_data:
@@ -424,36 +437,39 @@ class TCG_LOADER(object):
                         my_conceptualization.add_mapping(pcpt, cpt)
         
         return my_conceptualization
-        
-    def load_grammar(self, file_name='', file_path='./', cpt_knowledge = None):
+    
+    @staticmethod       
+    def load_grammar(file_name='', file_path='./', cpt_knowledge = None):
         """
         Loads and returns the TCG grammar defined in file_path\file_name.
         Requires a cpt_knowledge (CONCEPTUAL_KNOWLEDGE).
         """
         # Open and read file
-        json_data = self.json_read(file_name, path = file_path)
+        json_data = TCG_LOADER.json_read(file_name, path = file_path)
         gram_data = json_data['grammar']
         
         # Create grammar object
         my_grammar = cxn.GRAMMAR()
         
         for aCxn in gram_data:
-            self.read_cxn(my_grammar, aCxn, cpt_knowledge)
+            TCG_LOADER.read_cxn(my_grammar, aCxn, cpt_knowledge)
     
         return my_grammar
-                
-    def load_scene(self, file_name = '', file_path = './'):
+    
+    @staticmethod               
+    def load_scene(file_name = '', file_path = './'):
         """
         Loads and returns a DICT containing the visual scene data defined in file_path\file_name. Return None if error.
         
         Note: Might want to check that the perceptual schemas are indeed defined in perceptual knowledge.
         """
         # Open and read file
-        json_data = self.json_read(file_name, path = file_path)
+        json_data = TCG_LOADER.json_read(file_name, path = file_path)
         my_scene = json_data['scene']
         return my_scene
-        
-    def load_BU_saliency(self, file_name = '', file_path = './'):
+    
+    @staticmethod    
+    def load_BU_saliency(file_name = '', file_path = './'):
         """
         Loads and returns a the saliency data define in in file_path\file_name.mat Return None if error.
         """
@@ -465,12 +481,11 @@ class TCG_LOADER(object):
         
 ###############################################################################
 if __name__=='__main__':
-    TCG_loader = TCG_LOADER()
-    my_conceptual_knowledge = TCG_loader.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_perceptual_knowledge = TCG_loader.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_conceptualization = TCG_loader.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
-    my_grammar = TCG_loader.load_grammar("TCG_grammar.json", "./data/grammars/", my_conceptual_knowledge)
-    my_scene = TCG_loader.load_scene("TCG_scene.json", "./data/scenes/TCG_cholitas/")
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
+    my_grammar = TCG_LOADER.load_grammar("TCG_grammar.json", "./data/grammars/", my_conceptual_knowledge)
+    my_scene = TCG_LOADER.load_scene("TCG_scene.json", "./data/scenes/TCG_cholitas/")
 
     
     

@@ -39,7 +39,7 @@ def test(seed=None):
     
     flag1 = True
     flag2 = True
-    print "VB speaks. Ag1 listens"
+    print "VB speaks. Agt1 listens"
     for t in range(max_time):
         if t>10 and np.mod(t, speech_rate) == 0 and lang_input: # Need some time to have the system set up before it receives the first input.
             word_form = lang_input.pop()

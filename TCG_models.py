@@ -7,7 +7,7 @@ Contains functions that can instantiate various TCG models and submodels.
 import schema_theory as st
 import language_schemas as ls
 import perceptual_schemas as ps
-import loader as ld
+from loader import TCG_LOADER
 
 def TCG_production_system():
     """
@@ -106,12 +106,11 @@ def TCG_production_system():
     
     # Loading data
     grammar_name = 'TCG_grammar_VB'
-    
-    TCG_loader = ld.TCG_LOADER()
+
    
-    my_conceptual_knowledge = TCG_loader.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
-    my_grammar = TCG_loader.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
@@ -213,10 +212,9 @@ def TCG_comprehension_system():
     # Loading data
     grammar_name = 'TCG_grammar_VB_singlehead'
     
-    TCG_loader = ld.TCG_LOADER()
-    my_conceptual_knowledge = TCG_loader.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
-    my_grammar = TCG_loader.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
@@ -360,10 +358,9 @@ def TCG_language_system():
     # Loading data
     grammar_name = 'TCG_grammar_VB'
    
-    TCG_loader = ld.TCG_LOADER()
-    my_conceptual_knowledge = TCG_loader.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
-    my_grammar = TCG_loader.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
@@ -491,14 +488,13 @@ def TCG_description_system():
     # Loading data
     grammar_name = 'TCG_grammar_VB'
     
-    TCG_loader = ld.TCG_LOADER()
-    my_perceptual_knowledge = TCG_loader.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     
-    my_conceptual_knowledge = TCG_loader.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_conceptualization = TCG_loader.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
     
     grammar_file = "%s.json" %grammar_name
-    my_grammar = TCG_loader.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
     # Initialize perceptual LTM content
     perceptLTM.initialize(my_perceptual_knowledge)
