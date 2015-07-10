@@ -946,7 +946,7 @@ class SCHEMA_SYSTEM(object):
     Defines a model as a system of procedural schemas.
     Data:
         - name (str):
-        - schemas([PROCEDURAL_SCHEMAS]):
+        - schemas({schema_name:PROCEDURAL_SCHEMAS}):
         - connections ([CONNECT]):
         - input_port ([PORT]): the list of ports that read the input
         - output_ports ([PORT]): The list of ports that defines the output value
@@ -962,7 +962,7 @@ class SCHEMA_SYSTEM(object):
     TIME_STEP = 1.0
     def __init__(self, name=''):
         self.name = name
-        self.schemas = []
+        self.schemas = {}
         self.connections = []
         self.input_ports = None
         self.output_ports = None
@@ -994,7 +994,10 @@ class SCHEMA_SYSTEM(object):
         for schema in schemas:
             schema.dt = self.dt
             schema.t = self.t
-            self.schemas.append(schema)
+            if schema.name in self.schemas:
+                print "ERROR: There is already a schema named %s" % schema.name
+            else:
+                self.schemas[schema.name] = schema
     
     def set_input_ports(self, ports):
         """
@@ -1035,13 +1038,13 @@ class SCHEMA_SYSTEM(object):
             self.input = None
         
         # Update all the schema states
-        for schema in self.schemas:
+        for schema_name, schema in self.schemas.iteritems():
             init_t = time.time()
             schema.update()
             end_t = time.time()
             schema.t = self.t
             if self.verbose:
-                print 'Update %s, (%f s)' %(schema.name, end_t - init_t)
+                print 'Update %s, (%f s)' %(schema_name, end_t - init_t)
         
         # Propagate value through connections
         for connection in self.connections:
@@ -1070,8 +1073,8 @@ class SCHEMA_SYSTEM(object):
         data['brain_mapping'] = self.brain_mapping.get_info()
         
         data['procedural_schemas'] = {}
-        for schema in self.schemas:
-            data['procedural_schemas'][schema.name] = schema.get_info()
+        for schema_name, schema in self.schemas.iteritems():
+            data['procedural_schemas'][schema_name] = schema.get_info()
         
         return data
     
@@ -1079,8 +1082,8 @@ class SCHEMA_SYSTEM(object):
         """
         """
         data = {'schema_states':{}}
-        for schema in self.schemas:
-            data['schema_states'][schema.name] = schema.get_state()
+        for schema_name, schema in self.schemas.iteritems():
+            data['schema_states'][schema_name] = schema.get_state()
         return data
     
     def save_sim(self, file_name = 'output.json'):
@@ -1116,7 +1119,7 @@ class SCHEMA_SYSTEM(object):
         dot_sys.add_node(pydot.Node('INPUT', label='INPUT', shape='oval'))
         dot_sys.add_node(pydot.Node('OUTPUT', label='OUTPUT', shape='oval'))
         
-        for schema in self.schemas:
+        for schema_name, schema in self.schemas.iteritems():
             brain_regions = self.brain_mapping.schema_mapping[schema.name]
             label = '<'+schema.name+'<BR /><FONT POINT-SIZE="10">['+', '.join(brain_regions) +']</FONT>>'
             dot_sys.add_node(pydot.Node(schema.name, label=label, color=color, shape=node_shape, style=style, fillcolor=fill_color))

@@ -3,16 +3,15 @@
 @author: Victor Barres
 Test cases for the language production schemas defined in language_schemas.py
 """
-def test(seed=None):
-    import random
-    import schema_theory as st
-    import language_schemas as ls
-    import loader as ld
-    
-    random.seed(seed)
-    ##############################
-    ### Language schema system ###
-    ##############################
+import random
+import schema_theory as st
+import language_schemas as ls
+import loader as ld
+
+def TCG_production_system():
+    """
+    Creates and returns the TCG production schema system.
+    """
     # Instantiating all the necessary procedural schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
@@ -43,7 +42,7 @@ def test(seed=None):
     language_system_P.brain_mapping = language_brain_mapping
     
     # Setting up language schema system.
-    language_schemas = [semanticWM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, control]
+    language_schemas = [conceptLTM, semanticWM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, control]
 
     language_system_P.add_schemas(language_schemas)
     language_system_P.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
@@ -58,9 +57,6 @@ def test(seed=None):
     language_system_P.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     language_system_P.set_input_ports([semanticWM.find_port('from_conceptualizer')])
     language_system_P.set_output_ports([utter.find_port('to_output')])
-    
-    # Display schema system
-    language_system_P.system2dot(image_type='png', disp=True)
     
     # Parameters   
     semanticWM.dyn_params['tau'] = 300
@@ -119,6 +115,19 @@ def test(seed=None):
         
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
+    
+    return language_system_P
+    
+def test(seed=None):
+    
+    random.seed(seed)
+   
+    language_system_P = TCG_production_system()
+    
+    # Display schema system
+    language_system_P.system2dot(image_type='png', disp=True)
+    
+    conceptLTM = language_system_P.schemas['Concept_LTM']
     
     # Semantic WM content using predefined cpt_schema_instances.
     man_cpt_schema = conceptLTM.find_schema(name='MAN')
@@ -201,15 +210,15 @@ def test(seed=None):
             for inst in sem_timing[step]:
                 print "time:%i, sem:%s" %(step, inst.name)
             language_system_P.set_input(sem_timing[step])
-            semanticWM.set_output('to_control', True)
+            language_system_P.schemas['Semantic_WM'].set_output('to_control', True)
         language_system_P.update()
         output = language_system_P.get_output()
         if output:
             print "t:%i, %s" %(step, output)
     
 #    semanticWM.show_dynamics(c2_levels=False)
-    grammaticalWM_P.show_dynamics(c2_levels=False)
-    grammaticalWM_P.show_state()
+    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=False)
+    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')
 
 if __name__=='__main__':

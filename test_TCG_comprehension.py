@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 """
 @author: Victor Barres
-Test cases for the comprehensoin language schemas defined in language_schemas.py
+Test cases for the comprehension language schemas defined in language_schemas.py
 """
-def test(seed=None):
-    import random
-    import schema_theory as st
-    import language_schemas as ls
-    import loader as ld
-    
-    random.seed(seed)
-    ##############################
-    ### Language schema system ###
-    ##############################
+import random
+import schema_theory as st
+import language_schemas as ls
+import loader as ld
+
+def TCG_comprehension_system():
+    """
+    Creates and returns the TCG comprehension schema system.
+    """
     # Instantiating all the necessary procedural schemas
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
@@ -30,8 +29,8 @@ def test(seed=None):
                     'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'],
                     'Concept_LTM':[''],
                     'Control':['DLPFC']}
-   
-   # Initializing schema system
+    
+    # Initializing schema system
     language_system_C = st.SCHEMA_SYSTEM('language_system_C')
     
     # Setting up schema to brain mappings
@@ -53,8 +52,6 @@ def test(seed=None):
     language_system_C.set_input_ports([phonWM_C.find_port('from_input')])
     language_system_C.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
     
-    # Display schema system
-#    language_system_C.system2dot(image_type='png', disp=True)
     
     # Parameters
     phonWM_C.dyn_params['tau'] = 100
@@ -96,26 +93,35 @@ def test(seed=None):
     semanticWM.C2_params['comp_weight'] = 0
     
     conceptLTM.init_act = 0.8
-    
     control.task_params['time_pressure'] = 200
-    
+    control.set_mode('listen')
     
     # Loading data
     grammar_name = 'TCG_grammar_VB_singlehead'
-   
     my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
     my_grammar = ld.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
-        
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
     
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
     
+    return language_system_C
+
+
+def test(seed=None):
+    
+    random.seed(seed)
+    ##############################
+    ### Language schema system ###
+    ##############################
+    language_system_C = TCG_comprehension_system()
+    # Display schema system
+#    language_system_C.system2dot(image_type='png', disp=True)
+    
     option = 2
-    control.set_mode('listen')
     
     lang_inputs = {}
     lang_inputs[1] = {1:'a', 10:'woman', 20:'kick', 30:'a', 50:'man', 60:'in', 70:'blue'}
@@ -132,12 +138,12 @@ def test(seed=None):
             language_system_C.set_input(word_form)
         language_system_C.update()
     
-    phonWM_C.show_dynamics()
-    grammaticalWM_C.show_dynamics()
-    grammaticalWM_C.show_state()
+    language_system_C.schemas['Phonological_WM_C'].show_dynamics()
+    language_system_C.schemas['Grammatical_WM_C'].show_dynamics()
+    language_system_C.schemas['Grammatical_WM_C'].show_state()
     
-    semanticWM.show_dynamics()
-    semanticWM.show_SemRep()
+    language_system_C.schemas['Semantic_WM'].show_dynamics()
+    language_system_C.schemas['Semantic_WM'].show_SemRep()
 
 if __name__=='__main__':
     test(seed=None)

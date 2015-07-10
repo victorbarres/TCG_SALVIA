@@ -3,17 +3,16 @@
 @author: Victor Barres
 Test cases for a system that incoporates production and comprehension
 """
-def test(seed=None):
-    import random
-    import numpy as np
-    import schema_theory as st
-    import language_schemas as ls
-    import loader as ld
-    
-    random.seed(seed)
-    ##############################
-    ### Language schema system ###
-    ##############################
+import random
+import numpy as np
+import schema_theory as st
+import language_schemas as ls
+import loader as ld
+
+def TCG_language_system():
+    """
+    Creates and returns the TCG language schema system, including both production and comprehension.
+    """
     # Instantiating all the necessary procedural schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
@@ -73,10 +72,7 @@ def test(seed=None):
     language_system.set_input_ports([phonWM_C.find_port('from_input')])
     language_system.set_output_ports([utter.find_port('to_output')])
     
-    # Display schema system
-    language_system.system2dot(image_type='png', disp=True)
-    
-    # Parameters
+     # Parameters
     semanticWM.dyn_params['tau'] = 300
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0
@@ -116,7 +112,7 @@ def test(seed=None):
     conceptLTM.init_act = 1
     grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']*0.5
     
-    utter.params['speech_rate'] = 1
+    utter.params['speech_rate'] = 10
     
     control.task_params['time_pressure'] = 600
     
@@ -157,10 +153,19 @@ def test(seed=None):
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
     
-    option = 3
-    control.set_mode('listen')
+    return language_system
     
-    prod_rate = 10
+def test(seed=None):
+    random.seed(seed)
+
+    language_system = TCG_language_system()
+    
+    # Display schema system
+    language_system.system2dot(image_type='png', disp=True)
+    
+    option = 3
+    
+    speech_rate = language_system.schemas['Utter'].params['speech_rate']
     lang_inputs = {}
     lang_inputs[0] = ['a', 'woman', 'kick', 'a', 'man', 'in', 'blue']
     lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing ring']
@@ -172,22 +177,23 @@ def test(seed=None):
     max_time = 1000
     flag = True
     
+    language_system.schemas['Control'].set_mode('listen')
     for t in range(max_time):
-        if t>10 and np.mod(t, prod_rate) == 0 and lang_input: # Need some time to have the system set up before it receives the first input.
+        if t>10 and np.mod(t, speech_rate) == 0 and lang_input: # Need some time to have the system set up before it receives the first input.
             word_form = lang_input.pop()
             print 't: %i, receive: %s' %(t, word_form)
             language_system.set_input(word_form)
         language_system.update()
-        if semanticWM.schema_insts and flag: #Switching from comprehension to production
-            semanticWM.show_SemRep()
-            control.set_mode('produce')
+        if language_system.schemas['Semantic_WM'].schema_insts and flag: #Switching from comprehension to production
+            language_system.schemas['Semantic_WM'].show_SemRep()
+            language_system.schemas['Control'].set_mode('produce')
             flag = False
         output = language_system.get_output()
         if output:
             print 't: %i, %s' %(t, output)  
     
-    grammaticalWM_P.show_dynamics()
-    grammaticalWM_C.show_dynamics()
+    language_system.schemas['Grammatical_WM_P'].show_dynamics()
+    language_system.schemas['Grammatical_WM_C'].show_dynamics()
 
 if __name__=='__main__':
     test(seed=None)
