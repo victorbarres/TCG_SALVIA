@@ -79,8 +79,8 @@ def TCG_production_system(name='language_system_P'):
     grammaticalWM_P.dyn_params['x0'] = 0.5
     grammaticalWM_P.dyn_params['noise_mean'] = 0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
-    grammaticalWM_P.C2_params['confidence_threshold'] = 0.2
-    grammaticalWM_P.C2_params['prune_threshold'] = 0.1
+    grammaticalWM_P.C2_params['confidence_threshold'] = 0.5
+    grammaticalWM_P.C2_params['prune_threshold'] = 0.01
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
     
@@ -102,7 +102,7 @@ def TCG_production_system(name='language_system_P'):
     control.task_params['time_pressure'] = 500
     
     conceptLTM.init_act = 1
-    grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']
+    grammaticalLTM.init_act = 0.3
     
     # Loading data
     grammar_name = 'TCG_grammar_VB'

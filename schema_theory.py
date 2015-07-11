@@ -504,7 +504,7 @@ class WM(PROCEDURAL_SCHEMA):
             
         self.schema_insts.append(schema_inst)
         if not(act0):
-            act0 = schema_inst.activity # Uses the inti_activation defined by the associated schema.
+            act0 = schema_inst.activity # Uses the init_activation defined by the associated schema.
         act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.dyn_params['tau'], 'act_inf':self.dyn_params['act_inf'],
                       'L':self.dyn_params['L'], 'k':self.dyn_params['k'], 'x0':self.dyn_params['x0'],
                       'noise_mean':self.dyn_params['noise_mean'], 'noise_std':self.dyn_params['noise_std']}

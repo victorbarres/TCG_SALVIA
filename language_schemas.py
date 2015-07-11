@@ -432,8 +432,10 @@ class SEMANTIC_WM(WM):
             self.set_output('to_control', True)
         self.update_activations()
         self.update_SemRep(cpt_insts)        
-        self.prune()        
-        self.set_output('to_grammatical_WM_P', self.SemRep)
+        self.prune()
+    
+        sem_activations = dict([(inst.name, inst.activity) for inst in self.schema_insts])
+        self.set_output('to_grammatical_WM_P', sem_activations)
         
         if mode=='produce' and self.has_new_sem():
             self.set_output('to_cxn_retrieval_P', self.SemRep)
@@ -574,7 +576,7 @@ class GRAMMATICAL_WM_P(WM):
     def update(self):
         """
         """
-        SemRep = self.get_input('from_semantic_WM') # I need to tie the activity of the cxn_instances to that of the SemRep.
+        sem_activations = self.get_input('from_semantic_WM') # I need to tie the activity of the cxn_instances to that of the SemRep.
         new_cxn_insts= self.get_input('from_cxn_retrieval_P')
         produce = self.get_input('from_control')
         if new_cxn_insts:
@@ -583,7 +585,9 @@ class GRAMMATICAL_WM_P(WM):
         self.prune()
         if produce:
             self.end_competitions()
-        if produce and not(self.comp_links):
+#        if produce and not(self.comp_links):
+#            self.produce_form()
+        if not(self.comp_links):
             self.produce_form()
     
     def add_new_insts(self, new_insts):
@@ -640,13 +644,13 @@ class GRAMMATICAL_WM_P(WM):
         """
         w1 = 1 # Activation weight
         w2 = 0.2 # SemRep covered weight
-        w3 = 0 # SynForm length weight
-        
+        w3 = 0 # SynForm length weight                        
         winner = None
         max_score = None
+                
         # Computing the equivalent instance for each assemblage.
         for assemblage in assemblages:
-            eq_inst = self.assemblage2inst(assemblage)    
+            eq_inst = self.assemblage2inst(assemblage)
             sem_covered = len(eq_inst.content.SemFrame.nodes) + len(eq_inst.content.SemFrame.edges)
             form_len = len(eq_inst.content.SynForm.form)
             score = w1*eq_inst.activity + w2*sem_covered + w3*form_len # THIS NEEDS TO BE REVISED.
@@ -743,13 +747,24 @@ class GRAMMATICAL_WM_P(WM):
             
     def deactivate_coop_weigts(self, deact_weight=0):
         """
-        Sets all the coop_links that in grammatial WM to weight = deact_weight
+        Sets all the coop_links to weight = deact_weight
+        Args:
+            - deact_weight (FLOAT)
+        """
+        for coop_link in self.coop_links:
+                coop_link.weight = deact_weight
+            
+    def deactivate_coop_weigts2(self, assemblage, deact_weight=0):
+        """
+        Sets all the coop_links that are associated with an instance in assemblage to weight = deact_weight
         Instances are also placed below confidence threshold.
         Args:
             - assemblage (ASSEMBLAGE)
+            - deact_weight (FLOAT)
         """
-        for coop_links in self.coop_links:
-            coop_links.weight = deact_weight
+        for coop_link in self.coop_links:
+            if (coop_link.inst_from in assemblage.schema_insts) or (coop_link.inst_to in assemblage.schema_insts):
+                coop_link.weight = deact_weight
 
     ###############################
     ### cooperative computation ###
@@ -1936,6 +1951,6 @@ if __name__=='__main__':
     from test_TCG_comprehension import test as test_comprehension
     from test_TCG_dyad import test as test_dyad
     
-#    test_production(seed=None)
+    test_production(seed=0)
 #    test_comprehension(seed=None)
-    test_dyad(seed=0)
+#    test_dyad(seed=0)

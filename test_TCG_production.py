@@ -15,7 +15,7 @@ def test(seed=None):
     language_system_P = TCG_production_system()
     
     # Display schema system
-    language_system_P.system2dot(image_type='png', disp=True)
+#    language_system_P.system2dot(image_type='png', disp=True)
     
     conceptLTM = language_system_P.schemas['Concept_LTM']
     
@@ -69,8 +69,11 @@ def test(seed=None):
     # Define at which time the schema instances should be invoked in semantic working memory
     # Bypasses the conceptualizer bv directly setting it's output to semantic_WM.
 
-    sem_option = 3
-    end_delay = 500
+    # Parameters:
+    control = language_system_P.schemas['Control']
+    control.task_params['time_pressure'] = 600
+    sem_option = 5
+    end_delay = 1000
     
     sem_timings = {}
     sem_timings[1] = {100:[woman1]}
