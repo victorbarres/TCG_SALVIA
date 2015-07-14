@@ -438,10 +438,20 @@ class CXN:
     
     def node2form(self, node):
         """
-        Returns the form associated with the node "node"
+        Returns the form associated with the node "node" if it exists. None otherwise.
+        Args:
+            - node (TP_NODE) or (STR): Node or Node's name
         """
-        form_name =  self.SymLinks.SL[node.name]
-        form_elem = self.find_elem(form_name)
+        if isinstance(node, TP_NODE):
+            node_name = node.name
+        else:
+            node_name = node
+            
+        form_name =  self.SymLinks.SL.get(node_name, None)
+        if not(form_name):
+            return None
+        else:
+            form_elem = self.find_elem(form_name)
         return form_elem
     
     def copy(self):

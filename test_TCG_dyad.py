@@ -39,7 +39,7 @@ def test(seed=None):
     lang_inputs[3] = ['a', 'woman', 'kick', 'a', 'man']
     lang_inputs[4] = ['a', 'woman']
     
-    lang_input = lang_inputs[option]
+    lang_input = lang_inputs[option][:]
     lang_input.reverse()
     max_time = 2500
     

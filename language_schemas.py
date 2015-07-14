@@ -598,19 +598,26 @@ class GRAMMATICAL_WM_P(WM):
         """
         sem_input = self.get_input('from_semantic_WM') # I need to tie the activity of the cxn_instances to that of the SemRep.
         new_cxn_insts= self.get_input('from_cxn_retrieval_P')
-        produce = self.get_input('from_control')
+        ctrl_input = self.get_input('from_control')
         if new_cxn_insts:
             self.add_new_insts(new_cxn_insts)            
             
         self.convey_sem_activations(sem_input)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
-        if produce:
-#            self.end_competitions()
-#        if produce and not(self.comp_links):
-#            self.produce_form()
-#        if not(self.comp_links):
-            self.produce_form(sem_input)
+        if ctrl_input:
+            print self.t,
+            print ctrl_input['pressure']
+        if ctrl_input and ctrl_input['start_produce']:
+            phon_WM_output = []
+            sem_WM_output = []
+            output = self.produce_form(sem_input)
+            while output:
+                phon_WM_output.extend(output[0])
+                sem_WM_output.extend(output[1])
+                output = self.produce_form(sem_input)
+            self.set_output('to_phonological_WM_P', phon_WM_output)
+            self.set_output('to_semantic_WM', sem_WM_output)
     
     def add_new_insts(self, new_insts):
         """
@@ -640,7 +647,7 @@ class GRAMMATICAL_WM_P(WM):
             for node in sem_input:
                 inst_node = next((k for k,v in cover_nodes.items() if v==node), None) # Instances covers the node through sf_node
                 if inst_node:
-                    inst_form = inst.content.node2form(inst.content.find_elem(inst_node))
+                    inst_form = inst.content.node2form(inst_node)
                     if isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form. (Lexicalization)
                         act += sem_input[node]              
             act = act/len(cover_nodes.keys())
@@ -657,8 +664,6 @@ class GRAMMATICAL_WM_P(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input)
             if winner_assemblage and winner_assemblage.score > self.C2_params['confidence_threshold']:
                 (phon_form, missing_info, expressed) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
-                self.set_output('to_phonological_WM_P', phon_form)
-                self.set_output('to_semantic_WM', expressed)
             
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -674,6 +679,8 @@ class GRAMMATICAL_WM_P(WM):
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
+                return (phon_form, expressed)
+        return None
 
     def get_winner_assemblage(self, assemblages, sem_input):
         """
@@ -1967,21 +1974,25 @@ class CONTROL(PROCEDURAL_SCHEMA):
         # Communicating with  semantic_WM
         self.set_output('to_semantic_WM', self.state['mode'])
         
-#        # Communicating with  grammatical_WM_P
-#        if self.state['mode'] == 'produce':
-#            if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
-#                self.set_output('to_grammatical_WM_P', True)
-#                self.state['new_sem'] = False
-#            if self.get_input('from_phonological_WM_P'):
-#                self.state['last_prod_time'] = self.t
-#            if self.get_input('from_semantic_WM'):
-#                self.state['new_sem'] = True
-        
         # Communicating with grammatical_WM_P
         if self.state['mode'] == 'produce':
-            if self.t > self.task_params['start_produce']:
+            if self.get_input('from_phonological_WM_P'):
+                self.state['last_prod_time'] = self.t
+                
+            if self.get_input('from_semantic_WM'):
+                self.state['new_sem'] = True
+                
+            if self.t > self.task_params['start_produce'] and self.state['new_sem']:
                 self.state['start_produce'] = True
-        self.set_output('to_grammatical_WM_P', self.state['start_produce'])
+                self.state['new_sem'] = False
+            else:
+                self.state['start_produce'] = False
+            
+            pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramp up to 1
+         
+            output = {'start_produce':self.state['start_produce'], 'pressure':pressure}
+#            print output
+            self.set_output('to_grammatical_WM_P', output)
                 
         # Communicating with  grammatical_WM_C
         if self.state['mode'] == 'listen':
@@ -2025,7 +2036,7 @@ class TEXT2SPEECH(object):
             self.utterance = None
 ###############################################################################
 if __name__=='__main__':
-    from test_TCG_production import test as test_production
+    from test_TCG_production import test2 as test_production
     from test_TCG_comprehension import test as test_comprehension
     from test_TCG_dyad import test as test_dyad
     
