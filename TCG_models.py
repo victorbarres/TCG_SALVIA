@@ -50,6 +50,7 @@ def TCG_production_system(name='language_system_P'):
     language_system_P.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
     language_system_P.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
     language_system_P.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
+    language_system_P.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
     language_system_P.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
     language_system_P.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system_P.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
@@ -60,7 +61,7 @@ def TCG_production_system(name='language_system_P'):
     language_system_P.set_output_ports([utter.find_port('to_output')])
     
     # Parameters   
-    semanticWM.dyn_params['tau'] = 300
+    semanticWM.dyn_params['tau'] = 1000
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0
     semanticWM.dyn_params['k'] = 10.0
@@ -79,10 +80,13 @@ def TCG_production_system(name='language_system_P'):
     grammaticalWM_P.dyn_params['x0'] = 0.5
     grammaticalWM_P.dyn_params['noise_mean'] = 0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
-    grammaticalWM_P.C2_params['confidence_threshold'] = 0.5
-    grammaticalWM_P.C2_params['prune_threshold'] = 0.01
+    grammaticalWM_P.C2_params['confidence_threshold'] = 0.7
+    grammaticalWM_P.C2_params['prune_threshold'] = 0.05
     grammaticalWM_P.C2_params['coop_weight'] = 1
-    grammaticalWM_P.C2_params['comp_weight'] = -1
+    grammaticalWM_P.C2_params['comp_weight'] = -4
+    grammaticalWM_P.style_params['activation']=0.8
+    grammaticalWM_P.style_params['sem_length']=0.2
+    grammaticalWM_P.style_params['form_length']=0
     
     phonWM_P.dyn_params['tau'] = 100
     phonWM_P.dyn_params['act_inf'] = 0.0
@@ -100,12 +104,14 @@ def TCG_production_system(name='language_system_P'):
     
     control.set_mode('produce')
     control.task_params['time_pressure'] = 500
+    control.task_params['start_produce'] = 500
     
     conceptLTM.init_act = 1
     grammaticalLTM.init_act = 0.3
     
     # Loading data
     grammar_name = 'TCG_grammar_VB'
+#    grammar_name = 'TCG_grammar_VB_naming'
 
    
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")

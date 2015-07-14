@@ -391,6 +391,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
 class INST_ACTIVATION(object):
     """
     Note: Having dt and Tau is redundant... dt should be defined at the system level.
+    I have added E to gather external inputs (not carried through ports. Useful for activations across WMs.)
     """
     def __init__(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5, noise_mean=0, noise_std=0):
         self.t0 = t0
@@ -406,16 +407,18 @@ class INST_ACTIVATION(object):
         self.noise_mean= noise_mean
         self.noise_std=noise_std
         self.save_vals = {"t":[], "act":[]}
+        self.E = 0
         
     def update(self, I):
         """
         """
         noise =  random.normalvariate(self.noise_mean, self.noise_std)
-        d_act = self.dt/(self.tau)*(-self.act + self.logistic(I + noise)) + self.act_inf
+        d_act = self.dt/(self.tau)*(-self.act + self.logistic(self.E + I + noise)) + self.act_inf
         self.t += self.dt
         self.act += d_act
         self.save_vals["t"].append(self.t)
         self.save_vals["act"].append(self.act)
+        self.E = 0
     
     def logistic(self, x):
         return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
@@ -855,6 +858,7 @@ class ASSEMBLAGE(object):
         self.schema_insts = []
         self.coop_links = []
         self.activation = 0
+        self.score = 0
     
     def add_instance(self, new_inst):
         """

@@ -398,6 +398,7 @@ class SEMANTIC_WM(WM):
         self.add_port('IN', 'from_conceptualizer')
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('IN', 'from_grammatical_WM_C')
+        self.add_port('IN', 'from_grammatical_WM_P')
         self.add_port('IN', 'from_control')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_cxn_retrieval_P')
@@ -433,9 +434,14 @@ class SEMANTIC_WM(WM):
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
+        
+        expressed = self.get_input('from_grammatical_WM_P')
+        if expressed:
+            for name in expressed:
+                self.SemRep.node[name]['expressed'] = True
     
-        sem_activations = dict([(inst.name, inst.activity) for inst in self.schema_insts])
-        self.set_output('to_grammatical_WM_P', sem_activations)
+        output_to_gram = self.gram_WM_P_ouput()
+        self.set_output('to_grammatical_WM_P', output_to_gram)
         
         if mode=='produce' and self.has_new_sem():
             self.set_output('to_cxn_retrieval_P', self.SemRep)
@@ -482,15 +488,26 @@ class SEMANTIC_WM(WM):
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
-                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], new=True)
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], new=True, expressed=False)
             
             # Then add the relations
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
-                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True)
+                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True, expressed=False)
             
-#            self.show_SemRep()
+    def gram_WM_P_ouput(self):
+        """
+        Returns the output to send to gram_WM_P.
+        The signal sent to gram_WM_P contains the activation levels of the node instance that so far have not been expressed.
+        """
+        output = {}
+        for n,d in self.SemRep.nodes(data=True):
+            if not(d['expressed']):
+                output[n] = d['cpt_inst'].activity
+                
+        return output
+        
     
     def has_new_sem(self):
         """
@@ -568,27 +585,32 @@ class GRAMMATICAL_WM_P(WM):
         WM.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_cxn_retrieval_P')
-        self.add_port('OUT', 'to_phonological_WM_P')
         self.add_port('IN', 'from_control')
+        self.add_port('OUT', 'to_semantic_WM')
+        self.add_port('OUT', 'to_phonological_WM_P')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
         self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
-    
+        self.style_params = {'activation':1, 'sem_length':0, 'form_length':0}
+        self.assemblage = None
+        
     def update(self):
         """
         """
-        sem_activations = self.get_input('from_semantic_WM') # I need to tie the activity of the cxn_instances to that of the SemRep.
+        sem_input = self.get_input('from_semantic_WM') # I need to tie the activity of the cxn_instances to that of the SemRep.
         new_cxn_insts= self.get_input('from_cxn_retrieval_P')
         produce = self.get_input('from_control')
         if new_cxn_insts:
-            self.add_new_insts(new_cxn_insts)
+            self.add_new_insts(new_cxn_insts)            
+            
+        self.convey_sem_activations(sem_input)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
         if produce:
-            self.end_competitions()
+#            self.end_competitions()
 #        if produce and not(self.comp_links):
 #            self.produce_form()
-        if not(self.comp_links):
-            self.produce_form()
+#        if not(self.comp_links):
+            self.produce_form(sem_input)
     
     def add_new_insts(self, new_insts):
         """
@@ -603,16 +625,40 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def produce_form(self):
+    def convey_sem_activations(self, sem_input):
         """
+        For now, a construction receives activations from semantic working memory if 1. It's semframe covers at least one semrep that has not yet been 
+        expressed. 2. The SemFrame node that covers is linked to a TP_PHON.
+        This is more inclusive that only lexical items and should probably be replaced by:
+            - 1. Create a specific set of lexical construction
+            - 2. Define higher level consstruction which include lexical items as requiring to slot in the lexical construction.
+        """
+        for inst in self.schema_insts:
+            cover_nodes = inst.covers['nodes']
+            
+            act = 0
+            for node in sem_input:
+                inst_node = next((k for k,v in cover_nodes.items() if v==node), None) # Instances covers the node through sf_node
+                if inst_node:
+                    inst_form = inst.content.node2form(inst.content.find_elem(inst_node))
+                    if isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form. (Lexicalization)
+                        act += sem_input[node]              
+            act = act/len(cover_nodes.keys())
+            inst.activation.E += act
+
+    def produce_form(self,sem_input):
+        """
+        NOTE: There is an issue with the fact that it takes 2 steps for the fact that part of the SemRep has been expressed gets
+        registered by the semantic_WM. This leads to the repetition of the same assemblage twice.
         """
 #        self.end_competitions()
         assemblages = self.assemble()
         if assemblages:
-            winner_assemblage = self.get_winner_assemblage(assemblages)
-            if winner_assemblage.activation > self.C2_params['confidence_threshold']:
-                (phon_form, missing_info) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
+            winner_assemblage = self.get_winner_assemblage(assemblages, sem_input)
+            if winner_assemblage and winner_assemblage.score > self.C2_params['confidence_threshold']:
+                (phon_form, missing_info, expressed) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
                 self.set_output('to_phonological_WM_P', phon_form)
+                self.set_output('to_semantic_WM', expressed)
             
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -629,7 +675,7 @@ class GRAMMATICAL_WM_P(WM):
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
 
-    def get_winner_assemblage(self, assemblages):
+    def get_winner_assemblage(self, assemblages, sem_input):
         """
         Returns the winner assemblages and their equivalent instances.
         Args: 
@@ -639,27 +685,45 @@ class GRAMMATICAL_WM_P(WM):
         As for the SemRep covered weight, the constructions should receive activation from the SemRep instances. This could help directly factoring in the SemRep covered factor.
         The formula is biased by the fact that not all variables have the same range. This needs to be accounted for.   
         
-        NOTE: NEED TO SOMEHOW ACCOUNT FOR WEATHER OR NOT THE ASSEMBLAGE EXPRESSES NOVEL INFORMATION. Otherwise, I get the situation in which assemblage get reused
+        NOTE: NEED TO SOMEHOW ACCOUNT FOR WETHER OR NOT THE ASSEMBLAGE EXPRESSES NOVEL INFORMATION. Otherwise, I get the situation in which assemblage get reused
         because they are boosted by new construction while scoring higher that the novel assemblages.
         """
-        w1 = 1 # Activation weight
-        w2 = 0.2 # SemRep covered weight
-        w3 = 0 # SynForm length weight                        
+        w1 = self.style_params['activation'] # Activation weight
+        w2 = self.style_params['sem_length'] # SemRep covered weight
+        w3 = self.style_params['form_length'] # SynForm length weight     
         winner = None
-        max_score = None
-                
+        scores = {'sem_length':[], 'form_length':[], 'utterance_continuity': [], 'eq_insts':[]}
+              
         # Computing the equivalent instance for each assemblage.
+        # For each assemblage stores the values of relevant scores.
         for assemblage in assemblages:
             eq_inst = self.assemblage2inst(assemblage)
-            sem_covered = len(eq_inst.content.SemFrame.nodes) + len(eq_inst.content.SemFrame.edges)
-            form_len = len(eq_inst.content.SynForm.form)
-            score = w1*eq_inst.activity + w2*sem_covered + w3*form_len # THIS NEEDS TO BE REVISED.
+            sem_length = len([sf_node for sf_node in eq_inst.content.SemFrame.nodes if eq_inst.covers['nodes'][sf_node.name] in sem_input])
+            form = eq_inst.content.SynForm.form
+            form_length = len(form)
+            
+            scores['sem_length'].append(sem_length)
+            scores['form_length'].append(form_length)
+            scores['eq_insts'].append(eq_inst)
+        
+        # Normalize the scores
+        max_sem_length = max(scores['sem_length'])
+        max_form_length = max(scores['form_length'])
+        if max_sem_length==0 or max_form_length==0: # Doesn't return anything if there is no form or if the assemblage doesn't cover unexpressed info.
+            return None
+        scores['sem_length'] = [s/max_sem_length for s in scores['sem_length']]
+        scores['form_length'] = [s/max_form_length for s in scores['form_length']]
+        
+        max_score = None
+        for i in range(len(assemblages)):
+            score = w1*assemblages[i].activation + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i])
+            assemblages[i].score = score
             if not(max_score):
                 max_score = score
-                winner = assemblage
+                winner = assemblages[i]
             if score>max_score:
                 max_score = score
-                winner = assemblage
+                winner = assemblages[i]
         return winner
  
 #    def replace_assemblage(self, assemblage):
@@ -731,16 +795,22 @@ class GRAMMATICAL_WM_P(WM):
     def post_prod_state(self, winner_assemblage):
         """
         Sets the grammatical state after production given a winner assemblage.
+        If I use the option to not produce a winner if no assemblage covers any new SemRep nodes, don't need to set_subthreshold.
+        Except for the fact that if I don't there is repetition due to the lag between production of assemblage and registering in semWM that some elements have been expressed.
         """
         self.set_subthreshold(winner_assemblage.schema_insts)
         self.deactivate_coop_weigts()
+#        self.deactivate_coop_weigts2(winner_assemblage)
         
-    def set_subthreshold(self, insts, r=1):
+    def set_subthreshold(self, insts, r=0.8):
         """
         Sets the activation of all the instances in insts to r*confidence_threshold
         Args:
             - insts ([CXN_INST])
             - val (FLOAT)
+        NOTE:
+            If the score of the assemblage is not just the avereage cxn inst activation, the value needs to be place low enough
+            so that the system does not repeat the same utterance twice. 
         """
         for inst in insts:
             inst.set_activation(r*self.C2_params['confidence_threshold'])
@@ -1080,11 +1150,13 @@ class GRAMMATICAL_WM_P(WM):
     def form_read_out(assemblage):
         """
         Reads the phonological from generated by an assemblage by building the equivalent CXN INSTANCE.
-        Returns: (phon_form, missing_info) with:
+        Returns: (phon_form, missing_info, expressed) with:
             - phon_form = the longest consecutive TP_PHON sequence that can be uttered.
             - missing_info = pointer to the SemRep node associated with the first TP_SLOT encountered, represented the missing information.
+            - expressed = the set of semrep nodes that the assemblage expresses.
         """
         eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
+        expressed = eq_inst.trace['semrep']['nodes']
         phon_form = []
         missing_info = None
         for form in eq_inst.content.SynForm.form:
@@ -1096,7 +1168,7 @@ class GRAMMATICAL_WM_P(WM):
                 missing_info = SemRep_node
                 return (phon_form, missing_info)
       
-        return (phon_form, missing_info)
+        return (phon_form, missing_info, expressed)
     
     #######################
     ### DISPLAY METHODS ###
@@ -1880,8 +1952,8 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_grammatical_WM_C')
-        self.task_params = {'time_pressure':100}
-        self.state = {'last_prod_time':0, 'new_sem':False, 'mode':'produce'}
+        self.task_params = {'time_pressure':100, 'start_produce':1000}
+        self.state = {'last_prod_time':0, 'new_sem':False, 'mode':'produce', 'start_produce': False}
     
     def set_mode(self, mode):
         """
@@ -1895,15 +1967,21 @@ class CONTROL(PROCEDURAL_SCHEMA):
         # Communicating with  semantic_WM
         self.set_output('to_semantic_WM', self.state['mode'])
         
-        # Communicating with  grammatical_WM_P
+#        # Communicating with  grammatical_WM_P
+#        if self.state['mode'] == 'produce':
+#            if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
+#                self.set_output('to_grammatical_WM_P', True)
+#                self.state['new_sem'] = False
+#            if self.get_input('from_phonological_WM_P'):
+#                self.state['last_prod_time'] = self.t
+#            if self.get_input('from_semantic_WM'):
+#                self.state['new_sem'] = True
+        
+        # Communicating with grammatical_WM_P
         if self.state['mode'] == 'produce':
-            if ((self.t - self.state['last_prod_time']) > self.task_params['time_pressure']) and self.state['new_sem']:
-                self.set_output('to_grammatical_WM_P', True)
-                self.state['new_sem'] = False
-            if self.get_input('from_phonological_WM_P'):
-                self.state['last_prod_time'] = self.t
-            if self.get_input('from_semantic_WM'):
-                self.state['new_sem'] = True
+            if self.t > self.task_params['start_produce']:
+                self.state['start_produce'] = True
+        self.set_output('to_grammatical_WM_P', self.state['start_produce'])
                 
         # Communicating with  grammatical_WM_C
         if self.state['mode'] == 'listen':
