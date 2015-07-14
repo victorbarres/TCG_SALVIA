@@ -15,6 +15,8 @@ def test(seed=None):
     # Display schema system
     language_system.system2dot(image_type='png', disp=True)
     
+    language_system.schemas['Control'].task_params['start_produce'] = 100
+    
     option = 3
     
     language_system.schemas['Utter'].params['speech_rate'] = 40
@@ -37,7 +39,6 @@ def test(seed=None):
             word_form = lang_input.pop()
             print 't: %i, VB says: %s' %(t, word_form)
             language_system.set_input(word_form)
-        language_system.update()
         if language_system.schemas['Semantic_WM'].schema_insts and flag: #Switching from comprehension to production
             language_system.schemas['Semantic_WM'].show_SemRep()
             language_system.schemas['Control'].set_mode('produce')
@@ -45,7 +46,8 @@ def test(seed=None):
             print "Agt1 speaks."
         output = language_system.get_output()
         if output:
-            print 't: %i, Agt1 says: %s' %(t, output)  
+            print 't: %i, Agt1 says: %s' %(t, output)
+        language_system.update()
     
     language_system.schemas['Grammatical_WM_P'].show_dynamics()
     language_system.schemas['Grammatical_WM_C'].show_dynamics()

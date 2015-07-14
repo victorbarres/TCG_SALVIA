@@ -1989,7 +1989,10 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         self.state['mode'] = mode
         self.state['last_prod_time'] = self.t
-        self.task_params['start_produce'] += self.t
+        self.state['start_produce'] = False
+        self.state['unexpressed_sem'] = False
+        if mode =='produce':
+            self.task_params['start_produce'] += self.t
     
     def update(self):
         """

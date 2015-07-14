@@ -279,7 +279,7 @@ def TCG_language_system(name='language_system'):
     language_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
     language_system.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
     language_system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
-    language_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
+    language_system.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
     language_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
     language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
@@ -317,7 +317,7 @@ def TCG_language_system(name='language_system'):
     grammaticalWM_P.dyn_params['x0'] = 0.5
     grammaticalWM_P.dyn_params['noise_mean'] = 0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
-    grammaticalWM_P.C2_params['confidence_threshold'] = 0.5
+    grammaticalWM_P.C2_params['confidence_threshold'] = 0.7
     grammaticalWM_P.C2_params['prune_threshold'] = 0.01
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -1
@@ -342,8 +342,8 @@ def TCG_language_system(name='language_system'):
     
     utter.params['speech_rate'] = 10
     
-    control.task_params['time_pressure'] = 500
-    control.task_params['start_produce'] = 500
+    control.task_params['time_pressure'] = 200
+    control.task_params['start_produce'] = 300
     
     phonWM_C.dyn_params['tau'] = 100
     phonWM_C.dyn_params['act_inf'] = 0.0

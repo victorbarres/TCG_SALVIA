@@ -4,12 +4,8 @@
 Test cases for a system that incoporates production and comprehension
 """
 import random
-import numpy as np
 
 from TCG_models import TCG_language_system
-
-import viewer
-
     
 def test(seed=None):
     """
@@ -47,7 +43,7 @@ def test(seed=None):
     flag2 = True
     print "VB speaks. Agt1 listens"
     for t in range(max_time):
-        if t>10 and np.mod(t, speech_rate) == 0 and lang_input: # Need some time to have the system set up before it receives the first input.
+        if t>10 and (t % speech_rate == 0) and lang_input: # Need some time to have the system set up before it receives the first input.
             word_form = lang_input.pop()
             print 't: %i, VB says: %s' %(t, word_form)
             language_system_1.set_input(word_form)
