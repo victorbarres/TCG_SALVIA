@@ -29,8 +29,10 @@ def test(seed=None):
     description_system.set_input(my_scene)
     description_system.verbose = False
     
+    description_system.schemas['Control'].task_params['start_produce'] = 300
+    
     # Running the schema system
-    time = 1000
+    time = 900
     for t in range(time):
         description_system.update()
         output = description_system.get_output()
@@ -45,4 +47,4 @@ def test(seed=None):
     #description_system.save_sim('./tmp/test_description_output.json')
 
 if __name__ == '__main__':
-    test(seed=None)
+    test(seed=0)

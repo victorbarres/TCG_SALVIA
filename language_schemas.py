@@ -815,6 +815,7 @@ class GRAMMATICAL_WM_P(WM):
         Except for the fact that if I don't there is repetition due to the lag between production of assemblage and registering in semWM that some elements have been expressed.
         """
         self.set_subthreshold(winner_assemblage.schema_insts)
+        self.set_winners(winner_assemblage)
         self.deactivate_coop_weigts()
 #        self.deactivate_coop_weigts2(winner_assemblage)
         
@@ -839,6 +840,18 @@ class GRAMMATICAL_WM_P(WM):
         """
         for coop_link in self.coop_links:
                 coop_link.weight = deact_weight
+    
+    def set_winners(self, winner_assemblage):
+        """
+        Kills all the instances that are in competition with an instances that has been chosen in a winner assemblage.
+        """
+        winner_insts = winner_assemblage.schema_insts
+        for link in self.comp_links:
+            if link.inst_from in winner_insts:
+                link.inst_to.alive = False
+            if link.inst_to in winner_insts:
+                link.inst_from.alive = False
+        self.prune()
             
     def deactivate_coop_weigts2(self, assemblage, deact_weight=0):
         """
