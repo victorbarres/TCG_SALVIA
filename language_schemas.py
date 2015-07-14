@@ -430,7 +430,6 @@ class SEMANTIC_WM(WM):
         if cpt_insts:
             for inst in cpt_insts:
                self.add_instance(inst) # Does not deal with updating already existing nodes. Need to add that.
-            self.set_output('to_control', True)
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
@@ -445,6 +444,8 @@ class SEMANTIC_WM(WM):
         
         if mode=='produce' and self.has_new_sem():
             self.set_output('to_cxn_retrieval_P', self.SemRep)
+        if mode=='produce':
+            self.set_output('to_control', self.has_unexpressed_sem())
     
     def instantiate_cpts(self, SemFrame, cpt_schemas):
         """
@@ -521,6 +522,16 @@ class SEMANTIC_WM(WM):
             if d['new']:
                 return True
         return False
+    
+    def has_unexpressed_sem(self):
+        """
+        Returns true if there is at least 1 unexpresed node in the SemRep. False otherwise.
+        """
+        for n,d in self.SemRep.nodes(data=True):
+            if not(d['expressed']):
+                return True
+        return False
+        
         
     #######################
     ### DISPLAY METHODS ###
@@ -605,17 +616,14 @@ class GRAMMATICAL_WM_P(WM):
         self.convey_sem_activations(sem_input)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
-        if ctrl_input:
-            print self.t,
-            print ctrl_input['pressure']
         if ctrl_input and ctrl_input['start_produce']:
             phon_WM_output = []
             sem_WM_output = []
-            output = self.produce_form(sem_input)
+            output = self.produce_form(sem_input,ctrl_input)
             while output:
                 phon_WM_output.extend(output[0])
                 sem_WM_output.extend(output[1])
-                output = self.produce_form(sem_input)
+                output = self.produce_form(sem_input,ctrl_input)
             self.set_output('to_phonological_WM_P', phon_WM_output)
             self.set_output('to_semantic_WM', sem_WM_output)
     
@@ -653,7 +661,7 @@ class GRAMMATICAL_WM_P(WM):
             act = act/len(cover_nodes.keys())
             inst.activation.E += act
 
-    def produce_form(self,sem_input):
+    def produce_form(self,sem_input, ctrl_input):
         """
         NOTE: There is an issue with the fact that it takes 2 steps for the fact that part of the SemRep has been expressed gets
         registered by the semantic_WM. This leads to the repetition of the same assemblage twice.
@@ -662,7 +670,8 @@ class GRAMMATICAL_WM_P(WM):
         assemblages = self.assemble()
         if assemblages:
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input)
-            if winner_assemblage and winner_assemblage.score > self.C2_params['confidence_threshold']:
+            threshold = self.C2_params['confidence_threshold']
+            if winner_assemblage and winner_assemblage.score > threshold:
                 (phon_form, missing_info, expressed) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
             
                 # Option1: Replace the assemblage by it's equivalent instance
@@ -1960,13 +1969,14 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.task_params = {'time_pressure':100, 'start_produce':1000}
-        self.state = {'last_prod_time':0, 'new_sem':False, 'mode':'produce', 'start_produce': False}
+        self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'start_produce': False}
     
     def set_mode(self, mode):
         """
         """
         self.state['mode'] = mode
         self.state['last_prod_time'] = self.t
+        self.task_params['start_produce'] += self.t
     
     def update(self):
         """
@@ -1979,17 +1989,21 @@ class CONTROL(PROCEDURAL_SCHEMA):
             if self.get_input('from_phonological_WM_P'):
                 self.state['last_prod_time'] = self.t
                 
-            if self.get_input('from_semantic_WM'):
-                self.state['new_sem'] = True
+            self.state['unexpressed_sem'] = self.get_input('from_semantic_WM')
+            
+            if self.t == self.task_params['start_produce']:
+                self.state['last_prod_time'] = self.t
                 
-            if self.t > self.task_params['start_produce'] and self.state['new_sem']:
+            if self.t >= self.task_params['start_produce'] and self.state['unexpressed_sem']:
                 self.state['start_produce'] = True
-                self.state['new_sem'] = False
             else:
                 self.state['start_produce'] = False
             
-            pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramp up to 1
-         
+            if self.t < self.task_params['start_produce']:
+                pressure = 0
+            else:
+                pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramp up to 1
+
             output = {'start_produce':self.state['start_produce'], 'pressure':pressure}
 #            print output
             self.set_output('to_grammatical_WM_P', output)
