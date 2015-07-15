@@ -9,10 +9,6 @@ from TCG_models import TCG_language_system
     
 def test(seed=None):
     """
-    NOTE: The dyad cannot be run for now.
-    There is an important issue to sove with respect to the handling of the conceptual knowledge. 
-    When conceptual knowledge is being loaded the first time, it alters the concept class. When loaded a second time, the new conceptual knowledge
-    will overide the first one in the concept class... This needs to be changed.
     """
     random.seed(seed)
 
