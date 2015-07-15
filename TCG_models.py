@@ -305,7 +305,7 @@ def TCG_language_system(name='language_system'):
     language_system.set_output_ports([utter.find_port('to_output')])
     
      # Parameters
-    semanticWM.dyn_params['tau'] = 300.0
+    semanticWM.dyn_params['tau'] = 1000.0
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0
     semanticWM.dyn_params['k'] = 10.0
@@ -353,7 +353,7 @@ def TCG_language_system(name='language_system'):
     utter.params['speech_rate'] = 10.0
     
     control.task_params['time_pressure'] = 200.0
-    control.task_params['start_produce'] = 300.0
+    control.task_params['start_produce'] = 400.0
     
     phonWM_C.dyn_params['tau'] = 100.0
     phonWM_C.dyn_params['act_inf'] = 0.0

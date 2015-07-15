@@ -610,7 +610,7 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_P')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
+        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
         self.style_params = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0}
         
     def update(self):
@@ -1500,7 +1500,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
+        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':0, 'comp_asymmetry':0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
         self.pred_params = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
@@ -1552,8 +1552,11 @@ class GRAMMATICAL_WM_C(WM):
             for inst in [i for i in self.schema_insts if not(i.has_predicted)]:
                 inst_pred = inst.cxn_predictions()
                 pred_classes= pred_classes.union(inst_pred)
-        predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
-            
+        if pred_classes:
+            predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
+            print predictions
+        else:
+            predictions = None
         self.set_output('to_cxn_retrieval_C', predictions)
     
     def scanner(self, phon_inst):

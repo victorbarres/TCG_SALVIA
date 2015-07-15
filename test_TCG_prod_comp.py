@@ -23,7 +23,7 @@ def test(seed=None):
     speech_rate = language_system.schemas['Utter'].params['speech_rate']
     lang_inputs = {}
     lang_inputs[0] = ['a', 'woman', 'kick', 'a', 'man', 'in', 'blue']
-    lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing ring']
+    lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing', 'ring']
     lang_inputs[2] = ['a', 'woman', 'who', 'is', 'pretty', 'kick', 'a', 'man', 'in', 'blue']
     lang_inputs[3] = ['a', 'woman', 'kick', 'a', 'man']
     

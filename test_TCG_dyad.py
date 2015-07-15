@@ -20,13 +20,13 @@ def test(seed=None):
     language_system_1.schemas['Control'].set_mode('listen')
     language_system_2.schemas['Control'].set_mode(None)
     
-    option = 4
+    option = 3
     speech_rate = 100
     language_system_1.schemas['Utter'].params['speech_rate'] = speech_rate
     language_system_2.schemas['Utter'].params['speech_rate'] = speech_rate
     lang_inputs = {}
     lang_inputs[0] = ['a', 'woman', 'kick', 'a', 'man', 'in', 'blue']
-    lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing ring']
+    lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing', 'ring']
     lang_inputs[2] = ['a', 'woman', 'who', 'is', 'pretty', 'kick', 'a', 'man', 'in', 'blue']
     lang_inputs[3] = ['a', 'woman', 'kick', 'a', 'man']
     lang_inputs[4] = ['a', 'woman']

@@ -438,7 +438,7 @@
 	{
 		"name" : "ADJ_NOUN",
 		"class" : "N",
-		"preference" : 1.5,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{

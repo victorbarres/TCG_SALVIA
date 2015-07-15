@@ -500,7 +500,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.coop_links = []
         self.comp_links = []
         self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
-        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8}
+        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1, 'comp_asymmetry':0}
         self.save_state = {'insts':{}}
        
     def add_instance(self,schema_inst, act0=None):
@@ -524,7 +524,7 @@ class WM(PROCEDURAL_SCHEMA):
     def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None):
         if weight == None:
             weight=self.C2_params['coop_weight']
-        new_link = COOP_LINK(inst_from, inst_to, weight*qual)
+        new_link = COOP_LINK(inst_from, inst_to, weight*qual, self.C2_params['coop_asymmetry'])
         new_link.set_connect(port_from, port_to)
         self.coop_links.append(new_link)
 
@@ -561,7 +561,7 @@ class WM(PROCEDURAL_SCHEMA):
     def add_comp_link(self, inst_from, inst_to, weight=None):
         if weight == None:
             weight=self.C2_params['comp_weight']
-        new_link = COMP_LINK(inst_from, inst_to, weight)
+        new_link = COMP_LINK(inst_from, inst_to, weight, self.C2_params['comp_asymmetry'])
         self.comp_links.append(new_link)
     
     def find_comp_links(self,inst_from='any', inst_to='any'):
@@ -816,7 +816,7 @@ class COOP_LINK(F_LINK):
         
     NOTE: I need to experiment with the possibility to have 
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=1.0): # Test of having assymetric weights
+    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0):
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)

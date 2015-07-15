@@ -55,12 +55,12 @@ def test2(seed=None):
     # Display schema system
     language_system_C.system2dot(image_type='png', disp=True)
     
-    option = 1
-    speech_rate = 10
+    option = 4
+    speech_rate = 100
     
     lang_inputs = {}
     lang_inputs[0] = ['a', 'woman', 'kick', 'a', 'man', 'in', 'blue']
-    lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing ring']
+    lang_inputs[1] = ['a', 'woman', 'kick', 'a', 'man', 'in',  'a', 'blue', 'boxing', 'ring']
     lang_inputs[2] = ['a', 'woman', 'who', 'is', 'pretty', 'kick', 'a', 'man', 'in', 'blue']
     lang_inputs[3] = ['a', 'woman', 'kick', 'a', 'man']
     lang_inputs[4] = ['a', 'woman']
@@ -80,7 +80,7 @@ def test2(seed=None):
     language_system_C.schemas['Grammatical_WM_C'].show_dynamics()
     language_system_C.schemas['Grammatical_WM_C'].show_state()
     
-    language_system_C.schemas['Semantic_WM'].show_dynamics()
+#    language_system_C.schemas['Semantic_WM'].show_dynamics()
     language_system_C.schemas['Semantic_WM'].show_SemRep()
 
 if __name__=='__main__':
