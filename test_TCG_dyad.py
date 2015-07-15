@@ -53,6 +53,8 @@ def test(seed=None):
         word_form1 = language_system_1.get_output()
         if word_form1 and flag2:
             language_system_2.schemas['Control'].set_mode('listen')
+            language_system_2.update() # Cheat!! Need to set up the system so that it's ready to receive the utterance...
+            language_system_2.update()
             print 't: %i, Agt1 says: %s' %(t, word_form1)  
             language_system_2.set_input(word_form1)
         

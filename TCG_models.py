@@ -353,7 +353,7 @@ def TCG_language_system(name='language_system'):
     utter.params['speech_rate'] = 10.0
     
     control.task_params['time_pressure'] = 200.0
-    control.task_params['start_produce'] = 400.0
+    control.task_params['start_produce'] = 200.0
     
     phonWM_C.dyn_params['tau'] = 100.0
     phonWM_C.dyn_params['act_inf'] = 0.0

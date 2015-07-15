@@ -1554,7 +1554,6 @@ class GRAMMATICAL_WM_C(WM):
                 pred_classes= pred_classes.union(inst_pred)
         if pred_classes:
             predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
-            print predictions
         else:
             predictions = None
         self.set_output('to_cxn_retrieval_C', predictions)
