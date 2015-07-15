@@ -2,6 +2,8 @@
 	{
 		"name" : "CNJ_AND",
 		"class" : "S",
+		"preference" : 1,
+		"group": 3,
 		"SemFrame" :
 		{
 			"nodes" : [	{"name" : "EVT1", "concept" : "ACTION", "focus" : true, "head" : true}, 
@@ -17,6 +19,8 @@
 	{
 		"name" : "CNJ_WHILE",
 		"class" : "S",
+		"preference" : 1,
+		"group": 3,
 		"SemFrame" :
 		{
 			"nodes" : [	{"name" : "EVT1", "concept" : "ACTION", "focus" : true, "head" : true}, 
@@ -32,7 +36,8 @@
 	{
 		"name" : "SVO",
 		"class" : "S",
-		"preference" : 1,
+		"preference" : 2,
+		"group": 1.5,
 		"SemFrame" :
 		{
 			"nodes" : [	{"name" : "AGT", "concept" : "ENTITY", "focus" : true, "head" : false},
@@ -50,6 +55,8 @@
 	{
 		"name" : "PAS_SVO",
 		"class" : "S",
+		"preference" : 2,
+		"group": 0.5,
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "AGT", "concept" : "ENTITY", "focus" : false, "head" : false},
@@ -61,43 +68,49 @@
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
 					{"name" : "S2", "type" : "PHON", "phon" : "is"},
 					{"name" : "S3", "type" : "SLOT", "classes" : ["VP", "V"]},
-					{"name" : "S4", "type" : "PHON", "phon" : "-ed by"},
-					{"name" : "S5", "type" : "SLOT", "classes" : ["NP"]}],
-		"SymLinks" : {"PT" : "S1", "ACT" : "S3", "AGT" : "S5"}			
+					{"name" : "S4", "type" : "PHON", "phon" : "-ed"},
+					{"name" : "S5", "type" : "PHON", "phon" : "by"},
+					{"name" : "S6", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"PT" : "S1", "ACT" : "S3", "AGT" : "S6"}			
 	},
 	
 	{
 		"name" : "EXIST_S",
 		"class" : "S",
 		"preference": 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "THEME", "concept" : "OBJECT", "focus" : false, "head" : true}],
 			"edges" : []
 		},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "there is"},
-					{"name" : "S2", "type" : "SLOT", "classes" : ["NP"]}],
-		"SymLinks" : {"THEME" : "S2"}	
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "there"},
+					{"name" : "S2", "type" : "PHON", "phon" : "is"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"THEME" : "S3"}	
 	},
 	
 	{
 		"name" : "THEME_S",
 		"class" : "S",
 		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "THEME", "concept" : "PLACE", "focus" : false, "head" : true}],
 			"edges" : []
 		},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "it is"},
-					{"name" : "S2", "type" : "SLOT", "classes" : ["NP"]}],
-		"SymLinks" : {"THEME" : "S2"}				
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "it"},
+					{"name" : "S2", "type" : "PHON", "phon" : "is"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"THEME" : "S3"}				
 	},
 	
 	{
 		"name" : "SPA",
 		"class" : "S",
 		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : true, "head" : true},
@@ -115,6 +128,7 @@
 		"name" : "SV",
 		"class" : "S",
 		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "SUBJ", "concept" : "ENTITY", "focus" : true, "head" : false},
@@ -130,6 +144,7 @@
 		"name" : "PP_IN",
 		"class" : "S",
 		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "ACTION", "focus" : false, "head" : true},
@@ -144,6 +159,8 @@
 	{
 		"name" : "REL_SVO_WHO",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
@@ -162,6 +179,8 @@
 	{
 		"name" : "REL_SVO_WHICH",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ITEM", "focus" : false, "head" : true},
@@ -180,6 +199,8 @@
 	{
 		"name" : "REL_SV_WHO",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
@@ -195,6 +216,8 @@
 	{
 		"name" : "REL_SV_WHICH",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ITEM", "focus" : false, "head" : true},
@@ -210,6 +233,8 @@
 	{
 		"name" : "REL_PAS_SVO_WHO",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
@@ -219,16 +244,20 @@
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
-					{"name" : "S2", "type" : "PHON", "phon" : "who is"},
-					{"name" : "S3", "type" : "SLOT", "classes" : ["VP", "V"]},
-					{"name" : "S4", "type" : "PHON", "phon" : "-ed by"},
-					{"name" : "S5", "type" : "SLOT", "classes" : ["NP"]}],
-		"SymLinks" : {"OBJ" : "S1", "ACTION" : "S3", "SUBJ" : "S5"}		
+					{"name" : "S2", "type" : "PHON", "phon" : "who"},
+					{"name" : "S3", "type" : "PHON", "phon" : "is"},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["VP", "V"]},
+					{"name" : "S5", "type" : "PHON", "phon" : "-ed"},
+					{"name" : "S6", "type" : "PHON", "phon" : "by"},
+					{"name" : "S7", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"OBJ" : "S1", "ACTION" : "S4", "SUBJ" : "S7"}		
 	},
 
 	{
 		"name" : "REL_SPA_WHO",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
@@ -236,14 +265,16 @@
 			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
-					{"name" : "S2", "type" : "PHON", "phon" : "who is"},
-					{"name" : "S3", "type" : "SLOT", "classes" : ["A"]}],
-		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S3"}		
+					{"name" : "S2", "type" : "PHON", "phon" : "who"},
+					{"name" : "S3", "type" : "PHON", "phon" : "is"},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["A"]}],
+		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S4"}		
 	},
 
 	{
 		"name" : "REL_SPA_WHICH",
 		"class" : "N",
+		"preference" : 1,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "ITEM", "focus" : false, "head" : true},
@@ -251,14 +282,16 @@
 			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
-					{"name" : "S2", "type" : "PHON", "phon" : "which is"},
-					{"name" : "S3", "type" : "SLOT", "classes" : ["A"]}],
-		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S3"}		
+					{"name" : "S2", "type" : "PHON", "phon" : "which"},
+					{"name" : "S3", "type" : "PHON", "phon" : "is"},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["A"]}],
+		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S4"}		
 	},
 
 	{
 		"name" : "REL_SVO_WHO_NR",
 		"class" : "NP",
+		"preference" : 1,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
@@ -277,6 +310,8 @@
 	{
 		"name" : "REL_SVO_WHICH_NR",
 		"class" : "NP",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ITEM", "focus" : false, "head" : true},
@@ -295,6 +330,8 @@
 	{
 		"name" : "REL_SV_WHO_NR",
 		"class" : "NP",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
@@ -310,6 +347,8 @@
 	{
 		"name" : "REL_SV_WHICH_NR",
 		"class" : "NP",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ITEM", "focus" : false, "head" : true},
@@ -325,6 +364,8 @@
 	{
 		"name" : "REL_PAS_SVO_WHO_NR",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
@@ -334,16 +375,20 @@
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
-					{"name" : "S2", "type" : "PHON", "phon" : "who is"},
-					{"name" : "S3", "type" : "SLOT", "classes" : ["VP", "V"]},
-					{"name" : "S4", "type" : "PHON", "phon" : "-ed by"},
-					{"name" : "S5", "type" : "SLOT", "classes" : ["NP"]}],
-		"SymLinks" : {"OBJ" : "S1", "ACTION" : "S3", "SUBJ" : "S5"}		
+					{"name" : "S2", "type" : "PHON", "phon" : "who"},
+					{"name" : "S3", "type" : "PHON", "phon" : "is"},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["VP", "V"]},
+					{"name" : "S5", "type" : "PHON", "phon" : "-ed"},
+					{"name" : "S6", "type" : "PHON", "phon" : "by"},
+					{"name" : "S7", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"OBJ" : "S1", "ACTION" : "S4", "SUBJ" : "S7"}		
 	},
 
 	{
 		"name" : "REL_SPA_WHO_NR",
 		"class" : "NP",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
@@ -351,14 +396,17 @@
 			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
-					{"name" : "S2", "type" : "PHON", "phon" : "who is"},
-					{"name" : "S3", "type" : "SLOT", "classes" : ["A"]}],
-		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S3"}		
+					{"name" : "S2", "type" : "PHON", "phon" : "who"},
+					{"name" : "S3", "type" : "PHON", "phon" : "is"},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["A"]}],
+		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S4"}		
 	},
 
 	{
 		"name" : "REL_SPA_WHICH_NR",
 		"class" : "NP",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "ITEM", "focus" : false, "head" : true},
@@ -366,14 +414,17 @@
 			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
-					{"name" : "S2", "type" : "PHON", "phon" : "which is"},
-					{"name" : "S3", "type" : "SLOT", "classes" : ["A"]}],
-		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S3"}		
+					{"name" : "S2", "type" : "PHON", "phon" : "which"},
+					{"name" : "S3", "type" : "PHON", "phon" : "is"},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["A"]}],
+		"SymLinks" : {"OBJ" : "S1", "ATTR" : "S4"}		
 	},
 	
 	{
 		"name" : "A_DET_NOUN",
 		"class" : "NP",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : true}],
@@ -387,6 +438,8 @@
 	{
 		"name" : "ADJ_NOUN",
 		"class" : "N",
+		"preference" : 1.5,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : true},
@@ -401,6 +454,8 @@
 	{
 		"name" : "IN_COLOR",
 		"class" : "N",
+		"preference" : 1,
+		"group": 2,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "HUMAN", "concept" : "HUMAN", "focus" : false, "head" : true},
@@ -419,6 +474,8 @@
 	{
 		"name" : "HIT",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "HIT", "focus" : false, "head" : true}],
 					"edges" : []
@@ -430,6 +487,8 @@
 	{
 		"name" : "KICK",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "KICK", "focus" : false, "head" : true}],
 					"edges" : []
@@ -441,6 +500,8 @@
 	{
 		"name" : "WEAR",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "WEAR", "focus" : false, "head" : true}],
 					"edges" : []
@@ -452,6 +513,8 @@
 	{
 		"name" : "LAUGH",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "LAUGH", "focus" : false, "head" : true}],
 					"edges" : []
@@ -463,6 +526,8 @@
 	{
 		"name" : "WATCH",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "WATCH", "focus" : false, "head" : true}],
 					"edges" : []
@@ -474,28 +539,36 @@
 	{
 		"name" : "TALK",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "TALK", "focus" : false, "head" : true}],
 					"edges" : []
 					},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "talk to"}],
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "talk"},
+					{"name" : "S2", "type" : "PHON", "phon" : "to"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
 
 	{
 		"name" : "SQUIRT",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "SQUIRT", "focus" : false, "head" : true}],
 					"edges" : []
 					},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "squirt at"}],
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "squirt"},
+					{"name" : "S2", "type" : "PHON", "phon" : "at"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
 	
 	{
 		"name" : "SPLASH",
 		"class" : "V",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "SPLASH", "focus" : false, "head" : true}],
 					"edges" : []
@@ -507,6 +580,8 @@
 	{
 		"name" : "BLUE",
 		"class" : "A",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BLUE", "focus" : false, "head" : true}],
 					"edges" : []
@@ -518,6 +593,8 @@
 	{
 		"name" : "BLACK",
 		"class" : "A",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BLACK", "focus" : false, "head" : true}],
 					"edges" : []
@@ -529,6 +606,8 @@
 	{
 		"name" : "GREEN",
 		"class" : "A",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "GREEN", "focus" : false, "head" : true}],
 					"edges" : []
@@ -540,6 +619,8 @@
 	{
 		"name" : "SMALL",
 		"class" : "A",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "SMALL", "focus" : false, "head" : true}],
 					"edges" : []
@@ -551,6 +632,8 @@
 	{
 		"name" : "BIG",
 		"class" : "A",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BIG", "focus" : false, "head" : true}],
 					"edges" : []
@@ -562,6 +645,8 @@
 	{
 		"name" : "HANDSOME",
 		"class" : "A",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "HANDSOME", "focus" : false, "head" : true}],
 					"edges" : []
@@ -573,6 +658,8 @@
 	{
 		"name" : "PRETTY",
 		"class" : "A",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "PRETTY", "focus" : false, "head" : true}],
 					"edges" : []
@@ -584,6 +671,8 @@
 	{
 		"name" : "WOMAN",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "WOMAN", "focus" : false, "head" : true}],
 					"edges" : []
@@ -595,6 +684,8 @@
 	{
 		"name" : "WOMAN2",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "WOMAN", "focus" : false, "head" : true}],
 					"edges" : []
@@ -606,6 +697,8 @@
 	{
 		"name" : "MAN",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "MAN", "focus" : false, "head" : true}],
 					"edges" : []
@@ -617,6 +710,8 @@
 	{
 		"name" : "GIRL",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "GIRL", "focus" : false, "head" : true}],
 					"edges" : []
@@ -627,6 +722,8 @@
 	{
 		"name" : "BOY",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BOY", "focus" : false, "head" : true}],
 					"edges" : []
@@ -638,6 +735,8 @@
 	{
 		"name" : "PEOPLE",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "PEOPLE", "focus" : false, "head" : true}],
 					"edges" : []
@@ -649,6 +748,8 @@
 	{
 		"name" : "MOUSE",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "MOUSE", "focus" : false, "head" : true}],
 					"edges" : []
@@ -660,6 +761,8 @@
 	{
 		"name" : "TURTLE",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "TURTLE", "focus" : false, "head" : true}],
 					"edges" : []
@@ -671,6 +774,8 @@
 	{
 		"name" : "DRESS",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "DRESS", "focus" : false, "head" : true}],
 					"edges" : []
@@ -682,6 +787,8 @@
 	{
 		"name" : "TSHIRT",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "TSHIRT", "focus" : false, "head" : true}],
 					"edges" : []
@@ -693,17 +800,22 @@
 	{
 		"name" : "BOXINGRING",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BOXINGRING", "focus" : false, "head" : true}],
 					"edges" : []
 					},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boxing ring"}],
-		"SymLinks" : {"N1" : "S1"}
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boxing"},
+					{"name" : "S2", "type" : "PHON", "phon" : "ring"}],
+		"SymLinks" : {"N1" : "S2"}
 	},
 
 	{
 		"name" : "PARK",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "PARK", "focus" : false, "head" : true}],
 					"edges" : []
@@ -715,6 +827,8 @@
 	{
 		"name" : "SHIRT",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "SHIRT", "focus" : false, "head" : true}],
 					"edges" : []
@@ -726,6 +840,8 @@
 	{
 		"name" : "SUIT",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "SUIT", "focus" : false, "head" : true}],
 					"edges" : []
@@ -737,6 +853,8 @@
 	{
 		"name" : "CELLO",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "CELLO", "focus" : false, "head" : true}],
 					"edges" : []
@@ -748,6 +866,8 @@
 	{
 		"name" : "BAG",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BAG", "focus" : false, "head" : true}],
 					"edges" : []
@@ -759,17 +879,22 @@
 	{
 		"name" : "WATERING_CAN",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "WATERING_CAN", "focus" : false, "head" : true}],
 					"edges" : []
 					},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "watering can"}],
-		"SymLinks" : {"N1" : "S1"}
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "watering"},
+					{"name" : "S2", "type" : "PHON", "phon" : "can"}],
+		"SymLinks" : {"N1" : "S2"}
 	},
 		
 	{
 		"name" : "BALLERINA",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BALLERINA", "focus" : false, "head" : true}],
 					"edges" : []
@@ -781,6 +906,8 @@
 	{
 		"name" : "CELLIST",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "CELLIST", "focus" : false, "head" : true}],
 					"edges" : []
@@ -792,6 +919,8 @@
 	{
 		"name" : "FENCER",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "FENCER", "focus" : false, "head" : true}],
 					"edges" : []
@@ -803,6 +932,8 @@
 	{
 		"name" : "ROBBER",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "ROBBER", "focus" : false, "head" : true}],
 					"edges" : []
@@ -814,6 +945,8 @@
 	{
 		"name" : "POLICEMAN",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "POLICEMAN", "focus" : false, "head" : true}],
 					"edges" : []
@@ -823,8 +956,10 @@
 	},
 		
 	{
-		"name" : "hunter",
+		"name" : "HUNTER",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "HUNTER", "focus" : false, "head" : true}],
 					"edges" : []
@@ -836,6 +971,8 @@
 	{
 		"name" : "DOG",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "DOG", "focus" : false, "head" : true}],
 					"edges" : []
@@ -847,6 +984,8 @@
 	{
 		"name" : "HOOK",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "HOOK", "focus" : false, "head" : true}],
 					"edges" : []
@@ -858,6 +997,8 @@
 	{
 		"name" : "BOOKSHELF",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BOOKSHELF", "focus" : false, "head" : true}],
 					"edges" : []
@@ -869,6 +1010,8 @@
 	{
 		"name" : "WAGON",
 		"class" : "N",
+		"preference" : 1,
+		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "WAGON", "focus" : false, "head" : true}],
 					"edges" : []

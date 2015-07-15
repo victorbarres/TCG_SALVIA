@@ -17,6 +17,8 @@ import time
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
+
 import networkx as nx
 import json
 
@@ -735,13 +737,15 @@ class WM(PROCEDURAL_SCHEMA):
         """
         state = nx.DiGraph()
         for inst in self.schema_insts:
-            state.add_node(inst.name, activation= inst.activity)
+            state.add_node(inst.name, activation=inst.activity)
         for link in self.coop_links:
-            state.add_edge(link.inst_from.name, link.inst_to.name, type="coop")
-            state.add_edge(link.inst_to.name, link.inst_from.name, type="coop")
+            state.add_edge(link.inst_from.name, link.inst_to.name, type="coop", weight=link.weight)
+            if link.asymmetry_coef < 1:
+                state.add_edge(link.inst_to.name, link.inst_from.name, type="coop", weight=link.weight*(1-link.asymmetry_coef))
         for link in self.comp_links:
-            state.add_edge(link.inst_from.name, link.inst_to.name, type="comp")
-            state.add_edge(link.inst_to.name, link.inst_from.name, type="comp")
+            state.add_edge(link.inst_from.name, link.inst_to.name, type="comp", weight=link.weight)
+            if link.asymmetry_coef < 1:
+                state.add_edge(link.inst_to.name, link.inst_from.name, type="comp", weight=link.weight*(1-link.asymmetry_coef))
             
         pos = nx.spring_layout(state)   
         node_labels = dict((n, '%s(%.1f)' %(n, d['activation'])) for n,d in state.nodes(data=True))
@@ -785,7 +789,7 @@ class F_LINK(object):
     def update(self):
         """
         """
-        self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight) # Activation is propagated in both directions.
+        self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight) # Activation can be propagated in both directions depending on asymmetry coef.
         self.inst_from.act_port_in.value.append(self.inst_to.act_port_out.value*self.weight*(1-self.asymmetry_coef))
     
     def copy(self):
@@ -812,7 +816,7 @@ class COOP_LINK(F_LINK):
         
     NOTE: I need to experiment with the possibility to have 
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0): # Test of having assymetric weights
+    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=1.0): # Test of having assymetric weights
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
@@ -1076,7 +1080,7 @@ class SCHEMA_SYSTEM(object):
         # Save simulation data
         if not(self.sim_data['schema_system']):
             self.sim_data['schema_system'] = self.get_info()
-        self.sim_data[self.t] = self.get_state()
+        self.sim_data[self.t] = self.get_state()    
     
     ####################
     ### JSON METHODS ###
@@ -1175,6 +1179,27 @@ class SCHEMA_SYSTEM(object):
                 plt.title(title)
                 img = plt.imread(img_name)
                 plt.imshow(img)
+                
+########################
+### MODULE FUNCTIONS ###
+########################
+def save(schema_system, path='./tmp/'):
+    """
+    Saves a schema system using pickle.
+    """
+    file_name = path + schema_system.name
+    with open(file_name, 'w') as f:
+        pickle.dump(schema_system, f)
+
+def load(schema_system_name,path='./tmp/'):
+    """
+    loads a schema system using pickle.
+    """
+    file_name = path + schema_system_name
+    with open(file_name, 'r') as f:
+        schema_system  = pickle.load(f)
+        return schema_system
+    return None
         
 ###############################################################################
 if __name__=="__main__":

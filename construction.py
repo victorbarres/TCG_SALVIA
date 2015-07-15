@@ -360,9 +360,10 @@ class CXN:
     Grammatical construction.
     
     Data:
-        - name (str): construction name
-        - clss (str): construction class
-        - preference (int): construction preference
+        - name (STR): construction name
+        - clss (STR): construction class
+        - preference (FLOAT): construction preference (usage preferences, optional)
+        - group (INT): construction group (optional)
         - SemFrame (TP_SEMFRAME): cxn SemFrame.
         - SynForm (TP_SYNFORM): cxn SynForm.
         - SymLinks (TP_SYMLINKS): cxn SymLinks.
@@ -370,7 +371,8 @@ class CXN:
     def __init__(self):
         self.name = ''
         self.clss = ''
-        self.preference = 0 # construction preference
+        self.preference = None # construction preference
+        self.group = None # construction group
         self.SemFrame = TP_SEMFRAME() # Semantic frame
         self.SynForm = TP_SYNFORM() # Syntactic form
         self.SymLinks = TP_SYMLINKS() # Symbolic links
@@ -462,6 +464,7 @@ class CXN:
         new_cxn.name = self.name
         new_cxn.clss = self.clss
         new_cxn.preference = self.preference
+        new_cxn.group = self.preference
         
         (new_semframe, sem_corr) = self.SemFrame.copy()
         (new_synform, syn_corr) = self.SynForm.copy()
@@ -493,7 +496,8 @@ class CXN:
         new_cxn = CXN()
         new_cxn.name = "[%s-U(%i)-%s]" %(cxn_p.name, slot_p.order, cxn_c.name)
         new_cxn.clss = cxn_p.clss
-        new_cxn.preference = 0 # For now does not need to be defined....
+        new_cxn.preference = None # For now does not need to be defined....
+        new_cxn.group = None # For now does not need to be defined....
         new_cxn.SemFrame = new_semframe
         new_cxn.SynForm = new_synform
               

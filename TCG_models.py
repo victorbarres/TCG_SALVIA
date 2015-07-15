@@ -224,7 +224,7 @@ def TCG_comprehension_system(name='language_system_C'):
     control.set_mode('listen')
     
     # Loading data
-    grammar_name = 'TCG_grammar_VB_singlehead'
+    grammar_name = 'TCG_grammar_VB'
     
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
@@ -546,6 +546,5 @@ def TCG_description_system(name='description_system'):
     return description_system
 
 if __name__ == '__main__':
-    production_system_1 = TCG_production_system()
-    production_system_2 = TCG_production_system()
-    
+    production_system = TCG_production_system()
+    st.save(production_system)

@@ -39,7 +39,7 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
 
 class CXN_SCHEMA_INST(SCHEMA_INST):
     """
-    Construction instance
+    (Production) construction instance
     
     If copy= True, carries a copy of the construction stored in LTM. 
     Trace contains pointers to both the SemRep subgraphs that triggered the instantiation and to the CXN_SCHEMA in LTM that was instantiated.
@@ -108,9 +108,9 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
     def __init__(self, cxn_schema, trace, mapping=None, copy=True):
         CXN_SCHEMA_INST.__init__(self, cxn_schema=cxn_schema, mapping=mapping, trace=trace, copy=copy)
         self.form_sequence = self.content.SynForm.form[:]
-        self.form_sequence.reverse()
+        self.form_sequence.reverse() # Simply so that the sequence can be used as stack in python.
         self.form_state = self.form_sequence.pop()
-        self.phon_cover = []
+        self.phon_cover = [] # Should be reorganized with covers. Mapping should also be introduced by reworking the relations with constructions instances used for production.
         self.has_predicted = False
     
     def cxn_predictions(self):
@@ -574,7 +574,10 @@ class GRAMMATICAL_LTM(LTM):
         """
         self.grammar = grammar
         for cxn in grammar.constructions:
-            new_cxn_schema = CXN_SCHEMA(cxn, self.init_act)
+            preference = 1
+            if cxn.preference:
+                preference = cxn.preference
+            new_cxn_schema = CXN_SCHEMA(cxn, self.init_act*preference)
             self.add_schema(new_cxn_schema)
 
     def update(self):
@@ -938,9 +941,6 @@ class GRAMMATICAL_WM_P(WM):
     
     def compete(self, new_inst):
         """
-        How to make it incremental....?
-        Competition if they overlap on an edge.
-        I want to avoid having to rebuild the assemblages all the time...-> Incrementality.
         """
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
@@ -948,6 +948,16 @@ class GRAMMATICAL_WM_P(WM):
                if match["match_cat"] == -1:
                    self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
         
+#        # Possible addition...
+#        # Construction that correspond to 2 different hypotheses regarding which slot the new isnt should link to compete. 
+#        # This is might be problematic. See my notes in notebook.
+#        for inst1 in self.schema_insts:
+#            for inst2 in self.schema_insts:
+#                if inst1 != inst2:
+#                    link1 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst1)]
+#                    link2 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst2)]
+#                    if link1 and link2:
+#                        self.add_comp_link(inst_from=inst1, inst_to=inst2)
     
     @staticmethod
     def overlap(inst1, inst2):
@@ -2128,6 +2138,6 @@ if __name__=='__main__':
     from test_TCG_comprehension import test as test_comprehension
     from test_TCG_dyad import test as test_dyad
     
-    test_production(seed=0)
+    test_production(seed=1)
 #    test_comprehension(seed=None)
 #    test_dyad(seed=0)

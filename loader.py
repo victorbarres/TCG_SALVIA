@@ -246,6 +246,8 @@ class TCG_LOADER(object):
         new_cxn.clss = aCxn['class']
         if 'preference' in aCxn:
             new_cxn.preference = aCxn['preference']
+        if 'group' in aCxn:
+            new_cxn.group = aCxn['group']
         
         # Name table
         name_table = {'SemNodes':{}, 'SemEdges':{}, 'SynForms':{}, 'names':{}}
