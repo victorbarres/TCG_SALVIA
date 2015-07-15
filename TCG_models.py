@@ -62,53 +62,55 @@ def TCG_production_system(name='language_system_P'):
     language_system_P.set_output_ports([utter.find_port('to_output')])
     
     # Parameters   
-    semanticWM.dyn_params['tau'] = 1000
+    semanticWM.dyn_params['tau'] = 1000.0
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0
     semanticWM.dyn_params['k'] = 10.0
     semanticWM.dyn_params['x0'] = 0.5
-    semanticWM.dyn_params['noise_mean'] = 0
+    semanticWM.dyn_params['noise_mean'] = 0.0
     semanticWM.dyn_params['noise_std'] = 0.2
-    semanticWM.C2_params['confidence_threshold'] = 0
+    semanticWM.C2_params['confidence_threshold'] = 0.0
     semanticWM.C2_params['prune_threshold'] = 0.01
-    semanticWM.C2_params['coop_weight'] = 0
-    semanticWM.C2_params['comp_weight'] = 0
+    semanticWM.C2_params['coop_weight'] = 0.0
+    semanticWM.C2_params['comp_weight'] = 0.0
     
-    grammaticalWM_P.dyn_params['tau'] = 30
+    grammaticalWM_P.dyn_params['tau'] = 30 # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
     grammaticalWM_P.dyn_params['act_inf'] = 0.0
     grammaticalWM_P.dyn_params['L'] = 1.0
-    grammaticalWM_P.dyn_params['k'] = 10.0
+    grammaticalWM_P.dyn_params['k'] = 10.0 # Need to analyze the impact of that factor.
     grammaticalWM_P.dyn_params['x0'] = 0.5
-    grammaticalWM_P.dyn_params['noise_mean'] = 0
+    grammaticalWM_P.dyn_params['noise_mean'] = 0.0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
     grammaticalWM_P.C2_params['confidence_threshold'] = 0.7
-    grammaticalWM_P.C2_params['prune_threshold'] = 0.05
-    grammaticalWM_P.C2_params['coop_weight'] = 1
-    grammaticalWM_P.C2_params['comp_weight'] = -4
-    grammaticalWM_P.style_params['activation']=0.7
-    grammaticalWM_P.style_params['sem_length']=0.3
-    grammaticalWM_P.style_params['form_length']=0
-    grammaticalWM_P.style_params['continuity']=0
+    grammaticalWM_P.C2_params['prune_threshold'] = 0.01 # Manipulations can yield "broca's aphasia" (0.3)
+    grammaticalWM_P.C2_params['coop_weight'] = 1.0
+    grammaticalWM_P.C2_params['comp_weight'] = -4.0 # Needs to compensate for the dominance of cooperation link.
+    grammaticalWM_P.C2_params['sub_threshold_r'] = 0.8
+    grammaticalWM_P.C2_params['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
+    grammaticalWM_P.style_params['activation'] = 0.7
+    grammaticalWM_P.style_params['sem_length'] = 0.3
+    grammaticalWM_P.style_params['form_length'] = 0.0
+    grammaticalWM_P.style_params['continuity'] = 0.0
     
-    phonWM_P.dyn_params['tau'] = 100
+    phonWM_P.dyn_params['tau'] = 100.0
     phonWM_P.dyn_params['act_inf'] = 0.0
     phonWM_P.dyn_params['L'] = 1.0
     phonWM_P.dyn_params['k'] = 10.0
     phonWM_P.dyn_params['x0'] = 0.5
-    phonWM_P.dyn_params['noise_mean'] = 0
+    phonWM_P.dyn_params['noise_mean'] = 0.0
     phonWM_P.dyn_params['noise_std'] = 0.2
-    phonWM_P.C2_params['confidence_threshold'] = 0
+    phonWM_P.C2_params['confidence_threshold'] = 0.0
     phonWM_P.C2_params['prune_threshold'] = 0.01
-    phonWM_P.C2_params['coop_weight'] = 0
-    phonWM_P.C2_params['comp_weight'] = 0
+    phonWM_P.C2_params['coop_weight'] = 0.0
+    phonWM_P.C2_params['comp_weight'] = 0.0
     
-    utter.params['speech_rate'] = 1
+    utter.params['speech_rate'] = 1.0
     
     control.set_mode('produce')
-    control.task_params['time_pressure'] = 500
-    control.task_params['start_produce'] = 500
+    control.task_params['time_pressure'] = 500.0
+    control.task_params['start_produce'] = 500.0
     
-    conceptLTM.init_act = 1
+    conceptLTM.init_act = 1.0
     grammaticalLTM.init_act = 0.3
     
     # Loading data
@@ -176,47 +178,49 @@ def TCG_comprehension_system(name='language_system_C'):
     
     
     # Parameters
-    phonWM_C.dyn_params['tau'] = 100
+    phonWM_C.dyn_params['tau'] = 100.0
     phonWM_C.dyn_params['act_inf'] = 0.0
     phonWM_C.dyn_params['L'] = 1.0
     phonWM_C.dyn_params['k'] = 10.0
     phonWM_C.dyn_params['x0'] = 0.5
-    phonWM_C.dyn_params['noise_mean'] = 0
+    phonWM_C.dyn_params['noise_mean'] = 0.0
     phonWM_C.dyn_params['noise_std'] = 0.2
-    phonWM_C.C2_params['confidence_threshold'] = 0
+    phonWM_C.C2_params['confidence_threshold'] = 0.0
     phonWM_C.C2_params['prune_threshold'] = 0.01
-    phonWM_C.C2_params['coop_weight'] = 0
-    phonWM_C.C2_params['comp_weight'] = 0
+    phonWM_C.C2_params['coop_weight'] = 0.0
+    phonWM_C.C2_params['comp_weight'] = 0.0
     
-    grammaticalWM_C.dyn_params['tau'] = 100
+    grammaticalWM_C.dyn_params['tau'] = 100.0
     grammaticalWM_C.dyn_params['act_inf'] = 0.0
     grammaticalWM_C.dyn_params['L'] = 1.0
     grammaticalWM_C.dyn_params['k'] = 10.0
     grammaticalWM_C.dyn_params['x0'] = 0.5
-    grammaticalWM_C.dyn_params['noise_mean'] = 0
+    grammaticalWM_C.dyn_params['noise_mean'] = 0.0
     grammaticalWM_C.dyn_params['noise_std'] = 0.2
     grammaticalWM_C.C2_params['confidence_threshold'] = 0.5
     grammaticalWM_C.C2_params['prune_threshold'] = 0.1
-    grammaticalWM_C.C2_params['coop_weight'] = 1
-    grammaticalWM_C.C2_params['comp_weight'] = -1
+    grammaticalWM_C.C2_params['coop_weight'] = 1.0
+    grammaticalWM_C.C2_params['comp_weight'] = -1.0
+    grammaticalWM_C.C2_params['sub_threshold_r'] = 0.8
+    grammaticalWM_C.C2_params['deact_weight'] = 0.0
     
     grammaticalLTM.init_act = grammaticalWM_C.C2_params['confidence_threshold']*0.5
     
-    semanticWM.dyn_params['tau'] = 300
+    semanticWM.dyn_params['tau'] = 300.0
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0
     semanticWM.dyn_params['k'] = 10.0
     semanticWM.dyn_params['x0'] = 0.5
-    semanticWM.dyn_params['noise_mean'] = 0
+    semanticWM.dyn_params['noise_mean'] = 0.0
     semanticWM.dyn_params['noise_std'] = 0.2
-    semanticWM.C2_params['confidence_threshold'] = 0
+    semanticWM.C2_params['confidence_threshold'] = 0.0
     semanticWM.C2_params['prune_threshold'] = 0.01
-    semanticWM.C2_params['coop_weight'] = 0
-    semanticWM.C2_params['comp_weight'] = 0
+    semanticWM.C2_params['coop_weight'] = 0.0
+    semanticWM.C2_params['comp_weight'] = 0.0
     
     conceptLTM.init_act = 0.8
-    control.task_params['time_pressure'] = 500
-    control.task_params['start_produce'] = 500
+    control.task_params['time_pressure'] = 500.0
+    control.task_params['start_produce'] = 500.0
     control.set_mode('listen')
     
     # Loading data
@@ -283,6 +287,7 @@ def TCG_language_system(name='language_system'):
     language_system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
     language_system.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
     language_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
+    language_system.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
     language_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     language_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     language_system.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
@@ -300,35 +305,37 @@ def TCG_language_system(name='language_system'):
     language_system.set_output_ports([utter.find_port('to_output')])
     
      # Parameters
-    semanticWM.dyn_params['tau'] = 300
+    semanticWM.dyn_params['tau'] = 300.0
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0
     semanticWM.dyn_params['k'] = 10.0
     semanticWM.dyn_params['x0'] = 0.5
-    semanticWM.dyn_params['noise_mean'] = 0
+    semanticWM.dyn_params['noise_mean'] = 0.0
     semanticWM.dyn_params['noise_std'] = 0.2
-    semanticWM.C2_params['confidence_threshold'] = 0
+    semanticWM.C2_params['confidence_threshold'] = 0.0
     semanticWM.C2_params['prune_threshold'] = 0.01
-    semanticWM.C2_params['coop_weight'] = 0
-    semanticWM.C2_params['comp_weight'] = 0
+    semanticWM.C2_params['coop_weight'] = 0.0
+    semanticWM.C2_params['comp_weight'] = 0.0
     
-    grammaticalWM_P.dyn_params['tau'] = 30
+    grammaticalWM_P.dyn_params['tau'] = 30.0
     grammaticalWM_P.dyn_params['act_inf'] = 0.0
     grammaticalWM_P.dyn_params['L'] = 1.0
     grammaticalWM_P.dyn_params['k'] = 10.0
     grammaticalWM_P.dyn_params['x0'] = 0.5
-    grammaticalWM_P.dyn_params['noise_mean'] = 0
+    grammaticalWM_P.dyn_params['noise_mean'] = 0.0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
     grammaticalWM_P.C2_params['confidence_threshold'] = 0.7
     grammaticalWM_P.C2_params['prune_threshold'] = 0.01
-    grammaticalWM_P.C2_params['coop_weight'] = 1
-    grammaticalWM_P.C2_params['comp_weight'] = -1
-    grammaticalWM_P.style_params['activation']=0.7
-    grammaticalWM_P.style_params['sem_length']=0.2
-    grammaticalWM_P.style_params['form_length']=0
-    grammaticalWM_P.style_params['continuity']=0.1
+    grammaticalWM_P.C2_params['coop_weight'] = 1.0
+    grammaticalWM_P.C2_params['comp_weight'] = -1.0
+    grammaticalWM_P.C2_params['sub_threshold_r'] = 0.8
+    grammaticalWM_P.C2_params['deact_weight'] = 0.0
+    grammaticalWM_P.style_params['activation'] = 0.7
+    grammaticalWM_P.style_params['sem_length'] = 0.2
+    grammaticalWM_P.style_params['form_length'] = 0.0
+    grammaticalWM_P.style_params['continuity'] = 0.1
     
-    phonWM_P.dyn_params['tau'] = 100
+    phonWM_P.dyn_params['tau'] = 100.0
     phonWM_P.dyn_params['act_inf'] = 0.0
     phonWM_P.dyn_params['L'] = 1.0
     phonWM_P.dyn_params['k'] = 10.0
@@ -340,37 +347,39 @@ def TCG_language_system(name='language_system'):
     phonWM_P.C2_params['coop_weight'] = 0
     phonWM_P.C2_params['comp_weight'] = 0
     
-    conceptLTM.init_act = 1
+    conceptLTM.init_act = 1.0
     grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']*0.5
     
-    utter.params['speech_rate'] = 10
+    utter.params['speech_rate'] = 10.0
     
-    control.task_params['time_pressure'] = 200
-    control.task_params['start_produce'] = 300
+    control.task_params['time_pressure'] = 200.0
+    control.task_params['start_produce'] = 300.0
     
-    phonWM_C.dyn_params['tau'] = 100
+    phonWM_C.dyn_params['tau'] = 100.0
     phonWM_C.dyn_params['act_inf'] = 0.0
     phonWM_C.dyn_params['L'] = 1.0
     phonWM_C.dyn_params['k'] = 10.0
     phonWM_C.dyn_params['x0'] = 0.5
-    phonWM_C.dyn_params['noise_mean'] = 0
+    phonWM_C.dyn_params['noise_mean'] = 0.0
     phonWM_C.dyn_params['noise_std'] = 0.2
-    phonWM_C.C2_params['confidence_threshold'] = 0
+    phonWM_C.C2_params['confidence_threshold'] = 0.0
     phonWM_C.C2_params['prune_threshold'] = 0.01
-    phonWM_C.C2_params['coop_weight'] = 0
-    phonWM_C.C2_params['comp_weight'] = 0
+    phonWM_C.C2_params['coop_weight'] = 0.0
+    phonWM_C.C2_params['comp_weight'] = 0.0
     
-    grammaticalWM_C.dyn_params['tau'] = 100
+    grammaticalWM_C.dyn_params['tau'] = 100.0
     grammaticalWM_C.dyn_params['act_inf'] = 0.0
     grammaticalWM_C.dyn_params['L'] = 1.0
     grammaticalWM_C.dyn_params['k'] = 10.0
     grammaticalWM_C.dyn_params['x0'] = 0.5
-    grammaticalWM_C.dyn_params['noise_mean'] = 0
+    grammaticalWM_C.dyn_params['noise_mean'] = 0.0
     grammaticalWM_C.dyn_params['noise_std'] = 0.2
     grammaticalWM_C.C2_params['confidence_threshold'] = 0.5
     grammaticalWM_C.C2_params['prune_threshold'] = 0.1
-    grammaticalWM_C.C2_params['coop_weight'] = 1
-    grammaticalWM_C.C2_params['comp_weight'] = -1
+    grammaticalWM_C.C2_params['coop_weight'] = 1.0
+    grammaticalWM_C.C2_params['comp_weight'] = -1.0
+    grammaticalWM_C.C2_params['sub_threshold_r'] = 0.8
+    grammaticalWM_C.C2_params['deact_weight'] = 0.0
     
     # Loading data
     grammar_name = 'TCG_grammar_VB'
@@ -441,6 +450,7 @@ def TCG_description_system(name='description_system'):
     description_system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
     description_system.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
     description_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
+    description_system.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
     description_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
     description_system.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
     description_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
@@ -458,55 +468,57 @@ def TCG_description_system(name='description_system'):
     description_system.brain_mapping = description_brain_mapping
     
     # Parameters   
-    visualWM.dyn_params['tau'] = 300
+    visualWM.dyn_params['tau'] = 300.0
     visualWM.dyn_params['act_inf'] = 0.0
     visualWM.dyn_params['L'] = 1.0
     visualWM.dyn_params['k'] = 10.0
     visualWM.dyn_params['x0'] = 0.5
-    visualWM.dyn_params['noise_mean'] = 0
-    visualWM.dyn_params['noise_std'] = 1
-    visualWM.C2_params['confidence_threshold'] = 0
+    visualWM.dyn_params['noise_mean'] = 0.0
+    visualWM.dyn_params['noise_std'] = 1.0
+    visualWM.C2_params['confidence_threshold'] = 0.0
     visualWM.C2_params['prune_threshold'] = 0.3
-    visualWM.C2_params['coop_weight'] = 0
-    visualWM.C2_params['comp_weight'] = 0
+    visualWM.C2_params['coop_weight'] = 0.0
+    visualWM.C2_params['comp_weight'] = 0.0
     
-    perceptLTM.init_act = 1
+    perceptLTM.init_act = 1.0
     
-    semanticWM.dyn_params['tau'] = 300
+    semanticWM.dyn_params['tau'] = 300.0
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0
     semanticWM.dyn_params['k'] = 10.0
     semanticWM.dyn_params['x0'] = 0.5
-    semanticWM.dyn_params['noise_mean'] = 0
+    semanticWM.dyn_params['noise_mean'] = 0.0
     semanticWM.dyn_params['noise_std'] = 0.2
-    semanticWM.C2_params['confidence_threshold'] = 0
+    semanticWM.C2_params['confidence_threshold'] = 0.0
     semanticWM.C2_params['prune_threshold'] = 0.01
-    semanticWM.C2_params['coop_weight'] = 0
-    semanticWM.C2_params['comp_weight'] = 0
+    semanticWM.C2_params['coop_weight'] = 0.0
+    semanticWM.C2_params['comp_weight'] = 0.0
     
-    conceptLTM.init_act = 1
+    conceptLTM.init_act = 1.0
     
-    grammaticalWM_P.dyn_params['tau'] = 100
+    grammaticalWM_P.dyn_params['tau'] = 100.0
     grammaticalWM_P.dyn_params['act_inf'] = 0.0
     grammaticalWM_P.dyn_params['L'] = 1.0
     grammaticalWM_P.dyn_params['k'] = 10.0
     grammaticalWM_P.dyn_params['x0'] = 0.5
-    grammaticalWM_P.dyn_params['noise_mean'] = 0
+    grammaticalWM_P.dyn_params['noise_mean'] = 0.0
     grammaticalWM_P.dyn_params['noise_std'] = 0.2
     grammaticalWM_P.C2_params['confidence_threshold'] = 0.7
     grammaticalWM_P.C2_params['prune_threshold'] = 0.1
-    grammaticalWM_P.C2_params['coop_weight'] = 1
-    grammaticalWM_P.C2_params['comp_weight'] = -1
-    grammaticalWM_P.style_params['activation']=0.7
-    grammaticalWM_P.style_params['sem_length']=0.2
-    grammaticalWM_P.style_params['form_length']=0
-    grammaticalWM_P.style_params['continuity']=0.1
+    grammaticalWM_P.C2_params['coop_weight'] = 1.0
+    grammaticalWM_P.C2_params['comp_weight'] = -1.0
+    grammaticalWM_P.C2_params['sub_threshold_r'] = 0.8
+    grammaticalWM_P.C2_params['deact_weight'] = 0.0
+    grammaticalWM_P.style_params['activation'] = 0.7
+    grammaticalWM_P.style_params['sem_length'] = 0.3
+    grammaticalWM_P.style_params['form_length'] = 0
+    grammaticalWM_P.style_params['continuity'] = 0
     
     grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']
     
     control.task_params['mode'] = 'produce'
-    control.task_params['time_pressure'] = 500
-    control.task_params['start_produce'] = 500
+    control.task_params['time_pressure'] = 500.0
+    control.task_params['start_produce'] = 500.0
     
     # Loading data
     grammar_name = 'TCG_grammar_VB'

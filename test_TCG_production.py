@@ -182,11 +182,15 @@ def test2(seed=None):
     # Parameters:
     control = language_system_P.schemas['Control']
     
-    sem_rate = 100  
+    sem_rate = 100
     control.task_params['start_produce'] = sem_rate*2 # Start early
-#    control.task_params['start_produce'] = sem_rate*10 # Start late
+#    control.task_params['start_produce'] = sem_rate*10.0 # Start late
+    
+    control.task_params['time_pressure'] = sem_rate*0.1 # high pressure
+#    control.task_params['time_pressure'] = sem_rate*2 # low pressure
+    
       
-    sem_option = 6
+    sem_option = 7
     end_delay = control.task_params['start_produce']  + 200
     
     sem_timings = {}
@@ -206,7 +210,7 @@ def test2(seed=None):
     
     sem_timings[10] = [[woman1, modify1, pretty1], [man1, big1, modify2], [kick1], [agent1, patient1]]
     
-    sem_timings[11] = [[woman1, wear1, agent2, patient2, dress1, blue1, modify3, kick1, agent1, patient1, man1]]# Test IN_COLOR
+    sem_timings[11] = [[woman1, wear1, agent2, patient2, dress1, blue1, modify3, kick1, agent1, patient1, man1]] # Test IN_COLOR
     
     sem_timing = sem_timings[sem_option][:]
     sem_timing.reverse()
@@ -226,8 +230,8 @@ def test2(seed=None):
             print "t:%i, %s" %(t, output)
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
-#    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=False)
-#    language_system_P.schemas['Grammatical_WM_P'].show_state()
+    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
+    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')
 
 if __name__=='__main__':

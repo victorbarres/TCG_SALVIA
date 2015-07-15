@@ -306,7 +306,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = False
         self.trace = None
         self.activity = 0
-        self.act_params = {'t0':0, 'act0': 1, 'dt':0.1, 'tau':1, 'act_inf':0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0}
+        self.act_params = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
@@ -350,7 +350,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = True
         self.trace = trace
         self.set_ports()
-        self.act_params['act0'] = schema.init_act
+        self.act_params['act0'] = float(schema.init_act)
         self.initialize_activation()
     
     def update_activation(self):
@@ -393,21 +393,21 @@ class INST_ACTIVATION(object):
     Note: Having dt and Tau is redundant... dt should be defined at the system level.
     I have added E to gather external inputs (not carried through ports. Useful for activations across WMs.)
     """
-    def __init__(self, t0=0, act0=1, dt=0.1, tau=1, act_inf=0, L=1.0, k=10.0, x0=0.5, noise_mean=0, noise_std=0):
-        self.t0 = t0
-        self.act0 = act0
-        self.tau = tau
-        self.act_inf = act_inf
-        self.L = L
-        self.k = k
-        self.x0 = x0
-        self.dt = dt 
+    def __init__(self, t0=0.0, act0=1.0, dt=0.1, tau=1.0, act_inf=0.0, L=1.0, k=10.0, x0=0.5, noise_mean=0.0, noise_std=0.0):
+        self.t0 = float(t0)
+        self.act0 = float(act0)
+        self.tau = float(tau)
+        self.act_inf = float(act_inf)
+        self.L = float(L)
+        self.k = float(k)
+        self.x0 = float(x0)
+        self.dt = float(dt) 
         self.t = self.t0
         self.act = self.act0
-        self.noise_mean= noise_mean
-        self.noise_std=noise_std
+        self.noise_mean = float(noise_mean)
+        self.noise_std = float(noise_std)
         self.save_vals = {"t":[], "act":[]}
-        self.E = 0
+        self.E = 0.0
         
     def update(self, I):
         """
@@ -418,7 +418,7 @@ class INST_ACTIVATION(object):
         self.act += d_act
         self.save_vals["t"].append(self.t)
         self.save_vals["act"].append(self.act)
-        self.E = 0
+        self.E = 0.0
     
     def logistic(self, x):
         return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
@@ -497,8 +497,8 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.1}
-        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}
+        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
+        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8}
         self.save_state = {'insts':{}}
        
     def add_instance(self,schema_inst, act0=None):
@@ -519,7 +519,7 @@ class WM(PROCEDURAL_SCHEMA):
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
         
-    def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1, weight=None):
+    def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None):
         if weight == None:
             weight=self.C2_params['coop_weight']
         new_link = COOP_LINK(inst_from, inst_to, weight*qual)
@@ -586,7 +586,7 @@ class WM(PROCEDURAL_SCHEMA):
         for f_link in f_links:
             self.comp_links.remove(f_link)
            
-    def update_activations(self, coop_p=1, comp_p=1):
+    def update_activations(self, coop_p=1.0, comp_p=1.0):
         """
         Update all the activations of instances in working memory based on cooperation and competition f-links.
         Passes activations through coop links with probabiliy coop_p, and through competition liks with probability comp_p
@@ -771,18 +771,21 @@ class F_LINK(object):
         - weight (float)
         - asymmetry_coef (float): 0 <= asymmetry_coef <= 1
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=0, asymmetry_coef=0):
+    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0):
         """
         """
         self.inst_from = inst_from
         self.inst_to = inst_to
-        self.weight = weight
-        self.asymmetry_coef = asymmetry_coef
+        self.weight = float(weight)
+        self.asymmetry_coef = float(asymmetry_coef)
+    
+    def update_weight(self, new_weight):
+        self.weight = float(new_weight)
     
     def update(self):
         """
         """
-        self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight) # Activation is propagates in both directions.
+        self.inst_to.act_port_in.value.append(self.inst_from.act_port_out.value*self.weight) # Activation is propagated in both directions.
         self.inst_from.act_port_in.value.append(self.inst_to.act_port_out.value*self.weight*(1-self.asymmetry_coef))
     
     def copy(self):
@@ -809,17 +812,21 @@ class COOP_LINK(F_LINK):
         
     NOTE: I need to experiment with the possibility to have 
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=1, asymmetry_coef=0): # Test of having assymetric weights
+    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0): # Test of having assymetric weights
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
         self.connect = CONNECT()
     
-    def set_connect(self, port_from, port_to, weight=0, delay=0):
+    def set_connect(self, port_from, port_to, weight=0.0, delay=0.0):
         self.connect.port_from = port_from
         self.connect.port_to = port_to
-        self.connect.weight = weight
-        self.connect.delay = delay
+        self.connect.weight = float(weight)
+        self.connect.delay = float(delay)
+    
+    def update_weight(self, new_weight):
+        self.weight = float(new_weight)
+        self.connect.weight = float(new_weight)
     
     def copy(self):
         new_flink = COOP_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
@@ -845,7 +852,7 @@ class COMP_LINK(F_LINK):
         - inst_to (SCHEMA_INST)
         - weight (float)
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=-1, asymmetry_coef=0): #Symmetric links
+    def __init__(self, inst_from=None, inst_to=None, weight=-1.0, asymmetry_coef=0.0): #Symmetric links
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
@@ -857,8 +864,8 @@ class ASSEMBLAGE(object):
     def __init__(self):
         self.schema_insts = []
         self.coop_links = []
-        self.activation = 0
-        self.score = 0
+        self.activation = 0.0
+        self.score = 0.0
     
     def add_instance(self, new_inst):
         """
@@ -964,7 +971,7 @@ class SCHEMA_SYSTEM(object):
         - verbose (BOOL): If True, print execution information.
         - sim_data (DICT): stores the simulation data.
     """
-    T0 = 0
+    T0 = 0.0
     TIME_STEP = 1.0
     def __init__(self, name=''):
         self.name = name

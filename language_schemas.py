@@ -404,7 +404,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
         self.dyn_params = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
-        self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
+        self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
     def update(self):
@@ -606,10 +606,9 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_P')
-        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}  # BOOST THE INHIBITION TO COMPENSATE FOR THE AMOUNT OF COOPERATION.
-        self.style_params = {'activation':1, 'sem_length':0, 'form_length':0, 'continuity':0}
-        self.last_phon_output = []
+        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
+        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
+        self.style_params = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0}
         
     def update(self):
         """
@@ -620,16 +619,16 @@ class GRAMMATICAL_WM_P(WM):
         phon_input = self.get_input('from_phonological_WM_P')
         if new_cxn_insts:
             self.add_new_insts(new_cxn_insts)            
-            
+                
         self.convey_sem_activations(sem_input)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
+        
         if ctrl_input and ctrl_input['start_produce']:
-            output = self.produce_form(sem_input,ctrl_input,phon_input)
+            output = self.produce_form(sem_input,phon_input)
             if output:
                 self.set_output('to_phonological_WM_P', output['phon_WM_output'])
                 self.set_output('to_semantic_WM', output['sem_WM_output'])
-                self.last_phon_output = output['phon_WM_output']
     
     def add_new_insts(self, new_insts):
         """
@@ -664,15 +663,27 @@ class GRAMMATICAL_WM_P(WM):
                         act += sem_input[node]              
             act = act/len(cover_nodes.keys())
             inst.activation.E += act
+    
+#    def apply_pressure(self, pressure):
+#        """
+#        Applies pressure by ramping up C2
+#        """
+#        for link in [l for l in self.coop_links if l.weight != 0]: # Make sure not to reactivate old weights.
+#            link.update_weight(self.C2_params['coop_weight'] + self.C2_params['coop_weight']*pressure)
+#        for link in self.comp_links:
+#            link.update_weight(self.C2_params['comp_weight'] + self.C2_params['comp_weight']*pressure)
 
-    def produce_form(self,sem_input, ctrl_input, phon_input):
+    def produce_form(self,sem_input, phon_input):
         """
-        NOTE: There is an issue with the fact that it takes 2 steps for the fact that part of the SemRep has been expressed gets
+        NOTE: 
+            - There is an issue with the fact that it takes 2 steps for the fact that part of the SemRep has been expressed gets
         registered by the semantic_WM. This leads to the repetition of the same assemblage twice.
-        """
-#        self.end_competitions()
         
-        score_threshold = self.style_params['activation']*self.C2_params['confidence_threshold'] + self.style_params['sem_length'] + self.style_params['form_length'] + self.style_params['continuity']       
+            - Need to clarify how the score_threshold is defined.
+            - Note that the only reason I don't just take the 1 winner above threshold is because of the issue of having multipe none overlapping assemblages.
+            Might want to revisit assemble.
+        """
+        score_threshold = self.style_params['activation']*self.C2_params['confidence_threshold'] + self.style_params['sem_length'] + self.style_params['form_length'] + self.style_params['continuity']
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -680,7 +691,7 @@ class GRAMMATICAL_WM_P(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
-                eq_inst.content.show()
+#                eq_inst.content.show()
                 phon_WM_output.extend(phon_form)
                 sem_WM_output.extend(expressed)
                 assemblages.remove(winner_assemblage)
@@ -688,7 +699,7 @@ class GRAMMATICAL_WM_P(WM):
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
                 
-                # Option2: Dismantle the assembalge by removing all the coop_link it involves and setting all composing instances activatoins to confidence_threshold.
+                # Option2: Dismantle the assemblage by removing all the coop_link it involves and setting all composing instances activatoins to confidence_threshold.
 #                self.dismantle_assemblage(winner_assemblage)
                 
                  # Option3: Removes coop links + adds the equivalent instance.
@@ -868,29 +879,27 @@ class GRAMMATICAL_WM_P(WM):
         self.deactivate_coop_weigts()
 #        self.deactivate_coop_weigts2(winner_assemblage)
         
-    def set_subthreshold(self, insts, r=0.8):
+    def set_subthreshold(self, insts):
         """
-        Sets the activation of all the instances in insts to r*confidence_threshold
+        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.C2_paramss['sub_threshold_r']
         Args:
             - insts ([CXN_INST])
-            - val (FLOAT)
         NOTE:
             If the score of the assemblage is not just the avereage cxn inst activation, the value needs to be place low enough
             so that the system does not repeat the same utterance twice. 
         """
+        r= self.C2_params['sub_threshold_r']
         for inst in insts:
             inst.set_activation(r*self.C2_params['confidence_threshold'])
             
-    def deactivate_coop_weigts(self, deact_weight=0):
+    def deactivate_coop_weigts(self):
         """
-        Sets all the coop_links to weight = deact_weight
-        Args:
-            - deact_weight (FLOAT)
+        Sets all the coop_links to weight = self.C2_params['deact_weight']
         """
         for coop_link in self.coop_links:
-                coop_link.weight = deact_weight
+            coop_link.weight = self.C2_params['deact_weight']
                 
-    def deactivate_coop_weigts2(self, assemblage, deact_weight=0):
+    def deactivate_coop_weigts2(self, assemblage, deact_weight=0.0):
         """
         Sets all the coop_links that are associated with an instance in assemblage to weight = deact_weight
         Args:
@@ -1381,8 +1390,8 @@ class PHON_WM_P(WM):
         self.add_port('OUT', 'to_utter')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_control')
-        self.dyn_params = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0}
-        self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
+        self.dyn_params = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
     
     def update(self):
@@ -1446,8 +1455,8 @@ class PHON_WM_C(WM):
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_control')
-        self.dyn_params = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0}
-        self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
+        self.dyn_params = {'tau':2.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
 
     
@@ -1480,8 +1489,8 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('IN', 'from_cxn_retrieval_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
-        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1, 'comp_weight':-4, 'prune_threshold':0.3, 'confidence_threshold':0.8}
+        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
+        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
         self.pred_params = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
@@ -1617,30 +1626,27 @@ class GRAMMATICAL_WM_C(WM):
         """
         self.set_subthreshold(winner_assemblage.schema_insts)
         self.deactivate_coop_weigts()
-        
-    def set_subthreshold(self, insts, r=1):
+    
+    def set_subthreshold(self, insts):
         """
-        Sets the activation of all the instances in insts to r*confidence_threshold
+        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.C2_paramss['sub_threshold_r']
         Args:
             - insts ([CXN_INST])
-            - val (FLOAT)
         
         NOTE: directly taken from the production model.
         """
+        r= self.C2_params['sub_threshold_r']
         for inst in insts:
             inst.set_activation(r*self.C2_params['confidence_threshold'])
             
-    def deactivate_coop_weigts(self, deact_weight=0):
+    def deactivate_coop_weigts(self):
         """
-        Sets all the coop_links that in grammatial WM to weight = deact_weight
-        Instances are also placed below confidence threshold.
-        Args:
-            - assemblage (ASSEMBLAGE)
+        Sets all the coop_links to weight = self.C2_params['deact_weight']
         
         NOTE: directly taken from the production model.
         """
-        for coop_links in self.coop_links:
-            coop_links.weight = deact_weight
+        for coop_link in self.coop_links:
+            coop_link.weight = self.C2_params['deact_weight']
     
     def set_pred_init(self):
         """
@@ -2038,16 +2044,16 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         """
         self.state['mode'] = mode
-        self.state['last_prod_time'] = self.t
-        self.state['start_produce'] = False
-        self.state['unexpressed_sem'] = False
         if mode =='produce':
+            self.state['last_prod_time'] = self.t
+            self.state['start_produce'] = False
+            self.state['unexpressed_sem'] = False
             self.task_params['start_produce'] += self.t
     
     def update(self):
         """
         """
-        # Communicating with  semantic_WM
+        # Communicating with semantic_WM
         self.set_output('to_semantic_WM', self.state['mode'])
         
         # Communicating with grammatical_WM_P
@@ -2065,16 +2071,18 @@ class CONTROL(PROCEDURAL_SCHEMA):
             else:
                 self.state['start_produce'] = False
             
-            if self.t < self.task_params['start_produce']:
+            if self.t < self.task_params['start_produce'] or not(self.state['unexpressed_sem']):
                 pressure = 0
+                self.state['last_prod_time'] = self.t
             else:
-                pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramp up to 1
+                pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramps up linearly to 1
 
             output = {'start_produce':self.state['start_produce'], 'pressure':pressure}
-#            print output
             self.set_output('to_grammatical_WM_P', output)
+        else:
+            self.set_output('to_grammatical_WM_P', None)
                 
-        # Communicating with  grammatical_WM_C
+        # Communicating with grammatical_WM_C
         if self.state['mode'] == 'listen':
             self.set_output('to_grammatical_WM_C', True)
         else:
