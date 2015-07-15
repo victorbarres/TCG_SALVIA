@@ -182,10 +182,10 @@ def test2(seed=None):
     # Parameters:
     control = language_system_P.schemas['Control']
     
-    control.task_params['start_produce'] = 200
-    control.task_params['time_pressure'] = 50.0
-    
-    sem_rate = 100    
+    sem_rate = 100  
+    control.task_params['start_produce'] = sem_rate*2 # Start early
+#    control.task_params['start_produce'] = sem_rate*10 # Start late
+      
     sem_option = 6
     end_delay = control.task_params['start_produce']  + 200
     
@@ -226,7 +226,7 @@ def test2(seed=None):
             print "t:%i, %s" %(t, output)
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
-    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=False)
+#    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=False)
 #    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')
 

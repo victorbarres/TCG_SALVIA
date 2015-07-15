@@ -86,9 +86,9 @@ def TCG_production_system(name='language_system_P'):
     grammaticalWM_P.C2_params['coop_weight'] = 1
     grammaticalWM_P.C2_params['comp_weight'] = -4
     grammaticalWM_P.style_params['activation']=0.7
-    grammaticalWM_P.style_params['sem_length']=0.2
+    grammaticalWM_P.style_params['sem_length']=0.3
     grammaticalWM_P.style_params['form_length']=0
-    grammaticalWM_P.style_params['continuity']=0.1
+    grammaticalWM_P.style_params['continuity']=0
     
     phonWM_P.dyn_params['tau'] = 100
     phonWM_P.dyn_params['act_inf'] = 0.0

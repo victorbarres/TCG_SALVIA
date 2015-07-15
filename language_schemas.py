@@ -672,7 +672,7 @@ class GRAMMATICAL_WM_P(WM):
         """
 #        self.end_competitions()
         
-        score_threshold = self.style_params['activation']*self.C2_params['confidence_threshold'] + self.style_params['sem_length'] + self.style_params['form_length'] + self.style_params['continuity']
+        score_threshold = self.style_params['activation']*self.C2_params['confidence_threshold'] + self.style_params['sem_length'] + self.style_params['form_length'] + self.style_params['continuity']       
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -680,6 +680,7 @@ class GRAMMATICAL_WM_P(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
+                eq_inst.content.show()
                 phon_WM_output.extend(phon_form)
                 sem_WM_output.extend(expressed)
                 assemblages.remove(winner_assemblage)
@@ -699,6 +700,8 @@ class GRAMMATICAL_WM_P(WM):
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
                 if assemblages:
+                    for assemblage in assemblages:
+                        assemblage.update_activation()
                     winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
                 else:
                     winner_assemblage = None
