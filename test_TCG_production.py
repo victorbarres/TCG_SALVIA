@@ -6,6 +6,7 @@ Test cases for the language production schemas defined in language_schemas.py
 import random
 
 import language_schemas as ls
+from loader import TCG_LOADER
 from TCG_models import TCG_production_system
     
 def test(seed=None):
@@ -236,8 +237,133 @@ def test2(seed=None):
     language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')
 
+
+def test3(seed=None):
+    """
+    Test FOL sem inputs
+    """
+    
+    language_system_P = TCG_production_system()
+    # Display schema system
+#    language_system_P.system2dot(image_type='png', disp=True)
+    
+    conceptLTM = language_system_P.schemas['Concept_LTM']
+
+    sem_inputs = TCG_LOADER.load_sem_input("test.json", "./data/sem_inputs/")
+    option = 0
+    
+    my_input = sem_inputs[option]
+    sem_gen = sem_generator(my_input, conceptLTM, verbose=True)
+    (sem_insts, next_time) = sem_gen.next()
+    
+    max_time = 2000
+    # set up time:
+    for t in range(10):
+        language_system_P.update()
+    # Start processing
+    if sem_insts:
+        for inst in sem_insts:
+            print "time:%i, sem:%s" %(0, inst.name)
+        language_system_P.set_input(sem_insts)
+    language_system_P.update()
+        
+    for t in range(1,max_time):
+        if next_time and (t> next_time):
+            (sem_insts, next_time) = sem_gen.next()
+            for inst in sem_insts:
+                print "time:%i, sem:%s" %(t, inst.name)
+            language_system_P.set_input(sem_insts)
+            language_system_P.schemas['Semantic_WM'].set_output('to_control', True) #Do I need that?
+        language_system_P.update()
+        output = language_system_P.get_output()
+        if output:
+            print "t:%i, %s" %(t, output)
+    
+#    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
+    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
+    language_system_P.schemas['Grammatical_WM_P'].show_state()
+#    language_system_P.save_sim('./tmp/test_language_output.json')
+    
+
+def sem_generator(sem_input, conceptLTM, verbose=False):
+    """
+    Creates a generator based on a semantic_data loaded by TCG_LOADER.load_sem_input().
+    Eeach time next() function is called, returns a set of concept instances as well as the next time at which the generator should be called.
+    Args:
+        - sem_input: a semantic input dict loaded using load_sem_input()
+        - conceptLTM (CONCEPT_LTM): Contains concept schemas.
+    """        
+    # For reference.
+#        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
+#        cpt_pattern = r"[A-Z0-9_]+"
+#        var_pattern = r"[a-z0-9]+"
+#        cpt_var_pattern = r"\?[A-Z0-9_]+"
+    
+    # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
+    func_pattern_cpt = r"(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
+    func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)"
+    func_pattern_cpt_var = r"(?P<operator>?[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept variables?
+
+    sem_rate = sem_input['sem_rate']
+    propositions = sem_input['propositions']
+    sequence = sem_input['sequence']
+    timing = sem_input['timing']
+    if sem_rate and not(timing):
+        timing = [i*sem_rate for i in range(len(sequence))]
+    if not(timing) and not(sem_rate):
+        print "ERROR: Provide either timing or rate."
+        return
+        
+    if verbose:
+        for i in range(len(sequence)):
+            print 't: %.1f, prop: %s' %(timing[i], ' & '.join(propositions[sequence[i]]))
+                    
+    if timing[0]>0:
+        yield ([], timing[0])
+        
+    name_table = {}
+    for idx in range(len(sequence)):          
+        instances = []
+        prop_name = sequence[idx]
+        prop_list = propositions[prop_name]
+        for prop in prop_list:
+            # Case1:
+            match1 = re.search(func_pattern_cpt, prop)
+            match2 = re.search(func_pattern_rel, prop)
+            if match1:
+                dat = match1.groupdict()
+                concept = dat['operator']
+                var = dat['var']
+                cpt_schema = conceptLTM.find_schema(name=concept)
+                cpt_inst = ls.CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
+                name_table[var] = cpt_inst
+                instances.append(cpt_inst)
+            
+            elif match2:
+                dat = match2.groupdict()
+                rel = dat['operator']
+                arg1 = dat['var1']
+                arg2 = dat['var2']
+                if not((rel in name_table) and (arg1 in name_table) and (arg2 in name_table)):
+                    print "ERROR: variable used before it is defined."
+                else:
+                    rel_inst = name_table[rel]
+                    rel_inst.content['pFrom'] = name_table[arg1]
+                    rel_inst.content['pTo'] = name_table[arg2]
+            else:
+                print "ERROR, unknown formula"
+        
+        next_idx = idx + 1       
+        if next_idx<len(timing):
+            next_time = timing[next_idx]
+        else:
+            next_time = None
+
+        yield (instances, next_time)    
+
+    
 if __name__=='__main__':
-    test2(seed=1)
+    test3(seed=1)
         
 
 

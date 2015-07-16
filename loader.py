@@ -17,6 +17,7 @@ TCG data loader module
     All other methods should be considered private and are subject to change.
 """
 import json
+import re
 
 import concept as cpt
 import percept as per
@@ -475,6 +476,15 @@ class TCG_LOADER(object):
         saliency_data.load(file_path + file_name) # This needs to eb better integrated with the scene data.
         return saliency_data
     
+    @staticmethod
+    def load_sem_input(file_name = '', file_path = './'):
+        """
+        Loads and returns a the semantic input data define in in file_path\file_name.
+        Return None if error.
+        """
+        # Open and read file
+        json_data = TCG_LOADER.json_read(file_name, path = file_path)
+        return json_data['inputs']
             
         
 ###############################################################################
