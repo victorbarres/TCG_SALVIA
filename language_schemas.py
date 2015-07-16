@@ -5,8 +5,10 @@ Defines language schemas for TCG.
 
 Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
 Uses pyttsx for the text to speech implementation (optional!)
+Uses re for regular expression parsing of sem inputs (optional)
 """
 import matplotlib.pyplot as plt
+import re
 
 import networkx as nx
 import pyttsx
@@ -21,7 +23,7 @@ import TCG_graph
 ##################################
 
 ################################
-# GRAMMAITCAL KNOWLEDGE SCHEMA #
+# GRAMMATICAL KNOWLEDGE SCHEMA #
 class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Construction schema
@@ -2134,6 +2136,114 @@ class TEXT2SPEECH(object):
             self.engine.say(self.utterance)
             self.engine.runAndWait()
             self.utterance = None
+
+class SEM_GENERATOR(object):
+    """
+    """
+    def __init__(self, sem_inputs, conceptLTM):
+        self.sem_inputs = sem_inputs
+        self.conceptLTM = conceptLTM
+        self.preprocess_inputs()
+    
+    def preprocess_inputs(self):
+        """
+        """
+        for name, sem_input in self.sem_inputs.iteritems():
+            sem_rate = sem_input['sem_rate']
+            sequence = sem_input['sequence']
+            timing = sem_input['timing']
+            if sem_rate and not(timing):
+                sem_input['timing'] = [i*sem_rate for i in range(len(sequence))]
+            if not(timing) and not(sem_rate):
+                print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
+                
+    def show_options(self, verbose = False):
+        """
+        """
+        for name, sem_input in self.sem_inputs.iteritems():
+            print name
+            if verbose:
+                self.show_input(name)   
+    def show_input(self, input_name):
+        """
+        """
+        sem_input = self.sem_inputs.get(input_name, None)
+        if sem_input:
+            propositions = sem_input['propositions']
+            sequence = sem_input['sequence']
+            timing = sem_input['timing']
+            for i in range(len(sequence)):
+                print 't: %.1f, prop: %s' %(timing[i], ' , '.join(propositions[sequence[i]]))
+            
+    def sem_generator(self, input_name, verbose=False):
+        """
+        Creates a generator based on a semantic_data loaded by TCG_LOADER.load_sem_input().
+        Eeach time next() function is called, returns a set of concept instances as well as the next time at which the generator should be called.
+        Args:
+            - sem_input: a semantic input dict loaded using load_sem_input()
+            - conceptLTM (CONCEPT_LTM): Contains concept schemas.
+        """        
+        # For reference.
+    #        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
+    #        cpt_pattern = r"[A-Z0-9_]+"
+    #        var_pattern = r"[a-z0-9]+"
+    #        cpt_var_pattern = r"\?[A-Z0-9_]+"
+        
+        # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
+        func_pattern_cpt = r"(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
+        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)"
+        func_pattern_cpt_var = r"(?P<operator>?[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept variables?
+        
+        sem_input = self.sem_inputs[input_name]
+        propositions = sem_input['propositions']
+        sequence = sem_input['sequence']
+        timing = sem_input['timing']
+        
+        next_timing = timing[0]
+        yield ([], next_timing, '')
+            
+        name_table = {}
+        for idx in range(len(sequence)):          
+            instances = []
+            prop_name = sequence[idx]
+            prop_list = propositions[prop_name]
+            if verbose:
+                print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(propositions[sequence[idx]]))
+            for prop in prop_list:
+                # Case1:
+                match1 = re.search(func_pattern_cpt, prop)
+                match2 = re.search(func_pattern_rel, prop)
+                if match1:
+                    dat = match1.groupdict()
+                    concept = dat['operator']
+                    var = dat['var']                        
+                    cpt_schema = self.conceptLTM.find_schema(name=concept)
+                    cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
+                    name_table[var] = cpt_inst
+                    instances.append(cpt_inst)
+                
+                elif match2:
+                    dat = match2.groupdict()
+                    rel = dat['operator']
+                    arg1 = dat['var1']
+                    arg2 = dat['var2']
+                    if not((rel in name_table) and (arg1 in name_table) and (arg2 in name_table)):
+                        print "ERROR: variable used before it is defined."
+                    else:
+                        rel_inst = name_table[rel]
+                        rel_inst.content['pFrom'] = name_table[arg1]
+                        rel_inst.content['pTo'] = name_table[arg2]
+                else:
+                    print "ERROR, unknown formula"
+            
+            next_idx = idx + 1       
+            if next_idx<len(timing):
+                next_time = timing[next_idx]
+            else:
+                next_time = None
+            
+            yield (instances, next_time, ' , '.join(prop_list))   
+            
 ###############################################################################
 if __name__=='__main__':
     from test_TCG_production import test2 as test_production
