@@ -1,0 +1,47 @@
+{
+	"sem_rate" = 10,
+	
+	"inputs"  = 
+	{
+		1:"WOMAN(w1)",
+		2:"MAN(m1)",
+		3:"MAN(m2)",
+		4:"KICK(a1)",
+		6:["AGENT(a1, w1)", "PATIENT(a1, m1)"],
+		7:"WEAR(a2)",
+		8:"AGENT(a2, w1)",
+		9:"PATIENT(a2, e1)",
+		10:"DRESS(e1)"
+	},
+	
+	"inputs2"  = 
+	{
+		1:"WOMAN(w1)",
+		2:"MAN(m1)",
+		3:"MAN(m2)",
+		4:"KICK(a1)",
+		6:["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
+		7:"WEAR(a2)",
+		8:["AGENT(r3), "r3(a2, w1)",
+		9:["PATIENT(r4),"r4(a2, e1)"],
+		10:"DRESS(e1)"
+	},
+	
+		"inputs3"  = 
+	{
+		1:"WOMAN(w1)",
+		2:"MAN(m1)",
+		3:"MAN(m2)",
+		4:"KICK(a1)",
+		6:["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
+		7:"WEAR(a2)",
+		8:["AGENT(r3), "r3(a2, w1)",
+		9:["PATIENT(r4), "?ENTITY(e1)", "r4(a2, e1)"],
+		10:"DRESS(e1)"
+	},
+	
+	"comments" = "In inputs2: lower case is for variables, ALL_CAPS for CONCEPTS. 
+	What happens if a variable is called before it is assigned a concept? In a way this is fine, the variable defines the name of the concept inst. The concept inst can be updated later.
+	If I add the relation r(a,b) and b is not already defined as an instance name, then I create an concept instance named b which should be empty. But in my current implementation it'd be better if it had a type.
+	Basically this is equivalent to have a system with typed variables. Variables cannot be untyped. Input 3 adds the "?ENTITY(e1)" which types the variable e1 as an entity."
+}
