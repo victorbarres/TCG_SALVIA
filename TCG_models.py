@@ -351,7 +351,7 @@ def TCG_language_system(name='language_system'):
     grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']*0.5
     
     utter.params['speech_rate'] = 10.0
-    
+    control.task_params['mode'] = 'produce'
     control.task_params['time_pressure'] = 200.0
     control.task_params['start_produce'] = 200.0
     
@@ -544,6 +544,189 @@ def TCG_description_system(name='description_system'):
     grammaticalLTM.initialize(my_grammar)
     
     return description_system
+
+def TCG_full_system(name='full_system'):
+    """
+    Creates and returns the full TCG schema system, including both production, comprehension, and visual attention.
+    """
+    # Instantiating all the necessary procedural schemas
+    subscene_rec = ps.SUBSCENE_RECOGNITION()
+    perceptLTM = ps.PERCEPT_LTM()
+    visualWM = ps.VISUAL_WM()
+    conceptualizer = ls.CONCEPTUALIZER()
+    semanticWM = ls.SEMANTIC_WM()
+    conceptLTM = ls.CONCEPT_LTM()
+    grammaticalLTM = ls.GRAMMATICAL_LTM()
+    grammaticalWM_P = ls.GRAMMATICAL_WM_P()
+    cxn_retrieval_P = ls.CXN_RETRIEVAL_P()
+    grammaticalWM_C = ls.GRAMMATICAL_WM_C()
+    cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
+    phonWM_P = ls.PHON_WM_P()
+    utter = ls.UTTER()
+    phonWM_C = ls.PHON_WM_C()
+    control = ls.CONTROL()
+    
+    
+    # Defining schema to brain mappings.
+    mapping = {'Visual_WM':['ITG'], 
+                    'Percept_LTM':[''],
+                    'Subscene_recognition':['Ventral stream'],
+                    'Conceptualizer':['aTP'], 
+                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
+                    'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
+                    'Grammatical_LTM':['left_STG', 'left_MTG'],
+                    'Cxn_retrieval_P':[], 
+                    'Phonological_WM_P':['left_BA6'],
+                    'Utter':[''],
+                    'Cxn_retrieval_C':[], 
+                    'Phonological_WM_C':['Wernicke'],
+                    'Grammatical_WM_C':['lBA44, lBA45'],
+                    'Control':['DLPFC'],
+                    'Concept_LTM':['']}
+   
+   # Initializing schema system
+    system = st.SCHEMA_SYSTEM(name)
+    
+    # Setting up schema to brain mappings
+    brain_mapping = st.BRAIN_MAPPING()
+    brain_mapping.schema_mapping = mapping
+    system.brain_mapping = brain_mapping
+    
+    # Setting up language schema system.
+    schemas = [subscene_rec, perceptLTM, conceptualizer, visualWM, semanticWM, conceptLTM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, phonWM_C, grammaticalWM_C, cxn_retrieval_C, control]
+
+    system.add_schemas(schemas)
+    system.add_connection(perceptLTM, 'to_subscene_rec', subscene_rec, 'from_percept_LTM')
+    system.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
+
+    system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
+    system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
+    system.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
+    system.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
+    system.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
+    system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
+    system.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
+    system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
+    system.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
+    system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+    system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
+    system.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
+    system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
+    
+    system.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
+    system.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    system.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
+    system.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
+    system.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    system.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
+    system.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
+    system.add_connection(conceptLTM, 'to_semantic_WM', semanticWM, 'from_concept_LTM')
+    system.set_input_ports([phonWM_C.find_port('from_input'), subscene_rec.find_port('from_input')])
+    system.set_output_ports([utter.find_port('to_output')])
+    
+    # Parameters
+    visualWM.dyn_params['tau'] = 300.0
+    visualWM.dyn_params['act_inf'] = 0.0
+    visualWM.dyn_params['L'] = 1.0
+    visualWM.dyn_params['k'] = 10.0
+    visualWM.dyn_params['x0'] = 0.5
+    visualWM.dyn_params['noise_mean'] = 0.0
+    visualWM.dyn_params['noise_std'] = 1.0
+    visualWM.C2_params['confidence_threshold'] = 0.0
+    visualWM.C2_params['prune_threshold'] = 0.3
+    visualWM.C2_params['coop_weight'] = 0.0
+    visualWM.C2_params['comp_weight'] = 0.0
+    
+    semanticWM.dyn_params['tau'] = 1000.0
+    semanticWM.dyn_params['act_inf'] = 0.0
+    semanticWM.dyn_params['L'] = 1.0
+    semanticWM.dyn_params['k'] = 10.0
+    semanticWM.dyn_params['x0'] = 0.5
+    semanticWM.dyn_params['noise_mean'] = 0.0
+    semanticWM.dyn_params['noise_std'] = 0.2
+    semanticWM.C2_params['confidence_threshold'] = 0.0
+    semanticWM.C2_params['prune_threshold'] = 0.01
+    semanticWM.C2_params['coop_weight'] = 0.0
+    semanticWM.C2_params['comp_weight'] = 0.0
+    
+    grammaticalWM_P.dyn_params['tau'] = 30.0
+    grammaticalWM_P.dyn_params['act_inf'] = 0.0
+    grammaticalWM_P.dyn_params['L'] = 1.0
+    grammaticalWM_P.dyn_params['k'] = 10.0
+    grammaticalWM_P.dyn_params['x0'] = 0.5
+    grammaticalWM_P.dyn_params['noise_mean'] = 0.0
+    grammaticalWM_P.dyn_params['noise_std'] = 0.2
+    grammaticalWM_P.C2_params['confidence_threshold'] = 0.7
+    grammaticalWM_P.C2_params['prune_threshold'] = 0.01
+    grammaticalWM_P.C2_params['coop_weight'] = 1.0
+    grammaticalWM_P.C2_params['comp_weight'] = -1.0
+    grammaticalWM_P.C2_params['sub_threshold_r'] = 0.8
+    grammaticalWM_P.C2_params['deact_weight'] = 0.0
+    grammaticalWM_P.style_params['activation'] = 0.7
+    grammaticalWM_P.style_params['sem_length'] = 0.2
+    grammaticalWM_P.style_params['form_length'] = 0.0
+    grammaticalWM_P.style_params['continuity'] = 0.1
+    
+    phonWM_P.dyn_params['tau'] = 100.0
+    phonWM_P.dyn_params['act_inf'] = 0.0
+    phonWM_P.dyn_params['L'] = 1.0
+    phonWM_P.dyn_params['k'] = 10.0
+    phonWM_P.dyn_params['x0'] = 0.5
+    phonWM_P.dyn_params['noise_mean'] = 0
+    phonWM_P.dyn_params['noise_std'] = 0.2
+    phonWM_P.C2_params['confidence_threshold'] = 0
+    phonWM_P.C2_params['prune_threshold'] = 0.01
+    phonWM_P.C2_params['coop_weight'] = 0
+    phonWM_P.C2_params['comp_weight'] = 0
+    
+    conceptLTM.init_act = 1.0
+    grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']*0.5
+    
+    utter.params['speech_rate'] = 10.0
+    control.task_params['mode'] = 'produce'
+    control.task_params['time_pressure'] = 200.0
+    control.task_params['start_produce'] = 200.0
+    
+    phonWM_C.dyn_params['tau'] = 100.0
+    phonWM_C.dyn_params['act_inf'] = 0.0
+    phonWM_C.dyn_params['L'] = 1.0
+    phonWM_C.dyn_params['k'] = 10.0
+    phonWM_C.dyn_params['x0'] = 0.5
+    phonWM_C.dyn_params['noise_mean'] = 0.0
+    phonWM_C.dyn_params['noise_std'] = 0.2
+    phonWM_C.C2_params['confidence_threshold'] = 0.0
+    phonWM_C.C2_params['prune_threshold'] = 0.01
+    phonWM_C.C2_params['coop_weight'] = 0.0
+    phonWM_C.C2_params['comp_weight'] = 0.0
+    
+    grammaticalWM_C.dyn_params['tau'] = 100.0
+    grammaticalWM_C.dyn_params['act_inf'] = 0.0
+    grammaticalWM_C.dyn_params['L'] = 1.0
+    grammaticalWM_C.dyn_params['k'] = 10.0
+    grammaticalWM_C.dyn_params['x0'] = 0.5
+    grammaticalWM_C.dyn_params['noise_mean'] = 0.0
+    grammaticalWM_C.dyn_params['noise_std'] = 0.2
+    grammaticalWM_C.C2_params['confidence_threshold'] = 0.5
+    grammaticalWM_C.C2_params['prune_threshold'] = 0.1
+    grammaticalWM_C.C2_params['coop_weight'] = 1.0
+    grammaticalWM_C.C2_params['comp_weight'] = -1.0
+    grammaticalWM_C.C2_params['sub_threshold_r'] = 0.8
+    grammaticalWM_C.C2_params['deact_weight'] = 0.0
+    
+    # Loading data
+    grammar_name = 'TCG_grammar_VB'
+   
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    grammar_file = "%s.json" %grammar_name
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
+    
+    # Initialize conceptual LTM content
+    conceptLTM.initialize(my_conceptual_knowledge)
+        
+    # Initialize grammatical LTM content
+    grammaticalLTM.initialize(my_grammar)
+    
+    return system
 
 if __name__ == '__main__':
     production_system = TCG_production_system()
