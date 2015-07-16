@@ -17,7 +17,7 @@ def test(seed=None):
     description_system = TCG_description_system()
 
     # Generating schema system graph visualization
-    description_system.system2dot(image_type='png', disp=True)
+#    description_system.system2dot(image_type='png', disp=True)
     
     # Setting up BU saliency data
     scene_name = 'KC06_1_1'
@@ -42,7 +42,7 @@ def test(seed=None):
 #    description_system.schemas['Visual_WM'].show_SceneRep()
 #    description_system.schemas['Semantic_WM'].show_SemRep()
     description_system.schemas['Grammatical_WM_P'].show_dynamics()
-    description_system.schemas['Grammatical_WM_P'].show_state()
+#    description_system.schemas['Grammatical_WM_P'].show_state()
     
     #description_system.save_sim('./tmp/test_description_output.json')
 

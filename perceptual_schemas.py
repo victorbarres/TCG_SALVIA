@@ -394,7 +394,7 @@ class VISUAL_WM(WM):
         self.add_port('OUT', 'to_saliency_map')
         self.add_port('OUT', 'to_conceptualizer')
         self.dyn_params = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
-        self.C2_params = {'coop_weight':0, 'comp_weight':0, 'prune_threshold':0.01, 'confidence_threshold':0} # C2 is not implemented in this WM.
+        self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1, 'comp_asymmetry':0} # C2 is not implemented in this WM.
         self.SceneRep = nx.DiGraph()
         
     def update(self):
@@ -518,9 +518,10 @@ class PERCEPT_LTM(LTM):
 class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
     """
     Data
-        - inputs
+        - params: {'recognition_time':FLOAT}: Defines the time it takes to perceice a schema of uncertainty 1.
+        - inputs {'scene_input':scene_input, 'per_schemas':[PERCEPTUAL_SCHEMAS]}: The scene input is provided by the TCG loader, perceptual schemas are received from PERCEPT_LTM
         - scene_data (SCENE): stores data based on scene data received as input (as defined by LOADER)
-        - subscene
+        - subscene (SUB_SCENE): Currently perceived sub_scene.
         - uncertainty (INT): Remaining uncertainy in subscene perception.
         - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
     """
@@ -529,6 +530,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_percept_LTM')
         self.add_port('OUT','to_visual_WM')
+        self.params = {'recognition_time':10}
         self.inputs = {'scene_input':None, 'per_schemas':None}
         self.scene_data = None
         self.subscene = None
@@ -603,12 +605,12 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             self.next_saccade = True
             
         if self.next_saccade:
-            self._get_subscene()
+            self.get_subscene()
             self.next_saccade = False
             if self.subscene:
                 print "Perceiving subscene: %s" %self.subscene.name
                 print "Eye pos: (%.1f,%.1f)" %(self.eye_pos[0], self.eye_pos[1])
-                self.uncertainty = self.subscene.uncertainty*10
+                self.uncertainty = self.subscene.uncertainty*self.params['recognition_time']
         
         if self.subscene:
             self.uncertainty -= 1
@@ -619,7 +621,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
                 self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
                 self.subscene = None
 
-    def _get_subscene(self):
+    def get_subscene(self):
         """
         Get the subscene with highest saliency that hasn't yet been processed.
         Sets the eye position to the center of the subscene area.
@@ -648,8 +650,8 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
 
 ###############################################################################
 if __name__=='__main__':
-    from test_perceptual_schemas import test
-    test()
+    from test_TCG_scene_description import test
+    test(seed=None)
 
     
 

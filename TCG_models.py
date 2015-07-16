@@ -467,7 +467,9 @@ def TCG_description_system(name='description_system'):
     description_brain_mapping.schema_mapping = brain_mappings
     description_system.brain_mapping = description_brain_mapping
     
-    # Parameters   
+    # Parameters
+    subscene_rec.params['recognition_time'] = 10
+    
     visualWM.dyn_params['tau'] = 300.0
     visualWM.dyn_params['act_inf'] = 0.0
     visualWM.dyn_params['L'] = 1.0
@@ -625,6 +627,8 @@ def TCG_full_system(name='full_system'):
     system.set_output_ports([utter.find_port('to_output')])
     
     # Parameters
+    subscene_rec.params['recognition_time'] = 10
+    
     visualWM.dyn_params['tau'] = 300.0
     visualWM.dyn_params['act_inf'] = 0.0
     visualWM.dyn_params['L'] = 1.0
