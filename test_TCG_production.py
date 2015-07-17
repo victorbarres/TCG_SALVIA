@@ -104,7 +104,6 @@ def test(seed=None):
             for inst in sem_timing[step]:
                 print "time:%i, sem:%s" %(step, inst.name)
             language_system_P.set_input(sem_timing[step])
-            language_system_P.schemas['Semantic_WM'].set_output('to_control', True)
         language_system_P.update()
         output = language_system_P.get_output()
         if output:
@@ -224,7 +223,6 @@ def test2(seed=None):
             for inst in sem_insts:
                 print "time:%i, sem:%s" %(t, inst.name)
             language_system_P.set_input(sem_insts)
-            language_system_P.schemas['Semantic_WM'].set_output('to_control', True)
         language_system_P.update()
         output = language_system_P.get_output()
         if t == 250:
@@ -240,7 +238,7 @@ def test2(seed=None):
 
 def test3(seed=None):
     """
-    Test FOL sem inputs
+    Test Incremental Semantic Formulas sem inputs
     """
     
     language_system_P = TCG_production_system()
@@ -258,14 +256,13 @@ def test3(seed=None):
     (sem_insts, next_time, prop) = generator.next()
     
     set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 2000       
+    max_time = 600      
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
             print "t:%i, sem: %s (prop: %s)" %(t, ', '.join([inst.name for inst in sem_insts]), prop)
             language_system_P.set_input(sem_insts)
             language_system_P.schemas['Semantic_WM'].show_SemRep()
-            language_system_P.schemas['Semantic_WM'].set_output('to_control', True) #Do I need that?
         language_system_P.update()
         output = language_system_P.get_output()
         if output:
@@ -273,9 +270,9 @@ def test3(seed=None):
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
     language_system_P.schemas['Semantic_WM'].show_SemRep()
-    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
-    language_system_P.schemas['Grammatical_WM_P'].show_state()
-    language_system_P.save_sim('./tmp/test_language_output.json')
+#    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
+#    language_system_P.schemas['Grammatical_WM_P'].show_state()
+#    language_system_P.save_sim('./tmp/test_language_output.json')
 
     
 if __name__=='__main__':

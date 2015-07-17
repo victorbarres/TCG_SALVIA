@@ -206,6 +206,7 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
         SCHEMA_INST.__init__(self, schema=cpt_schema, trace=trace)
         content_copy = cpt_schema.content.copy()
         self.content = content_copy
+        self.unbound = False
         
     def match(self, cpt_inst, match_type = "is_a"):
         """
@@ -2190,9 +2191,8 @@ class SEM_GENERATOR(object):
     #        cpt_var_pattern = r"\?[A-Z0-9_]+"
         
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
-        func_pattern_cpt = r"(\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
+        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
         func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)"
-        func_pattern_cpt_var = r"(?P<operator>?[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept variables?
         
         sem_input = self.sem_inputs[input_name]
         propositions = sem_input['propositions']
@@ -2215,10 +2215,13 @@ class SEM_GENERATOR(object):
                 match2 = re.search(func_pattern_rel, prop)
                 if match1:
                     dat = match1.groupdict()
+                    cpt_var = dat['cpt_var'] == '?'
                     concept = dat['operator']
                     var = dat['var']                        
                     cpt_schema = self.conceptLTM.find_schema(name=concept)
                     cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
+                    if cpt_var:
+                        cpt_inst.unbound = True
                     name_table[var] = cpt_inst
                     instances.append(cpt_inst)
                 
