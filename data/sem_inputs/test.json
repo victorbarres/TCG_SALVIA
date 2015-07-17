@@ -10,30 +10,12 @@
 				"P5":["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
 				"P6":["WEAR(a2)"],
 				"P7":["AGENT(r3)", "r3(a2, w1)"],
-				"P8":["PATIENT(r4)", "ENTITY(e1)", "r4(a2, e1)"],
-				"P9":["DRESS(e1)"] 
-			  },
-			  "sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
-			  "timing":[],
-			  "comments": "Test semantic input"
-			},
-			
-		"test2": {
-			"sem_rate": 10,
-			 "propositions"  : {
-				"P1": ["WOMAN(w1)"],
-				"P2":["MAN(m1)"],
-				"P3":["MAN(m2)"],
-				"P4":["KICK(a1)"],
-				"P5":["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
-				"P6":["WEAR(a2)"],
-				"P7":["AGENT(r3)", "r3(a2, w1)"],
 				"P8":["PATIENT(r4)", "?ENTITY(e1)", "r4(a2, e1)"],
 				"P9":["DRESS(e1)"] 
 			  },
 			  "sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
 			  "timing":[],
-			  "comments": "Test semantic input with ? used to define concept variables."
+			  "comments": "Test semantic input. The ? is optional but indicates that this concept does not have a possible lexicalization. Needs to be updated before it can be expressed."
 			}
 	}
 }

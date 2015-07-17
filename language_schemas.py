@@ -2190,7 +2190,7 @@ class SEM_GENERATOR(object):
     #        cpt_var_pattern = r"\?[A-Z0-9_]+"
         
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
-        func_pattern_cpt = r"(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
+        func_pattern_cpt = r"(\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
         func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)"
         func_pattern_cpt_var = r"(?P<operator>?[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept variables?
         
