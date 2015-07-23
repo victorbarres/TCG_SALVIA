@@ -17,8 +17,8 @@ def test(seed=None):
     description_system = TCG_description_system()
 
     # Generating schema system graph visualization
-#    description_system.system2dot(image_type='png', disp=True)
-    
+    description_system.system2dot(image_type='svg', disp=False)
+
     # Setting up BU saliency data
     scene_name = 'KC06_1_1'
     scene_folder = "./data/scenes/%s/" %scene_name

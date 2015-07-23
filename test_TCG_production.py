@@ -16,7 +16,7 @@ def test(seed=None):
     language_system_P = TCG_production_system()
     
     # Display schema system
-#    language_system_P.system2dot(image_type='png', disp=True)
+    language_system_P.system2dot(image_type='svg', disp=False)
     
     conceptLTM = language_system_P.schemas['Concept_LTM']
     
@@ -242,8 +242,8 @@ def test3(seed=None):
     """
     
     language_system_P = TCG_production_system()
-    # Display schema system
-#    language_system_P.system2dot(image_type='png', disp=True)
+#     Display schema system
+    language_system_P.system2dot(image_type='svg', disp=False)
     
     conceptLTM = language_system_P.schemas['Concept_LTM']
 

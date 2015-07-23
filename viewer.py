@@ -8,6 +8,16 @@ Defines the TCG_VIEWER class that allows to view a certain dataset into the TCG 
 
 Can be also be use in command line: python viewer.py
 """
+import os, shutil
+import SimpleHTTPServer
+import SocketServer
+import webbrowser
+import subprocess        
+import json
+import pydot
+import matplotlib.pyplot as plt
+import construction
+
 class TCG_VIEWER:
     """
     Connects the simulation to the the TCG viewer.
@@ -40,11 +50,6 @@ class TCG_VIEWER:
         Setting up server at port PORT serving the viewer folder defined by viewer_path
         and opens default browser to "http://localhost:PORT"
         """
-        import os
-        import SimpleHTTPServer
-        import SocketServer
-        
-        import webbrowser
         PORT = self.server_port
     
         os.chdir(self.viewer_path)
@@ -61,7 +66,6 @@ class TCG_VIEWER:
         """
         Copies and creates all the required data in viewer/tmp directory.
         """
-        import os, shutil
         if os.path.exists(self.viewer_path + self.tmp):
             shutil.rmtree(self.viewer_path + self.tmp)
         print os.getcwd()
@@ -75,12 +79,9 @@ class TCG_VIEWER:
         """
         Create graph images for all the constructions.
         Uses graphviz with pydot implementation.
-        """
-        import os, shutil
-        import subprocess        
-        import json
-        import pydot
         
+        Obsolete, check format of display_cxn
+        """        
         prog = 'dot'
         file_type = 'svg'
         
@@ -98,36 +99,48 @@ class TCG_VIEWER:
         grammar = json_data['grammar']
         
         font_size = '10'
+        font_name = 'consolas'
         style = 'filled'
         fill_color = 'white'
+        
+        SemFrame_color = 'white' #'lightcoral'
+        SemFrame_node_shape = 'circle'
+        SemFrame_head_shape = 'doublecircle'
+        SemFrame_node_color = 'black'
+        
+        SynForm_color = 'white' #lightblue'
+        SynForm_shape = 'box'
+        
+        SymLinks_color = 'red'
+        SymLinks_width = '1'
         
         for cxn in grammar:
             dot_cxn = pydot.Dot(graph_type = 'digraph')
             dot_cxn.set_rankdir('LR')
-            dot_cxn.set_fontname('consolas')
+            dot_cxn.set_fontname(font_name)
 
             
             cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame')
-            cluster_SemFrame.set_bgcolor('lightcoral')
+            cluster_SemFrame.set_bgcolor(SemFrame_color)
             for node in cxn['SemFrame']['nodes']:
                 if node['head'] == True:
-                    node_shape = 'doublecircle'
+                    node_shape = SemFrame_head_shape
                 else:
-                    node_shape = 'circle'
-                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept'], color='black', shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
+                    node_shape = SemFrame_node_shape
+                cluster_SemFrame.add_node(pydot.Node(node['name'], label=node['concept'], color=SemFrame_node_color, shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
             for edge in cxn['SemFrame']['edges']:
                 cluster_SemFrame.add_edge(pydot.Edge(edge['from'], edge['to'], label=edge['concept']))
             
             dot_cxn.add_subgraph(cluster_SemFrame)
             
             cluster_SynForm = pydot.Cluster('SynForm', label='SynForm')
-            cluster_SynForm.set_bgcolor('lightblue')
+            cluster_SynForm.set_bgcolor(SynForm_color)
             pre_form = None
             for form in cxn['SynForm']:
                 if form['type'] == "SLOT":
-                    cluster_SynForm.add_node(pydot.Node(form['name'], label ="[" +  ", ".join(form['classes']) +"]", shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label ="[" +  ", ".join(form['classes']) +"]", shape=SynForm_shape, style=style, fillcolor=fill_color, fontsize=font_size))
                 elif form['type'] == 'PHON':
-                    cluster_SynForm.add_node(pydot.Node(form['name'], label = form['phon'], shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
+                    cluster_SynForm.add_node(pydot.Node(form['name'], label = form['phon'], shape=SynForm_shape, style=style, fillcolor=fill_color, fontsize=font_size))
                 if not(pre_form):
                     pre_form = form['name']
                 else:
@@ -137,7 +150,7 @@ class TCG_VIEWER:
             dot_cxn.add_subgraph(cluster_SynForm)
             
             for k in cxn['SymLinks'].keys():
-                dot_cxn.add_edge(pydot.Edge(k, cxn['SymLinks'][k], color='red', dir='none', penwidth='1'))
+                dot_cxn.add_edge(pydot.Edge(k, cxn['SymLinks'][k], color=SymLinks_color, dir='none', penwidth=SymLinks_width))
             
             file_name = cxn_folder + cxn['name'] + ".gv"
             dot_cxn.write(file_name)
@@ -152,12 +165,7 @@ class TCG_VIEWER:
         """
         Create graph image for the conceptual knowledge.
         Uses graphviz with pydot implementation.
-        """
-        import os, shutil
-        import subprocess        
-        import json
-        import pydot
-        
+        """        
         prog = 'dot'
         file_type = 'svg'
         
@@ -205,12 +213,7 @@ class TCG_VIEWER:
         """
         Create graph image for the percetual knowledge.
         Uses graphviz with pydot implementation.
-        """
-        import os, shutil
-        import subprocess        
-        import json
-        import pydot
-        
+        """  
         prog = 'dot'
         file_type = 'svg'
         
@@ -265,12 +268,7 @@ class TCG_VIEWER:
         """
         Create graph image for the conceputalizer.
         Uses graphviz with pydot implementation.
-        """
-        import os, shutil
-        import subprocess        
-        import json
-        import pydot
-        
+        """        
         prog = 'dot'
         file_type = 'svg'
         
@@ -332,58 +330,23 @@ class TCG_VIEWER:
         
         Args:
             - cxn (CXN): the construction object to be displayed.
-        """
-        import subprocess
-        
-        import pydot
-        import matplotlib.pyplot as plt
-        
-        import construction
-        
+        """        
         tmp_folder = './tmp/'        
         
         prog = 'dot'
         file_type = 'png'
-        dot_cxn = pydot.Dot(graph_type = 'digraph')
-        dot_cxn.set_rankdir('LR')
-        dot_cxn.set_fontname('consolas')
 
-        font_size = '10'
-        style = 'filled'
-        fill_color = 'white'
-
+        font_name = 'consolas'
+        labeljust='l'
+        penwidth = '2'
+        rankdir = 'LR'
         
-        cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame')
-        cluster_SemFrame.set_bgcolor('lightcoral')
-        for node in cxn.SemFrame.nodes:
-            if node.head:
-                node_shape = 'doublecircle'
-            else:
-                node_shape = 'circle'
-            cluster_SemFrame.add_node(pydot.Node(node.name, label=node.concept.meaning, color='black', shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
-        for edge in cxn.SemFrame.edges:
-            cluster_SemFrame.add_edge(pydot.Edge(edge.pFrom.name, edge.pTo.name, label=edge.concept.meaning))
+        dot_cxn = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth)
+        dot_cxn.set_rankdir(rankdir)
+        dot_cxn.set_fontname(font_name)
         
-        dot_cxn.add_subgraph(cluster_SemFrame)
-        
-        cluster_SynForm = pydot.Cluster('SynForm', label='SynForm')
-        cluster_SynForm.set_bgcolor('lightblue')
-        pre_form = None
-        for form in cxn.SynForm.form:
-            if isinstance(form, construction.TP_SLOT):
-                cluster_SynForm.add_node(pydot.Node(form.name, label ="[" +  ", ".join(form.cxn_classes) +"]", shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
-            elif isinstance(form, construction.TP_PHON):
-                cluster_SynForm.add_node(pydot.Node(form.name, label = form.cxn_phonetics, shape="box", style=style, fillcolor=fill_color, fontsize=font_size))
-            if not(pre_form):
-                pre_form = form.name
-            else:
-                cluster_SynForm.add_edge(pydot.Edge(pre_form, form.name, label='next'))
-                pre_form = form.name
-        
-        dot_cxn.add_subgraph(cluster_SynForm)
-        
-        for k, v in cxn.SymLinks.SL.iteritems():
-            dot_cxn.add_edge(pydot.Edge(k, v, color='red', dir='none', penwidth='1'))
+        cluster_cxn = TCG_VIEWER._create_cxn_cluster(cxn)
+        dot_cxn.add_subgraph(cluster_cxn)
         
         file_name = tmp_folder + cxn.name + ".gv"
         dot_cxn.write(file_name)
@@ -401,6 +364,78 @@ class TCG_VIEWER:
         plt.imshow(img)
     
     @staticmethod
+    def _create_cxn_cluster(cxn):
+        """
+        returns a DOT cluster containing all the information regarding the construction.
+        """
+        font_size = '16'
+        font_name = 'consolas'
+        style = 'filled'
+        
+        cxn_color = 'white'
+        cxn_bg_color = 'lightgray'
+        
+        SemFrame_color = 'black'
+        SemFrame_bg_color = 'white'
+        SemFrame_node_shape = 'circle'
+        SemFrame_head_shape = 'doublecircle'
+        SemFrame_node_color = 'grey'
+        SemFrame_node_fill_color = 'grey'
+        
+        SynForm_color = 'black'
+        SynForm_bg_color = 'white'
+        SynForm_shape = 'box'
+        SynForm_node_color = 'grey'
+        SynForm_node_fill_color = 'grey'
+        
+        SymLinks_color = 'red'
+        SymLinks_width = '2'
+        
+        label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">class: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
+        cluster_cxn = pydot.Cluster('cxn', label=label, color=cxn_color)
+        cluster_cxn.set_bgcolor(cxn_bg_color)
+        
+        cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame', color=SemFrame_color)
+        cluster_SemFrame.set_bgcolor(SemFrame_bg_color)
+        for node in cxn.SemFrame.nodes:
+            if node.head:
+                node_shape = SemFrame_head_shape
+            else:
+                node_shape = SemFrame_node_shape
+            new_node = pydot.Node(node.name, label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=style, fontsize=font_size)
+            cluster_SemFrame.add_node(new_node)
+        for edge in cxn.SemFrame.edges:
+            new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, label=edge.concept.meaning)
+            cluster_SemFrame.add_edge(new_edge)
+        
+        cluster_cxn.add_subgraph(cluster_SemFrame)
+        
+        cluster_SynForm = pydot.Cluster('SynForm', label='SynForm', color=SynForm_color)
+        cluster_SynForm.set_bgcolor(SynForm_bg_color)
+        pre_form = None
+        for form in cxn.SynForm.form:
+            if isinstance(form, construction.TP_SLOT):
+                new_node = pydot.Node(form.name, label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                cluster_SynForm.add_node(new_node)
+            elif isinstance(form, construction.TP_PHON):
+                new_node = pydot.Node(form.name, label = form.cxn_phonetics, shape=SynForm_shape, style=style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                cluster_SynForm.add_node(new_node)
+            if not(pre_form):
+                pre_form = form.name
+            else:
+                new_edge = pydot.Edge(pre_form, form.name, label='next')
+                cluster_SynForm.add_edge(new_edge)
+                pre_form = form.name
+        
+        cluster_cxn.add_subgraph(cluster_SynForm)
+        
+        for k, v in cxn.SymLinks.SL.iteritems():
+            new_edge = pydot.Edge(v, k, color=SymLinks_color , dir='none', penwidth=SymLinks_width)
+            cluster_cxn.add_edge(new_edge)
+        
+        return cluster_cxn
+    
+    @staticmethod
     def display_semrep(semrep, name=''):
         """
         Create graph images for the semrep 'semrep'.
@@ -408,12 +443,7 @@ class TCG_VIEWER:
         
         Args:
             - semrep (nx.DiGraph): the semrep to be displayed
-        """
-        import subprocess
-        
-        import pydot
-        import matplotlib.pyplot as plt
-        
+        """        
         tmp_folder = './tmp/'   
         if not(name):
             name = 'SemRep'
@@ -449,11 +479,29 @@ class TCG_VIEWER:
         plt.title(title)
         img = plt.imread(img_name)
         plt.imshow(img)
+        
+    @staticmethod
+    def display_cxn_assemblage(cxn_assemblage, name=''):
+        """
+        Nicer display for assemblage.
+        Should have a concise=True/False option (concise does not show the inside of cxn. Ideally, clicking on a cxn would expand it)
+        """
+        for cxn_inst in cxn_assemblage.schema_insts:
+            print "create cxn_insts DOT clusters"
+        for coop_link in cxn_assemblage.coop_links:
+            print "added appropriate edges"
+        return
+    
+    @staticmethod
+    def display_wm_state(WM):
+        """
+        Nicer display for wm state.
+        """
+        return
             
 
 ###############################################################################
 if __name__ == '__main__':
-    import os
     data_folder = './output/'
     
     data_list = os.listdir(data_folder)

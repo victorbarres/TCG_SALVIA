@@ -153,8 +153,8 @@ class KNOWLEDGE_SCHEMA(SCHEMA):
     """    
     def __init__(self, name="", LTM=None, content=None, init_act=0):
         SCHEMA.__init__(self, name)
-        self.LTM = LTM
         self.content = content
+        self.LTM = LTM
         self.init_act = init_act
     
     def set_name(self, name):
@@ -185,9 +185,9 @@ class PROCEDURAL_SCHEMA(SCHEMA):
     """
     def __init__(self, name=''):
         SCHEMA.__init__(self,name)
-        self.activity = 0
         self.in_ports = []
         self.out_ports = []
+        self.activity = 0
         self.t = 0
         self.dt = 1.0
     
@@ -1117,7 +1117,7 @@ class SCHEMA_SYSTEM(object):
     #######################
     ### DISPLAY METHODS ###
     #######################
-    def system2dot(self, image_type='svg', disp=False):
+    def system2dot(self, image_type='svg', disp=False, show_brain_regions=False):
         """
         Generates a dot file of the system's graph.
         Also creates an image.
@@ -1131,7 +1131,6 @@ class SCHEMA_SYSTEM(object):
         file_type = image_type
         dot_sys = pydot.Dot(graph_type = 'digraph', splines = 'ortho')
         dot_sys.set_rankdir('LR')
-        dot_sys.set_fontname('consolas')
 
         color = 'black'
         node_shape = 'record'
@@ -1142,8 +1141,11 @@ class SCHEMA_SYSTEM(object):
         dot_sys.add_node(pydot.Node('OUTPUT', label='OUTPUT', shape='oval'))
         
         for schema_name, schema in self.schemas.iteritems():
-            brain_regions = self.brain_mapping.schema_mapping[schema.name]
-            label = '<'+schema.name+'<BR /><FONT POINT-SIZE="10">['+', '.join(brain_regions) +']</FONT>>'
+            if show_brain_regions:
+                brain_regions = self.brain_mapping.schema_mapping[schema.name]
+                label = '<<FONT FACE="consolas">'+schema.name+'</FONT><BR /><FONT POINT-SIZE="10">['+', '.join(brain_regions) +']</FONT>>'
+            else:
+                label = '<<FONT FACE="consolas">'+schema.name+'</FONT>>'
             dot_sys.add_node(pydot.Node(schema.name, label=label, color=color, shape=node_shape, style=style, fillcolor=fill_color))
         
         for connection in self.connections:

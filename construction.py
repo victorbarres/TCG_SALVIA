@@ -515,6 +515,9 @@ class CXN:
         for n1, n2 in syn_corr.iteritems():
             name_corr[n1] = n2
         
+        cxn_p.show()
+        cxn_c.show()
+        new_cxn.show()
         return (new_cxn, name_corr)
     
     def show(self):
@@ -631,28 +634,16 @@ class GRAMMAR:
 ###############################################################################
 
 if __name__=='__main__':
-    import loader as ld
+    from loader import TCG_LOADER
     
-    my_grammar = ld.load_grammar("TCG_grammar.json", "./data/grammars/")
-    cxn =  my_grammar.constructions[0]
-#    semframe= cxn.SemFrame
-#    print [n.name for n in semframe.nodes]
-#    (sfr_copy, c) = semframe.copy()
-#    print [n.name for n in sfr_copy.nodes]
-#    print c
-#    
-#    synform = cxn.SynForm
-#    print [f.name for f in synform.form]
-#    (sfo_copy, c) = synform.copy()
-#    print [f.name for f in sfo_copy.form]
-#    print c
-#    
-#    (cxn_copy, c) = cxn.copy()
-#    cxn.SemFrame.draw()
-#    cxn_copy.SemFrame.draw()
-#    print [n.name for n in cxn_copy.SemFrame.nodes]
-#    print c
+    # Loading data
+    grammar_name = 'TCG_grammar_VB'
     
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    grammar_file = "%s.json" %grammar_name
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
+    
+    cxn = my_grammar.constructions[0]
     cxn2 = my_grammar.constructions[1]
     
     (cxn3, c) = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
