@@ -395,69 +395,72 @@ class TCG_VIEWER:
         SymLinks_width = '2'
         
         label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">class: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
-        cluster_cxn = pydot.Cluster('cxn', label=label, color=cxn_color, sytle=style)
+        cluster_cxn = pydot.Cluster(cxn.name, label=label, color=cxn_color, sytle=style)
         cluster_cxn.set_bgcolor(cxn_bg_color)
         
-        cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame', color=SemFrame_color)
+        cluster_SemFrame = pydot.Cluster(cxn.name + 'SemFrame', label='SemFrame', color=SemFrame_color)
         cluster_SemFrame.set_bgcolor(SemFrame_bg_color)
         for node in cxn.SemFrame.nodes:
             if node.head:
                 node_shape = SemFrame_head_shape
             else:
                 node_shape = SemFrame_node_shape
-            new_node = pydot.Node(node.name, label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size)
+            new_node = pydot.Node(str(node), label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size)
             cluster_SemFrame.add_node(new_node)
         for edge in cxn.SemFrame.edges:
-            new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, label=edge.concept.meaning)
+            new_edge = pydot.Edge(str(edge.pFrom), str(edge.pTo), label=edge.concept.meaning)
             cluster_SemFrame.add_edge(new_edge)
         
         cluster_cxn.add_subgraph(cluster_SemFrame)
         
-        cluster_SynForm = pydot.Cluster('SynForm', label='SynForm', color=SynForm_color)
+        cluster_SynForm = pydot.Cluster(cxn.name + 'SynForm', label='SynForm', color=SynForm_color)
         cluster_SynForm.set_bgcolor(SynForm_bg_color)
         pre_form = None
         for form in cxn.SynForm.form:
             if isinstance(form, construction.TP_SLOT):
-                new_node = pydot.Node(form.name, label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                new_node = pydot.Node(str(form), label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
                 cluster_SynForm.add_node(new_node)
             elif isinstance(form, construction.TP_PHON):
-                new_node = pydot.Node(form.name, label = form.cxn_phonetics, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                new_node = pydot.Node(str(form), label = form.cxn_phonetics, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
                 cluster_SynForm.add_node(new_node)
             if not(pre_form):
-                pre_form = form.name
+                pre_form = form
             else:
-                new_edge = pydot.Edge(pre_form, form.name, label='next')
+                new_edge = pydot.Edge(str(pre_form), str(form), label='next')
                 cluster_SynForm.add_edge(new_edge)
-                pre_form = form.name
+                pre_form = form
         
         cluster_cxn.add_subgraph(cluster_SynForm)
         
         for k, v in cxn.SymLinks.SL.iteritems():
-            new_edge = pydot.Edge(v, k, color=SymLinks_color , dir='none', penwidth=SymLinks_width)
+            node = cxn.find_elem(k)
+            form = cxn.find_elem(v)
+            new_edge = pydot.Edge(str(form), str(node), color=SymLinks_color , dir='none', penwidth=SymLinks_width)
             cluster_cxn.add_edge(new_edge)
         
         return cluster_cxn
+        
     @staticmethod
     def _create_cxn_inst_cluster(cxn_inst, concise=False):
         """
         Returns a DOT cluster containing all the information regarding the construction instance
         """
-        cxn_cluster = TCG_VIEWER._create_cxn_cluster(cxn_inst.content)
-        inst_cluster = pydot.Cluster('instance', color='white', fill='white')
-        for port in cxn_inst.out_ports:
-            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2', color="#000000")
-            inst_cluster.add_node(port_node)
-        
         label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">activity: %.1f</TD></TR></TABLE></FONT>>' %('consolas', cxn_inst.name, cxn_inst.activity)
-        inst_cluster_content = pydot.Cluster('instance_content', label=label, style='rounded', color='black', fill='white')
-        inst_cluster_content.add_subgraph(cxn_cluster)
-        inst_cluster.add_subgraph(inst_cluster_content)
-        
-        for port in cxn_inst.in_ports:
-            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2')
+        inst_cluster = pydot.Cluster(cxn_inst.name, label=label, style='rounded', color='black', fill='white')
+        for port in cxn_inst.out_ports:
+            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2', color='white')
             inst_cluster.add_node(port_node)
-            edge = pydot.Edge(str(port), port.data.name, style='dashed', dir='none', splines='spline')
-            inst_cluster.add_edge(edge)
+        
+        if not(concise):
+            cxn_cluster = TCG_VIEWER._create_cxn_cluster(cxn_inst.content)
+            inst_cluster.add_subgraph(cxn_cluster)
+        
+        #For now I'll remove the input ports. Too much cluter.
+#        for port in cxn_inst.in_ports:
+#            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2')
+#            inst_cluster.add_node(port_node)
+#            edge = pydot.Edge(str(port), str(port.data), style='dashed', dir='none', splines='spline')
+#            inst_cluster.add_edge(edge)
         
         
         return inst_cluster
@@ -532,9 +535,10 @@ class TCG_VIEWER:
         plt.figure(facecolor='white')
         plt.axis('off')
         img = plt.imread(img_name)
-        plt.imshow(img)    
+        plt.imshow(img)
+        
     @staticmethod
-    def display_cxn_assemblage(cxn_assemblage, name='', concise=False):
+    def display_cxn_assemblage(cxn_assemblage, name='cxn_assemblage', concise=False):
         """
         Nicer display for assemblage.
         Should have a concise=True/False option (concise does not show the inside of cxn. Ideally, clicking on a cxn would expand it)
@@ -543,11 +547,27 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'png'
         
+        assemblage_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l', compound='true')
+        
         for cxn_inst in cxn_assemblage.schema_insts:
-            print "create cxn_insts DOT clusters"
+            cxn_inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst, concise=concise)
+            assemblage_graph.add_subgraph(cxn_inst_cluster)
         for coop_link in cxn_assemblage.coop_links:
-            print "added appropriate edges"
-        return
+            connect = coop_link.connect
+            coop_edge = pydot.Edge(str(connect.port_from), str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box', ltail='cluster_' + coop_link.inst_from.name)
+            assemblage_graph.add_edge(coop_edge)
+        
+        file_name = tmp_folder + name + ".gv"
+        assemblage_graph.write(file_name)
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        img_name = '%s.%s' %(file_name,file_type)
+        
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        img = plt.imread(img_name)
+        plt.imshow(img)
     
     @staticmethod
     def display_wm_state(WM):

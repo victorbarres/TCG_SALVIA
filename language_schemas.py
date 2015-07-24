@@ -698,6 +698,7 @@ class GRAMMATICAL_WM_P(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
+                viewer.TCG_VIEWER.display_cxn_assemblage(winner_assemblage, 'assemblage' + str(self.t))
 #                eq_inst.content.show()
                 phon_WM_output.extend(phon_form)
                 sem_WM_output.extend(expressed)
@@ -1347,7 +1348,7 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
                 edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
                 mapping = {'nodes':node_mapping, 'edges':edge_mapping}                
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
-                viewer.TCG_VIEWER.display_cxn_instance(new_instance)
+#                viewer.TCG_VIEWER.display_cxn_i`stance(new_instance)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
     def SemMatch_cat(self, SemRep, cxn_schema):

@@ -21,7 +21,7 @@ def test(seed=None):
     sem_inputs = TCG_LOADER.load_sem_input("test.json", "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
 
-    input_name = 'test_name'    
+    input_name = 'test'    
     generator = sem_gen.sem_generator(input_name)
     
     (sem_insts, next_time, prop) = generator.next()
