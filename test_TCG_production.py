@@ -6,6 +6,7 @@ Test cases for the language production schemas defined in language_schemas.py
 import language_schemas as ls
 from loader import TCG_LOADER
 from TCG_models import TCG_production_system
+from viewer import TCG_VIEWER
     
 def test(seed=None):
     """
@@ -41,6 +42,7 @@ def test(seed=None):
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
 #    language_system_P.schemas['Semantic_WM'].show_SemRep()
+    TCG_VIEWER.display_semrep(language_system_P.schemas['Semantic_WM'].SemRep)
 #    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
 #    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')

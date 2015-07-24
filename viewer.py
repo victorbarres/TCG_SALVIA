@@ -400,15 +400,16 @@ class TCG_VIEWER:
         label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">class: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
         cluster_cxn = pydot.Cluster(name, label=label, color=cxn_color)
         cluster_cxn.set_bgcolor(cxn_bg_color)
-
-        cluster_SemFrame = pydot.Cluster(name + '_SemFrame', label='SemFrame', color=SemFrame_color)
+        
+        label = '<<FONT FACE="%s">SemFrame</FONT>>' %font_name
+        cluster_SemFrame = pydot.Cluster(name + '_SemFrame', label=label, color=SemFrame_color)
         cluster_SemFrame.set_bgcolor(SemFrame_bg_color)
         for node in cxn.SemFrame.nodes:
             if node.head:
                 node_shape = SemFrame_head_shape
             else:
                 node_shape = SemFrame_node_shape
-            new_node = pydot.Node(str(node), label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size)
+            new_node = pydot.Node(str(node), label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name)
             cluster_SemFrame.add_node(new_node)
         for edge in cxn.SemFrame.edges:
             new_edge = pydot.Edge(str(edge.pFrom), str(edge.pTo), label=edge.concept.meaning)
@@ -416,15 +417,16 @@ class TCG_VIEWER:
         
         cluster_cxn.add_subgraph(cluster_SemFrame)
         
-        cluster_SynForm = pydot.Cluster(name + '_SynForm', label='SynForm', color=SynForm_color)
+        label = '<<FONT FACE="%s">SynForm</FONT>>' %font_name
+        cluster_SynForm = pydot.Cluster(name + '_SynForm', label=label, color=SynForm_color)
         cluster_SynForm.set_bgcolor(SynForm_bg_color)
         pre_form = None
         for form in cxn.SynForm.form:
             if isinstance(form, construction.TP_SLOT):
-                new_node = pydot.Node(str(form), label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                new_node = pydot.Node(str(form), label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
                 cluster_SynForm.add_node(new_node)
             elif isinstance(form, construction.TP_PHON):
-                new_node = pydot.Node(str(form), label = form.cxn_phonetics, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                new_node = pydot.Node(str(form), label = form.cxn_phonetics, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
                 cluster_SynForm.add_node(new_node)
             if not(pre_form):
                 pre_form = form
@@ -493,6 +495,34 @@ class TCG_VIEWER:
             C2_cluster.add_edge(comp_edge)
         
         return C2_cluster
+        
+    @staticmethod   
+    def _create_semrep_cluster(semrep, name=''):
+        """
+        Returns a DOT cluster containing all the SemRep information.
+        """
+        node_font_size = '14'
+        edge_font_size = '12'
+        style = 'filled'
+        node_fill_color = 'lightgrey'
+        node_color = 'white'
+        node_shape = 'oval'
+        font_name = 'consolas'
+        semrep_cluster = pydot.Cluster(name, color='white', fillcolor='white')
+        
+        for n, d in semrep.nodes(data=True):
+            label = '%s (%.1f)' %(d['cpt_inst'].name, d['cpt_inst'].activity)
+            new_node = pydot.Node(n, label=label, shape=node_shape, style=style, color=node_color, fillcolor=node_fill_color, fontsize=node_font_size, fontname=font_name)
+            semrep_cluster.add_node(new_node)
+            
+        for u,v, d in semrep.edges(data=True):
+            label = label = '%s (%.1f)' %(d['cpt_inst'].name, d['cpt_inst'].activity)
+            new_edge = pydot.Edge(u, v, label=label,  fontsize=edge_font_size, fontname=font_name, penwidth='2')
+            semrep_cluster.add_edge(new_edge)
+        
+        return semrep_cluster
+        
+        
     @staticmethod
     def display_semrep(semrep, name=''):
         """
@@ -507,21 +537,13 @@ class TCG_VIEWER:
             name = 'SemRep'
         
         prog = 'dot'
-        file_type = 'png'
-        dot_semrep = pydot.Dot(graph_type = 'digraph')
-        dot_semrep.set_rankdir('LR')
-        dot_semrep.set_fontname('consolas')
-
-        font_size = '20'
-        style = 'filled'
-        fill_color = 'white'
-        node_shape = 'circle'
+        file_type = 'svg'
         
-        for n, d in semrep.nodes(data=True):
-            dot_semrep.add_node(pydot.Node(n, label=d['concept'].meaning, color='black', shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
-            
-        for u,v, d in semrep.edges(data=True):
-            dot_semrep.add_edge(pydot.Edge(u, v, label=d['concept'].meaning,  fontsize=font_size))
+        dot_semrep = pydot.Dot(graph_type = 'digraph', penwidth ='2')
+        dot_semrep.set_rankdir('LR')
+        
+        semrep_cluster = TCG_VIEWER._create_semrep_cluster(semrep, name)
+        dot_semrep.add_subgraph(semrep_cluster)
         
         file_name = tmp_folder + name + ".gv"
         dot_semrep.write(file_name)
@@ -529,14 +551,14 @@ class TCG_VIEWER:
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
-        img_name = '%s.%s' %(file_name,file_type)
-        
-        plt.figure(facecolor='white')
-        plt.axis('off')
-        title = name
-        plt.title(title)
-        img = plt.imread(img_name)
-        plt.imshow(img)
+#        img_name = '%s.%s' %(file_name,file_type)
+#        
+#        plt.figure(facecolor='white')
+#        plt.axis('off')
+#        title = name
+#        plt.title(title)
+#        img = plt.imread(img_name)
+#        plt.imshow(img)
         
     @staticmethod
     def display_cxn_instance(cxn_inst, name=''):
@@ -546,10 +568,12 @@ class TCG_VIEWER:
         tmp_folder = './tmp/'        
         prog = 'dot'
         file_type = 'png'
+        
+        font_name ='consolas'
 
         inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst)
         
-        inst_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l')
+        inst_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l' ,fontname=font_name)
         inst_graph.add_subgraph(inst_cluster)
         
         name = cxn_inst.name
