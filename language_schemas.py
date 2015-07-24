@@ -17,6 +17,7 @@ import pyttsx
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
 import TCG_graph
+import viewer
 
 ##################################
 ### Language knowledge schemas ###
@@ -1346,6 +1347,7 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
                 edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
                 mapping = {'nodes':node_mapping, 'edges':edge_mapping}                
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
+                viewer.TCG_VIEWER.display_cxn_instance(new_instance)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
     def SemMatch_cat(self, SemRep, cxn_schema):

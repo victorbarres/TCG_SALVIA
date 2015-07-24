@@ -370,10 +370,13 @@ class TCG_VIEWER:
         """
         font_size = '16'
         font_name = 'consolas'
-        style = 'filled'
+        
+        style = 'rounded'
         
         cxn_color = 'white'
         cxn_bg_color = 'lightgray'
+        
+        node_style = 'filled'
         
         SemFrame_color = 'black'
         SemFrame_bg_color = 'white'
@@ -392,7 +395,7 @@ class TCG_VIEWER:
         SymLinks_width = '2'
         
         label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">class: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
-        cluster_cxn = pydot.Cluster('cxn', label=label, color=cxn_color)
+        cluster_cxn = pydot.Cluster('cxn', label=label, color=cxn_color, sytle=style)
         cluster_cxn.set_bgcolor(cxn_bg_color)
         
         cluster_SemFrame = pydot.Cluster('SemFrame', label='SemFrame', color=SemFrame_color)
@@ -402,7 +405,7 @@ class TCG_VIEWER:
                 node_shape = SemFrame_head_shape
             else:
                 node_shape = SemFrame_node_shape
-            new_node = pydot.Node(node.name, label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=style, fontsize=font_size)
+            new_node = pydot.Node(node.name, label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size)
             cluster_SemFrame.add_node(new_node)
         for edge in cxn.SemFrame.edges:
             new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, label=edge.concept.meaning)
@@ -415,10 +418,10 @@ class TCG_VIEWER:
         pre_form = None
         for form in cxn.SynForm.form:
             if isinstance(form, construction.TP_SLOT):
-                new_node = pydot.Node(form.name, label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                new_node = pydot.Node(form.name, label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
                 cluster_SynForm.add_node(new_node)
             elif isinstance(form, construction.TP_PHON):
-                new_node = pydot.Node(form.name, label = form.cxn_phonetics, shape=SynForm_shape, style=style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
+                new_node = pydot.Node(form.name, label = form.cxn_phonetics, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size)
                 cluster_SynForm.add_node(new_node)
             if not(pre_form):
                 pre_form = form.name
@@ -434,6 +437,30 @@ class TCG_VIEWER:
             cluster_cxn.add_edge(new_edge)
         
         return cluster_cxn
+    @staticmethod
+    def _create_cxn_inst_cluster(cxn_inst, concise=False):
+        """
+        Returns a DOT cluster containing all the information regarding the construction instance
+        """
+        cxn_cluster = TCG_VIEWER._create_cxn_cluster(cxn_inst.content)
+        inst_cluster = pydot.Cluster('instance', color='white', fill='white')
+        for port in cxn_inst.out_ports:
+            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2', color="#000000")
+            inst_cluster.add_node(port_node)
+        
+        label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">activity: %.1f</TD></TR></TABLE></FONT>>' %('consolas', cxn_inst.name, cxn_inst.activity)
+        inst_cluster_content = pydot.Cluster('instance_content', label=label, style='rounded', color='black', fill='white')
+        inst_cluster_content.add_subgraph(cxn_cluster)
+        inst_cluster.add_subgraph(inst_cluster_content)
+        
+        for port in cxn_inst.in_ports:
+            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2')
+            inst_cluster.add_node(port_node)
+            edge = pydot.Edge(str(port), port.data.name, style='dashed', dir='none', splines='spline')
+            inst_cluster.add_edge(edge)
+        
+        
+        return inst_cluster
     
     @staticmethod
     def display_semrep(semrep, name=''):
@@ -481,11 +508,41 @@ class TCG_VIEWER:
         plt.imshow(img)
         
     @staticmethod
-    def display_cxn_assemblage(cxn_assemblage, name=''):
+    def display_cxn_instance(cxn_inst, name=''):
+        """
+        Display a construction instance.
+        """
+        tmp_folder = './tmp/'        
+        prog = 'dot'
+        file_type = 'png'
+
+        inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst, concise=False)
+        
+        inst_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l')
+        inst_graph.add_subgraph(inst_cluster)
+        
+        name = cxn_inst.name
+        file_name = tmp_folder + name + ".gv"
+        inst_graph.write(file_name)
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        img_name = '%s.%s' %(file_name,file_type)
+        
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        img = plt.imread(img_name)
+        plt.imshow(img)    
+    @staticmethod
+    def display_cxn_assemblage(cxn_assemblage, name='', concise=False):
         """
         Nicer display for assemblage.
         Should have a concise=True/False option (concise does not show the inside of cxn. Ideally, clicking on a cxn would expand it)
         """
+        tmp_folder = './tmp/'        
+        prog = 'dot'
+        file_type = 'png'
+        
         for cxn_inst in cxn_assemblage.schema_insts:
             print "create cxn_insts DOT clusters"
         for coop_link in cxn_assemblage.coop_links:

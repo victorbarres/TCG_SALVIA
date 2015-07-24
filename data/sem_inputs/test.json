@@ -16,6 +16,15 @@
 			  "sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
 			  "timing":[],
 			  "comments": "Test semantic input. The ? is optional but indicates that this concept does not have a possible lexicalization. Needs to be updated before it can be expressed."
+			},
+		"test_name": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"P1": ["WOMAN(w1)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": ""
 			}
 	}
 }

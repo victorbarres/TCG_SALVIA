@@ -515,9 +515,6 @@ class CXN:
         for n1, n2 in syn_corr.iteritems():
             name_corr[n1] = n2
         
-        cxn_p.show()
-        cxn_c.show()
-        new_cxn.show()
         return (new_cxn, name_corr)
     
     def show(self):
