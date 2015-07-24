@@ -17,7 +17,6 @@ import pyttsx
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
 import TCG_graph
-import viewer
 
 ##################################
 ### Language knowledge schemas ###
@@ -68,6 +67,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                     new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
                     new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
                     new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
+                    print new_mapping
                     self.covers = new_mapping
         else:
              self.covers = mapping
@@ -631,8 +631,6 @@ class GRAMMATICAL_WM_P(WM):
         self.convey_sem_activations(sem_input)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
-        if self.t>200 and self.t<202:
-            viewer.TCG_VIEWER.display_gram_wm_state(self)
         
         if ctrl_input and ctrl_input['start_produce']:
             output = self.produce_form(sem_input,phon_input)

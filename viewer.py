@@ -409,10 +409,10 @@ class TCG_VIEWER:
                 node_shape = SemFrame_head_shape
             else:
                 node_shape = SemFrame_node_shape
-            new_node = pydot.Node(str(node), label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name)
+            new_node = pydot.Node(node.name, label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name)
             cluster_SemFrame.add_node(new_node)
         for edge in cxn.SemFrame.edges:
-            new_edge = pydot.Edge(str(edge.pFrom), str(edge.pTo), label=edge.concept.meaning)
+            new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, label=edge.concept.meaning)
             cluster_SemFrame.add_edge(new_edge)
         
         cluster_cxn.add_subgraph(cluster_SemFrame)
@@ -440,7 +440,7 @@ class TCG_VIEWER:
         for k, v in cxn.SymLinks.SL.iteritems():
             node = cxn.find_elem(k)
             form = cxn.find_elem(v)
-            new_edge = pydot.Edge(str(form), str(node), color=SymLinks_color , dir='none', penwidth=SymLinks_width, style=SymLinks_style)
+            new_edge = pydot.Edge(str(form), node.name, color=SymLinks_color , dir='none', penwidth=SymLinks_width, style=SymLinks_style)
             cluster_cxn.add_edge(new_edge)
         
         return cluster_cxn
@@ -479,7 +479,7 @@ class TCG_VIEWER:
         Returns a DOT cluster containing all the information regarding the C2 between cxn instances.
         """
         
-        C2_cluster = pydot.Cluster('c2_cluster', color='white', fill='white')
+        C2_cluster = pydot.Cluster('c2_cluster', label='', color='white', fill='white')
         
         for cxn_inst in cxn_insts:
             cxn_inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst)
@@ -487,7 +487,7 @@ class TCG_VIEWER:
         for coop_link in coop_links:
             connect = coop_link.connect
 #            coop_edge = pydot.Edge(str(connect.port_from), str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box', ltail='cluster_' + coop_link.inst_from.name)
-            coop_edge = pydot.Edge(str(connect.port_from.data), str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box')
+            coop_edge = pydot.Edge(connect.port_from.data.name, str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box')
 
             C2_cluster.add_edge(coop_edge)
         for comp_link in comp_links:
@@ -508,7 +508,7 @@ class TCG_VIEWER:
         node_color = 'white'
         node_shape = 'oval'
         font_name = 'consolas'
-        semrep_cluster = pydot.Cluster(name, color='white', fillcolor='white')
+        semrep_cluster = pydot.Cluster(name, label='', color='white', fillcolor='white')
         
         for n, d in semrep.nodes(data=True):
             label = '%s (%.1f)' %(d['cpt_inst'].name, d['cpt_inst'].activity)
@@ -521,44 +521,44 @@ class TCG_VIEWER:
             semrep_cluster.add_edge(new_edge)
         
         return semrep_cluster
-        
-        
-    @staticmethod
-    def display_semrep(semrep, name=''):
+    
+    
+    @staticmethod        
+    def _create_lingWM_cluster(semWM, gramWM):
         """
-        Create graph images for the semrep 'semrep'.
+        Returns a DOT cluster containing all the the linguisticWM (semanticWM + grammaticamWM)
         Uses graphviz with pydot implementation.
         
-        Args:
-            - semrep (nx.DiGraph): the semrep to be displayed
+        NOTE: would need to add phonological WM
         """        
-        tmp_folder = './tmp/'   
-        if not(name):
-            name = 'SemRep'
+        font_name = 'consolas'
+        cover_color = 'grey'
+        cover_style = 'dashed'
         
-        prog = 'dot'
-        file_type = 'svg'
+        lingWM_cluster = pydot.Cluster('linguisticWM')
         
-        dot_semrep = pydot.Dot(graph_type = 'digraph', penwidth ='2')
-        dot_semrep.set_rankdir('LR')
+        # Add SemanticWM cluster
+        label = '<<FONT FACE="%s">Semantic WM (t:%.1f)</FONT>>' %(font_name, semWM.t)
+        semWM_cluster = pydot.Cluster('semWM', label=label)
+        semrep_cluster = TCG_VIEWER._create_semrep_cluster(semWM.SemRep, 'SemRep')
+        semWM_cluster.add_subgraph(semrep_cluster)
+        lingWM_cluster.add_subgraph(semWM_cluster)
         
-        semrep_cluster = TCG_VIEWER._create_semrep_cluster(semrep, name)
-        dot_semrep.add_subgraph(semrep_cluster)
+        # Add GrammaticalWM cluster
+        label = '<<FONT FACE="%s">Grammatical WM (t:%.1f)</FONT>>' %(font_name, gramWM.t)
+        gramWM_cluster = pydot.Cluster('gramWM', label=label)
+        cxn_inst_C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(gramWM.schema_insts, gramWM.coop_links, gramWM.comp_links)
+        gramWM_cluster.add_subgraph(cxn_inst_C2_cluster)
+        lingWM_cluster.add_subgraph(gramWM_cluster)
         
-        file_name = tmp_folder + name + ".gv"
-        dot_semrep.write(file_name)
+        #Add covers links
+        for cxn_inst in gramWM.schema_insts:
+            node_covers = cxn_inst.covers['nodes'] # I am only going to show the node covers for simplicity
+            for n1, n2 in node_covers.iteritems():
+                new_edge = pydot.Edge(n1, n2, color=cover_color, style=cover_style)
+                lingWM_cluster.add_edge(new_edge)
         
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
-        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
-        subprocess.call(cmd, shell=True)
-#        img_name = '%s.%s' %(file_name,file_type)
-#        
-#        plt.figure(facecolor='white')
-#        plt.axis('off')
-#        title = name
-#        plt.title(title)
-#        img = plt.imread(img_name)
-#        plt.imshow(img)
+        return lingWM_cluster
         
     @staticmethod
     def display_cxn_instance(cxn_inst, name=''):
@@ -618,7 +618,7 @@ class TCG_VIEWER:
 #        plt.imshow(img)
     
     @staticmethod
-    def display_gram_wm_state(WM):
+    def display_gramWM_state(WM):
         """
         Nicer display for wm state.
         """
@@ -635,6 +635,71 @@ class TCG_VIEWER:
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
+    
+    @staticmethod
+    def display_semWM_state(WM):
+        """
+        Create graph images for the semanic working memory
+        Uses graphviz with pydot implementation.
+        """        
+        tmp_folder = './tmp/'   
+        
+        prog = 'dot'
+        file_type = 'svg'
+        
+        dot_semrep = pydot.Dot(graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
+        
+        semrep_cluster = TCG_VIEWER._create_semrep_cluster(WM.SemRep, 'SemRep')
+        dot_semrep.add_subgraph(semrep_cluster)
+        
+        file_name = '%s%s%.1f.gv' %(tmp_folder, WM.name, WM.t)
+        dot_semrep.write(file_name)
+        
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+#        img_name = '%s.%s' %(file_name,file_type)
+#        
+#        plt.figure(facecolor='white')
+#        plt.axis('off')
+#        title = name
+#        plt.title(title)
+#        img = plt.imread(img_name)
+#        plt.imshow(img)
+        
+    @staticmethod
+    def display_lingWM_state(semWM, gramWM):
+        """
+        Create graph images for the ling working memory (semantic WM + grammatical WM)
+        Uses graphviz with pydot implementation.
+        """        
+        tmp_folder = './tmp/'   
+        
+        prog = 'dot'
+        file_type = 'svg'
+        
+        lingWM_graph = pydot.Dot(graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
+        lingWM_graph.set_rankdir('LR')
+        
+        lingWM_cluster = TCG_VIEWER._create_lingWM_cluster(semWM, gramWM)
+        lingWM_graph.add_subgraph(lingWM_cluster)
+        
+        file_name = '%sling_WM%.1f.gv' %(tmp_folder, semWM.t)
+        lingWM_graph.write(file_name)
+        
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+#        img_name = '%s.%s' %(file_name,file_type)
+#        
+#        plt.figure(facecolor='white')
+#        plt.axis('off')
+#        title = name
+#        plt.title(title)
+#        img = plt.imread(img_name)
+#        plt.imshow(img)
+        
+
             
 
 ###############################################################################

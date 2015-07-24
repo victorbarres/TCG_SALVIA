@@ -22,7 +22,7 @@ def test(seed=None):
     sem_inputs = TCG_LOADER.load_sem_input("test.json", "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
 
-    input_name = 'test'    
+    input_name = 'test_name'    
     generator = sem_gen.sem_generator(input_name)
     
     (sem_insts, next_time, prop) = generator.next()
@@ -39,10 +39,13 @@ def test(seed=None):
         output = language_system_P.get_output()
         if output:
             print "t:%i, '%s'" %(t, output)
+        if t>200 and t<202:
+#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'])
+            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'])
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
 #    language_system_P.schemas['Semantic_WM'].show_SemRep()
-    TCG_VIEWER.display_semrep(language_system_P.schemas['Semantic_WM'].SemRep)
+    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'])
 #    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
 #    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')
