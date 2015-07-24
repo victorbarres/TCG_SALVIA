@@ -364,14 +364,13 @@ class TCG_VIEWER:
         plt.imshow(img)
     
     @staticmethod
-    def _create_cxn_cluster(cxn):
+    def _create_cxn_cluster(cxn, name=None):
         """
         returns a DOT cluster containing all the information regarding the construction.
         """
         font_size = '16'
         font_name = 'consolas'
         
-        style = 'rounded'
         
         cxn_color = 'white'
         cxn_bg_color = 'lightgray'
@@ -391,14 +390,18 @@ class TCG_VIEWER:
         SynForm_node_color = 'grey'
         SynForm_node_fill_color = 'grey'
         
-        SymLinks_color = 'red'
-        SymLinks_width = '2'
+        SymLinks_color = 'black'
+        SymLinks_width = '1'
+        SymLinks_style = 'dashed'
         
+        if not(name):
+            name = cxn.name
+            
         label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">class: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
-        cluster_cxn = pydot.Cluster(cxn.name, label=label, color=cxn_color, sytle=style)
+        cluster_cxn = pydot.Cluster(name, label=label, color=cxn_color)
         cluster_cxn.set_bgcolor(cxn_bg_color)
-        
-        cluster_SemFrame = pydot.Cluster(cxn.name + 'SemFrame', label='SemFrame', color=SemFrame_color)
+
+        cluster_SemFrame = pydot.Cluster(name + '_SemFrame', label='SemFrame', color=SemFrame_color)
         cluster_SemFrame.set_bgcolor(SemFrame_bg_color)
         for node in cxn.SemFrame.nodes:
             if node.head:
@@ -413,7 +416,7 @@ class TCG_VIEWER:
         
         cluster_cxn.add_subgraph(cluster_SemFrame)
         
-        cluster_SynForm = pydot.Cluster(cxn.name + 'SynForm', label='SynForm', color=SynForm_color)
+        cluster_SynForm = pydot.Cluster(name + '_SynForm', label='SynForm', color=SynForm_color)
         cluster_SynForm.set_bgcolor(SynForm_bg_color)
         pre_form = None
         for form in cxn.SynForm.form:
@@ -435,25 +438,28 @@ class TCG_VIEWER:
         for k, v in cxn.SymLinks.SL.iteritems():
             node = cxn.find_elem(k)
             form = cxn.find_elem(v)
-            new_edge = pydot.Edge(str(form), str(node), color=SymLinks_color , dir='none', penwidth=SymLinks_width)
+            new_edge = pydot.Edge(str(form), str(node), color=SymLinks_color , dir='none', penwidth=SymLinks_width, style=SymLinks_style)
             cluster_cxn.add_edge(new_edge)
         
         return cluster_cxn
         
     @staticmethod
-    def _create_cxn_inst_cluster(cxn_inst, concise=False):
+    def _create_cxn_inst_cluster(cxn_inst):
         """
         Returns a DOT cluster containing all the information regarding the construction instance
         """
         label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">activity: %.1f</TD></TR></TABLE></FONT>>' %('consolas', cxn_inst.name, cxn_inst.activity)
-        inst_cluster = pydot.Cluster(cxn_inst.name, label=label, style='rounded', color='black', fill='white')
+        inst_cluster = pydot.Cluster(cxn_inst.name, label=label, color='black', fill='white')
         for port in cxn_inst.out_ports:
             port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2', color='white')
             inst_cluster.add_node(port_node)
         
-        if not(concise):
-            cxn_cluster = TCG_VIEWER._create_cxn_cluster(cxn_inst.content)
-            inst_cluster.add_subgraph(cxn_cluster)
+        #Node use to draw competition links.
+        comp_node = pydot.Node(name=cxn_inst.name, shape='point', color='white')
+        inst_cluster.add_node(comp_node)
+        
+        cxn_cluster = TCG_VIEWER._create_cxn_cluster(cxn_inst.content, cxn_inst.name + '_content')
+        inst_cluster.add_subgraph(cxn_cluster)
         
         #For now I'll remove the input ports. Too much cluter.
 #        for port in cxn_inst.in_ports:
@@ -465,6 +471,28 @@ class TCG_VIEWER:
         
         return inst_cluster
     
+    @staticmethod
+    def _create_cxn_inst_C2_cluster(cxn_insts, coop_links, comp_links):
+        """
+        Returns a DOT cluster containing all the information regarding the C2 between cxn instances.
+        """
+        
+        C2_cluster = pydot.Cluster('c2_cluster', color='white', fill='white')
+        
+        for cxn_inst in cxn_insts:
+            cxn_inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst)
+            C2_cluster.add_subgraph(cxn_inst_cluster)
+        for coop_link in coop_links:
+            connect = coop_link.connect
+#            coop_edge = pydot.Edge(str(connect.port_from), str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box', ltail='cluster_' + coop_link.inst_from.name)
+            coop_edge = pydot.Edge(str(connect.port_from.data), str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box')
+
+            C2_cluster.add_edge(coop_edge)
+        for comp_link in comp_links:
+            comp_edge = pydot.Edge(comp_link.inst_from.name, comp_link.inst_to.name, color='red', penwidth='3', dir='both', arrowhead='dot', arrowtail='dot', ltail='cluster_' + comp_link.inst_from.name, lhead='cluster_' + comp_link.inst_to.name)
+            C2_cluster.add_edge(comp_edge)
+        
+        return C2_cluster
     @staticmethod
     def display_semrep(semrep, name=''):
         """
@@ -519,7 +547,7 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'png'
 
-        inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst, concise=False)
+        inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst)
         
         inst_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l')
         inst_graph.add_subgraph(inst_cluster)
@@ -538,43 +566,51 @@ class TCG_VIEWER:
         plt.imshow(img)
         
     @staticmethod
-    def display_cxn_assemblage(cxn_assemblage, name='cxn_assemblage', concise=False):
+    def display_cxn_assemblage(cxn_assemblage, name='cxn_assemblage'):
         """
         Nicer display for assemblage.
         Should have a concise=True/False option (concise does not show the inside of cxn. Ideally, clicking on a cxn would expand it)
         """
         tmp_folder = './tmp/'        
         prog = 'dot'
-        file_type = 'png'
+        file_type = 'svg'
         
-        assemblage_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l', compound='true')
+        assemblage_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
         
-        for cxn_inst in cxn_assemblage.schema_insts:
-            cxn_inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst, concise=concise)
-            assemblage_graph.add_subgraph(cxn_inst_cluster)
-        for coop_link in cxn_assemblage.coop_links:
-            connect = coop_link.connect
-            coop_edge = pydot.Edge(str(connect.port_from), str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box', ltail='cluster_' + coop_link.inst_from.name)
-            assemblage_graph.add_edge(coop_edge)
+        C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(cxn_assemblage.schema_insts, cxn_assemblage.coop_links, [])
+        assemblage_graph.add_subgraph(C2_cluster)
+
         
         file_name = tmp_folder + name + ".gv"
         assemblage_graph.write(file_name)
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
-        img_name = '%s.%s' %(file_name,file_type)
+#        img_name = '%s.%s' %(file_name,file_type)
         
-        plt.figure(facecolor='white')
-        plt.axis('off')
-        img = plt.imread(img_name)
-        plt.imshow(img)
+#        plt.figure(facecolor='white')
+#        plt.axis('off')
+#        img = plt.imread(img_name)
+#        plt.imshow(img)
     
     @staticmethod
-    def display_wm_state(WM):
+    def display_gram_wm_state(WM):
         """
         Nicer display for wm state.
         """
-        return
+        tmp_folder = './tmp/'        
+        prog = 'dot'
+        file_type = 'svg'
+        
+        gram_WM_state_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
+        C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(WM.schema_insts, WM.coop_links,WM.comp_links)
+        gram_WM_state_graph.add_subgraph(C2_cluster)
+        
+        file_name = '%s%s%.1f.gv' %(tmp_folder, WM.name, WM.t)
+        gram_WM_state_graph.write(file_name)
+        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
             
 
 ###############################################################################

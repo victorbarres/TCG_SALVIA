@@ -33,14 +33,14 @@ def test(seed=None):
             (sem_insts, next_time, prop) = generator.next()
             print "t:%i, sem: %s (prop: %s)" %(t, ', '.join([inst.name for inst in sem_insts]), prop)
             language_system_P.set_input(sem_insts)
-            language_system_P.schemas['Semantic_WM'].show_SemRep()
+#            language_system_P.schemas['Semantic_WM'].show_SemRep()
         language_system_P.update()
         output = language_system_P.get_output()
         if output:
             print "t:%i, '%s'" %(t, output)
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
-    language_system_P.schemas['Semantic_WM'].show_SemRep()
+#    language_system_P.schemas['Semantic_WM'].show_SemRep()
 #    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
 #    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')

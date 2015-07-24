@@ -167,7 +167,7 @@ class TP_SEMFRAME(TP_ELEM):
     
     def get_head(self):
         """
-        Return head node (NEED TO CHECK FOR THE CASE OF MULTIPLE NODES!!!!!!)
+        Return head node (NEED TO CHECK FOR THE CASE OF MULTIPLE HEAD NODES!!!!!!)
         """
         for node in self.nodes:
             if node.head:

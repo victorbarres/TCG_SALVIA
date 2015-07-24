@@ -92,7 +92,8 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                 port.schema=self
         
         if out_ports == None:
-            self.add_port('OUT','output')
+            SemFrame_head = self.content.SemFrame.get_head()
+            self.add_port('OUT','output', port_data=SemFrame_head)
         else:
              for port in out_ports:
                 self.out_ports.append(port)
@@ -630,6 +631,8 @@ class GRAMMATICAL_WM_P(WM):
         self.convey_sem_activations(sem_input)
         self.update_activations(coop_p=1, comp_p=1)
         self.prune()
+        if self.t>200 and self.t<202:
+            viewer.TCG_VIEWER.display_gram_wm_state(self)
         
         if ctrl_input and ctrl_input['start_produce']:
             output = self.produce_form(sem_input,phon_input)
@@ -698,7 +701,6 @@ class GRAMMATICAL_WM_P(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
-                viewer.TCG_VIEWER.display_cxn_assemblage(winner_assemblage, 'assemblage' + str(self.t))
 #                eq_inst.content.show()
                 phon_WM_output.extend(phon_form)
                 sem_WM_output.extend(expressed)
@@ -1348,7 +1350,6 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
                 edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
                 mapping = {'nodes':node_mapping, 'edges':edge_mapping}                
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
-#                viewer.TCG_VIEWER.display_cxn_i`stance(new_instance)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
     def SemMatch_cat(self, SemRep, cxn_schema):
