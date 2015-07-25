@@ -15,7 +15,7 @@ def test(seed=None):
     
     language_system_P = TCG_production_system()
 #     Display schema system
-    language_system_P.system2dot(image_type='svg', disp=False)
+#    language_system_P.system2dot(image_type='svg', disp=False)
     
     conceptLTM = language_system_P.schemas['Concept_LTM']
 
@@ -40,12 +40,13 @@ def test(seed=None):
         if output:
             print "t:%i, '%s'" %(t, output)
         if t>200 and t<202:
-#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'])
-            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'])
+#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
+            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=True)
+            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=False)
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
 #    language_system_P.schemas['Semantic_WM'].show_SemRep()
-    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'])
+#    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'])
 #    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
 #    language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')

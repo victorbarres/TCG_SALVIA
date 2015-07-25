@@ -371,11 +371,11 @@ class TCG_VIEWER:
         font_size = '16'
         font_name = 'consolas'
         
-        
         cxn_color = 'white'
         cxn_bg_color = 'lightgray'
-        
+
         node_style = 'filled'
+        edge_style = 'solid'
         
         SemFrame_color = 'black'
         SemFrame_bg_color = 'white'
@@ -412,7 +412,7 @@ class TCG_VIEWER:
             new_node = pydot.Node(node.name, label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name)
             cluster_SemFrame.add_node(new_node)
         for edge in cxn.SemFrame.edges:
-            new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, label=edge.concept.meaning)
+            new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, style=edge_style, label=edge.concept.meaning)
             cluster_SemFrame.add_edge(new_edge)
         
         cluster_cxn.add_subgraph(cluster_SemFrame)
@@ -431,7 +431,7 @@ class TCG_VIEWER:
             if not(pre_form):
                 pre_form = form
             else:
-                new_edge = pydot.Edge(str(pre_form), str(form), label='next')
+                new_edge = pydot.Edge(str(pre_form), str(form), style=edge_style, label='next')
                 cluster_SynForm.add_edge(new_edge)
                 pre_form = form
         
@@ -474,12 +474,40 @@ class TCG_VIEWER:
         return inst_cluster
     
     @staticmethod
+    def _create_inst_C2_cluster(insts, coop_links, comp_links):
+        """
+        Returns a DOT cluster containing the C2 graph, with the instances as nodes without display instances content.
+        """
+        font_name = 'consolas'
+        inst_shape = 'box'
+        inst_color = 'grey'
+        inst_fill_color = 'grey'
+        
+        C2_cluster = pydot.Cluster('C2_cluster', label='', color='white', fill='white')
+        for inst in insts:
+            label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, inst.name, inst.activity)
+            new_node = pydot.Node(inst.name, lable=label, shape=inst_shape, color=inst_color, fillcolor=inst_fill_color)
+            C2_cluster.add_node(new_node)
+        
+        for coop_link in coop_links:
+             coop_edge = pydot.Edge(coop_link.inst_from.name, coop_link.inst_to.name, splines='spline', color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box')
+             C2_cluster.add_edge(coop_edge)
+            
+        for comp_link in comp_links:
+            comp_edge = pydot.Edge(comp_link.inst_from.name, comp_link.inst_to.name, splines='spline', color='red', penwidth='3', dir='both', arrowhead='dot', arrowtail='dot')
+            C2_cluster.add_edge(comp_edge)
+        
+        return C2_cluster
+            
+            
+    @staticmethod
     def _create_cxn_inst_C2_cluster(cxn_insts, coop_links, comp_links):
         """
         Returns a DOT cluster containing all the information regarding the C2 between cxn instances.
         """
         
         C2_cluster = pydot.Cluster('c2_cluster', label='', color='white', fill='white')
+        splines='splines' # I am not sure that this works...
         
         for cxn_inst in cxn_insts:
             cxn_inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst)
@@ -487,11 +515,11 @@ class TCG_VIEWER:
         for coop_link in coop_links:
             connect = coop_link.connect
 #            coop_edge = pydot.Edge(str(connect.port_from), str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box', ltail='cluster_' + coop_link.inst_from.name)
-            coop_edge = pydot.Edge(connect.port_from.data.name, str(connect.port_to.data), color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box')
+            coop_edge = pydot.Edge(connect.port_from.data.name, str(connect.port_to.data), splines=splines, color='green', penwidth='3', dir='both', arrowhead='box', arrowtail='box')
 
             C2_cluster.add_edge(coop_edge)
         for comp_link in comp_links:
-            comp_edge = pydot.Edge(comp_link.inst_from.name, comp_link.inst_to.name, color='red', penwidth='3', dir='both', arrowhead='dot', arrowtail='dot', ltail='cluster_' + comp_link.inst_from.name, lhead='cluster_' + comp_link.inst_to.name)
+            comp_edge = pydot.Edge(comp_link.inst_from.name, comp_link.inst_to.name, splines=splines, color='red', penwidth='3', dir='both', arrowhead='dot', arrowtail='dot', ltail='cluster_' + comp_link.inst_from.name, lhead='cluster_' + comp_link.inst_to.name)
             C2_cluster.add_edge(comp_edge)
         
         return C2_cluster
@@ -524,7 +552,7 @@ class TCG_VIEWER:
     
     
     @staticmethod        
-    def _create_lingWM_cluster(semWM, gramWM):
+    def _create_lingWM_cluster(semWM, gramWM, concise=False):
         """
         Returns a DOT cluster containing all the the linguisticWM (semanticWM + grammaticamWM)
         Uses graphviz with pydot implementation.
@@ -547,7 +575,10 @@ class TCG_VIEWER:
         # Add GrammaticalWM cluster
         label = '<<FONT FACE="%s">Grammatical WM (t:%.1f)</FONT>>' %(font_name, gramWM.t)
         gramWM_cluster = pydot.Cluster('gramWM', label=label)
-        cxn_inst_C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(gramWM.schema_insts, gramWM.coop_links, gramWM.comp_links)
+        if not(concise):
+            cxn_inst_C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(gramWM.schema_insts, gramWM.coop_links, gramWM.comp_links)
+        else:
+            cxn_inst_C2_cluster = TCG_VIEWER._create_inst_C2_cluster(gramWM.schema_insts, gramWM.coop_links, gramWM.comp_links)
         gramWM_cluster.add_subgraph(cxn_inst_C2_cluster)
         lingWM_cluster.add_subgraph(gramWM_cluster)
         
@@ -555,7 +586,10 @@ class TCG_VIEWER:
         for cxn_inst in gramWM.schema_insts:
             node_covers = cxn_inst.covers['nodes'] # I am only going to show the node covers for simplicity
             for n1, n2 in node_covers.iteritems():
-                new_edge = pydot.Edge(n1, n2, dir='both', color=cover_color, style=cover_style)
+                if not(concise):
+                    new_edge = pydot.Edge(n1, n2, dir='both', color=cover_color, style=cover_style, splines='spline')
+                else:
+                    new_edge = pydot.Edge(cxn_inst.name, n2, dir='both', color=cover_color, style=cover_style, splines='spline')
                 lingWM_cluster.add_edge(new_edge)
         
         return lingWM_cluster
@@ -599,7 +633,7 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
-        assemblage_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
+        assemblage_graph = pydot.Dot('cxn_assemblage', graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
         
         C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(cxn_assemblage.schema_insts, cxn_assemblage.coop_links, [])
         assemblage_graph.add_subgraph(C2_cluster)
@@ -618,7 +652,7 @@ class TCG_VIEWER:
 #        plt.imshow(img)
     
     @staticmethod
-    def display_gramWM_state(WM):
+    def display_gramWM_state(WM, concise=False):
         """
         Nicer display for wm state.
         """
@@ -626,11 +660,18 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
-        gram_WM_state_graph = pydot.Dot(graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
-        C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(WM.schema_insts, WM.coop_links,WM.comp_links)
+        if not(concise):
+            C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(WM.schema_insts, WM.coop_links,WM.comp_links)
+            name = WM.name
+        else:
+            C2_cluster = TCG_VIEWER._create_inst_C2_cluster(WM.schema_insts, WM.coop_links,WM.comp_links)
+            name='%s_concise' %WM.name
+        
+        gram_WM_state_graph = pydot.Dot(name, graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
         gram_WM_state_graph.add_subgraph(C2_cluster)
         
-        file_name = '%s%s%.1f.gv' %(tmp_folder, WM.name, WM.t)
+        
+        file_name = '%s%s%.1f.gv' %(tmp_folder, name, WM.t)
         gram_WM_state_graph.write(file_name)
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
@@ -668,7 +709,7 @@ class TCG_VIEWER:
 #        plt.imshow(img)
         
     @staticmethod
-    def display_lingWM_state(semWM, gramWM):
+    def display_lingWM_state(semWM, gramWM, concise=False):
         """
         Create graph images for the ling working memory (semantic WM + grammatical WM)
         Uses graphviz with pydot implementation.
@@ -677,14 +718,18 @@ class TCG_VIEWER:
         
         prog = 'dot'
         file_type = 'svg'
+        if not(concise):
+            name='linguisticWM'
+        else:
+            name='lingusiticWM_concise'
         
-        lingWM_graph = pydot.Dot('Linsguitic_WM', graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
+        lingWM_graph = pydot.Dot(name, graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
         lingWM_graph.set_rankdir('LR')
         
-        lingWM_cluster = TCG_VIEWER._create_lingWM_cluster(semWM, gramWM)
+        lingWM_cluster = TCG_VIEWER._create_lingWM_cluster(semWM, gramWM, concise=concise)
         lingWM_graph.add_subgraph(lingWM_cluster)
         
-        file_name = '%sling_WM%.1f.gv' %(tmp_folder, semWM.t)
+        file_name = '%s%s%.1f.gv' %(tmp_folder, name, semWM.t)
         lingWM_graph.write(file_name)
         
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
