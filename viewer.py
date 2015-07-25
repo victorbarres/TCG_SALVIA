@@ -555,7 +555,7 @@ class TCG_VIEWER:
         for cxn_inst in gramWM.schema_insts:
             node_covers = cxn_inst.covers['nodes'] # I am only going to show the node covers for simplicity
             for n1, n2 in node_covers.iteritems():
-                new_edge = pydot.Edge(n1, n2, color=cover_color, style=cover_style)
+                new_edge = pydot.Edge(n1, n2, dir='both', color=cover_color, style=cover_style)
                 lingWM_cluster.add_edge(new_edge)
         
         return lingWM_cluster
@@ -678,7 +678,7 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
-        lingWM_graph = pydot.Dot(graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
+        lingWM_graph = pydot.Dot('Linsguitic_WM', graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
         lingWM_graph.set_rankdir('LR')
         
         lingWM_cluster = TCG_VIEWER._create_lingWM_cluster(semWM, gramWM)

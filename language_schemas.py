@@ -67,7 +67,6 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
                     new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
                     new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
                     new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
-                    print new_mapping
                     self.covers = new_mapping
         else:
              self.covers = mapping

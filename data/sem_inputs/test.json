@@ -25,6 +25,17 @@
 			  "sequence" :["P1"],
 			  "timing":[],
 			  "comments": ""
+			},
+		"blue_woman": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"P1": ["WOMAN(w1)"],
+				"P2": ["BLUE(b1)"],
+				"P3": ["MODIFY(m1)", "m1(b1, w1)"]
+			  },
+			  "sequence" :["P1", "P2", "P3"],
+			  "timing":[],
+			  "comments": ""
 			}
 	}
 }
