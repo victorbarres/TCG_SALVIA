@@ -18,6 +18,8 @@ from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM,
 import construction
 import TCG_graph
 
+from viewer import TCG_VIEWER
+
 ##################################
 ### Language knowledge schemas ###
 ##################################
@@ -1131,6 +1133,8 @@ class GRAMMATICAL_WM_P(WM):
         """
         Returns a new, reduced, assemblage in which the instances cooperating (as defined by 'coop_link') have been combined.
         """
+        name = 'cxn_assemblage_%.1f_%i' %(assemblage.activation, len(assemblage.coop_links))
+        TCG_VIEWER.display_cxn_assemblage(assemblage, name)
         inst_p = coop_link.inst_to
         inst_c = coop_link.inst_from
         connect = coop_link.connect

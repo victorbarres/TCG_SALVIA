@@ -42,7 +42,6 @@ def test(seed=None):
         if t>200 and t<202:
 #            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
             TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=True)
-            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=False)
     
 #    language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
 #    language_system_P.schemas['Semantic_WM'].show_SemRep()

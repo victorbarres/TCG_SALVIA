@@ -624,7 +624,7 @@ class TCG_VIEWER:
         plt.imshow(img)
         
     @staticmethod
-    def display_cxn_assemblage(cxn_assemblage, name='cxn_assemblage'):
+    def display_cxn_assemblage(cxn_assemblage, name='cxn_assembalge', concise=False):
         """
         Nicer display for assemblage.
         Should have a concise=True/False option (concise does not show the inside of cxn. Ideally, clicking on a cxn would expand it)
@@ -633,7 +633,13 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
-        assemblage_graph = pydot.Dot('cxn_assemblage', graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
+        if not(concise):
+            C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(cxn_assemblage.schema_insts, cxn_assemblage.coop_links,[])
+        else:
+            C2_cluster = TCG_VIEWER._create_inst_C2_cluster(cxn_assemblage.schema_insts, cxn_assemblage.coop_links,[])
+            name='%s_concise' %name
+        
+        assemblage_graph = pydot.Dot(name, graph_type='digraph', rankdir='LR', labeljust='l', compound='true', style='rounded')
         
         C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(cxn_assemblage.schema_insts, cxn_assemblage.coop_links, [])
         assemblage_graph.add_subgraph(C2_cluster)
