@@ -500,7 +500,7 @@ class WM(PROCEDURAL_SCHEMA):
         self.coop_links = []
         self.comp_links = []
         self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
-        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1, 'comp_asymmetry':0}
+        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}}
        
     def add_instance(self,schema_inst, act0=None):
@@ -588,23 +588,23 @@ class WM(PROCEDURAL_SCHEMA):
         for f_link in f_links:
             self.comp_links.remove(f_link)
            
-    def update_activations(self, coop_p=1.0, comp_p=1.0):
+    def update_activations(self):
         """
         Update all the activations of instances in working memory based on cooperation and competition f-links.
-        Passes activations through coop links with probabiliy coop_p, and through competition liks with probability comp_p
+        Passes activations through coop links with probabiliy P_coop, and through competition liks with probability P_comp
         Then updates all instance activation.
         Saves states.
         """
         # Propagating cooperation
         for flink in self.coop_links:
             r = random.random()
-            if(r<coop_p):
+            if(r<self.C2_params['P_coop']):
                 flink.update()  
         
         # Propagating competition
         for flink in self.comp_links:
             r = random.random()
-            if(r<comp_p):
+            if(r<self.C2_params['P_comp']):
                 flink.update()
        
         # Update all instances activation and sets alive=False for instances that fall below threshold.

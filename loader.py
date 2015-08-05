@@ -17,7 +17,6 @@ TCG data loader module
     All other methods should be considered private and are subject to change.
 """
 import json
-import re
 
 import concept as cpt
 import percept as per
