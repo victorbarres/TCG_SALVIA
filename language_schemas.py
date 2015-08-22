@@ -409,6 +409,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
+        self.add_port('OUT', 'to_visual_WM')
         self.dyn_params = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
@@ -630,7 +631,7 @@ class GRAMMATICAL_WM_P(WM):
             self.add_new_insts(new_cxn_insts)            
                 
         self.convey_sem_activations(sem_input)
-        self.update_activations(coop_p=1, comp_p=1)
+        self.update_activations()
         self.prune()
         
         if ctrl_input and ctrl_input['start_produce']:
@@ -1050,7 +1051,7 @@ class GRAMMATICAL_WM_P(WM):
         """
         WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
         
-        NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. IS THIS IS THE ONE THA SHOULD BE CONSIDERED?
+        NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. IS THIS IS THE ONE THAT SHOULD BE CONSIDERED?
         """
         inst_network = GRAMMATICAL_WM_P.build_instance_network(self.schema_insts, self.coop_links)
 
@@ -1121,13 +1122,13 @@ class GRAMMATICAL_WM_P(WM):
         """
         new_assemblage = assemblage.copy()
         coop_links = new_assemblage.coop_links
-        name = 'cxn_assemblage_%.1f_%i' %(new_assemblage.activation, len(new_assemblage.coop_links))
-        TCG_VIEWER.display_cxn_assemblage(assemblage, name)
+#        name = 'cxn_assemblage_%.1f_%i' %(new_assemblage.activation, len(new_assemblage.coop_links))
+#        TCG_VIEWER.display_cxn_assemblage(assemblage, name)
         while len(coop_links)>0:
             new_assemblage = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
             coop_links = new_assemblage.coop_links
-            name = 'cxn_assemblage_%.1f_%i' %(new_assemblage.activation, len(new_assemblage.coop_links))
-            TCG_VIEWER.display_cxn_assemblage(new_assemblage, name)
+#            name = 'cxn_assemblage_%.1f_%i' %(new_assemblage.activation, len(new_assemblage.coop_links))
+#            TCG_VIEWER.display_cxn_assemblage(new_assemblage, name)
         eq_inst = new_assemblage.schema_insts[0]
         eq_inst.activity = new_assemblage.activation
         return eq_inst
@@ -1137,8 +1138,8 @@ class GRAMMATICAL_WM_P(WM):
         """
         Returns a new, reduced, assemblage in which the instances cooperating (as defined by 'coop_link') have been combined.
         """
-        name = 'cxn_assemblage_%.1f_%i' %(assemblage.activation, len(assemblage.coop_links))
-        TCG_VIEWER.display_cxn_assemblage(assemblage, name)
+#        name = 'cxn_assemblage_%.1f_%i' %(assemblage.activation, len(assemblage.coop_links))
+#        TCG_VIEWER.display_cxn_assemblage(assemblage, name)
         inst_p = coop_link.inst_to
         inst_c = coop_link.inst_from
         connect = coop_link.connect

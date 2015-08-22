@@ -174,7 +174,7 @@ def TCG_comprehension_system(name='language_system_C'):
     language_system_C.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     language_system_C.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     language_system_C.set_input_ports([phonWM_C.find_port('from_input')])
-    language_system_C.set_output_ports([phonWM_C.find_port('to_grammatical_WM_C')])
+    language_system_C.set_output_ports([semanticWM.find_port('to_visual_WM')])
     
     
     # Parameters

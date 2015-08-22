@@ -17,6 +17,7 @@ import json
 import pydot
 import matplotlib.pyplot as plt
 import construction
+import percept
 from loader import TCG_LOADER
 
 class TCG_VIEWER:
@@ -30,7 +31,7 @@ class TCG_VIEWER:
         - tmp (STR): Temp folder.
     """
 
-    def __init__(self, data_path, PORT=8080, viewer_path="viewer/"):
+    def __init__(self, data_path, PORT=8000, viewer_path="viewer/"):
         """
         Requires the path (data_path) to the folder that contains the data to be diplayed in the viewer.
         """
@@ -103,45 +104,30 @@ class TCG_VIEWER:
         
         os.mkdir(cpt_folder)
         
-        cpt_file = 'TCG_semantics.json'
-        with open(self.viewer_path + self.tmp + cpt_file, 'r') as f:
-            json_data = json.load(f)
-        
-        cpt = json_data['CONCEPTUAL_KNOWLEDGE']
-        edge_type = 'is_a'
-        dot_cpt = pydot.Dot('Conceptual_Knowledge', graph_type='digraph', style='rounded')
-        dot_cpt.set_rankdir('BT')
         font_name = 'consolas'
-        font_size = '16'
-        color = 'black'
-        node_shape = 'box'
-        style = 'rounded'
-        fill_color = 'white'
+        labeljust='l'
+        penwidth = '2'
+        rankdir = 'RL'
         
-        def _add_rel(sup_node, cpt_data, dot_cpt):
-            for concept in cpt_data:
-                label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, concept)
-                new_node = pydot.Node(concept, label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
-                dot_cpt.add_node(new_node)
-                if sup_node != None:
-                    label = ''
-#                    label = edge_type
-                    new_edge = pydot.Edge(concept, sup_node, label=label, fontsize=font_size)
-                    dot_cpt.add_edge(new_edge)
-                
-                _add_rel(concept, cpt_data[concept], dot_cpt)
-        label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, 'CONCEPTUAL KNOWLEDGE')
-        top_node = pydot.Node('CONCEPTUAL_KNOWLEDGE', label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
-        dot_cpt.add_node(top_node)
-        _add_rel('CONCEPTUAL_KNOWLEDGE', cpt, dot_cpt)
+        if not(self.conceptual_knowledge):
+            "Conceptual knowledge was not loaded."
+            return
         
-        file_name = cpt_folder + 'TCG_concepts' + ".gv"
-        dot_cpt.write(file_name)
+        cpt_graph = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth)
+        cpt_graph.set_rankdir(rankdir)
+        cpt_graph.set_fontname(font_name)
+        
+        cluster_cpt = TCG_VIEWER._create_concepts_cluster(self.conceptual_knowledge)
+        cpt_graph.add_subgraph(cluster_cpt)
+        
+        file_name = cpt_folder + "TCG_concepts" + ".gv"
+        cpt_graph.write(file_name)
+        
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         
-        return dot_cpt
+        return cpt_graph
     
     def _create_cxn_imgs(self):
         """
@@ -201,45 +187,30 @@ class TCG_VIEWER:
         
         os.mkdir(per_folder)
         
-        per_file = 'TCG_semantics.json'
-        with open(self.viewer_path + self.tmp + per_file, 'r') as f:
-            json_data = json.load(f)
+        font_name = 'consolas'
+        labeljust='l'
+        penwidth = '2'
+        rankdir = 'RL'
         
-        per = json_data['PERCEPTUAL_KNOWLEDGE']
-        edge_type1 = 'is_a'
-        edge_type2 = 'token'
-        dot_per = pydot.Dot(graph_type='digraph')
-        dot_per.set_rankdir('BT')
-        dot_per.set_fontname('consolas')
-        font_size = '10'
-        color = 'black'
-        node_shape = 'box'
-        node_shape2 = 'octagon'
-        style = 'filled'
-        fill_color = 'white'
+        if not(self.perceptual_knowledge):
+            "Perceptual knowledge was not loaded."
+            return
         
-        def _add_rel(sup_node, per_data, dot_per):
-            for percept in per_data:
-                dot_per.add_node(pydot.Node(percept, label=percept, color=color, shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
-                if sup_node != None:
-                    dot_per.add_edge(pydot.Edge(percept, sup_node, label=edge_type1, fontsize=font_size))
-                
-                if isinstance(per_data[percept], list):
-                    for token in per_data[percept]:
-                        dot_per.add_node(pydot.Node(token, label=token, color=color, shape=node_shape2, style=style, fillcolor=fill_color, fontsize=font_size))
-                        dot_per.add_edge(pydot.Edge(token, percept, label=edge_type2, fontsize=font_size))
-                else:
-                    _add_rel(percept, per_data[percept], dot_per)
+        per_graph = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth)
+        per_graph.set_rankdir(rankdir)
+        per_graph.set_fontname(font_name)
         
-        _add_rel('PERCEPTUAL_KNOWLEDGE', per, dot_per)
+        cluster_per = TCG_VIEWER._create_percepts_cluster(self.perceptual_knowledge)
+        per_graph.add_subgraph(cluster_per)
+        
         
         file_name = per_folder + 'TCG_percepts' + ".gv"
-        dot_per.write(file_name)
+        per_graph.write(file_name)
         # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         
-        return dot_per
+        return per_graph
     
     def _create_conceptualizer_img(self, dot_cpt):
         """
@@ -300,6 +271,74 @@ class TCG_VIEWER:
         subprocess.call(cmd, shell=True)
     
     @staticmethod
+    def _create_concepts_cluster(cpt_knowledge, name=None):
+        """
+        Returns a DOT cluster containing all the information regarding the conceptual knowledge.
+        """
+        font_name = 'consolas'
+        font_size = '16'
+        color = 'black'
+        node_shape = 'box'
+        style = 'rounded'
+        fill_color = 'white'
+        
+        if not(name):
+            name = "conceptual_knowledge"
+        
+        cluster_name = name
+        cluster_cpt = pydot.Cluster(cluster_name)
+        
+        for concept in cpt_knowledge.nodes:
+            label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, concept.name)
+            new_node = pydot.Node(concept.name, label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
+            cluster_cpt.add_node(new_node)
+        
+        for sem_rel in cpt_knowledge.edges:
+            label = ''
+#           label = sem_rel.type
+            new_edge = pydot.Edge(sem_rel.pFrom.name, sem_rel.pTo.name, label=label, fontsize=font_size)
+            cluster_cpt.add_edge(new_edge)
+        
+        return cluster_cpt
+    
+    @staticmethod
+    def _create_percepts_cluster(per_knowledge, name=None):
+        """
+        Returns a DOT cluster containing all the information regarding the perceptual knowledge.
+        """
+        font_name = 'consolas'
+        font_size = '16'
+        color = 'black'
+        node_shape1 = 'box'
+        node_shape2 = 'octagon'
+        style = 'filled'
+        fill_color = 'white'
+        
+        if not(name):
+            name = "perceptual_knowledge"
+        
+        cluster_name = name
+        cluster_per = pydot.Cluster(cluster_name)
+        
+        for per in per_knowledge.nodes:
+            label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, per.name)
+            if isinstance(per, percept.PERCEPT_CAT):
+                node_shape=node_shape1
+            else:
+                node_shape=node_shape2
+            new_node = pydot.Node(per.name, label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
+            cluster_per.add_node(new_node)
+        
+        for sem_rel in per_knowledge.edges:
+            label = ''
+#           label = sem_rel.type
+            new_edge = pydot.Edge(sem_rel.pFrom.name, sem_rel.pTo.name, label=label, fontsize=font_size)
+            cluster_per.add_edge(new_edge)
+        
+        return cluster_per
+        
+    
+    @staticmethod
     def _create_cxn_cluster(cxn, name=None):
         """
         Returns a DOT cluster containing all the information regarding the construction.
@@ -334,7 +373,7 @@ class TCG_VIEWER:
             name = cxn.name
             
         label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">class: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
-        cluster_name = cxn.name
+        cluster_name = name
         cluster_cxn = pydot.Cluster(cluster_name, label=label, color=cxn_color)
         cluster_cxn.set_bgcolor(cxn_bg_color)
         

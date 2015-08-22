@@ -74,10 +74,10 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
     Semantic network.
     
     Data:
-        - nodes ([CONCEPT]): List of concepts.
+        - nodes ([PERCEPT]): List of percepts.
         - edges ([SEM_REL]): List of semantic relations.
         - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.
-            Each node has an additional attributes meaning = concept.meaning
+            Each node has an additional attributes meaning = percept.meaning
             Each edge has an additional attribute type = sem_rel.type
     """
     def __init__(self, nodes=[], edges=[]):
@@ -85,7 +85,7 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
     
     def add_ent(self, percept):
         """
-        Adds a percept to the the perceptual knowlege while also linking the perceptual knowledge back to the concept.
+        Adds a percept to the the perceptual knowlege while also linking the perceptual knowledge back to the perceptt.
         """
         flag  = super(PERCEPTUAL_KNOWLEDGE, self).add_ent(percept)
         if flag:
