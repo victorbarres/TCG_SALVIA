@@ -12,8 +12,7 @@ import os, shutil
 import SimpleHTTPServer
 import SocketServer
 import webbrowser
-import subprocess        
-import json
+import subprocess
 import pydot
 import matplotlib.pyplot as plt
 import construction
@@ -80,21 +79,21 @@ class TCG_VIEWER:
         
         self.conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", self.viewer_path + self.tmp)
         self.perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", self.viewer_path + self.tmp)
-        self.sconceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", self.viewer_path + self.tmp, self.conceptual_knowledge, self.perceptual_knowledge)
+        self.conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", self.viewer_path + self.tmp, self.conceptual_knowledge, self.perceptual_knowledge)
         self.grammar = TCG_LOADER.load_grammar("TCG_grammar.json", self.viewer_path + self.tmp, self.conceptual_knowledge)
         self.scene = TCG_LOADER.load_scene("TCG_scene.json", self.viewer_path + self.tmp)
         
         self._create_cxn_imgs()
-        dot_cpt = self._create_concept_img()
+        self._create_concept_img()
         self._create_percept_img()
-        self._create_conceptualizer_img(dot_cpt)
+        self._create_conceptualizer_img()
     
     def _create_concept_img(self):
         """
         Create graph image for the conceptual knowledge.
         Uses graphviz with pydot implementation.
         """        
-        prog = 'dot'
+        prog = 'neato'
         file_type = 'svg'
         
         cpt_folder = self.viewer_path + self.tmp + 'cpt/'        
@@ -113,7 +112,7 @@ class TCG_VIEWER:
             "Conceptual knowledge was not loaded."
             return
         
-        cpt_graph = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth)
+        cpt_graph = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth, overlap='false')
         cpt_graph.set_rankdir(rankdir)
         cpt_graph.set_fontname(font_name)
         
@@ -123,11 +122,94 @@ class TCG_VIEWER:
         file_name = cpt_folder + "TCG_concepts" + ".gv"
         cpt_graph.write(file_name)
         
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        # This is a work around becauses dot.write or dot.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+    
+    def _create_percept_img(self):
+        """
+        Create graph image for the percetual knowledge.
+        Uses graphviz with pydot implementation.
+        """  
+        prog = 'neato'
+        file_type = 'svg'
+        
+        per_folder = self.viewer_path + self.tmp + 'per/'        
+        
+        if os.path.exists(per_folder):
+            shutil.rmtree(per_folder)
+        
+        os.mkdir(per_folder)
+        
+        font_name = 'consolas'
+        labeljust='l'
+        penwidth = '2'
+        rankdir = 'RL'
+        
+        if not(self.perceptual_knowledge):
+            "Perceptual knowledge was not loaded."
+            return
+        
+        per_graph = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth, overlap='false')
+        per_graph.set_rankdir(rankdir)
+        per_graph.set_fontname(font_name)
+        
+        cluster_per = TCG_VIEWER._create_percepts_cluster(self.perceptual_knowledge)
+        per_graph.add_subgraph(cluster_per)
+        
+        
+        file_name = per_folder + 'TCG_percepts' + ".gv"
+        per_graph.write(file_name)
+        
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         
-        return cpt_graph
+        return per_graph
+    
+    def _create_conceptualizer_img(self, show_cpt=True):
+        """
+        Create graph image for the conceputalizer.
+        Uses graphviz with pydot implementation.
+        """        
+        prog = 'dot'
+        file_type = 'svg'
+        
+        czer_folder = self.viewer_path + self.tmp + 'czer/'        
+        
+        if os.path.exists(czer_folder):
+            shutil.rmtree(czer_folder)
+        
+        os.mkdir(czer_folder)
+        
+        font_name = 'consolas'
+        labeljust='l'
+        penwidth = '2'
+        rankdir = 'RL'
+        
+        if not(self.conceptualization):
+            print "Conceptualization was not loaded."
+            return
+        
+        if show_cpt and not(self.conceptual_knowledge):
+            print "conceptual knowledge not loaded"
+            return
+        
+        czer_graph = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth, overlap='false')
+        czer_graph.set_rankdir(rankdir)
+        czer_graph.set_fontname(font_name)
+
+        cpt_knowledge=None
+        if show_cpt:
+            cpt_knowledge = self.conceptual_knowledge
+        
+        cluster_czer = TCG_VIEWER._create_conceptualizer_cluster(self.conceptualization, cpt_knowledge=cpt_knowledge)
+        czer_graph.add_subgraph(cluster_czer)
+        
+        file_name = czer_folder + 'TCG_conceptualizer' + ".gv"
+        czer_graph.write(file_name)
+        
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
     
     def _create_cxn_imgs(self):
         """
@@ -166,109 +248,10 @@ class TCG_VIEWER:
             file_name = cxn_folder + cxn.name + ".gv"
             cxn_graph.write(file_name)
             
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cxn_graphs = os.listdir(cxn_folder)
         for cxn_file in cxn_graphs:
             cmd = "%s -T%s %s > %s.%s" %(prog, file_type, cxn_folder + cxn_file, cxn_folder + cxn_file, file_type)
             subprocess.call(cmd, shell=True)
-    
-    def _create_percept_img(self):
-        """
-        Create graph image for the percetual knowledge.
-        Uses graphviz with pydot implementation.
-        """  
-        prog = 'dot'
-        file_type = 'svg'
-        
-        per_folder = self.viewer_path + self.tmp + 'per/'        
-        
-        if os.path.exists(per_folder):
-            shutil.rmtree(per_folder)
-        
-        os.mkdir(per_folder)
-        
-        font_name = 'consolas'
-        labeljust='l'
-        penwidth = '2'
-        rankdir = 'RL'
-        
-        if not(self.perceptual_knowledge):
-            "Perceptual knowledge was not loaded."
-            return
-        
-        per_graph = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth)
-        per_graph.set_rankdir(rankdir)
-        per_graph.set_fontname(font_name)
-        
-        cluster_per = TCG_VIEWER._create_percepts_cluster(self.perceptual_knowledge)
-        per_graph.add_subgraph(cluster_per)
-        
-        
-        file_name = per_folder + 'TCG_percepts' + ".gv"
-        per_graph.write(file_name)
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
-        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
-        subprocess.call(cmd, shell=True)
-        
-        return per_graph
-    
-    def _create_conceptualizer_img(self, dot_cpt):
-        """
-        Create graph image for the conceputalizer.
-        Uses graphviz with pydot implementation.
-        """        
-        prog = 'dot'
-        file_type = 'svg'
-        
-        czer_folder = self.viewer_path + self.tmp + 'czer/'        
-        
-        if os.path.exists(czer_folder):
-            shutil.rmtree(czer_folder)
-        
-        os.mkdir(czer_folder)
-        
-        czer_file = 'TCG_semantics.json'
-        with open(self.viewer_path + self.tmp + czer_file, 'r') as f:
-            json_data = json.load(f)
-        
-        czer = json_data['CONCEPTUALIZATION']
-        dot_czer = pydot.Dot(graph_type = 'digraph')
-        dot_czer.set_rankdir('BT')
-        dot_czer.set_fontname('consolas')
-        font_size = '10'
-        color = 'black'
-        node_shape = 'box'
-        style = 'filled'
-        fill_color = 'white'
-        edge_color = 'red'
-        
-        def _create_subgraph(graph):
-            sbg = pydot.Subgraph('')
-            for node in graph.get_nodes():
-                sbg.add_node(node)
-            for edge in graph.get_edges():
-                sbg.add_edge(edge)
-            return sbg
-        
-        cluster_concepts = pydot.Cluster('concepts', label='concepts')
-        cpt_sbg = _create_subgraph(dot_cpt)
-        cluster_concepts.add_subgraph(cpt_sbg)
-        
-        cluster_percepts = pydot.Cluster('percepts', label='percepts')
-        
-        dot_czer.add_subgraph(cluster_concepts)
-        dot_czer.add_subgraph(cluster_percepts)
-        
-        for target in czer:
-            for source in czer[target]:
-                cluster_percepts.add_node(pydot.Node(source, label=source, color=color, shape=node_shape, style=style, fillcolor=fill_color, fontsize=font_size))
-                dot_czer.add_edge(pydot.Edge(source, target, color=edge_color))
-        
-        file_name = czer_folder + 'TCG_conceptualizer' + ".gv"
-        dot_czer.write(file_name)
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
-        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
-        subprocess.call(cmd, shell=True)
     
     @staticmethod
     def _create_concepts_cluster(cpt_knowledge, name=None):
@@ -336,8 +319,55 @@ class TCG_VIEWER:
             cluster_per.add_edge(new_edge)
         
         return cluster_per
-        
     
+    @staticmethod
+    def _create_conceptualizer_cluster(conceptualization, cpt_knowledge=None, name=None):
+        """
+        Returns a DOT cluster containing all the information regarding the conceptualization.
+        """
+        font_name = 'consolas'
+        font_size = '16'
+        color = 'black'
+        edge_color = 'red'
+        node_shape1 = 'box'
+        node_shape2 = 'octagon'
+        style = 'filled'
+        fill_color = 'white'
+        
+        if not(name):
+            name = "conceptualization"
+        
+        cluster_name = name
+        cluster_czer = pydot.Cluster(cluster_name)
+        
+        if not(cpt_knowledge):
+            for cpt in conceptualization.per2cpt.values():
+                label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, cpt)
+                node_shape=node_shape1
+                new_node = pydot.Node(cpt, label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
+                cluster_czer.add_node(new_node)
+        else:
+            cluster_cpt = TCG_VIEWER._create_concepts_cluster(cpt_knowledge)
+            cluster_czer.add_subgraph(cluster_cpt)
+            
+        cluster_per = pydot.Cluster('perceptual_knowledge')
+        for per in conceptualization.per2cpt.keys():
+            label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, per)
+            node_shape=node_shape2
+            new_node = pydot.Node(per, label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
+            cluster_per.add_node(new_node)
+        
+        cluster_czer.add_subgraph(cluster_per)
+          
+        
+        for per, cpt in conceptualization.per2cpt.iteritems():
+            label = ''
+#           label = 'conceptualization'
+            new_edge = pydot.Edge(per, cpt, label=label, fontsize=font_size, color=edge_color)
+            cluster_czer.add_edge(new_edge)
+       
+        return cluster_czer
+        
     @staticmethod
     def _create_cxn_cluster(cxn, name=None):
         """
@@ -600,7 +630,6 @@ class TCG_VIEWER:
         file_name = tmp_folder + cxn.name + ".gv"
         dot_cxn.write(file_name)
             
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         img_name = '%s.%s' %(file_name,file_type)
@@ -631,7 +660,7 @@ class TCG_VIEWER:
         name = cxn_inst.name
         file_name = tmp_folder + name + ".gv"
         inst_graph.write(file_name)
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         img_name = '%s.%s' %(file_name,file_type)
@@ -665,7 +694,7 @@ class TCG_VIEWER:
         
         file_name = tmp_folder + name + ".gv"
         assemblage_graph.write(file_name)
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
 #        img_name = '%s.%s' %(file_name,file_type)
@@ -697,7 +726,7 @@ class TCG_VIEWER:
         
         file_name = '%s%s%.1f.gv' %(tmp_folder, name, WM.t)
         gram_WM_state_graph.write(file_name)
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
+        
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
     
@@ -720,7 +749,6 @@ class TCG_VIEWER:
         file_name = '%s%s%.1f.gv' %(tmp_folder, WM.name, WM.t)
         dot_semrep.write(file_name)
         
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
 #        img_name = '%s.%s' %(file_name,file_type)
@@ -756,7 +784,6 @@ class TCG_VIEWER:
         file_name = '%s%s%.1f.gv' %(tmp_folder, name, semWM.t)
         lingWM_graph.write(file_name)
         
-        # This is a work around becauses dot.write or doc.create do not work properly -> Cannot access dot.exe (even though it is on the system path)
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
 #        img_name = '%s.%s' %(file_name,file_type)
