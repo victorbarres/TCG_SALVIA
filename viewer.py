@@ -341,11 +341,13 @@ class TCG_VIEWER:
         cluster_czer = pydot.Cluster(cluster_name)
         
         if not(cpt_knowledge):
+            cluster_cpt = pydot.cluster('conceptual_knowledge')
             for cpt in conceptualization.per2cpt.values():
                 label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, cpt)
                 node_shape=node_shape1
                 new_node = pydot.Node(cpt, label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
-                cluster_czer.add_node(new_node)
+                cluster_cpt.add_node(new_node)
+            cluster_czer.add_subgraph(cluster_cpt)
         else:
             cluster_cpt = TCG_VIEWER._create_concepts_cluster(cpt_knowledge)
             cluster_czer.add_subgraph(cluster_cpt)
