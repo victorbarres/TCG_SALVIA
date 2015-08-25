@@ -29,9 +29,9 @@
 		"blue_woman": {
 			"sem_rate": 10,
 			 "propositions"  : {
-				"P1": ["WOMAN(w1)"],
-				"P2": ["BLUE(b1)"],
-				"P3": ["MODIFY(m1)", "m1(b1, w1)"]
+				"P1": ["WOMAN(w1, 0.9)"],
+				"P2": ["BLUE(b1, 0.8)"],
+				"P3": ["MODIFY(m1, 0.7)", "m1(b1, w1)"]
 			  },
 			  "sequence" :["P1", "P2", "P3"],
 			  "timing":[],

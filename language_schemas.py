@@ -2198,10 +2198,12 @@ class SEM_GENERATOR(object):
     #        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
     #        cpt_pattern = r"[A-Z0-9_]+"
     #        var_pattern = r"[a-z0-9]+"
+    #        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
     #        cpt_var_pattern = r"\?[A-Z0-9_]+"
         
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
         func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
+        func_pattern_cpt2 = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation
         func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)"
         
         sem_input = self.sem_inputs[input_name]
@@ -2221,7 +2223,7 @@ class SEM_GENERATOR(object):
                 print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(propositions[sequence[idx]]))
             for prop in prop_list:
                 # Case1:
-                match1 = re.search(func_pattern_cpt, prop)
+                match1 = re.search(func_pattern_cpt2, prop)
                 match2 = re.search(func_pattern_rel, prop)
                 if match1:
                     dat = match1.groupdict()
@@ -2229,7 +2231,11 @@ class SEM_GENERATOR(object):
                     concept = dat['operator']
                     var = dat['var']                        
                     cpt_schema = self.conceptLTM.find_schema(name=concept)
+                    cpt_act = dat.get('act', None)
+                        
                     cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
+                    if cpt_act:
+                        cpt_inst.set_activation(float(cpt_act))
                     if cpt_var:
                         cpt_inst.unbound = True
                     name_table[var] = cpt_inst
