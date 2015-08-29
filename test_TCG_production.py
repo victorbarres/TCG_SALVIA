@@ -22,13 +22,15 @@ def test(seed=None):
     sem_inputs = TCG_LOADER.load_sem_input("test.json", "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
 
-    input_name = 'blue_woman'    
+    input_name = 'kick'    
     generator = sem_gen.sem_generator(input_name)
     
     (sem_insts, next_time, prop) = generator.next()
     
     set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 600      
+    max_time = 600   
+    save_states = [10,50,100,200,400]
+    
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
@@ -39,9 +41,11 @@ def test(seed=None):
         output = language_system_P.get_output()
         if output:
             print "t:%i, '%s'" %(t, output)
-        if t>200 and t<202:
-#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
+        if t in save_states:
+            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
             TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=True)
+            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=False)
+            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=False)
     
     language_system_P.schemas['Semantic_WM'].show_dynamics(c2_levels=False)
     language_system_P.schemas['Semantic_WM'].show_SemRep()
@@ -50,7 +54,7 @@ def test(seed=None):
     language_system_P.schemas['Grammatical_WM_P'].show_state()
 #    language_system_P.save_sim('./tmp/test_language_output.json')
 
-    
+
 if __name__=='__main__':
     test(seed=1)
         

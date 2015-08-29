@@ -36,6 +36,24 @@
 			  "sequence" :["P1", "P2", "P3"],
 			  "timing":[],
 			  "comments": ""
+			},
+		"woman":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 1.0)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test naming"
+			},
+		"kick":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 1.0)", "MAN(m1, 1.0)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive"
 			}
 	}
 }

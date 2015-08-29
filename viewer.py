@@ -495,7 +495,7 @@ class TCG_VIEWER:
         C2_cluster = pydot.Cluster('C2_cluster', label='', color='white', fill='white')
         for inst in insts:
             label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, inst.name, inst.activity)
-            new_node = pydot.Node(inst.name, lable=label, shape=inst_shape, color=inst_color, fillcolor=inst_fill_color)
+            new_node = pydot.Node(inst.name, label=label, shape=inst_shape, color=inst_color, fillcolor=inst_fill_color)
             C2_cluster.add_node(new_node)
         
         for coop_link in coop_links:
@@ -773,9 +773,9 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         if not(concise):
-            name='linguisticWM'
+            name='LinguisticWM'
         else:
-            name='lingusiticWM_concise'
+            name='LingusiticWM_concise'
         
         lingWM_graph = pydot.Dot(name, graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
         lingWM_graph.set_rankdir('LR')
