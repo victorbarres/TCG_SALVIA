@@ -1432,9 +1432,12 @@ class PHON_WM_P(WM):
             self.set_output('to_utter', [phon_inst.content['word_form'] for phon_inst in new_phon_sequence])
             self.set_output('to_control', True)
         else:
-            self.set_output('to_utter', None)     
+            self.set_output('to_utter', None)
+        
+        self.update_activations()
+        self.prune()
         self.set_output('to_grammatical_WM_P', [phon_inst.content['word_form'] for phon_inst in self.phon_sequence])
-            
+        
     
     ####################
     ### JSON METHODS ###

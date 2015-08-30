@@ -52,6 +52,7 @@ def test(seed=None):
     TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'])
     language_system_P.schemas['Grammatical_WM_P'].show_dynamics(c2_levels=True)
     language_system_P.schemas['Grammatical_WM_P'].show_state()
+    language_system_P.schemas['Phonological_WM_P'].show_dynamics(c2_levels=False)
 #    language_system_P.save_sim('./tmp/test_language_output.json')
 
 
