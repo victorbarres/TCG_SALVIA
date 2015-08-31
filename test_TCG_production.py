@@ -29,7 +29,7 @@ def test(seed=None):
     
     set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 600   
-    save_states = [10,50,100,200,400]
+    save_states = [10,20,30,100,200,400]
     
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
@@ -41,7 +41,7 @@ def test(seed=None):
         output = language_system_P.get_output()
         if output:
             print "t:%i, '%s'" %(t, output)
-        if t in save_states:
+        if t - set_up_time in save_states:
             TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
             TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=True)
             TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=False)
