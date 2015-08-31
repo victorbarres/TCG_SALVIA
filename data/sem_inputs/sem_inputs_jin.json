@@ -1,0 +1,67 @@
+{ 
+	"inputs":{
+		"scene_demo": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				
+			  },
+			  "sequence" :[],
+			  "timing":[],
+			  "comments": "Layout of the hitting event is given first. TCG Scene: Woman-hit-man"
+			},
+		"scene_demo": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				
+			  },
+			  "sequence" :[],
+			  "timing":[],
+			  "comments": "TCG Scene: Cholita scene"
+			},
+		"scene_girlkickboy": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				
+			  },
+			  "sequence" :[],
+			  "timing":[],
+			  "comments": "Scene setting induces a passive expression."
+			},
+		"scene_incremental": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				
+			  },
+			  "sequence" :[],
+			  "timing":[],
+			  "comments": "Kuchinsky's example of difficult event and easy objects. TCG Scene: incremental strategy."
+			},
+		"scene_structural": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				
+			  },
+			  "sequence" :[],
+			  "timing":[],
+			  "comments": "Kuchinsky's example of easy event with difficult objects. TCG Scene: structural strategy."
+			},
+		"scene_test": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				
+			  },
+			  "sequence" :[],
+			  "timing":[],
+			  "comments": "TCG Scene: Test Scene."
+			},
+		"scene_womanhitman": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				
+			  },
+			  "sequence" :[],
+			  "timing":[],
+			  "comments": "The famous "pretty woman in blue hit man" example. TCG Scene: Woman-hit-man."
+			}
+	}
+}

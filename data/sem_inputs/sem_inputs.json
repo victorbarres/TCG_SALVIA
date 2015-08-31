@@ -37,7 +37,7 @@
 			  "timing":[],
 			  "comments": ""
 			},
-		"woman":{
+		"woman_static":{
 			"sem_rate":10,
 			"propositions": {
 				"P1":["WOMAN(w1, 1.0)"]
@@ -46,7 +46,7 @@
 			"timing":[],
 			"comments":"test naming"
 			},
-		"kick":{
+		"kick_static":{
 			"sem_rate":10,
 			"propositions": {
 				"P1":["WOMAN(w1, 1.0)", "MAN(m1, 1.0)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]

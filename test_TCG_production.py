@@ -19,10 +19,10 @@ def test(seed=None):
     
     conceptLTM = language_system_P.schemas['Concept_LTM']
 
-    sem_inputs = TCG_LOADER.load_sem_input("test.json", "./data/sem_inputs/")    
+    sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
 
-    input_name = 'kick'    
+    input_name = 'blue_woman'    
     generator = sem_gen.sem_generator(input_name)
     
     (sem_insts, next_time, prop) = generator.next()
