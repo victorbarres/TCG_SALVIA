@@ -22,14 +22,14 @@ def test(seed=None):
     sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
 
-    input_name = 'blue_woman'    
+    input_name = 'blue_woman_kick_man'    
     generator = sem_gen.sem_generator(input_name)
     
     (sem_insts, next_time, prop) = generator.next()
     
     set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 600   
-    save_states = [10,20,30,100,200,400]
+    save_states = [10,20,30,60,100,400]
     
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:

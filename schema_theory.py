@@ -649,29 +649,41 @@ class WM(PROCEDURAL_SCHEMA):
         """
         Computes the overall activity of the working memory.
         The activity reflects the amount of cooperation and competition going on.
+        
+        Note:   
+            - I have not incoporated dt in the values!
         """
+        tot_act = 0
+        for inst in self.schema_insts:
+            tot_act += inst.activity
+        d_act = tot_act - self.activity
+        self.activity = tot_act
+        
         tot_coop = 0
         tot_comp = 0
         for link in self.coop_links:
             inst_from = link.inst_from
             inst_to = link.inst_to
-            transfer = abs(inst_from.activity - inst_to.activity)*link.weight
+            transfer = abs((inst_from.activity - inst_to.activity)*link.weight)
             tot_coop += transfer
         
         for link in self.comp_links:
             inst_from = link.inst_from
             inst_to = link.inst_to
-            transfer = abs(inst_from.activity - inst_to.activity)*link.weight*-1
+            transfer = abs((inst_from.activity - inst_to.activity)*link.weight)
             tot_comp += transfer
         
-        self.activity = tot_comp + tot_coop
-        if not(self.save_state.has_key('total_activity')):
-            self.save_state['total_activity'] = {'t':[], 'act':[], 'comp':[], 'coop':[]}
-        self.save_state['total_activity']['t'].append(self.t)
-        self.save_state['total_activity']['comp'].append(tot_comp)
-        self.save_state['total_activity']['coop'].append(tot_coop)
-        self.save_state['total_activity']['act'].append(self.activity)
-    
+        if not(self.save_state.has_key('WM_activity')):
+            self.save_state['WM_activity'] = {'t':[], 'act':[], 'd_act':[], 'comp':[], 'coop':[], 'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}
+        self.save_state['WM_activity']['t'].append(self.t)
+        self.save_state['WM_activity']['act'].append(self.activity)
+        self.save_state['WM_activity']['d_act'].append(d_act)
+        self.save_state['WM_activity']['comp'].append(tot_comp)
+        self.save_state['WM_activity']['coop'].append(tot_coop)
+        self.save_state['WM_activity']['c2_network']['num_insts'].append(len(self.schema_insts))
+        self.save_state['WM_activity']['c2_network']['num_coop_links'].append(len(self.coop_links))
+        self.save_state['WM_activity']['c2_network']['num_comp_links'].append(len(self.comp_links))
+        
     ####################
     ### JSON METHODS ###
     ####################
@@ -695,39 +707,85 @@ class WM(PROCEDURAL_SCHEMA):
     #######################
     ### DISPLAY METHODS ###
     #######################
-    def show_dynamics(self, c2_levels=True):
+    def show_dynamics(self, inst_act=True, WM_act=True, c2_levels=True, c2_network=True):
         """
+        Note:
+            - I am computing the density considering all links as unweighted and bidirectional.This does not take into account the assymetry coef or the weights.
         """
-        plt.figure(facecolor='white')
-        num_plots = 1
-        if c2_levels:
-            num_plots =2
-        plt.subplot(num_plots,1,1)
-        title = '%s dynamics \n dyn: [tau:%g, act_inf:%g, L:%g, k:%g, x0:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(
-                            self.name,
-                            self.dyn_params['tau'], self.dyn_params['act_inf'], self.dyn_params['L'], self.dyn_params['k'], self.dyn_params['x0'],
-                            self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
-                              self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'], self.C2_params['confidence_threshold'])
-        plt.title(title)
-        plt.xlabel('time', fontsize=14)
-        plt.ylabel('activity', fontsize=14)
-        for inst in self.save_state['insts'].keys():
-            plt.plot(self.save_state['insts'][inst]['t'], self.save_state['insts'][inst]['act'], label=inst, linewidth=2)
-        axes = plt.gca()
-        axes.set_ylim([0,1])
-        axes.set_xlim([0, max(self.save_state['total_activity']['t'])])
-        plt.axhline(y=self.C2_params['prune_threshold'], color='k',ls='dashed')
-        plt.axhline(y=self.C2_params['confidence_threshold'], color='r',ls='dashed')
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
-        
-        if c2_levels:
-            plt.subplot(num_plots,1,num_plots)
-            plt.title('Total activity')
+        # Plot instance activations
+        if inst_act:
+            plt.figure(facecolor='white')
+            title = '%s dynamics \n dyn: [tau:%g, act_inf:%g, L:%g, k:%g, x0:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(
+                                self.name,
+                                self.dyn_params['tau'], self.dyn_params['act_inf'], self.dyn_params['L'], self.dyn_params['k'], self.dyn_params['x0'],
+                                self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
+                                  self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'], self.C2_params['confidence_threshold'])
+            plt.title(title)
             plt.xlabel('time', fontsize=14)
             plt.ylabel('activity', fontsize=14)
-            plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['comp'],  linewidth=2, color='r', label='competition')
-            plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['coop'],  linewidth=2, color='g', label='cooperation')
-            plt.plot(self.save_state['total_activity']['t'], self.save_state['total_activity']['act'], '--',  linewidth=2, color='k', label='total')
+            for inst in self.save_state['insts'].keys():
+                plt.plot(self.save_state['insts'][inst]['t'], self.save_state['insts'][inst]['act'], label=inst, linewidth=2)
+            axes = plt.gca()
+            axes.set_ylim([0,1])
+            axes.set_xlim([0, max(self.save_state['total_activity']['t'])])
+            plt.axhline(y=self.C2_params['prune_threshold'], color='k',ls='dashed')
+            plt.axhline(y=self.C2_params['confidence_threshold'], color='r',ls='dashed')
+            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+            plt.show()
+        
+        
+        # Plot global activity values.
+        num_plots =  len([val==True for val in [WM_act, c2_levels]])
+        if num_plots != 0:
+            plt.figure(facecolor='white')
+            i=0
+            #plot WM activity
+            if WM_act:
+                i+=1
+                plt.subplot(num_plots,i, 1)
+                plt.title('WM activity')
+                plt.xlabel('time', fontsize=14)
+                plt.ylabel('activity', fontsize=14)
+                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['act'], linwidth=2, color='k', label='act')
+                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['d_act'],'--',  linwidth=2, color='k', label='d_act')
+                plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+                
+            # Plot c2 levels
+            if c2_levels:
+                i+=1            
+                plt.subplot(num_plots,1,i)
+                plt.title('C2 levels')
+                plt.xlabel('time', fontsize=14)
+                plt.ylabel('activation transfer', fontsize=14)
+                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['comp'],  linewidth=2, color='r', label='competition')
+                plt.plot(self.save_state['WMl_activity']['t'], self.save_state['WM_activity']['coop'],  linewidth=2, color='g', label='cooperation')
+                tot_c2 = [v1 + v2 for (v1, v2) in zip(self.save_state['WM_activity']['comp'], self.save_state['WM_activity']['coop'])]
+                plt.plot(self.save_state['WM_activity']['t'], tot_c2, '--',  linewidth=2, color='k', label='total')
+                plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+            
+            plt.show()
+        
+        # Plot c2 network data
+        if c2_network:
+            plt.figure(facecolor='white')    
+           
+            plt.subplot(2,1,1)
+            plt.title('C2 instances and links')
+            plt.xlabel('time', fontsize=14)
+            plt.ylabel('number', fontsize=14)
+            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_insts'],  linewidth=2, color='k', label='num insts')
+            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_coop_links'],  linewidth=2, color='g', label='num coop links')
+            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_comp_links'],  linewidth=2, color='r', label='num comp links')
+            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+            
+            plt.title('C2 network density')
+            plt.xlabel('time', fontsize=14)
+            plt.ylabel('density', fontsize=14)
+            
+            coop_density = [2*e_coop/(n*(n-1)) for (n,e_coop) in zip(self.save_state['WM_activity']['c2_network']['num_insts'],self.save_state['WM_activity']['c2_network']['num_coop_links'])]
+            comp_density = [2*e_comp/(n*(n-1)) for (n,e_comp) in zip(self.save_state['WM_activity']['c2_network']['num_insts'],self.save_state['WM_activity']['c2_network']['num_comp_links'])]
+            plt.plot(self.save_state['WM_activity']['t'], coop_density,  linewidth=2, color='g', label='coop density')
+            plt.plot(self.save_state['WM_activity']['t'], comp_density,  linewidth=2, color='r', label='comp density')
             plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
             plt.show()
             

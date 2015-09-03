@@ -26,17 +26,6 @@
 			  "timing":[],
 			  "comments": ""
 			},
-		"blue_woman": {
-			"sem_rate": 10,
-			 "propositions"  : {
-				"P1": ["WOMAN(w1, 0.9)"],
-				"P2": ["BLUE(b1, 0.8)"],
-				"P3": ["MODIFY(m1, 0.7)", "m1(b1, w1)"]
-			  },
-			  "sequence" :["P1", "P2", "P3"],
-			  "timing":[],
-			  "comments": ""
-			},
 		"woman_static":{
 			"sem_rate":10,
 			"propositions": {
@@ -54,6 +43,33 @@
 			"sequence":["P1"],
 			"timing":[],
 			"comments":"test transitive"
+			},
+		"blue_woman": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"P1": ["WOMAN(w1, 0.9)"],
+				"P2": ["BLUE(b1, 0.8)"],
+				"P3": ["MODIFY(m1, 0.7)", "m1(b1, w1)"]
+			  },
+			  "sequence" :["P1", "P2", "P3"],
+			  "timing":[],
+			  "comments": ""
+			},
+		"blue_woman_kick_man":{
+			"sem_rate":10,
+			"propositions"  : {
+				"P1":["WOMAN(w1)"],
+				"P2":["MAN(m1)"],
+				"P3":["KICK(a1)"],
+				"P4":["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
+				"P5":["WEAR(a2)"],
+				"P6":["AGENT(r3)", "r3(a2, w1)"],
+				"P7":["PATIENT(r4)", "DRESS(d1)", "r4(a2, d1)"],
+				"P8":["BLUE(q1)", "MODIFY(r5)", "r5(q1,d1)"]
+			  },
+			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+			"timing":[],
+			"comments":""
 			}
 	}
 }
