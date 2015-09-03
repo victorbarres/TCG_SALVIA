@@ -92,7 +92,7 @@ def test_subscene_rec():
         perceptual_system.update()
     perceptual_system.update()
 
-    visualWM.show_dynamics(c2_levels=False)
+    visualWM.show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     perceptual_system.save_sim('./tmp/test_perception_output.json')
 
 def test_BUsaliency():        
@@ -151,8 +151,6 @@ def test_BUsaliency():
     plt.axis('off')
     plt.title('Input scene')
     plt.imshow(saliency_data.orig_image.data)
-    
-    
     
     plt.subplot(2,2,2)
     plt.axis('off')

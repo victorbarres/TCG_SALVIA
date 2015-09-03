@@ -76,11 +76,11 @@ def test2(seed=None):
             language_system_C.set_input(word_form)
         language_system_C.update()
     
-    language_system_C.schemas['Phonological_WM_C'].show_dynamics()
-    language_system_C.schemas['Grammatical_WM_C'].show_dynamics()
+    language_system_C.schemas['Phonological_WM_C'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+    language_system_C.schemas['Grammatical_WM_C'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
     language_system_C.schemas['Grammatical_WM_C'].show_state()
     
-#    language_system_C.schemas['Semantic_WM'].show_dynamics()
+#    language_system_C.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     language_system_C.schemas['Semantic_WM'].show_SemRep()
 
 if __name__=='__main__':

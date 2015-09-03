@@ -72,8 +72,8 @@ def test(seed=None):
         language_system_1.update()
         language_system_2.update()
     
-    language_system_1.schemas['Grammatical_WM_P'].show_dynamics()
-    language_system_2.schemas['Grammatical_WM_P'].show_dynamics()
+    language_system_1.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
+    language_system_2.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
     
             
 

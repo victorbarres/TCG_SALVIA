@@ -49,8 +49,8 @@ def test(seed=None):
             print 't: %i, Agt1 says: %s' %(t, output)
         language_system.update()
     
-    language_system.schemas['Grammatical_WM_P'].show_dynamics()
-    language_system.schemas['Grammatical_WM_C'].show_dynamics()
+    language_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
+    language_system.schemas['Grammatical_WM_C'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
 
 if __name__=='__main__':
     test(seed=None)
