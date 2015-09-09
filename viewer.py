@@ -48,8 +48,8 @@ class TCG_VIEWER:
         """
         Starts the viewer.
         """
-        self._load_data()
-        self._start_server()
+        self.load_data()
+        self.start_server()
         
     def _start_server(self):
         """
@@ -537,6 +537,8 @@ class TCG_VIEWER:
     def _create_semrep_cluster(semrep, name=''):
         """
         Returns a DOT cluster containing all the SemRep information.
+        Args:
+            - SemRep (Networkx.DiGraph): State of visWM.
         """
         node_font_size = '14'
         edge_font_size = '12'
@@ -563,7 +565,7 @@ class TCG_VIEWER:
     @staticmethod        
     def _create_lingWM_cluster(semWM, gramWM, concise=False):
         """
-        Returns a DOT cluster containing all the the linguisticWM (semanticWM + grammaticamWM)
+        Returns a DOT cluster containing all the linguisticWM (semanticWM + grammaticamWM)
         Uses graphviz with pydot implementation.
         
         NOTE: would need to add phonological WM
@@ -603,6 +605,41 @@ class TCG_VIEWER:
         
         return lingWM_cluster
     
+    @staticmethod
+    def _create_scenerep_cluster(scenerep, name=''):
+        """
+        Returns a DOT cluster containing all the SceneRep information.
+        
+        Args:
+            - SceneRep (Networkx.DiGraph): State of visWM.
+            
+        Note:
+            - Node position is defined by instances position.
+        """
+        node_font_size = '14'
+        edge_font_size = '12'
+        style = 'filled'
+        node_fill_color = '#%s%s%s%s' %('00', '00', '00', '44') #RGBA format
+        node_color = 'white'
+        node_shape = 'box'
+        font_name = 'consolas'
+        
+        scenerep_cluster = pydot.Cluster(name, label='', color='white', fillcolor='white')
+        
+        for n, d in scenerep.nodes(data=True):
+            label = '%s (%.1f)' %(d['per_inst'].name, d['per_inst'].activity)
+            scale = 1
+            pos = "%f,%f" %(d['pos'][0]*scale, d['pos'][1]*scale)
+            new_node = pydot.Node(n, pos = pos, label=label, shape=node_shape, style=style, color=node_color, fillcolor=node_fill_color, fontsize=node_font_size, fontname=font_name)
+            scenerep_cluster.add_node(new_node)
+            
+        for u,v, d in scenerep.edges(data=True):
+            label = label = '%s (%.1f)' %(d['per_inst'].name, d['per_inst'].activity)
+            new_edge = pydot.Edge(u, v, label=label,  fontsize=edge_font_size, fontname=font_name, penwidth='2')
+            scenerep_cluster.add_edge(new_edge)
+        
+        return scenerep_cluster
+        
     @staticmethod
     def display_cxn(cxn):
         """
@@ -733,7 +770,7 @@ class TCG_VIEWER:
         subprocess.call(cmd, shell=True)
     
     @staticmethod
-    def display_semWM_state(WM):
+    def display_semWM_state(semWM):
         """
         Create graph images for the semanic working memory
         Uses graphviz with pydot implementation.
@@ -742,14 +779,16 @@ class TCG_VIEWER:
         
         prog = 'dot'
         file_type = 'svg'
+    
+        name = 'semanticWM'
         
-        dot_semrep = pydot.Dot(graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
+        semWM_graph = pydot.Dot(name, graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
         
-        semrep_cluster = TCG_VIEWER._create_semrep_cluster(WM.SemRep, 'SemRep')
-        dot_semrep.add_subgraph(semrep_cluster)
+        semrep_cluster = TCG_VIEWER._create_semrep_cluster(semWM.SemRep, 'SemRep')
+        semWM_graph.add_subgraph(semrep_cluster)
         
-        file_name = '%s%s%.1f.gv' %(tmp_folder, WM.name, WM.t)
-        dot_semrep.write(file_name)
+        file_name = '%s%s%.1f.gv' %(tmp_folder, semWM.name, semWM.t)
+        semWM_graph.write(file_name)
         
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
@@ -778,8 +817,7 @@ class TCG_VIEWER:
             name='LingusiticWM_concise'
         
         lingWM_graph = pydot.Dot(name, graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
-        lingWM_graph.set_rankdir('LR')
-        
+
         lingWM_cluster = TCG_VIEWER._create_lingWM_cluster(semWM, gramWM, concise=concise)
         lingWM_graph.add_subgraph(lingWM_cluster)
         
@@ -796,6 +834,29 @@ class TCG_VIEWER:
 #        plt.title(title)
 #        img = plt.imread(img_name)
 #        plt.imshow(img)
+        
+    @staticmethod
+    def display_visWM_state(visWM):
+        """
+        Create graph images for the visual working memory.
+        Uses graphviz with pydot implementation.
+        """
+        tmp_folder = './tmp/'
+        
+        prog = 'neato' # Need to use neato or fdp to make use of node positions in rendering
+        file_type = 'svg'
+        
+        name = 'visualWM'
+        
+        visWM_graph = pydot.Dot(name, graph_type= 'digraph', rankdir='LR', labeljust='L', compound='true', style='rounded', penwidth = '2')
+        scenerep_cluster = TCG_VIEWER._create_scenerep_cluster(visWM.SceneRep, 'SceneRep')
+        visWM_graph.add_subgraph(scenerep_cluster)
+        
+        file_name = '%s%s%.1f.gv' %(tmp_folder, visWM.name, visWM.t)
+        visWM_graph.write(file_name)
+        
+        cmd = "%s -T%s -n2 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or -n2 if all node positions are given.
+        subprocess.call(cmd, shell=True)
         
 
             

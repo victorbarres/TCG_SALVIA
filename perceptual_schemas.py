@@ -18,9 +18,7 @@ import scene as scn
 seed = None
 random.seed(seed)
 
-####################################
-### Perceptual knowledge schemas ###
-####################################
+
 class AREA(object):
     """
     Simply defines an area in the visual input
@@ -84,8 +82,10 @@ class AREA(object):
         """
         data = {'id': self.id, 'x':self.x, 'y':self.y, 'w':self.w, 'h':self.h, 'saliency':self.saliency}
         return data
-        
 
+####################################
+### Perceptual knowledge schemas ###
+####################################
 class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Perceptual schema
