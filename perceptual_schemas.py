@@ -228,7 +228,7 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
             - out_ports ([PORT]):
             - alive (bool): status flag
             - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
-            - covers ({'cpt_insts'=[]}): Pointer to the concept instances associated through conceptualization.
+            - covers ({'cpt_inst'=CPT_SCHEMA_INST}): Pointer to the concept instances associated through conceptualization.
         
     Notes:
         For now, those schema instances are not used to form assemablages -> so no use for ports... 
@@ -238,7 +238,7 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
         SCHEMA_INST.__init__(self, schema=per_schema, trace=trace)
         content_copy = per_schema.content.copy()
         self.content = content_copy
-        self.covers = {'cpt_insts':[]}
+        self.covers = {'cpt_inst':None}
     
     def set_area(self, x=0, y=0, w=0, h=0, saliency=0):
         """

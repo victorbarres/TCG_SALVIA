@@ -34,7 +34,7 @@ def test(seed=None):
     
     set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900
-    save_states = [10,20,30,60,100,400]
+    save_states = [49,85,98,110,120,300]
     
     # Running the schema system
     for t in range(max_time):
@@ -43,7 +43,7 @@ def test(seed=None):
         if output:
             print output
         if t - set_up_time in save_states:
-                TCG_VIEWER.display_visWM_state(description_system.schemas['Visual_WM'])
+                TCG_VIEWER.display_WMs_state(description_system.schemas['Visual_WM'], description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
 #                TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)
 #                TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
     

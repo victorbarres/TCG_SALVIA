@@ -17,6 +17,7 @@ import pydot
 import matplotlib.pyplot as plt
 import construction
 import percept
+import perceptual_schemas
 from loader import TCG_LOADER
 
 class TCG_VIEWER:
@@ -549,13 +550,14 @@ class TCG_VIEWER:
         font_name = 'consolas'
         semrep_cluster = pydot.Cluster(name, label='', color='white', fillcolor='white')
         
+        
         for n, d in semrep.nodes(data=True):
-            label = '%s (%.1f)' %(d['cpt_inst'].name, d['cpt_inst'].activity)
+            label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['cpt_inst'].name, d['cpt_inst'].activity)
             new_node = pydot.Node(n, label=label, shape=node_shape, style=style, color=node_color, fillcolor=node_fill_color, fontsize=node_font_size, fontname=font_name)
             semrep_cluster.add_node(new_node)
             
         for u,v, d in semrep.edges(data=True):
-            label = label = '%s (%.1f)' %(d['cpt_inst'].name, d['cpt_inst'].activity)
+            label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['cpt_inst'].name, d['cpt_inst'].activity)
             new_edge = pydot.Edge(u, v, label=label,  fontsize=edge_font_size, fontname=font_name, penwidth='2')
             semrep_cluster.add_edge(new_edge)
         
@@ -619,26 +621,63 @@ class TCG_VIEWER:
         node_font_size = '14'
         edge_font_size = '12'
         style = 'filled'
+        cluster_fill_color = '#%s%s%s%s' %('00', '00', '00', '11') #RGBA format
         node_fill_color = '#%s%s%s%s' %('00', '00', '00', '44') #RGBA format
         node_color = 'white'
         node_shape = 'box'
         font_name = 'consolas'
         
-        scenerep_cluster = pydot.Cluster(name, label='', color='white', fillcolor='white')
+        scenerep_cluster = pydot.Cluster(name, label='', color='white', fillcolor=cluster_fill_color)
         
         for n, d in scenerep.nodes(data=True):
-            label = '%s (%.1f)' %(d['per_inst'].name, d['per_inst'].activity)
+            pos = d['per_inst'].content['area'].center()
+            w = d['per_inst'].content['area'].w
+            h = d['per_inst'].content['area'].h
+            
+            label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">%s (%.1f)</TD></TR><TR><TD ALIGN="LEFT">area: (x:%.1f,y:%.1f,w:%.1f,h:%.1f)</TD></TR></TABLE></FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity, pos[0], pos[1], w, h)
+#            label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity)
             scale = 1
             pos = "%f,%f" %(d['pos'][0]*scale, d['pos'][1]*scale)
-            new_node = pydot.Node(n, pos = pos, label=label, shape=node_shape, style=style, color=node_color, fillcolor=node_fill_color, fontsize=node_font_size, fontname=font_name)
+#            width = "%f" %(d['per_inst'].content['area'].w*scale*0.01) # This is annoying! width is defined in inches, and pos is interpreted in points.....
+#            height = "%f" %(d['per_inst'].content['area'].h*scale*0.01)
+            new_node = pydot.Node(n, pos=pos, label=label, shape=node_shape, style=style, color=node_color, fillcolor=node_fill_color, fontsize=node_font_size, fontname=font_name)
             scenerep_cluster.add_node(new_node)
             
         for u,v, d in scenerep.edges(data=True):
-            label = label = '%s (%.1f)' %(d['per_inst'].name, d['per_inst'].activity)
+            label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity)
             new_edge = pydot.Edge(u, v, label=label,  fontsize=edge_font_size, fontname=font_name, penwidth='2')
             scenerep_cluster.add_edge(new_edge)
         
         return scenerep_cluster
+    
+    @staticmethod        
+    def _create_WMs_cluster(visWM, semWM, gramWM, concise=True):
+        font_name = 'consolas'
+        cover_color = 'grey'
+        cover_style = 'dashed'
+        
+        WMs_cluster = pydot.Cluster('WMs')
+        
+        # Add visWM cluster
+        label = '<<FONT FACE="%s">Visual WM (t:%.1f)</FONT>>' %(font_name, visWM.t)
+        visWM_cluster = pydot.Cluster('visWM', label=label)
+        scenerep_cluster = TCG_VIEWER._create_scenerep_cluster(visWM.SceneRep)
+        visWM_cluster.add_subgraph(scenerep_cluster)
+        WMs_cluster.add_subgraph(visWM_cluster)
+        
+        # Add LingWM cluster
+        lingWM_cluster = TCG_VIEWER._create_lingWM_cluster(semWM, gramWM, concise)
+        WMs_cluster.add_subgraph(lingWM_cluster)
+        
+        #Add conceptualization links
+        for per_inst in visWM.schema_insts:
+            if not(isinstance(per_inst.content, perceptual_schemas.PERCEPT_SCHEMA_REL)):
+                cpt_inst = per_inst.covers['cpt_inst'] # I am only going to show the node covers for simplicity
+                if cpt_inst:
+                    new_edge = pydot.Edge(cpt_inst.name, per_inst.name, dir='both', color=cover_color, style=cover_style, splines='spline')
+                    WMs_cluster.add_edge(new_edge)
+        
+        return WMs_cluster
         
     @staticmethod
     def display_cxn(cxn):
@@ -848,18 +887,41 @@ class TCG_VIEWER:
         
         name = 'visualWM'
         
-        visWM_graph = pydot.Dot(name, graph_type= 'digraph', rankdir='LR', labeljust='L', compound='true', style='rounded', penwidth = '2')
+        visWM_graph = pydot.Dot(name, graph_type= 'digraph', rankdir='LR', labeljust='L', compound='true', style='rounded', penwidth = '2', dpi='72')
         scenerep_cluster = TCG_VIEWER._create_scenerep_cluster(visWM.SceneRep, 'SceneRep')
         visWM_graph.add_subgraph(scenerep_cluster)
         
         file_name = '%s%s%.1f.gv' %(tmp_folder, visWM.name, visWM.t)
         visWM_graph.write(file_name)
         
-        cmd = "%s -T%s -n2 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or -n2 if all node positions are given.
+        cmd = "%s -T%s -n2 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
         subprocess.call(cmd, shell=True)
+    
+    @staticmethod
+    def display_WMs_state(visWM, semWM, gramWM, concise=True):
+        """
+        Create graph images for including both visual and linguisitc working memory.
+        """
+        tmp_folder = './tmp/'
         
+        prog = 'dot' # Need to use neato or fdp to make use of node positions in rendering
+        file_type = 'svg'
 
-            
+        if not(concise):
+            name='WMs '
+        else:
+            name='WMs_concise'
+        
+        WMs_graph = pydot.Dot(name, graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
+        
+        WMs_cluster = TCG_VIEWER._create_WMs_cluster(visWM, semWM, gramWM, concise)
+        WMs_graph.add_subgraph(WMs_cluster)
+        
+        file_name = '%s%s%.1f.gv' %(tmp_folder, name, semWM.t)
+        WMs_graph.write(file_name)
+        
+        cmd = "%s -T%s -s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
+        subprocess.call(cmd, shell=True)
 
 ###############################################################################
 if __name__ == '__main__':
