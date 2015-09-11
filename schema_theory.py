@@ -11,6 +11,7 @@ Uses numpy to implement the schema instances activation values.
 Uses matplotlib.plt to visualize WM state dynamics
 Uses networkx to visualize WM state
 Uses json to save simulation data in json format.
+Uses pickle to save schema_systems.
 """
 import abc
 import time

@@ -8,6 +8,7 @@ import schema_theory as st
 import language_schemas as ls
 import perceptual_schemas as ps
 from loader import TCG_LOADER
+    
 
 def TCG_production_system(name='language_system_P'):
     """

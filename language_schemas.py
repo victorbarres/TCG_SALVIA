@@ -18,8 +18,6 @@ from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM,
 import construction
 import TCG_graph
 
-from viewer import TCG_VIEWER
-
 ##################################
 ### Language knowledge schemas ###
 ##################################
@@ -1122,13 +1120,10 @@ class GRAMMATICAL_WM_P(WM):
         """
         new_assemblage = assemblage.copy()
         coop_links = new_assemblage.coop_links
-#        name = 'cxn_assemblage_%.1f_%i' %(new_assemblage.activation, len(new_assemblage.coop_links))
-#        TCG_VIEWER.display_cxn_assemblage(assemblage, name)
+
         while len(coop_links)>0:
             new_assemblage = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
             coop_links = new_assemblage.coop_links
-#            name = 'cxn_assemblage_%.1f_%i' %(new_assemblage.activation, len(new_assemblage.coop_links))
-#            TCG_VIEWER.display_cxn_assemblage(new_assemblage, name)
         eq_inst = new_assemblage.schema_insts[0]
         eq_inst.activity = new_assemblage.activation
         return eq_inst
@@ -1138,8 +1133,6 @@ class GRAMMATICAL_WM_P(WM):
         """
         Returns a new, reduced, assemblage in which the instances cooperating (as defined by 'coop_link') have been combined.
         """
-#        name = 'cxn_assemblage_%.1f_%i' %(assemblage.activation, len(assemblage.coop_links))
-#        TCG_VIEWER.display_cxn_assemblage(assemblage, name)
         inst_p = coop_link.inst_to
         inst_c = coop_link.inst_from
         connect = coop_link.connect
@@ -2205,7 +2198,7 @@ class SEM_GENERATOR(object):
     #        cpt_var_pattern = r"\?[A-Z0-9_]+"
         
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
-        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition
+#        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition (without activation)
         func_pattern_cpt2 = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation
         func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)"
         
