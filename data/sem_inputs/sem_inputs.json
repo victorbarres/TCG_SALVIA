@@ -70,6 +70,61 @@
 			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
 			"timing":[],
 			"comments":""
-			}
+			}, 
+			
+		"kick_static_focus_agent":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 0.9)", "MAN(m1, 0.7)", "KICK(a1, 0.9)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test agent focus on static representation. This does not seem to work since there is also an effect of lexical competition on WOMAN"
+		},
+		
+		"kick_static_focus_patient":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 0.7)", "MAN(m1, 0.9)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test patient focus on static representation. This does not seem to work since there is also an effect of lexical competition on WOMAN"
+		},
+		
+		"kick_static_focus_agent2":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["BOY(w1, 0.9)", "MAN(m1, 0.7)", "KICK(a1, 0.9)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test agent focus on static representation."
+		},
+		
+		"kick_static_focus_patient2":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["BOY(w1, 0.7)", "MAN(m1, 0.9)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test patient focus on static representation."
+		},
+		
+		"kick_dynamic_focus_patient2":{
+			"sem_rate":50,
+			"propositions": {
+				"P1":["MAN(m1, 0.9)"],
+				"P2":["KICK(a1, 0.8)"],
+				"P3":["BOY(w1, 0.7)"],
+				"P4":["AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1", "P2", "P3", "P4"],
+			"timing":[],
+			"comments":"In this case I want to show that the initial advantage of given to the patient can be overrun by the decay in grammatical WM. By playing on the rate, we can see
+			at which point the system produces exclusively BOY focused utterances (r=20?)."
+		}
+		
 	}
 }

@@ -36,7 +36,7 @@
 	{
 		"name" : "SVO",
 		"class" : "S",
-		"preference" : 1.5,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" :
 		{
@@ -55,7 +55,7 @@
 	{
 		"name" : "PAS_SVO",
 		"class" : "S",
-		"preference" : 0.5,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -81,7 +81,7 @@
 		"group": 2,
 		"SemFrame" : 
 		{
-			"nodes"  : [{"name" : "THEME", "concept" : "OBJECT", "focus" : false, "head" : true}],
+			"nodes"  : [{"name" : "THEME", "concept" : "OBJECT", "focus" : true, "head" : true}],
 			"edges" : []
 		},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "there"},
