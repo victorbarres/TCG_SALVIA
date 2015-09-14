@@ -2271,7 +2271,73 @@ class SEM_GENERATOR(object):
             else:
                 next_time = None
             
-            yield (instances, next_time, ' , '.join(prop_list))   
+            yield (instances, next_time, ' , '.join(prop_list))
+
+class UTTER_GEN():
+    """
+    """
+    def __init__(self, ling_inputs):
+        self.ling_inputs = ling_inputs
+        self.preprocess_inputs()
+    
+    def preprocess_inputs(self):
+        """
+        """
+        for name, ling_input in self.ling_inputs.iteritems():
+            utter_rate = ling_input['utter_rate']
+            utterance = ling_input['utterance']
+            timing = ling_input['timing']
+            if utter_rate and not(timing):
+                ling_input['timing'] = [i*utter_rate for i in range(len(utterance))]
+            if not(timing) and not(utter_rate):
+                print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
+    
+    def show_options(self, verbose = False):
+        """
+        """
+        for name, ling_input in self.ling_inputs.iteritems():
+            print name
+            if verbose:
+                self.show_input(name) 
+                
+    def show_input(self, input_name):
+        """
+        """
+        ling_input = self.ling_inputs.get(input_name, None)
+        if ling_input:
+            utterance = ling_input['utterance']
+            timing = ling_input['timing']
+            for i in range(len(utterance)):
+                print 't: %.1f, word-form: %s' %(timing[i], utterance[i])
+    
+    def sem_generator(self, input_name, verbose=False):
+        """
+        Creates a generator based on a linguistic_data loaded by TCG_LOADER.load_ling_input().
+        Eeach time next() function is called, returns a word-form (STRING) as well as the next time at which the generator should be called.
+        Args:
+            - ling_input: a linguistic input dict loaded using load_ling_input()
+        """        
+
+        
+        ling_input = self.ling_inputs[input_name]
+        utterance = ling_input['utterance']
+        timing = ling_input['timing']
+        
+        next_timing = timing[0]
+        yield ([], next_timing, '')
+            
+        for idx in range(len(utterance)):          
+            word_form = utterance[idx]
+            if verbose:
+                print 'ling_input <- t: %.1f, word-form: %s' %(timing[idx], word_form)
+            
+            next_idx = idx + 1       
+            if next_idx<len(timing):
+                next_time = timing[next_idx]
+            else:
+                next_time = None
+            
+            yield (word_form, next_time)
             
 ###############################################################################
 if __name__=='__main__':
