@@ -484,6 +484,17 @@ class TCG_LOADER(object):
         # Open and read file
         json_data = TCG_LOADER.json_read(file_name, path = file_path)
         return json_data['inputs']
+        
+        
+    @staticmethod
+    def load_ling_input(file_name = '', file_path = './'):
+        """
+        Loads and returns a the linguistic input data define in in file_path\file_name.
+        Return None if error.
+        """
+        # Open and read file
+        json_data = TCG_LOADER.json_read(file_name, path = file_path)
+        return json_data['inputs']
             
         
 ###############################################################################

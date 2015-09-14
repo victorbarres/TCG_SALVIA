@@ -2310,15 +2310,13 @@ class UTTER_GEN():
             for i in range(len(utterance)):
                 print 't: %.1f, word-form: %s' %(timing[i], utterance[i])
     
-    def sem_generator(self, input_name, verbose=False):
+    def utter_generator(self, input_name, verbose=False):
         """
         Creates a generator based on a linguistic_data loaded by TCG_LOADER.load_ling_input().
         Eeach time next() function is called, returns a word-form (STRING) as well as the next time at which the generator should be called.
         Args:
             - ling_input: a linguistic input dict loaded using load_ling_input()
         """        
-
-        
         ling_input = self.ling_inputs[input_name]
         utterance = ling_input['utterance']
         timing = ling_input['timing']
