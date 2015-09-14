@@ -4,11 +4,13 @@
 Defines language schemas for TCG.
 
 Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
+Uses Numpy for vectorial operations.
 Uses pyttsx for the text to speech implementation (optional!)
 Uses re for regular expression parsing of sem inputs (optional)
 """
 import matplotlib.pyplot as plt
 import re
+import numpy as np
 
 import networkx as nx
 import pyttsx
@@ -1384,8 +1386,20 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
         
         NOTE: I NEED TO THINK ABOUT HOW TO INCORPORATE FOCUS ETC....
+            - In the current version of focus, it only looks at the focus node for the quality of match. 
+                But focus should be defined as contrasts within consructions (and between constructions.)
+                Move from focus as boolean value to focus as value attached to each node.
+            - Still need to incorporate light sem. For this, need to switch to vector space representaiton of concept. 
+            This could be added on top of the is-a ontology.
         """
-        return 1
+        # Compute match qual value based on focus values.
+        focus_match = 1
+        for cxn_node, sem_node_name in a_sub_iso['nodes'].iteritems():
+            sem_node_act = SemRep.node[sem_node_name]['cpt_inst'].activity
+            if cxn_node.focus:
+                focus = 1
+                focus_match -= focus - sem_node_act # This is much too simple. But placeholder for now.            
+        return focus_match
     
     ####################
     ### JSON METHODS ###
