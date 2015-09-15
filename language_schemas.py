@@ -634,7 +634,7 @@ class GRAMMATICAL_WM_P(WM):
         self.update_activations()
         self.prune()
         
-        if ctrl_input and ctrl_input['start_produce']:
+        if ctrl_input and ctrl_input['produce']:
             output = self.produce_form(sem_input,phon_input)
             if output:
                 self.set_output('to_phonological_WM_P', output['phon_WM_output'])
@@ -2073,7 +2073,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.task_params = {'time_pressure':100, 'start_produce':1000}
-        self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'start_produce': False}
+        self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'produce': False}
     
     def set_mode(self, mode):
         """
@@ -2081,7 +2081,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.state['mode'] = mode
         if mode =='produce':
             self.state['last_prod_time'] = self.t
-            self.state['start_produce'] = False
+            self.state['produce'] = False
             self.state['unexpressed_sem'] = False
             self.task_params['start_produce'] += self.t
     
@@ -2102,9 +2102,9 @@ class CONTROL(PROCEDURAL_SCHEMA):
                 self.state['last_prod_time'] = self.t
                 
             if self.t >= self.task_params['start_produce'] and self.state['unexpressed_sem']:
-                self.state['start_produce'] = True
+                self.state['produce'] = True
             else:
-                self.state['start_produce'] = False
+                self.state['produce'] = False
             
             if self.t < self.task_params['start_produce'] or not(self.state['unexpressed_sem']):
                 pressure = 0
@@ -2112,7 +2112,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             else:
                 pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramps up linearly to 1
 
-            output = {'start_produce':self.state['start_produce'], 'pressure':pressure}
+            output = {'produce':self.state['produce'], 'pressure':pressure}
             self.set_output('to_grammatical_WM_P', output)
         else:
             self.set_output('to_grammatical_WM_P', None)
