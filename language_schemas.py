@@ -248,19 +248,20 @@ class PHON_SCHEMA(KNOWLEDGE_SCHEMA):
 
 class PHON_RELATION_SCHEMA(KNOWLEDGE_SCHEMA):
     """
+    UNUSED! For now the PhonologicalWM contains a sequence of PHONS_SCHEMA_INST that define word_forms.
     Temporal relation between phonological form schemas.
     NOTE:
-        - For now only 'next' is implemented.
+         For now only 'next' is implemented.
     """
-    def __init__(self, name, word_form, init_act):
+    def __init__(self, name, phon_rel, init_act):
         """
         Args:
             - name (STR):
-            - word_form (STR):
+            - phon_rel (STR):
             - init_act (FLOAT):
         """
         KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
-        self.set_content({'word_form':word_form})
+        self.set_content({'phon_rel':phon_rel})
         self.content['pFrom'] = None 
         self.content['pTo'] = None
 

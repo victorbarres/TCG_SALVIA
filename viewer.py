@@ -418,7 +418,12 @@ class TCG_VIEWER:
                 node_shape = SemFrame_head_shape
             else:
                 node_shape = SemFrame_node_shape
-            new_node = pydot.Node(node.name, label=node.concept.meaning, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name)
+            if node.focus:
+                label = "%s%s"%(node.concept.meaning, '(F)')
+            else:
+                label = "%s"%node.concept.meaning
+                
+            new_node = pydot.Node(node.name, label=label, color=SemFrame_node_color, fillcolor=SemFrame_node_fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name)
             cluster_SemFrame.add_node(new_node)
         for edge in cxn.SemFrame.edges:
             new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, style=edge_style, label=edge.concept.meaning)
