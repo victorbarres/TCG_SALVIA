@@ -86,8 +86,10 @@
 				"WATCH" : {}
 			},
 			"DITRANSITIVE" :
+			{
 				"GIVE": {},
-				"SEND": {},
+				"SEND": {}
+			}
 		},
 		
 		"PROPERTY" :
@@ -119,8 +121,8 @@
 			{
 				"AGENT" : {},
 				"PATIENT" : {},
-				"THEME": {},
-				"RECIPIENT":{}
+				"THEME" : {},
+				"RECIPIENT" : {}
 			},
 			"TEMPORAL" :
 			{

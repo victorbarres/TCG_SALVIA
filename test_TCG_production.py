@@ -22,7 +22,7 @@ def test(seed=None):
     sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
 
-    input_name = 'kick_dynamic_focus_patient2'    
+    input_name = 'ditransitive_give'    
     generator = sem_gen.sem_generator(input_name)
     
     (sem_insts, next_time, prop) = generator.next()
@@ -41,19 +41,19 @@ def test(seed=None):
         output = language_system_P.get_output()
         if output:
             print "t:%i, '%s'" %(t, output)
-#        if t - set_up_time in save_states:
-#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
-#            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=True)
-#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=False)
-#            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=False)
+        if t - set_up_time in save_states:
+            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
+            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=True)
+            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=False)
+            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=False)
     
-#    language_system_P.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
-#    language_system_P.schemas['Semantic_WM'].show_SemRep()
-#    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'])
-#    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
-#    language_system_P.schemas['Grammatical_WM_P'].show_state()
-#    language_system_P.schemas['Phonological_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
-#    language_system_P.save_sim('./tmp/test_language_output.json')
+    language_system_P.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+    language_system_P.schemas['Semantic_WM'].show_SemRep()
+    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'])
+    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
+    language_system_P.schemas['Grammatical_WM_P'].show_state()
+    language_system_P.schemas['Phonological_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+    language_system_P.save_sim('./tmp/test_language_output.json')
 
 
 if __name__=='__main__':

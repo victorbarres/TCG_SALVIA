@@ -122,9 +122,17 @@
 			},
 			"sequence":["P1", "P2", "P3", "P4"],
 			"timing":[],
-			"comments":"In this case I want to show that the initial advantage of given to the patient can be overrun by the decay in grammatical WM. By playing on the rate, we can see
-			at which point the system produces exclusively BOY focused utterances (r=20?)."
-		}
+			"comments":"In this case I want to show that the initial advantage of given to the patient can be overrun by the decay in grammatical WM. By playing on the rate, we can see at which point the system produces exclusively BOY focused utterances (r=20?)."
+		},
 		
+		"ditransitive_give":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["TURTLE(o1)", "BOY(o2)", "GIRL(o3)", "GIVE(a1)", "THEME(r1)", "AGENT(r2)", "RECIPIENT(r3)", "r2(a1, o2)", "r1(a1,o1)", "r3(a1, o3)"]
+			},
+			"sequence": ["P1"],
+			"timing":[],
+			"comments":"test double object and oblique dative argument structure constructions"
+		}
 	}
 }
