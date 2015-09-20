@@ -296,10 +296,12 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - out_ports ([PORT]):
         - activity (float):
     Data:
+        - content (KNOWLEDGE_SCHEMA)
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation.
+        - activity (FLOAT): activity value for schema instance
         - act_params (DICT): {t0:FLOAT,act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}
-        - activation (INST_ACTIVATION): Activation value of schema instance
+        - activation (INST_ACTIVATION): Activation object of schema instance
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
     """    

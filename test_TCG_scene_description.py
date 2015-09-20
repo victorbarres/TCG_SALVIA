@@ -18,7 +18,7 @@ def test(seed=None):
     description_system = TCG_description_system()
 
     # Generating schema system graph visualization
-    description_system.system2dot(image_type='svg', disp=False)
+    description_system.system2dot(image_type='png', disp=True)
 
     # Defining scene input
     scene_name = 'KC06_1_1'
@@ -33,7 +33,7 @@ def test(seed=None):
     description_system.schemas['Control'].task_params['start_produce'] = 300
     
     set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 900
+    max_time = 500
     save_states = [49,85,98,110,120,300]
     
     # Running the schema system
@@ -41,18 +41,18 @@ def test(seed=None):
         description_system.update()
         output = description_system.get_output()
         if output:
-            print output
+             print "t:%i, '%s'" %(t, output)
         if t - set_up_time in save_states:
                 TCG_VIEWER.display_WMs_state(description_system.schemas['Visual_WM'], description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
-#                TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)
-#                TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
+                TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)
+                TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
     
-#    description_system.schemas['Visual_WM'].show_SceneRep()
-#    description_system.schemas['Visual_WM'].show_dynamics()
-#    description_system.schemas['Semantic_WM'].show_SemRep()
-#    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
-#    description_system.schemas['Grammatical_WM_P'].show_state()
-#    
+    description_system.schemas['Visual_WM'].show_SceneRep()
+    description_system.schemas['Visual_WM'].show_dynamics()
+    description_system.schemas['Semantic_WM'].show_SemRep()
+    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
+    description_system.schemas['Grammatical_WM_P'].show_state()
+    
     #description_system.save_sim('./tmp/test_description_output.json')
 
 if __name__ == '__main__':

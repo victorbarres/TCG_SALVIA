@@ -60,18 +60,28 @@ class AREA(object):
         return (x,y)
            
     
+    def set_BU_saliency(self, BU_saliency_map=None):
+        """
+        Sets the area saliency based on a BU saliency map
+        TO BE WRITTEN
+        """
+        if not(BU_saliency_map):
+            self.saliency = random.random()
+        else:
+            self.saliency = 0 # to be defined.
+    
+    @staticmethod
     def hull(area1, area2):
         """
-        Class method
         Returns the smallest area containing area1 and area2 (~ convex hull)
-        Right now the saliency is defined as the max of both saliency values... NOT SURE IT IS A GOOD WAY OF DOING THIS!
+        Right now the saliency is defined as the average of both saliency values... NOT SURE IT IS A GOOD WAY OF DOING THIS!
         """
         merge_area = AREA()
         merge_area.x = min([area1.x, area2.x])
         merge_area.y = min([area1.y, area2.y])
         merge_area.w = max([area1.y + area1.w, area2.y + area2.w]) - merge_area.y
         merge_area.h = max([area1.x + area1.h, area2.x + area2.h]) - merge_area.x
-        merge_area.saliency = max([area1.saliency + area2.saliency]) # THIS MIGHT NOT BE A GOOD IDEA!!
+        merge_area.saliency = (area1.saliency + area2.saliency)/2 # THIS MIGHT NOT BE A GOOD IDEA!!
         return merge_area
     
     ####################
@@ -101,9 +111,9 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
         - content of schema is defined as:
             - 'percept' (PERCEPT): the percept defining the schema (declarative content) linked to perceptual knowledge.
             - 'features' (): contains the perceptual features
-            - 'area' (AREA): defines the area of the scene associated with this perceptual schema.
-            - 'saliency' (FLOAT): Saliency of the schema (can difer from the saliency of the area it is associated to.)
-            - 'uncertainty' (INT): Uncertainty indexing the difficulty of the recognition process for the schema of the schema.
+#            - 'area' (AREA): defines the area of the scene associated with this perceptual schema.
+#            - 'saliency' (FLOAT): Saliency of the schema (can difer from the saliency of the area it is associated to.)
+#            - 'uncertainty' (INT): Uncertainty indexing the difficulty of the recognition process for the schema of the schema.
     """
     # Schema types
     UNDEFINED = 'UNDEFINED'
@@ -118,28 +128,14 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     def __init__(self, name, percept, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
         self.type = PERCEPT_SCHEMA.UNDEFINED
-        self.set_content({'percept':percept, 'features':None, 'area':None, 'saliency':None, 'uncertainty':None})
+        self.set_content({'percept':percept, 'features':None})
     
     def set_features(self, features):
         self.content['features'] = features
     
-    def set_area(self, an_area):
-        self.content['area'] = an_area
-    
     ### -> Set the initial activation
-#    def set_saliency(self, saliency=None):
-#        """
-#        Sets the saliency to saliency (FLOAT). If no saliency is provided, by default, sets saliency of perceptual schema equal to the bottom-up saliency 
-#        value of the area it is associated with.
-#        """
-#        if saliency:
-#            self.content['saliency'] = saliency
-#            return True
-#        elif self.area:
-#            self.content['saliency'] = self.content['area'].saliency
-#            return True
-#        else:
-#            return False
+    # To be done.
+
 
 class PERCEPT_OBJECT(PERCEPT_SCHEMA):
     """
@@ -220,13 +216,8 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
     Perceptual schema instance.
     
     Data:
-        SCHEMA_INST:
-            - id (INT): Unique id
-            - activation (INST_ACTIVATION): Current activation value of schema instance
-            - schema (PERCEPT_SCHEMA):
-            - in_ports ([PORT]):
-            - out_ports ([PORT]):
-            - alive (bool): status flag
+        Inherited from SCHEMA_INST:
+            Note: 
             - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
             - covers ({'cpt_inst'=CPT_SCHEMA_INST}): Pointer to the concept instances associated through conceptualization.
         
@@ -240,11 +231,19 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
         self.content = content_copy
         self.covers = {'cpt_inst':None}
     
-    def set_area(self, x=0, y=0, w=0, h=0, saliency=0):
+    def set_area(self, area):
         """
+        Args:
+            - area (AREA)
         """
-        area = AREA(x,y,w,h,saliency)
         self.content['area'] = area
+    
+    def set_saliency(self, saliency=0.0):
+        """
+        Might differ from area saliency
+        Args:
+            - saliency (float)
+        """
         self.content['saliency'] = saliency
 
 #####################################
@@ -260,7 +259,7 @@ class SALIENCY_MAP(PROCEDURAL_SCHEMA):
             - IOR_max (INT): Max number of IORmaks that can be maintained.
         - IOR_masks ([{'mask':ARRAY, 't':INT, 'fix':(INT, INT)}]): set of inhibition of return masks.
         - IOR_mask (ARRAY): Stores the combined IOR_masks
-        - saliency_map (array): BU_saliency_map + inhibition of return  
+        - saliency_map (array): BU_saliency_map + inhibition of return
     """
     def __init__(self, name='Saliency_map'):
         PROCEDURAL_SCHEMA.__init__(self, name)
@@ -400,16 +399,17 @@ class VISUAL_WM(WM):
     def update(self):
         """
         """
-        sub_scene= self.get_input('from_subscene_rec')
-
-        if sub_scene:
+        ss_input= self.get_input('from_subscene_rec')
+        if ss_input:
+            sub_scene = ss_input['subscene']
+            init_act = ss_input['init_act']
             new_insts = []
             for inst in sub_scene.nodes + sub_scene.edges:
                 if not(inst in self.schema_insts):
+                    inst.set_activation(init_act)
                     self.add_instance(inst)
                     new_insts.append(inst)
             self.update_SceneRep(new_insts)
-#            self.show_SceneRep()
         self.update_activations()
         self.prune()
         self.set_output('to_conceptualizer', self.SceneRep)
@@ -529,20 +529,22 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         PROCEDURAL_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_percept_LTM')
+        self.add_port('IN', 'from_saliency_map')
         self.add_port('OUT','to_visual_WM')
         self.params = {'recognition_time':10}
-        self.inputs = {'scene_input':None, 'per_schemas':None}
+        self.inputs = {'scene_input':None, 'per_schemas':None, 'BU_saliency_map':None}
         self.scene_data = None
         self.subscene = None
         self.uncertainty = 0
         self.next_saccade = False 
         self.eye_pos = (0,0)
         
-    def initialize(self, scene_input, per_schemas):
+    def initialize(self, scene_input, per_schemas, BU_saliency_map=None):
         """
         Creates the scene_data (SCENE) based on the scene_input.
         Scene_input should be a DICT generated by LOADER.load_scene.
         """
+            
         my_scene = scn.SCENE()
         my_scene.width = scene_input['resolution'][0]
         my_scene.height = scene_input['resolution'][1]
@@ -552,11 +554,13 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             dat = scene_input['schemas'][i]
             schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
             inst = PERCEPT_SCHEMA_INST(schema, trace=schema)
+            area = AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1])
+            area.set_BU_saliency(BU_saliency_map=None) # THIS NEEDS TO BE CHANGED (for now random)    
+            inst.set_area(area)
             if dat['saliency'] == 'auto':
-                saliency  = random.random() # THIS NEEDS TO BE CHANGED!!!
+                inst.set_saliency(area.saliency)  # Does this make any sense at all??
             else:
-                saliency = dat['saliency']
-            inst.set_area(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1], saliency=saliency)
+                inst.set_saliency(dat['saliency'])
             inst.content['uncertainty'] = int(dat['uncertainty'])
             name_table[dat['name']] = inst
         
@@ -564,13 +568,15 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             dat = scene_input['schemas'][i]
             schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
             inst = PERCEPT_SCHEMA_INST(schema, trace=schema)
-            if dat['saliency'] == 'auto':
-                saliency  = random.random() # THIS NEEDS TO BE CHANGED!!!
-            else:
-                saliency = dat['saliency']
-            inst.set_area(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1], saliency=saliency)
             inst.content['pFrom'] = name_table[dat['from']]
             inst.content['pTo'] = name_table[dat['to']]
+            area = AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1]) # This means that the area is gonna be of size 0
+            area.set_BU_saliency(BU_saliency_map=None) # THIS NEEDS TO BE CHANGED (for now random)            
+            inst.set_area(area)
+            if dat['saliency'] == 'auto':
+                inst.set_saliency(area.saliency) # Does this make any sense at all?? 
+            else:
+                inst.set_saliency(dat['saliency'])
             inst.content['uncertainty'] = int(dat['uncertainty'])
             name_table[dat['name']] = inst
         
@@ -580,6 +586,12 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             subscene = scn.SUB_SCENE(name = dat['name'])
             for schema in dat['schemas']:
                 subscene.add_per_schema(name_table[schema])
+            
+            if dat['saliency'] != 'auto':
+                subscene.saliency = float(dat['saliency'])
+            
+            if dat['uncertainty'] != 'auto':
+                subscene.uncertainty = int(dat['uncertainty'])
             
             my_scene.add_subscene(subscene)
         
@@ -608,7 +620,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
-                print "Perceiving subscene: %s" %self.subscene.name
+                print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene.name, self.subscene.saliency)
                 print "Eye pos: (%.1f,%.1f)" %(self.eye_pos[0], self.eye_pos[1])
                 self.uncertainty = self.subscene.uncertainty*self.params['recognition_time']
         
@@ -617,7 +629,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             if self.uncertainty <0:
                 self.next_saccade = True
                 print 't: %i, trigger next saccade' % self.t
-                self.set_output('to_visual_WM', self.subscene)
+                self.set_output('to_visual_WM', {'subscene':self.subscene, 'init_act':self.subscene.saliency})
                 self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
                 self.subscene = None
 
@@ -647,6 +659,42 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         data['uncertainty'] = self.uncertainty
         data['next_saccade'] = self.next_saccade
         return data
+
+
+class SIMPLE_SALIENCY_MAP(PROCEDURAL_SCHEMA):
+    """
+    Data:
+        - BU_saliency_map (array): BOTTOM-up saliency data generated by Itti-Koch matlab saliency toolbox.
+        - areas [AREA]:
+    """
+    def __init__(self, name='Saliency_map'):
+        PROCEDURAL_SCHEMA.__init__(self, name)
+        self.add_port('IN', 'from_input')
+        self.add_port('IN', 'from_visual_WM')
+        self.add_port('OUT', 'to_visual_WM') 
+        self.add_port('OUT', 'to_subscene_rec')
+        self.BU_saliency_map = None
+        self.areas = []
+    
+    def update(self):
+        """
+        """
+        areas = self.get_input('from_visual_WM')
+        if areas:
+            #add new areas
+            new_areas = [a for a in areas if not(a in self.areas)]
+            self.areas.extend[new_areas]
+            
+            #remove unused areas
+            dead_areas = [a for a in self.areas if not(a in areas)]
+            for area in dead_areas:
+                self.areas.remove(area)
+        
+        # NOTHING IS DONE HERE...                
+        
+        # Send saliency value to visualWM and subscene_rec
+        self.set_output('to_visual_WM', self.BU_saliency_map)
+        self.set_output('to_subscene_rec', self.BU_saliency_map)
 
 ###############################################################################
 if __name__=='__main__':

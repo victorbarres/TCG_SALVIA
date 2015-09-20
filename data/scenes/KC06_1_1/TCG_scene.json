@@ -167,13 +167,17 @@
     "name": "BALLERINA",
     "schemas": [
      "BALLERINA"
-    ]
+    ],
+	"saliency":1.0,
+	"uncertainty":"auto"
    },
    "ss_1": {
     "name": "CELLIST",
     "schemas": [
      "CELLIST"
-    ]
+    ],
+	"saliency":0.98,
+	"uncertainty":"auto"
    },
    "ss_2": {
     "name": "SPLASH_EVT",
@@ -183,13 +187,17 @@
      "SPLASH",
      "SPLASH_AGT",
      "SPLASH_PT"
-    ]
+    ],
+	"saliency":0.95,
+	"uncertainty":"auto"
    },
    "ss_3": {
     "name": "FENCER",
     "schemas": [
      "FENCER"
-    ]
+    ],
+	"saliency":0.9,
+	"uncertainty":"auto"
    },
    "ss_4": {
     "name": "BAG",
@@ -197,13 +205,17 @@
      "BAG",
      "RED",
      "RED_MOD"
-    ]
+    ],
+	"saliency":0.85,
+	"uncertainty":"auto"
    },
    "ss_5": {
     "name": "TREE",
     "schemas": [
      "TREE"
-    ]
+    ],
+	"saliency":0.84,
+	"uncertainty":"auto"
    }
   }
  }

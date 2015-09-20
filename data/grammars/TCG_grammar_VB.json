@@ -958,6 +958,19 @@
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "wagon"}],
 		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "TREE",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "TREE", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "tree"}],
+		"SymLinks" : {"N1" : "S1"}
 	}
 ]
 }

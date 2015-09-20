@@ -405,6 +405,7 @@ def TCG_description_system(name='description_system'):
     subscene_rec = ps.SUBSCENE_RECOGNITION()
     perceptLTM = ps.PERCEPT_LTM()
     visualWM = ps.VISUAL_WM()
+    simpleSM = ps.SIMPLE_SALIENCY_MAP()
     
     conceptualizer = ls.CONCEPTUALIZER()
     conceptLTM = ls.CONCEPT_LTM()
@@ -420,7 +421,8 @@ def TCG_description_system(name='description_system'):
     # Defining schema to brain mappings.
     brain_mappings = {'Visual_WM':['ITG'], 
                         'Percept_LTM':[''],
-                        'Subscene_recognition':['Ventral stream'], 
+                        'Subscene_recognition':['Ventral stream'],
+                        'Saliency_map':['Dorsal_stream', 'IPS'],
                         'Conceptualizer':['aTP'], 
                         'Concept_LTM':[''],
                         'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
@@ -432,7 +434,7 @@ def TCG_description_system(name='description_system'):
                         'Control':['DLPFC'], 
                         'Concept_LTM':['']}
                         
-    schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
+    schemas = [subscene_rec, visualWM, simpleSM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
     # Creating schema system and adding procedural schemas
     description_system = st.SCHEMA_SYSTEM(name)
     description_system.add_schemas(schemas)
@@ -440,6 +442,9 @@ def TCG_description_system(name='description_system'):
     # Defining connections
     description_system.add_connection(perceptLTM, 'to_subscene_rec', subscene_rec, 'from_percept_LTM')
     description_system.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
+    description_system.add_connection(simpleSM, 'to_visual_WM', visualWM, 'from_saliency_map')
+    description_system.add_connection(visualWM, 'to_saliency_map', simpleSM, 'from_visual_WM')
+    description_system.add_connection(simpleSM, 'to_subscene_rec', subscene_rec, 'from_saliency_map')
     
     description_system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
     description_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
@@ -479,7 +484,7 @@ def TCG_description_system(name='description_system'):
     visualWM.dyn_params['noise_mean'] = 0.0
     visualWM.dyn_params['noise_std'] = 1.0
     visualWM.C2_params['confidence_threshold'] = 0.0
-    visualWM.C2_params['prune_threshold'] = 0.3
+    visualWM.C2_params['prune_threshold'] = 0.01
     visualWM.C2_params['coop_weight'] = 0.0
     visualWM.C2_params['comp_weight'] = 0.0
     
@@ -518,6 +523,18 @@ def TCG_description_system(name='description_system'):
     grammaticalWM_P.style_params['continuity'] = 0
     
     grammaticalLTM.init_act = grammaticalWM_P.C2_params['confidence_threshold']
+    
+    phonWM_P.dyn_params['tau'] = 100.0
+    phonWM_P.dyn_params['act_inf'] = 0.0
+    phonWM_P.dyn_params['L'] = 1.0
+    phonWM_P.dyn_params['k'] = 10.0
+    phonWM_P.dyn_params['x0'] = 0.5
+    phonWM_P.dyn_params['noise_mean'] = 0
+    phonWM_P.dyn_params['noise_std'] = 0.2
+    phonWM_P.C2_params['confidence_threshold'] = 0
+    phonWM_P.C2_params['prune_threshold'] = 0.01
+    phonWM_P.C2_params['coop_weight'] = 0
+    phonWM_P.C2_params['comp_weight'] = 0
     
     control.task_params['mode'] = 'produce'
     control.task_params['time_pressure'] = 500.0
