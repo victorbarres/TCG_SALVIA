@@ -939,7 +939,7 @@ class TCG_VIEWER:
     def display_saccades(fixations, img_file):
         """
         """
-        #Get scene image
+        # Load scene image
         imgPIL = Image.open(img_file)
         
         # Convert to nparray
