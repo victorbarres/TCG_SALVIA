@@ -32,10 +32,11 @@ def test(seed=None):
     
     description_system.schemas['Control'].task_params['start_produce'] = 300
     
-    set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
+    set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 500
     save_states = [49,85,98,110,120,300]
     
+    fixations = []
     # Running the schema system
     for t in range(max_time):
         description_system.update()
@@ -44,21 +45,28 @@ def test(seed=None):
             if output['Utter']:
              print "t:%i, '%s'" %(t, output['Utter'])
             if output['Subscene_recognition']:
-             print "t:%i, '%s'" %(t, output['Subscene_recognition'])
+                eye_pos = output['Subscene_recognition']['eye_pos']
+                if eye_pos:
+                    fixations.append({'time':t, 'pos':eye_pos})
+                vals = [(u,v) for u,v in output['Subscene_recognition'].iteritems() if v]
+                if vals:
+                    print "t:%i, '%s'" %(t, vals)
         if t - set_up_time in save_states:
                 TCG_VIEWER.display_WMs_state(description_system.schemas['Visual_WM'], description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
                 TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)
                 TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
     
-#    description_system.schemas['Visual_WM'].show_SceneRep()
-#    description_system.schemas['Visual_WM'].show_dynamics()
-#    description_system.schemas['Semantic_WM'].show_SemRep()
-#    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
-#    description_system.schemas['Grammatical_WM_P'].show_state()
+    description_system.schemas['Visual_WM'].show_SceneRep()
+    description_system.schemas['Visual_WM'].show_dynamics()
+    description_system.schemas['Semantic_WM'].show_SemRep()
+    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
+    description_system.schemas['Grammatical_WM_P'].show_state()
     
-    description_system.schemas['Subscene_recognition'].show_scene(scene_folder + 'scene.png')
+    img_file = scene_folder + 'scene.png'
+    description_system.schemas['Subscene_recognition'].show_scene(img_file)
+    TCG_VIEWER.display_saccades(fixations, img_file)
     
-    #description_system.save_sim('./tmp/test_description_output.json')
+#    description_system.save_sim('./tmp/test_description_output.json')
 
 if __name__ == '__main__':
     test(seed=0)

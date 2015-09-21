@@ -620,25 +620,31 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             self.next_saccade = True
         
         # Start saccade and subscene recognition process   
+        output = {'eye_pos':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
         if self.next_saccade:
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
-                self.set_output('to_output', {'subscene':self.subscene.name, 'saliency': self.subscene.saliency})
+                output['eye_pos'] = self.eye_pos
+                output['subscene'] = self.subscene.name
+                output['saliency'] = self.subscene.saliency
                 print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene.name, self.subscene.saliency)
                 print "Eye pos: (%.1f,%.1f)" %(self.eye_pos[0], self.eye_pos[1])
                 self.uncertainty = self.subscene.uncertainty*self.params['recognition_time']
+                output['uncertainty'] = self.uncertainty
         
         if self.subscene:
             self.uncertainty -= 1
-            self.set_output('to_output', {'uncertainty':self.uncertainty})
+            output['uncertainty'] = self.uncertainty
             if self.uncertainty <0:
                 self.next_saccade = True
-                self.set_output('to_output', {'next_saccade':self.t})
+                output['next_saccade'] = self.t
                 print 't: %i, trigger next saccade' % self.t
                 self.set_output('to_visual_WM', {'subscene':self.subscene, 'init_act':self.subscene.saliency})
                 self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
                 self.subscene = None
+        
+        self.set_output('to_output', output)
 
     def get_subscene(self):
         """

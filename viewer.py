@@ -990,6 +990,8 @@ class TCG_VIEWER:
     @staticmethod
     def display_saccades(fixations, img_file):
         """
+        Args:
+            -fixation [DICT]. Format {'time':FLOAT, 'pos':(FLOAT, FLOAT)}
         """
         # Load scene image
         imgPIL = Image.open(img_file)
@@ -998,23 +1000,25 @@ class TCG_VIEWER:
         img = np.asarray(imgPIL)
         
         # Drawing figure
-        fig = plt.figure()
-        plt.title('TO BE DEFINED')
+        fig = plt.figure(facecolor='white')
+        plt.title('Saccades')
         plt.imshow(img)
         fig = plt.gcf()
         ax = fig.gca()
         
         # Fixation point
-        fix_radius = 50.0
+        fix_radius = 80.0
+        head_size = 20
+        
         prev_pos = None
         for fix in fixations:
             pos = fix['pos']
-            fixation = plt.Circle((pos[0],pos[1]), fix_radius , color='r', alpha=0.5)
+            fixation = plt.Circle((pos[1],pos[0]), fix_radius , color='r', alpha=0.5)
             ax.add_patch(fixation)
             info = 't:%.1f' %fix['time']
-            plt.text(pos[0] + fix_radius, pos[1], info, fontsize=12)
+            plt.text(pos[1] + fix_radius, pos[0], info, fontsize=12)
             if prev_pos:
-                plt.arrow(prev_pos[0], prev_pos[1], pos[0]-prev_pos[0], pos[1]-prev_pos[1], length_includes_head=True, head_width=fix_radius/5, head_length=fix_radius/3, fc='k', ec='k')
+                plt.arrow(prev_pos[1], prev_pos[0], pos[1]-prev_pos[1], pos[0]-prev_pos[0], length_includes_head=True, head_width=head_size/2, head_length=head_size, fc='k', ec='k')
             prev_pos = pos
         
         plt.show()
