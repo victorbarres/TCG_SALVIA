@@ -50,11 +50,13 @@ def test(seed=None):
                 TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)
                 TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
     
-    description_system.schemas['Visual_WM'].show_SceneRep()
-    description_system.schemas['Visual_WM'].show_dynamics()
-    description_system.schemas['Semantic_WM'].show_SemRep()
-    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
-    description_system.schemas['Grammatical_WM_P'].show_state()
+#    description_system.schemas['Visual_WM'].show_SceneRep()
+#    description_system.schemas['Visual_WM'].show_dynamics()
+#    description_system.schemas['Semantic_WM'].show_SemRep()
+#    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
+#    description_system.schemas['Grammatical_WM_P'].show_state()
+    
+    description_system.schemas['Subscene_recognition'].show_scene(scene_folder + 'scene.png')
     
     #description_system.save_sim('./tmp/test_description_output.json')
 

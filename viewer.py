@@ -15,6 +15,7 @@ import webbrowser
 import subprocess
 import pydot
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import numpy as np
 from PIL import Image
 import construction
@@ -641,7 +642,7 @@ class TCG_VIEWER:
             w = d['per_inst'].content['area'].w
             h = d['per_inst'].content['area'].h
             
-            label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">%s (%.1f)</TD></TR><TR><TD ALIGN="LEFT">area_%i: (x:%.1f,y:%.1f,w:%.1f,h:%.1f)</TD></TR></TABLE></FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity, d['per_inst'].area.id, pos[0], pos[1], w, h)
+            label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">%s (%.1f)</TD></TR><TR><TD ALIGN="LEFT">area_%i: (x:%.1f,y:%.1f,w:%.1f,h:%.1f)</TD></TR></TABLE></FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity, d['per_inst'].content['area'].id, pos[0], pos[1], w, h)
 #            label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity)
             scale = 1
             pos = "%f,%f" %(d['pos'][0]*scale, d['pos'][1]*scale)
@@ -934,6 +935,44 @@ class TCG_VIEWER:
     def display_scene(scene, img_file):
         """
         """
+        # Load scene image
+        imgPIL = Image.open(img_file)
+        
+        # Convert to nparray
+        img = np.asarray(imgPIL)
+        
+        # Drawing figure
+        fig = plt.figure()
+        title = 'Scene'
+        plt.title(title)
+        plt.imshow(img)
+        fig = plt.gcf()
+        ax = fig.gca()
+        
+        color_dict = {'OBJECT':'g', 'ACTION':'r' , 'QUALITY':'b'}
+        
+        # Display perceptual schemas and area
+        for per_schema in scene.schemas:
+            if not(isinstance(per_schema.trace, perceptual_schemas.PERCEPT_SCHEMA_REL)):
+                area = per_schema.content['area']
+                pos = area.center()
+                ellipse = patches.Ellipse((pos[1], pos[0]), width=area.w, height=area.h, alpha=0.2,color=color_dict[per_schema.trace.type])
+                ax.add_patch(ellipse)
+                info = '%s (%.1f)' %(per_schema.name, per_schema.content['saliency'])
+                plt.text(pos[1]+10, pos[0], info, fontsize=10)  
+            else:
+                schema_from = per_schema.content['pFrom']
+                schema_to = per_schema.content['pTo']
+                pos_from = schema_from.content['area'].center()
+                pos_to = schema_to.content['area'].center()
+                head_size = 30
+                pos_start = (pos_from[1], pos_from[0])
+                d_pos = (pos_to[1] - pos_from[1], pos_to[0] - pos_from[0])
+                plt.arrow(pos_start[0], pos_start[1], d_pos[0], d_pos[1], length_includes_head=True, head_width=head_size/2, head_length=head_size, fc='k', ec='k')
+                info = '%s (%.1f)' %(per_schema.name, per_schema.content['saliency'])
+                plt.text(pos_start[0] + d_pos[0]/2 +10, pos_start[1] + d_pos[1]/2 +10, info, fontsize=10)
+        
+        plt.show()
     
     @staticmethod
     def display_saccades(fixations, img_file):
@@ -966,6 +1005,17 @@ class TCG_VIEWER:
             prev_pos = pos
         
         plt.show()
+    
+    @staticmethod
+    def display_saliencymap(saliency_map):
+        """
+        """
+        plt.figure()
+        plt.title('saliency map')
+        plt.plot(saliency_map)
+        plt.show()
+        
+        
 
 ###############################################################################
 if __name__ == '__main__':

@@ -13,6 +13,7 @@ import random
 import networkx as nx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM
+import viewer
 import scene as scn
 
 seed = None
@@ -650,6 +651,15 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
                 max_saliency = ss.saliency
                 self.subscene = ss
                 self.eye_pos = self.subscene.area.center()
+    
+    #######################
+    ### DISPLAY METHODS ###
+    #######################
+    def show_scene(self, img_file):
+        """
+        """
+        if self.scene_data:
+            viewer.TCG_VIEWER.display_scene(self.scene_data, img_file)
     
     ####################
     ### JSON METHODS ###
