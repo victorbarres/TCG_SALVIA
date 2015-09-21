@@ -93,7 +93,7 @@ class SUB_SCENE(object):
         self.uncertainty = 0
         self.saliency = 0
     
-    def add_per_schema(self, schema_inst, update_saliency=True, update_uncertainty=True):
+    def add_per_schema(self, schema_inst, update_uncertainty=True):
         """
         Adds a percetual schema to the sub_scenes.
         If the perceptual schema instantiates a relation schemas, it is added to edges. Else it is added to nodes.
@@ -103,13 +103,13 @@ class SUB_SCENE(object):
             return False
         if isinstance(schema_inst.trace, ps.PERCEPT_SCHEMA_REL):
             self.edges.append(schema_inst)
-            self.update_area(update_saliency)
+            self.update_area()
             if update_uncertainty:
                 self.update_uncertainty()
             return True
         else:
             self.nodes.append(schema_inst)
-            self.update_area(update_saliency)
+            self.update_area()
             if update_uncertainty:
                 self.update_uncertainty()
             return True
@@ -131,20 +131,20 @@ class SUB_SCENE(object):
                 return schema_inst
         return None
             
-    def update_area(self, update_saliency=True):
+    def update_area(self):
         """
         Recalculates the area associated with the subscene based on associated schema instances.
+        Note:
+            - For now doesn't account for edges since the area is not well defined for edges.
         """
-        schema_insts = self.nodes + self.edges
+        schema_insts = self.nodes
         if len(schema_insts) == 0:
             self.area = None
             return False
         self.area = schema_insts[0].content['area']
         for schema_inst in schema_insts[1:]:
+            
             self.area = ps.AREA.hull(self.area, schema_inst.content['area'])
-        
-        if update_saliency:
-            self.saliency = self.area.saliency
         return True
     
     def update_uncertainty(self):

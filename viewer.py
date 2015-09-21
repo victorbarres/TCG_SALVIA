@@ -942,7 +942,7 @@ class TCG_VIEWER:
         img = np.asarray(imgPIL)
         
         # Drawing figure
-        fig = plt.figure()
+        fig = plt.figure(facecolor='white')
         title = 'Scene'
         plt.title(title)
         plt.imshow(img)
@@ -955,23 +955,36 @@ class TCG_VIEWER:
         for per_schema in scene.schemas:
             if not(isinstance(per_schema.trace, perceptual_schemas.PERCEPT_SCHEMA_REL)):
                 area = per_schema.content['area']
-                pos = area.center()
-                ellipse = patches.Ellipse((pos[1], pos[0]), width=area.w, height=area.h, alpha=0.2,color=color_dict[per_schema.trace.type])
-                ax.add_patch(ellipse)
+                pos = (area.y, area.x)
+                rectangle = patches.Rectangle((pos[0], pos[1]), width=area.w, height=area.h, alpha=0.2,color=color_dict[per_schema.trace.type])
+                ax.add_patch(rectangle)
                 info = '%s (%.1f)' %(per_schema.name, per_schema.content['saliency'])
-                plt.text(pos[1]+10, pos[0], info, fontsize=10)  
+                plt.text(area.y, area.x + 10, info, fontsize=10)
             else:
                 schema_from = per_schema.content['pFrom']
                 schema_to = per_schema.content['pTo']
                 pos_from = schema_from.content['area'].center()
                 pos_to = schema_to.content['area'].center()
-                head_size = 30
+                head_size = 10
                 pos_start = (pos_from[1], pos_from[0])
                 d_pos = (pos_to[1] - pos_from[1], pos_to[0] - pos_from[0])
                 plt.arrow(pos_start[0], pos_start[1], d_pos[0], d_pos[1], length_includes_head=True, head_width=head_size/2, head_length=head_size, fc='k', ec='k')
                 info = '%s (%.1f)' %(per_schema.name, per_schema.content['saliency'])
-                plt.text(pos_start[0] + d_pos[0]/2 +10, pos_start[1] + d_pos[1]/2 +10, info, fontsize=10)
+                plt.text(pos_start[0] + d_pos[0]/2, pos_start[1] + d_pos[1]/2, info, fontsize=10)
         
+        # Display subscenes
+        for subscene in scene.subscenes:
+            margin = 20
+            lw = 3
+            area = subscene.area            
+            pos = (area.y - margin, area.x - margin)
+            w = area.w + 2*margin
+            h = area.h + 2*margin
+            rectangle = patches.Rectangle((pos[0], pos[1]), width=w, height=h, fc='none', ec='r', lw=lw)
+            ax.add_patch(rectangle)
+            info = 'SS_%s (%.1f, %i)' %(subscene.name, subscene.saliency, subscene.uncertainty)
+            plt.text(pos[0]+lw, pos[1]+lw+10, info, fontsize=10, color='r')
+            
         plt.show()
     
     @staticmethod
