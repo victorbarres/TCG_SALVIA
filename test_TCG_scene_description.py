@@ -41,7 +41,10 @@ def test(seed=None):
         description_system.update()
         output = description_system.get_output()
         if output:
-             print "t:%i, '%s'" %(t, output)
+            if output['Utter']:
+             print "t:%i, '%s'" %(t, output['Utter'])
+            if output['Subscene_recognition']:
+             print "t:%i, '%s'" %(t, output['Subscene_recognition'])
         if t - set_up_time in save_states:
                 TCG_VIEWER.display_WMs_state(description_system.schemas['Visual_WM'], description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
                 TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)

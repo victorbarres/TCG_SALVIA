@@ -465,8 +465,8 @@ def TCG_description_system(name='description_system'):
     
     
     # Defining input and output ports 
-    description_system.set_input_ports([subscene_rec.find_port('from_input')])
-    description_system.set_output_ports([utter.find_port('to_output')])
+    description_system.set_input_ports([subscene_rec.find_port('from_input'), simpleSM.find_port('from_input')])
+    description_system.set_output_ports([utter.find_port('to_output'), subscene_rec.find_port('to_output')])
     
     # Setting up schema to brain mappings
     description_brain_mapping = st.BRAIN_MAPPING()

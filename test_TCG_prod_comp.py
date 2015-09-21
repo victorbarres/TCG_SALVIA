@@ -45,8 +45,8 @@ def test(seed=None):
             flag = False
             print "Agt1 speaks."
         output = language_system.get_output()
-        if output:
-            print 't: %i, Agt1 says: %s' %(t, output)
+        if output and output['Utter']:
+            print 't: %i, Agt1 says: %s' %(t, output['Utter'])
         language_system.update()
     
     language_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)

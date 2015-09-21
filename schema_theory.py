@@ -1128,8 +1128,9 @@ class SCHEMA_SYSTEM(object):
             connection.update()
         
         # Update the system output
+        self.outputs[self.t] = {}
         for p in self.output_ports:
-            self.outputs[self.t] = p.value
+            self.outputs[self.t][p.schema.name] = p.value
             p.value = None
         
         # Save simulation data

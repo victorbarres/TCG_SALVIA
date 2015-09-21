@@ -39,8 +39,8 @@ def test(seed=None):
 #            language_system_P.schemas['Semantic_WM'].show_SemRep()
         language_system_P.update()
         output = language_system_P.get_output()
-        if output:
-            print "t:%i, '%s'" %(t, output)
+        if output['Utter']:
+            print "t:%i, '%s'" %(t, output['Utter'])
         if t - set_up_time in save_states:
             TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True)
             TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'],language_system_P.schemas['Grammatical_WM_P'], concise=True)

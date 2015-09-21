@@ -15,6 +15,8 @@ import webbrowser
 import subprocess
 import pydot
 import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
 import construction
 import percept
 import perceptual_schemas
@@ -639,7 +641,7 @@ class TCG_VIEWER:
             w = d['per_inst'].content['area'].w
             h = d['per_inst'].content['area'].h
             
-            label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">%s (%.1f)</TD></TR><TR><TD ALIGN="LEFT">area: (x:%.1f,y:%.1f,w:%.1f,h:%.1f)</TD></TR></TABLE></FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity, pos[0], pos[1], w, h)
+            label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">%s (%.1f)</TD></TR><TR><TD ALIGN="LEFT">area_%i: (x:%.1f,y:%.1f,w:%.1f,h:%.1f)</TD></TR></TABLE></FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity, d['per_inst'].area.id, pos[0], pos[1], w, h)
 #            label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['per_inst'].name, d['per_inst'].activity)
             scale = 1
             pos = "%f,%f" %(d['pos'][0]*scale, d['pos'][1]*scale)
@@ -927,6 +929,43 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s -s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
         subprocess.call(cmd, shell=True)
+    
+    @staticmethod
+    def display_scene(scene, img_file):
+        """
+        """
+    
+    @staticmethod
+    def display_saccades(fixations, img_file):
+        """
+        """
+        #Get scene image
+        imgPIL = Image.open(img_file)
+        
+        # Convert to nparray
+        img = np.asarray(imgPIL)
+        
+        # Drawing figure
+        fig = plt.figure()
+        plt.title('TO BE DEFINED')
+        plt.imshow(img)
+        fig = plt.gcf()
+        ax = fig.gca()
+        
+        # Fixation point
+        fix_radius = 50.0
+        prev_pos = None
+        for fix in fixations:
+            pos = fix['pos']
+            fixation = plt.Circle((pos[0],pos[1]), fix_radius , color='r', alpha=0.5)
+            ax.add_patch(fixation)
+            info = 't:%.1f' %fix['time']
+            plt.text(pos[0] + fix_radius, pos[1], info, fontsize=12)
+            if prev_pos:
+                plt.arrow(prev_pos[0], prev_pos[1], pos[0]-prev_pos[0], pos[1]-prev_pos[1], length_includes_head=True, head_width=fix_radius/5, head_length=fix_radius/3, fc='k', ec='k')
+            prev_pos = pos
+        
+        plt.show()
 
 ###############################################################################
 if __name__ == '__main__':

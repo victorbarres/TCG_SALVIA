@@ -50,13 +50,13 @@ def test(seed=None):
             flag1 = False
             print "Agt1 speaks. Agt2 listens"
             
-        word_form1 = language_system_1.get_output()
-        if word_form1 and flag2:
+        output = language_system_1.get_output()
+        if output and  output['Utter'] and flag2:
             language_system_2.schemas['Control'].set_mode('listen')
             language_system_2.update() # Cheat!! Need to set up the system so that it's ready to receive the utterance...
             language_system_2.update()
-            print 't: %i, Agt1 says: %s' %(t, word_form1)  
-            language_system_2.set_input(word_form1)
+            print 't: %i, Agt1 says: %s' %(t,  output['Utter'])  
+            language_system_2.set_input(output['Utter'])
         
         if language_system_2.schemas['Semantic_WM'].schema_insts and flag2: #Switching from comprehension to production
             language_system_2.schemas['Semantic_WM'].show_SemRep()
@@ -65,9 +65,9 @@ def test(seed=None):
             flag2 = False
             print "Agt2 speaks."
         
-        word_form2 = language_system_2.get_output()
-        if word_form2:
-            print 't: %i, Agt2 says: %s' %(t, word_form2)  
+        output = language_system_2.get_output() 
+        if output and output['Utter']:
+            print 't: %i, Agt2 says: %s' %(t, output['Utter'])  
             
         language_system_1.update()
         language_system_2.update()

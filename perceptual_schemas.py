@@ -531,6 +531,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.add_port('IN', 'from_percept_LTM')
         self.add_port('IN', 'from_saliency_map')
         self.add_port('OUT','to_visual_WM')
+        self.add_port('OUT','to_output')
         self.params = {'recognition_time':10}
         self.inputs = {'scene_input':None, 'per_schemas':None, 'BU_saliency_map':None}
         self.scene_data = None
@@ -610,24 +611,29 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         if per_schemas:
             self.inputs['per_schemas'] = per_schemas
         
+        # Wait to have received all info to initalize
         if self.inputs['scene_input'] and self.inputs['per_schemas']:
             self.initialize(self.inputs['scene_input'], self.inputs['per_schemas'])
             self.inputs['scene_input'] =  None
             self.inputs['per_schemas'] = None
             self.next_saccade = True
-            
+        
+        # Start saccade and subscene recognition process   
         if self.next_saccade:
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
+                self.set_output('to_output', {'subscene':self.subscene.name, 'saliency': self.subscene.saliency})
                 print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene.name, self.subscene.saliency)
                 print "Eye pos: (%.1f,%.1f)" %(self.eye_pos[0], self.eye_pos[1])
                 self.uncertainty = self.subscene.uncertainty*self.params['recognition_time']
         
         if self.subscene:
             self.uncertainty -= 1
+            self.set_output('to_output', {'uncertainty':self.uncertainty})
             if self.uncertainty <0:
                 self.next_saccade = True
+                self.set_output('to_output', {'next_saccade':self.t})
                 print 't: %i, trigger next saccade' % self.t
                 self.set_output('to_visual_WM', {'subscene':self.subscene, 'init_act':self.subscene.saliency})
                 self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
