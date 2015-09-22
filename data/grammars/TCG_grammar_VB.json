@@ -36,7 +36,7 @@
 	{
 		"name" : "SVO",
 		"class" : "S",
-		"preference" : 1.5,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" :
 		{
@@ -55,7 +55,7 @@
 	{
 		"name" : "PAS_SVO",
 		"class" : "S",
-		"preference" : 0.5,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{

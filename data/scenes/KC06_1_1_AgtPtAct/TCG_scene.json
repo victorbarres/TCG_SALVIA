@@ -1,0 +1,119 @@
+{
+ "scene": {
+  "resolution": [
+   1025,
+   768
+  ],
+  "schemas": {
+   "sc_0": {
+    "name": "BALLERINA",
+    "location": [
+     164,
+     530
+    ],
+    "size": [
+     192,
+     451
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O14_BALLERINA"
+   },
+   "sc_1": {
+    "name": "CELLIST",
+    "location": [
+     197,
+     131
+    ],
+    "size": [
+     171,
+     530
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O15_CELLIST"
+   },
+   "sc_2": {
+    "name": "SPLASH",
+    "location": [
+     316,
+     307
+    ],
+    "size": [
+     255,
+     102
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "A8_SPLASH"
+   },
+   "sc_3": {
+    "name": "SPLASH_AGT",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R14_SPLASHER",
+    "from": "SPLASH",
+    "to": "BALLERINA"
+   },
+   "sc_4": {
+    "name": "SPLASH_PT",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R15_SPLASHEE",
+    "from": "SPLASH",
+    "to": "CELLIST"
+   }
+  },
+  "subscenes": {
+  "ss_0": {
+    "name": "BALLERINA",
+    "schemas": [
+     "BALLERINA"
+    ],
+	"saliency":1.0,
+	"uncertainty":"auto"
+   },
+   "ss_1": {
+    "name": "CELLIST",
+    "schemas": [
+     "CELLIST"
+    ],
+	"saliency":0.9,
+	"uncertainty":"auto"
+   },
+   "ss_2": {
+    "name": "SPLASH_EVT",
+    "schemas": [
+     "BALLERINA",
+     "CELLIST",
+     "SPLASH",
+     "SPLASH_AGT",
+     "SPLASH_PT"
+    ],
+	"saliency":0.85,
+	"uncertainty":"auto"
+   }
+  }
+ }
+}

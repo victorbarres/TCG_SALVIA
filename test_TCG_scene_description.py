@@ -21,7 +21,7 @@ def test(seed=None):
     description_system.system2dot(image_type='png', disp=True)
 
     # Defining scene input
-    scene_name = 'KC06_1_1'
+    scene_name = 'KC06_1_1_AgtPtAct'
     scene_folder = "./data/scenes/%s/" %scene_name
     
     my_scene = TCG_LOADER.load_scene("TCG_scene.json", scene_folder)
