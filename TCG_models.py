@@ -270,7 +270,7 @@ def TCG_language_system(name='language_system'):
                     'Control':['DLPFC'],
                     'Concept_LTM':['']}
    
-   # Initializing schema system
+    # Initializing schema system
     language_system = st.SCHEMA_SYSTEM(name)
     
     # Setting up schema to brain mappings
@@ -305,7 +305,7 @@ def TCG_language_system(name='language_system'):
     language_system.set_input_ports([phonWM_C.find_port('from_input')])
     language_system.set_output_ports([utter.find_port('to_output')])
     
-     # Parameters
+    # Parameters
     semanticWM.dyn_params['tau'] = 1000.0
     semanticWM.dyn_params['act_inf'] = 0.0
     semanticWM.dyn_params['L'] = 1.0

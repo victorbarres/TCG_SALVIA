@@ -1040,6 +1040,7 @@ class SCHEMA_SYSTEM(object):
         self.output_ports = None
         self.input = None
         self.outputs = {}
+        self.brain_mapping = None
         self.t = SCHEMA_SYSTEM.T0
         self.dt = SCHEMA_SYSTEM.TIME_STEP
         self.verbose = False

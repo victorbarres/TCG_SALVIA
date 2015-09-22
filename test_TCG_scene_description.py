@@ -21,8 +21,9 @@ def test(seed=None):
     description_system.system2dot(image_type='png', disp=True)
 
     # Defining scene input
-    scene_name = 'KC06_1_1_AgtPtAct'
+    scene_name = 'KC06_1_1'
     scene_folder = "./data/scenes/%s/" %scene_name
+    img_file = scene_folder + 'scene.png'
     
     my_scene = TCG_LOADER.load_scene("TCG_scene.json", scene_folder)
     
@@ -34,11 +35,15 @@ def test(seed=None):
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 500
-    save_states = [49,85,98,110,120,300]
+    save_states = [30, 40,50,60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300]
     
     fixations = []
     # Running the schema system
     for t in range(max_time):
+        if t== -1*set_up_time:
+            
+            description_system.schemas['Subscene_recognition'].show_scene(img_file)
+            
         description_system.update()
         output = description_system.get_output()
         if output:
@@ -57,13 +62,12 @@ def test(seed=None):
                 TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
     
     description_system.schemas['Visual_WM'].show_SceneRep()
-    description_system.schemas['Visual_WM'].show_dynamics()
+    description_system.schemas['Visual_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     description_system.schemas['Semantic_WM'].show_SemRep()
+    description_system.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
     description_system.schemas['Grammatical_WM_P'].show_state()
     
-    img_file = scene_folder + 'scene.png'
-    description_system.schemas['Subscene_recognition'].show_scene(img_file)
     TCG_VIEWER.display_saccades(fixations, img_file)
     
 #    description_system.save_sim('./tmp/test_description_output.json')
