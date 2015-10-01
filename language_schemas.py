@@ -1477,6 +1477,7 @@ class UTTER(PROCEDURAL_SCHEMA):
         if new_utterance:
             new_utterance.reverse()
             self.utterance_stack =  new_utterance + self.utterance_stack
+            
 ####################
 ### GRAMMAR COMP ###
 class PHON_WM_C(WM):
@@ -1612,13 +1613,22 @@ class GRAMMATICAL_WM_C(WM):
         TCG version of the Earley chart parsing completer.
         NOTES:
             -  Recursively check all the "completed" cxn (dot all the way to the right) and make the appropriate coop links.
+            - I HAVE ADDED COMPETITION HERE... BUT I AM NOT SURE THAT THIS IS THE WAY TO GO.
+                This has to be wrong in some way because their could be loops in the tree (think of an example), and in addition
+                one wants to be able to maintain multiple possible predictions alive in terms of incomplete instances.
         """
         completed_insts = [inst for inst in self.schema_insts if not(inst.form_state)]
         while completed_insts:
             incomplete_insts = [inst for inst in self.schema_insts if inst.form_state]
-            for inst1 in incomplete_insts:
-                for inst2 in completed_insts:
-                    self.cooperate(inst1, inst2)                    
+            for inst1 in completed_insts:
+                competing_insts = []
+                for inst2 in incomplete_insts:
+                    coop = self.cooperate(inst2, inst1)   
+                    if coop:
+                        competing_insts.append(inst2)
+                # Sets up competition between incompleted cxn that try to map onto the same compeleted cxn.
+                self.compete(competing_insts)
+               
             completed_insts = [inst for inst in incomplete_insts if not(inst.form_state)]
     
     def produce_meaning(self):
@@ -1824,7 +1834,7 @@ class GRAMMATICAL_WM_C(WM):
     ##################
     ### Assemblage ###
     ##################    
-    def assemble(self): # THIS IS VERY DIFFERENT FROM THE ASSEMBLE ALGORITHM OF TCG 1.0
+    def assemble(self):
         """
         WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
         
@@ -1833,6 +1843,8 @@ class GRAMMATICAL_WM_C(WM):
         NOTE: THIS IS COPIED FROM GRAMMATICAL_WM_P and uses methods from GRAMMATICAL_WM_P!!
         """
         inst_network = GRAMMATICAL_WM_P.build_instance_network(self.schema_insts, self.coop_links)
+        if self.t == 2016:
+            GRAMMATICAL_WM_P.draw_instance_network(inst_network)
 
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
         assemblages = []
@@ -2274,7 +2286,7 @@ class SEM_GENERATOR(object):
             
             yield (instances, next_time, ' , '.join(prop_list))
 
-class UTTER_GEN():
+class UTTER_GENERATOR():
     """
     """
     def __init__(self, ling_inputs):
@@ -2323,12 +2335,12 @@ class UTTER_GEN():
         timing = ling_input['timing']
         
         next_timing = timing[0]
-        yield ([], next_timing, '')
+        yield ('', next_timing)
             
         for idx in range(len(utterance)):          
             word_form = utterance[idx]
             if verbose:
-                print 'ling_input <- t: %.1f, word-form: %s' %(timing[idx], word_form)
+                print 'ling_input <- t: %.1f, word_form: %s' %(timing[idx], word_form)
             
             next_idx = idx + 1       
             if next_idx<len(timing):
