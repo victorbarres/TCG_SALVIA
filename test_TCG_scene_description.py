@@ -35,7 +35,7 @@ def test(seed=None):
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 500
-    save_states = [30, 40,50,60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 200, 250, 300]
+    save_states = [130]
     
     fixations = []
     # Running the schema system

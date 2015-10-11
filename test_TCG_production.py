@@ -25,6 +25,8 @@ def test(seed=None):
     input_name = 'ditransitive_give'    
     generator = sem_gen.sem_generator(input_name)
     
+    language_system_P.schemas['Grammatical_WM_P'].C2_params['prune_threshold'] = 0.4
+    
     (sem_insts, next_time, prop) = generator.next()
     
     set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
@@ -55,9 +57,111 @@ def test(seed=None):
     language_system_P.schemas['Phonological_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     language_system_P.save_sim('./tmp/test_language_output.json')
 
+def test_params(seed=None):
+    """
+    First quick function to test the impact of param on outputs
+    """
+    from sys import stdout
+    import numpy as np
+    
+    # Set up model
+    language_system_P = TCG_production_system()
+    conceptLTM = language_system_P.schemas['Concept_LTM']
+
+    sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
+    sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
+    input_name = 'ditransitive_give'    
+    
+    # Set up parameter space
+    sample_rate = 3
+    tau_samples = np.linspace(30,30, 1)
+    noise_samples = np.linspace(0.2,0.2, 1)
+    conf_samples = np.linspace(0.7,0.7, 1)
+    k_samples = np.linspace(10.0, 10.0,  1)
+    prune_samples = np.linspace(0.01,0.1, 10)
+    coop_samples = np.linspace(1.0,1.0, 1)
+    comp_samples = np.linspace(-4.0,-4.0,1)
+    
+    params_samples = []
+    for tau_param in tau_samples:
+        for k_param in k_samples:
+            for noise_param in noise_samples:
+                for conf_param in conf_samples:
+                    for prune_param in prune_samples:
+                        for coop_param in coop_samples:
+                            for comp_param in comp_samples:
+                                param_set = {'tau':float(tau_param), 
+                                             'k':float(k_param), 
+                                             'noise_std':float(noise_param), 
+                                             'conf_thresh':float(conf_param), 
+                                             'prune_thresh':float(prune_param), 
+                                             'coop_weight':float(coop_param), 
+                                             'comp_weight':float(comp_param)}
+                                params_samples.append(param_set)
+                                
+    num_sims = len(params_samples)
+                                
+    grammaticalWM_P = language_system_P.schemas['Grammatical_WM_P']
+    
+    # Running simulations
+    num  = 1
+    for params in params_samples:
+        generator = sem_gen.sem_generator(input_name)
+        (sem_insts, next_time, prop) = generator.next()
+        stdout.flush();
+        stdout.write(" Sim number: %i (%.2f%%)      %s" %(num,num/float(num_sims)*100,"\r"))
+
+        num += 1
+        utter = []
+        
+        grammaticalWM_P.dyn_params['tau'] = params['tau']
+        grammaticalWM_P.dyn_params['act_inf'] = 0.0
+        grammaticalWM_P.dyn_params['L'] = 1.0
+        grammaticalWM_P.dyn_params['k'] = params['k']
+        grammaticalWM_P.dyn_params['x0'] = 0.5
+        grammaticalWM_P.dyn_params['noise_mean'] = 0.0
+        grammaticalWM_P.dyn_params['noise_std'] = params['noise_std']
+        grammaticalWM_P.C2_params['confidence_threshold'] = params['conf_thresh']
+        grammaticalWM_P.C2_params['prune_threshold'] = params['prune_thresh']
+        grammaticalWM_P.C2_params['coop_weight'] = params['coop_weight']
+        grammaticalWM_P.C2_params['comp_weight'] = params['comp_weight']
+        grammaticalWM_P.C2_params['sub_threshold_r'] = 0.8
+        grammaticalWM_P.C2_params['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
+        grammaticalWM_P.style_params['activation'] = 0.7
+        grammaticalWM_P.style_params['sem_length'] = 0.3
+        
+        
+        set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
+        max_time = 900
+
+        for t in range(set_up_time, max_time):
+            if next_time != None and t>next_time:
+                (sem_insts, next_time, prop) = generator.next()
+                language_system_P.set_input(sem_insts)
+            language_system_P.update()
+            output = language_system_P.get_output()
+            if output['Utter']:
+               utter.append(output['Utter'])
+        
+        params['utter'] = ' '.join(utter)
+        
+    
+    file_name = 'test.csv'
+    params_name = ['tau', 'k', 'noise_std', 'conf_thresh', 'prune_thresh', 'coop_weight', 'comp_weight', 'utter']
+    
+    line = lambda vals: ', '.join([str(v) for v in vals]) + '\n'
+    with open(file_name, 'w') as f:
+        header = line(params_name)
+        f.write(header)
+        for params in params_samples:
+            vals = [params[name] for name in params_name]
+            new_line = line(vals)
+            f.write(new_line)
+
 
 if __name__=='__main__':
-    test(seed=1)
+#    test(seed=1)
+    test_params(seed=1)
         
 
 

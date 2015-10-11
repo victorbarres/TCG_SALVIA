@@ -502,8 +502,11 @@ if __name__=='__main__':
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
-    my_grammar = TCG_LOADER.load_grammar("TCG_grammar.json", "./data/grammars/", my_conceptual_knowledge)
+    my_grammar = TCG_LOADER.load_grammar("TCG_grammar_VB.json", "./data/grammars/", my_conceptual_knowledge)
     my_scene = TCG_LOADER.load_scene("TCG_scene.json", "./data/scenes/TCG_cholitas/")
+    
+    my_cxn = my_grammar.find_construction('WOMAN')
+    my_cxn.show()
 
     
     
