@@ -324,7 +324,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation.
         - activity (FLOAT): activity value for schema instance
-        - params: {t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}
+        - params: {'act':{t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}}
         - activation (INST_ACTIVATION): Activation object of schema instance
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
@@ -335,7 +335,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = False
         self.trace = None
         self.activity = 0
-        self.params = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['act'] = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
@@ -345,13 +345,13 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         Set activation parameters
         """
-        self.activation = INST_ACTIVATION(t0=self.params['t0'], act0=self.params['act0'], dt=self.params['dt'], tau=self.params['tau'],
-                                          act_inf=self.params['act_inf'], L=self.params['L'], k=self.params['k'], x0=self.params['x0'],
-                                          noise_mean=self.params['noise_mean'], noise_std=self.params['noise_std'])
+        self.activation = INST_ACTIVATION(t0=self.params['act']['t0'], act0=self.params['act']['act0'], dt=self.params['act']['dt'], tau=self.params['act']['tau'],
+                                          act_inf=self.params['act']['act_inf'], L=self.params['act']['L'], k=self.params['act']['k'], x0=self.params['act']['x0'],
+                                          noise_mean=self.params['act']['noise_mean'], noise_std=self.params['act']['noise_std'])
         
-        self.activation.save_vals["t"].append(self.params['t0'])
-        self.activation.save_vals["act"].append(self.params['act0'])
-        self.activity = self.params['act0']
+        self.activation.save_vals["t"].append(self.params['act']['t0'])
+        self.activation.save_vals["act"].append(self.params['act']['act0'])
+        self.activity = self.params['act']['act0']
         self.act_port_out.value = self.activity
     
     def set_activation(self, value):
@@ -379,7 +379,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = True
         self.trace = trace
         self.set_ports()
-        self.params['act0'] = float(schema.init_act)
+        self.params['act']['act0'] = float(schema.init_act)
         self.initialize_activation()
     
     def update_activation(self):
@@ -540,7 +540,7 @@ class WM(PROCEDURAL_SCHEMA):
         act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 'act_inf':self.params['dyn']['act_inf'],
                       'L':self.params['dyn']['L'], 'k':self.params['dyn']['k'], 'x0':self.params['dyn']['x0'],
                       'noise_mean':self.params['dyn']['noise_mean'], 'noise_std':self.params['dyn']['noise_std']}
-        schema_inst.params = act_params
+        schema_inst.params['act'] = act_params
         schema_inst.initialize_activation()
         self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
         return True
