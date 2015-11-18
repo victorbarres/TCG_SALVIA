@@ -622,7 +622,7 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('OUT', 'to_phonological_WM_P')
         self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
         self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
-        self.style_params = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0}
+        self.style_params = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         
     def update(self):
         """
@@ -639,6 +639,7 @@ class GRAMMATICAL_WM_P(WM):
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
+            self.style_params = ctrl_input['style_params']
             output = self.produce_form(sem_input,phon_input)
             if output:
                 self.set_output('to_phonological_WM_P', output['phon_WM_output'])
@@ -2086,6 +2087,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.task_params = {'time_pressure':100, 'start_produce':1000}
+        self.style_params = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0}
         self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'produce': False}
     
     def set_mode(self, mode):
@@ -2125,7 +2127,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             else:
                 pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramps up linearly to 1
 
-            output = {'produce':self.state['produce'], 'pressure':pressure}
+            output = {'produce':self.state['produce'], 'pressure':pressure, 'style_params':self.style_params.copy()}
             self.set_output('to_grammatical_WM_P', output)
         else:
             self.set_output('to_grammatical_WM_P', None)

@@ -180,6 +180,9 @@ class PROCEDURAL_SCHEMA(SCHEMA):
     Data:
         - in_ports ([PORT]):
         - out_ports ([PORT]):
+        - params (DICT): Stores the process parameters
+        - inputs (DICT): At each time steps stores the inputs
+        - outputs (DICT): At each time steps stores the ouputs
         - activity (float): The activity level of the schema.
         - t (FLOAT): Time.
         - dt (FLOAT): Time step.
@@ -188,12 +191,14 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         SCHEMA.__init__(self,name)
         self.in_ports = []
         self.out_ports = []
+        self.params = {}
+        self.inputs = {}
+        self.outputs = {}
         self.activity = 0
         self.t = 0
         self.dt = 1.0
     
-    
-    def add_port(self,port_type, port_name='', port_data=None, port_value=None):
+    def add_port(self, port_type, port_name='', port_data=None, port_value=None):
         """
         Adds a new port to the procedural schema. Port_type (str) ['IN' or 'OUT'], port_name (str), and a value port_value for the port.
         If sucessessful, returns the port id. Else returns None.
@@ -207,6 +212,15 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             return new_port.id
         else:
             return None
+        
+    def get_inputs(self):
+        """
+        Get all inputs and store them in the local self.inputs DICT.
+        """
+        self.inputs = {}
+        for port in self.in_ports:
+            self.inputs(port.name) = port.value
+            port.value = None # Reset port value
     
     def get_input(self, port_name):
         """
@@ -255,6 +269,15 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             return None
         return found[0]
     
+    def set_params(self, params):
+        """
+        Set the procedural schemas parameters to params (DICT)
+        
+        Args:
+            - params (DICT): contains all the parameters.
+        """
+        self.params = params
+        
     @abc.abstractmethod    
     def update(self):
         """
@@ -294,13 +317,14 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - name (str): schema name
         - in_ports ([PORT]):
         - out_ports ([PORT]):
+        - params (DICT)
         - activity (float):
     Data:
         - content (KNOWLEDGE_SCHEMA)
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation.
         - activity (FLOAT): activity value for schema instance
-        - act_params (DICT): {t0:FLOAT,act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}
+        - params: {t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}
         - activation (INST_ACTIVATION): Activation object of schema instance
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
@@ -311,7 +335,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = False
         self.trace = None
         self.activity = 0
-        self.act_params = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
@@ -321,13 +345,13 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         """
         Set activation parameters
         """
-        self.activation = INST_ACTIVATION(t0=self.act_params['t0'], act0=self.act_params['act0'], dt=self.act_params['dt'], tau=self.act_params['tau'],
-                                          act_inf=self.act_params['act_inf'], L=self.act_params['L'], k=self.act_params['k'], x0=self.act_params['x0'],
-                                          noise_mean=self.act_params['noise_mean'], noise_std=self.act_params['noise_std'])
+        self.activation = INST_ACTIVATION(t0=self.params['t0'], act0=self.params['act0'], dt=self.params['dt'], tau=self.params['tau'],
+                                          act_inf=self.params['act_inf'], L=self.params['L'], k=self.params['k'], x0=self.params['x0'],
+                                          noise_mean=self.params['noise_mean'], noise_std=self.params['noise_std'])
         
-        self.activation.save_vals["t"].append(self.act_params['t0'])
-        self.activation.save_vals["act"].append(self.act_params['act0'])
-        self.activity = self.act_params['act0']
+        self.activation.save_vals["t"].append(self.params['t0'])
+        self.activation.save_vals["act"].append(self.params['act0'])
+        self.activity = self.params['act0']
         self.act_port_out.value = self.activity
     
     def set_activation(self, value):
@@ -355,7 +379,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.alive = True
         self.trace = trace
         self.set_ports()
-        self.act_params['act0'] = float(schema.init_act)
+        self.params['act0'] = float(schema.init_act)
         self.initialize_activation()
     
     def update_activation(self):
@@ -482,19 +506,19 @@ class WM(PROCEDURAL_SCHEMA):
         - name (str): schema name
         - in_ports ([PORT]):
         - out_ports ([PORT]):
+        - params (DICT):
         - activity (float): The activity level of the schema.
     Data:
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
-        - dyn_params ({'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT})
-        - C2_params ({'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT})
+        - params (DICT): {'dyn': {'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
+                          'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT}}
+            Note:
             - coop_weight (FLOAT): weight of cooperation f-links
             - comp_weight (FLOAT): weight of competition f-links
             - prune_threshold (FLOAT): Below this threshold the instances are considered inactive (Alive=False)
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
-        
-        - assemblages ????
     """
     def __init__(self, name=''):
         PROCEDURAL_SCHEMA.__init__(self,name)
@@ -502,8 +526,8 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.dyn_params = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
-        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
+        self.params['dyn'] = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}}
        
     def add_instance(self,schema_inst, act0=None):
@@ -513,10 +537,10 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts.append(schema_inst)
         if not(act0):
             act0 = schema_inst.activity # Uses the init_activation defined by the associated schema.
-        act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.dyn_params['tau'], 'act_inf':self.dyn_params['act_inf'],
-                      'L':self.dyn_params['L'], 'k':self.dyn_params['k'], 'x0':self.dyn_params['x0'],
-                      'noise_mean':self.dyn_params['noise_mean'], 'noise_std':self.dyn_params['noise_std']}
-        schema_inst.act_params = act_params
+        act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 'act_inf':self.params['dyn']['act_inf'],
+                      'L':self.params['dyn']['L'], 'k':self.params['dyn']['k'], 'x0':self.params['dyn']['x0'],
+                      'noise_mean':self.params['dyn']['noise_mean'], 'noise_std':self.params['dyn']['noise_std']}
+        schema_inst.params = act_params
         schema_inst.initialize_activation()
         self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
         return True
@@ -526,8 +550,8 @@ class WM(PROCEDURAL_SCHEMA):
         
     def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None):
         if weight == None:
-            weight=self.C2_params['coop_weight']
-        new_link = COOP_LINK(inst_from, inst_to, weight*qual, self.C2_params['coop_asymmetry'])
+            weight=self.params['C2']['coop_weight']
+        new_link = COOP_LINK(inst_from, inst_to, weight*qual, self.params['C2']['coop_asymmetry'])
         new_link.set_connect(port_from, port_to)
         self.coop_links.append(new_link)
 
@@ -563,8 +587,8 @@ class WM(PROCEDURAL_SCHEMA):
         
     def add_comp_link(self, inst_from, inst_to, weight=None):
         if weight == None:
-            weight=self.C2_params['comp_weight']
-        new_link = COMP_LINK(inst_from, inst_to, weight, self.C2_params['comp_asymmetry'])
+            weight=self.params['C2']['comp_weight']
+        new_link = COMP_LINK(inst_from, inst_to, weight, self.params['C2']['comp_asymmetry'])
         self.comp_links.append(new_link)
     
     def find_comp_links(self,inst_from='any', inst_to='any'):
@@ -601,19 +625,19 @@ class WM(PROCEDURAL_SCHEMA):
         # Propagating cooperation
         for flink in self.coop_links:
             r = random.random()
-            if(r<self.C2_params['P_coop']):
+            if(r<self.params['C2']['P_coop']):
                 flink.update()  
         
         # Propagating competition
         for flink in self.comp_links:
             r = random.random()
-            if(r<self.C2_params['P_comp']):
+            if(r<self.params['C2']['P_comp']):
                 flink.update()
        
         # Update all instances activation and sets alive=False for instances that fall below threshold.
         for inst in self.schema_insts:
             inst.update_activation()
-            if inst.activity<self.C2_params['prune_threshold']:
+            if inst.activity<self.params['C2']['prune_threshold']:
                 inst.alive = False
         
         self.update_activity()
@@ -690,8 +714,8 @@ class WM(PROCEDURAL_SCHEMA):
         """
         """
         data = super(WM, self).get_info()
-        data['dyn_params'] = self.dyn_params
-        data['C2_params'] = self.C2_params
+        data['params']['dyn'] = self.params['dyn']
+        data['params']['C2'] = self.C2
         return data
         
     def get_state(self):
@@ -716,9 +740,9 @@ class WM(PROCEDURAL_SCHEMA):
             plt.figure(facecolor='white')
             title = '%s dynamics \n dyn: [tau:%g, act_inf:%g, L:%g, k:%g, x0:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(
                                 self.name,
-                                self.dyn_params['tau'], self.dyn_params['act_inf'], self.dyn_params['L'], self.dyn_params['k'], self.dyn_params['x0'],
-                                self.dyn_params['noise_mean'], self.dyn_params['noise_std'], 
-                                  self.C2_params['coop_weight'], self.C2_params['comp_weight'], self.C2_params['prune_threshold'], self.C2_params['confidence_threshold'])
+                                self.params['dyn']['tau'], self.params['dyn']['act_inf'], self.params['dyn']['L'], self.params['dyn']['k'], self.params['dyn']['x0'],
+                                self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
+                                  self.params['C2']['coop_weight'], self.params['C2']['comp_weight'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
             plt.title(title)
             plt.xlabel('time', fontsize=14)
             plt.ylabel('activity', fontsize=14)
@@ -727,8 +751,8 @@ class WM(PROCEDURAL_SCHEMA):
             axes = plt.gca()
             axes.set_ylim([0,1])
             axes.set_xlim([0, max(self.save_state['WM_activity']['t'])])
-            plt.axhline(y=self.C2_params['prune_threshold'], color='k',ls='dashed')
-            plt.axhline(y=self.C2_params['confidence_threshold'], color='r',ls='dashed')
+            plt.axhline(y=self.params['C2']['prune_threshold'], color='k',ls='dashed')
+            plt.axhline(y=self.params['C2']['confidence_threshold'], color='r',ls='dashed')
             plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
             plt.show()
         
