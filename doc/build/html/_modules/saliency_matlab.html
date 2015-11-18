@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>saliency_matlab &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for saliency_matlab</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Defines the interface between the Matlab SaliencyToolbox and TCG</span>
+
+<span class="sd">Uses scipy.io to read .mat files.</span>
+
+<span class="sd">The matlab saliency toolbox should have already generated the .mat files containing bottom-up saliency information.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">scipy.io</span> <span class="kn">as</span> <span class="nn">sio</span>
+
+<div class="viewcode-block" id="SALIENCY_PARAMS"><a class="viewcode-back" href="../code.html#saliency_matlab.SALIENCY_PARAMS">[docs]</a><span class="k">class</span> <span class="nc">SALIENCY_PARAMS</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores the parameters used in computing the bottom-up saliency data.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - foaSize (INT)</span>
+<span class="sd">        - pyramidType (STR)</span>
+<span class="sd">        - features ([STR])</span>
+<span class="sd">        - weights ([FLOAT])</span>
+<span class="sd">        - IORtype (STR)</span>
+<span class="sd">        - shapeMode (STR)</span>
+<span class="sd">        - levelParams (DICT) : minLevel:INT, maxlevel:INT, minDelta:INT, maxDelta:INT, mapLevel:INT</span>
+<span class="sd">        - normtype (STR)</span>
+<span class="sd">        - numIter (INT)</span>
+<span class="sd">        - useRandom (BOOL)</span>
+<span class="sd">        - segmentComputeType (STR)</span>
+<span class="sd">        - IORdecay (FLOAT)</span>
+<span class="sd">        - smOutputRange (FLOAT)</span>
+<span class="sd">        - noiseAmpl (FLOAT)</span>
+<span class="sd">        - noiseConst (FLOAT)</span>
+<span class="sd">        - gaborParams (DICT): filterPeriod:INT, elongation:INT, filterSize:INT, stddev:INT, phasese:[INT]</span>
+<span class="sd">        - oriAngles ([FLOAT])</span>
+<span class="sd">        - oriComputeMode (STR)</span>
+<span class="sd">        - visualizationStyle (STR)</span>
+<span class="sd">        - exclusionMask ([])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">foaSize</span> <span class="o">=</span> <span class="mi">64</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyramidType</span> <span class="o">=</span> <span class="s">&#39;dyadic&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Color&#39;</span><span class="p">,</span> <span class="s">&#39;Intensities&#39;</span><span class="p">,</span> <span class="s">&#39;Orientations&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IORtype</span> <span class="o">=</span> <span class="s">&#39;shape&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shapeMode</span> <span class="o">=</span> <span class="s">&#39;shapeFM&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">levelParams</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;minLevel&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s">&#39;maxLevel&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="s">&#39;minDelta&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s">&#39;maxDelta&#39;</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="s">&#39;mapLevel&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normtype</span> <span class="o">=</span> <span class="s">&#39;Iterative&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numIter</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">useRandom</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segmentComputeType</span> <span class="o">=</span> <span class="s">&#39;Fast&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">IORdecay</span> <span class="o">=</span> <span class="mf">0.9999</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smOutputRange</span> <span class="o">=</span> <span class="mf">1.0e-09</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noiseAmpl</span> <span class="o">=</span> <span class="mf">1.0e-17</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noiseConst</span> <span class="o">=</span> <span class="mf">1.0e-14</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaborParams</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;filterPeriod&#39;</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="s">&#39;elongation&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s">&#39;filterSize&#39;</span><span class="p">:</span><span class="mi">9</span><span class="p">,</span> <span class="s">&#39;stddev&#39;</span><span class="p">:</span><span class="mf">2.3333</span><span class="p">,</span> <span class="s">&#39;phases&#39;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span><span class="mi">90</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oriAngles</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">45</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">135</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oriComputeMode</span> <span class="o">=</span> <span class="s">&#39;efficient&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualizationStyle</span> <span class="o">=</span> <span class="s">&#39;Contour&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exclusionMask</span> <span class="o">=</span><span class="p">[]</span>
+</div>
+<div class="viewcode-block" id="ORIG_IMAGE"><a class="viewcode-back" href="../code.html#saliency_matlab.ORIG_IMAGE">[docs]</a><span class="k">class</span> <span class="nc">ORIG_IMAGE</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores the original image information.</span>
+<span class="sd">    Data:</span>
+<span class="sd">        - filename (STR)</span>
+<span class="sd">        - data (ARRAY)</span>
+<span class="sd">        - type (STR)</span>
+<span class="sd">        - size ([INT])</span>
+<span class="sd">        - dims (INT)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="SALIENCY_MAP"><a class="viewcode-back" href="../code.html#saliency_matlab.SALIENCY_MAP">[docs]</a><span class="k">class</span> <span class="nc">SALIENCY_MAP</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores the saliency map.</span>
+<span class="sd">    Data:</span>
+<span class="sd">        - label (STR)</span>
+<span class="sd">        - data (ARRAY)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="s">&#39;SaliencyMap&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="CONSPICUITY_MAP"><a class="viewcode-back" href="../code.html#saliency_matlab.CONSPICUITY_MAP">[docs]</a><span class="k">class</span> <span class="nc">CONSPICUITY_MAP</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data:</span>
+<span class="sd">        - label(STR)</span>
+<span class="sd">        - data (ARRAY)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="PYRAMID_LEVEL"><a class="viewcode-back" href="../code.html#saliency_matlab.PYRAMID_LEVEL">[docs]</a><span class="k">class</span> <span class="nc">PYRAMID_LEVEL</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data:</span>
+<span class="sd">        - label (STR)</span>
+<span class="sd">        - data (ARRAY)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="PYRAMID"><a class="viewcode-back" href="../code.html#saliency_matlab.PYRAMID">[docs]</a><span class="k">class</span> <span class="nc">PYRAMID</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data:</span>
+<span class="sd">         - lablel (STR)</span>
+<span class="sd">         - type (STR)</span>
+<span class="sd">         - levels ([PYRAMID_LEVEL])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">levels</span> <span class="o">=</span> <span class="p">[]</span>
+</div>
+<div class="viewcode-block" id="SALIENCY_FEATURE_DATA"><a class="viewcode-back" href="../code.html#saliency_matlab.SALIENCY_FEATURE_DATA">[docs]</a><span class="k">class</span> <span class="nc">SALIENCY_FEATURE_DATA</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data:</span>
+<span class="sd">        - label (STR)</span>
+<span class="sd">        - pyramid ([PYRAMID])</span>
+<span class="sd">        - FM(ARRAY)</span>
+<span class="sd">        - csLevels</span>
+<span class="sd">        - CM (CONSPICUITY_MAP)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyramid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">FM</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">csLevels</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CM</span> <span class="o">=</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="SALIENCY_DATA"><a class="viewcode-back" href="../code.html#saliency_matlab.SALIENCY_DATA">[docs]</a><span class="k">class</span> <span class="nc">SALIENCY_DATA</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Data:</span>
+<span class="sd">        - img_name (STR)</span>
+<span class="sd">        - feature_data ([SALIENCY_FEATURE_DATA])</span>
+<span class="sd">        - saliency_map (SALIENCY_MAP)</span>
+<span class="sd">        - orig_image (ORIG_IMAGE)</span>
+<span class="sd">        - params (SALIENCY_PARAMS)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_name</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saliency_map</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orig_image</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="bp">None</span>
+        
+
+<div class="viewcode-block" id="SALIENCY_DATA.load"><a class="viewcode-back" href="../code.html#saliency_matlab.SALIENCY_DATA.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Data:</span>
+<span class="sd">            file_path (STR): path to the .mat file generated by TCG_saliency.m</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mat_content</span><span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">struct_as_record</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">squeeze_me</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">BU_saliency</span> <span class="o">=</span> <span class="n">mat_content</span><span class="p">[</span><span class="s">&#39;BU_saliency&#39;</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_name</span> <span class="o">=</span> <span class="n">BU_saliency</span><span class="o">.</span><span class="n">img_name</span>
+        
+        <span class="n">params</span> <span class="o">=</span> <span class="n">BU_saliency</span><span class="o">.</span><span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_params</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        
+        <span class="n">saliency_map</span> <span class="o">=</span> <span class="n">BU_saliency</span><span class="o">.</span><span class="n">sal_map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saliency_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_saliency_map</span><span class="p">(</span><span class="n">saliency_map</span><span class="p">)</span>
+        
+        <span class="n">orig_image</span> <span class="o">=</span> <span class="n">BU_saliency</span><span class="o">.</span><span class="n">origImage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orig_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_orig_image</span><span class="p">(</span><span class="n">orig_image</span><span class="p">)</span>
+        
+        <span class="n">sal_data</span> <span class="o">=</span> <span class="n">BU_saliency</span><span class="o">.</span><span class="n">sal_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_feature_data</span><span class="p">(</span><span class="n">sal_data</span><span class="p">)</span>
+    </div>
+    <span class="k">def</span> <span class="nf">_load_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myParams</span> <span class="o">=</span> <span class="n">SALIENCY_PARAMS</span><span class="p">()</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">foaSize</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">foaSize</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">pyramidType</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">pyramidType</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">features</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">weights</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">IORtype</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">IORtype</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">shapeMode</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">shapeMode</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">levelParams</span><span class="p">[</span><span class="s">&#39;minLevel&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">params</span><span class="o">.</span><span class="n">levelParams</span><span class="o">.</span><span class="n">minLevel</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">levelParams</span><span class="p">[</span><span class="s">&#39;maxLevel&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">params</span><span class="o">.</span><span class="n">levelParams</span><span class="o">.</span><span class="n">maxLevel</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">levelParams</span><span class="p">[</span><span class="s">&#39;minDelta&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">params</span><span class="o">.</span><span class="n">levelParams</span><span class="o">.</span><span class="n">minDelta</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">levelParams</span><span class="p">[</span><span class="s">&#39;maxDelta&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">params</span><span class="o">.</span><span class="n">levelParams</span><span class="o">.</span><span class="n">maxDelta</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">levelParams</span><span class="p">[</span><span class="s">&#39;mapLevel&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="n">params</span><span class="o">.</span><span class="n">levelParams</span><span class="o">.</span><span class="n">mapLevel</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">normtype</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">normtype</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">numIter</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">numIter</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">useRandom</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">useRandom</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">segmentComputeType</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">segmentComputeType</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">IORdecay</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">IORdecay</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">smOutputRange</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">smOutputRange</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">noiseAmpl</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">noiseAmpl</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">noiseConst</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">noiseConst</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">gaborParams</span><span class="p">[</span><span class="s">&#39;filterPeriod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">gaborParams</span><span class="o">.</span><span class="n">filterPeriod</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">gaborParams</span><span class="p">[</span><span class="s">&#39;elongation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">gaborParams</span><span class="o">.</span><span class="n">elongation</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">gaborParams</span><span class="p">[</span><span class="s">&#39;filterSize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">gaborParams</span><span class="o">.</span><span class="n">filterSize</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">gaborParams</span><span class="p">[</span><span class="s">&#39;stddev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">gaborParams</span><span class="o">.</span><span class="n">stddev</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">gaborParams</span><span class="p">[</span><span class="s">&#39;phases&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">gaborParams</span><span class="o">.</span><span class="n">phases</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">oriAngles</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">oriAngles</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">oriComputeMode</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">oriComputeMode</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">visualizationStyle</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">visualizationStyle</span>
+        <span class="n">myParams</span><span class="o">.</span><span class="n">exclusionMask</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">exclusionMask</span>
+        <span class="k">return</span> <span class="n">myParams</span>
+    
+    <span class="k">def</span> <span class="nf">_load_saliency_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">saliency_map</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mySalMap</span> <span class="o">=</span> <span class="n">SALIENCY_MAP</span><span class="p">()</span>
+        <span class="n">mySalMap</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">saliency_map</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">return</span> <span class="n">mySalMap</span>
+        
+    <span class="k">def</span> <span class="nf">_load_orig_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orig_image</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myOrigImg</span> <span class="o">=</span> <span class="n">ORIG_IMAGE</span><span class="p">()</span>
+        <span class="n">myOrigImg</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">orig_image</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">myOrigImg</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">orig_image</span><span class="o">.</span><span class="n">dims</span>
+        <span class="n">myOrigImg</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">orig_image</span><span class="o">.</span><span class="n">filename</span>
+        <span class="n">myOrigImg</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span><span class="n">orig_image</span><span class="o">.</span><span class="n">type</span>
+        <span class="k">return</span> <span class="n">myOrigImg</span>
+    
+    <span class="k">def</span> <span class="nf">_load_feature_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sal_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">myFeaturesData</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">sal_data</span><span class="p">:</span>
+            <span class="n">feat_data</span> <span class="o">=</span> <span class="n">SALIENCY_FEATURE_DATA</span><span class="p">()</span>
+            <span class="n">feat_data</span><span class="o">.</span><span class="n">label</span><span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">label</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">pyr</span><span class="p">)</span> <span class="ow">is</span> <span class="n">sio</span><span class="o">.</span><span class="n">matlab</span><span class="o">.</span><span class="n">mio5_params</span><span class="o">.</span><span class="n">mat_struct</span><span class="p">:</span>
+                <span class="n">feat</span><span class="o">.</span><span class="n">pyr</span> <span class="o">=</span> <span class="p">[</span><span class="n">feat</span><span class="o">.</span><span class="n">pyr</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">feat</span><span class="o">.</span><span class="n">pyr</span><span class="p">:</span>
+                <span class="n">myPyr</span> <span class="o">=</span> <span class="n">PYRAMID</span><span class="p">()</span>
+                <span class="n">myPyr</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">label</span>
+                <span class="n">myPyr</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">type</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">levels</span><span class="p">:</span>
+                    <span class="n">myLevel</span> <span class="o">=</span> <span class="n">PYRAMID_LEVEL</span><span class="p">()</span>
+                    <span class="n">myLevel</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">label</span>
+                    <span class="n">myLevel</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">data</span>
+                    <span class="n">myPyr</span><span class="o">.</span><span class="n">levels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myLevel</span><span class="p">)</span>
+                <span class="n">feat_data</span><span class="o">.</span><span class="n">pyramid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myPyr</span><span class="p">)</span>
+            <span class="n">feat_data</span><span class="o">.</span><span class="n">CM</span>  <span class="o">=</span> <span class="n">CONSPICUITY_MAP</span><span class="p">()</span>
+            <span class="n">feat_data</span><span class="o">.</span><span class="n">CM</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">CM</span><span class="o">.</span><span class="n">label</span>
+            <span class="n">feat_data</span><span class="o">.</span><span class="n">CM</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">CM</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">feat_data</span><span class="o">.</span><span class="n">FM</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">FM</span>
+            <span class="n">feat_data</span><span class="o">.</span><span class="n">csLevels</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">csLevels</span>
+            <span class="n">myFeaturesData</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feat_data</span><span class="p">)</span>
+                
+        <span class="k">return</span> <span class="n">myFeaturesData</span>
+
+<span class="c">###############################################################################</span></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">saliency_data</span> <span class="o">=</span> <span class="n">SALIENCY_DATA</span><span class="p">()</span>
+    <span class="n">saliency_data</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s">&quot;../../Python/SpyderWorkspace/SandBox/TestMatlabRead/balloons.mat&quot;</span><span class="p">)</span>
+    
+    
+        
+        
+        
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

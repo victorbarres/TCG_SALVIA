@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>test_TCG_scene_description &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for test_TCG_scene_description</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Test TCG description</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">TCG_models</span> <span class="kn">import</span> <span class="n">TCG_description_system</span>
+<span class="kn">from</span> <span class="nn">viewer</span> <span class="kn">import</span> <span class="n">TCG_VIEWER</span>
+<span class="kn">from</span> <span class="nn">loader</span> <span class="kn">import</span> <span class="n">TCG_LOADER</span>
+
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../code.html#test_TCG_scene_description.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    
+    <span class="n">description_system</span> <span class="o">=</span> <span class="n">TCG_description_system</span><span class="p">()</span>
+
+    <span class="c"># Generating schema system graph visualization</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">system2dot</span><span class="p">(</span><span class="n">image_type</span><span class="o">=</span><span class="s">&#39;png&#39;</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c"># Defining scene input</span>
+    <span class="n">scene_name</span> <span class="o">=</span> <span class="s">&#39;KC06_1_1&#39;</span>
+    <span class="n">scene_folder</span> <span class="o">=</span> <span class="s">&quot;./data/scenes/</span><span class="si">%s</span><span class="s">/&quot;</span> <span class="o">%</span><span class="n">scene_name</span>
+    <span class="n">img_file</span> <span class="o">=</span> <span class="n">scene_folder</span> <span class="o">+</span> <span class="s">&#39;scene.png&#39;</span>
+    
+    <span class="n">my_scene</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_scene</span><span class="p">(</span><span class="s">&quot;TCG_scene.json&quot;</span><span class="p">,</span> <span class="n">scene_folder</span><span class="p">)</span>
+    
+    <span class="c"># Schema rec intialization</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">my_scene</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span>
+    
+    <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Control&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;start_produce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">300</span>
+    
+    <span class="n">set_up_time</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span> <span class="c"># Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.</span>
+    <span class="n">max_time</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">save_states</span> <span class="o">=</span> <span class="p">[</span><span class="mi">130</span><span class="p">]</span>
+    
+    <span class="n">fixations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c"># Running the schema system</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_time</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">set_up_time</span><span class="p">:</span>
+            
+            <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Subscene_recognition&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_scene</span><span class="p">(</span><span class="n">img_file</span><span class="p">)</span>
+            
+        <span class="n">description_system</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">description_system</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">]:</span>
+             <span class="k">print</span> <span class="s">&quot;t:</span><span class="si">%i</span><span class="s">, &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Subscene_recognition&#39;</span><span class="p">]:</span>
+                <span class="n">eye_pos</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Subscene_recognition&#39;</span><span class="p">][</span><span class="s">&#39;eye_pos&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">eye_pos</span><span class="p">:</span>
+                    <span class="n">fixations</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;time&#39;</span><span class="p">:</span><span class="n">t</span><span class="p">,</span> <span class="s">&#39;pos&#39;</span><span class="p">:</span><span class="n">eye_pos</span><span class="p">})</span>
+                <span class="n">vals</span> <span class="o">=</span> <span class="p">[(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Subscene_recognition&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">vals</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;t:</span><span class="si">%i</span><span class="s">, &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">vals</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">-</span> <span class="n">set_up_time</span> <span class="ow">in</span> <span class="n">save_states</span><span class="p">:</span>
+                <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_WMs_state</span><span class="p">(</span><span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Visual_WM&#39;</span><span class="p">],</span> <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">],</span> <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">],</span> <span class="n">concise</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_gramWM_state</span><span class="p">(</span><span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">],</span> <span class="n">concise</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_lingWM_state</span><span class="p">(</span><span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">],</span> <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">],</span> <span class="n">concise</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+    <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Visual_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_SceneRep</span><span class="p">()</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Visual_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_SemRep</span><span class="p">()</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_state</span><span class="p">()</span>
+    
+    <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_saccades</span><span class="p">(</span><span class="n">fixations</span><span class="p">,</span> <span class="n">img_file</span><span class="p">)</span>
+    
+<span class="c">#    description_system.save_sim(&#39;./tmp/test_description_output.json&#39;)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

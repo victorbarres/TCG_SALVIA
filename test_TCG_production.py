@@ -64,23 +64,18 @@ def test_params(seed=None):
     from sys import stdout
     import numpy as np
     
-    # Set up model
-    language_system_P = TCG_production_system()
-    conceptLTM = language_system_P.schemas['Concept_LTM']
-
-    sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
-    sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
+    # Chose input name
     input_name = 'ditransitive_give'    
     
     # Set up parameter space
-    sample_rate = 3
+    sample_rate = 40
     tau_samples = np.linspace(30,30, 1)
     noise_samples = np.linspace(0.2,0.2, 1)
-    conf_samples = np.linspace(0.7,0.7, 1)
     k_samples = np.linspace(10.0, 10.0,  1)
-    prune_samples = np.linspace(0.01,0.1, 10)
-    coop_samples = np.linspace(1.0,1.0, 1)
-    comp_samples = np.linspace(-4.0,-4.0,1)
+    conf_samples = np.linspace(0.4,0.4, 1)
+    prune_samples = np.linspace(0.3,0.3,1)
+    coop_samples = np.linspace(0.0,2.0, sample_rate)
+    comp_samples = np.linspace(-1.0,-1.0,1)
     
     params_samples = []
     for tau_param in tau_samples:
@@ -101,18 +96,15 @@ def test_params(seed=None):
                                 
     num_sims = len(params_samples)
                                 
-    grammaticalWM_P = language_system_P.schemas['Grammatical_WM_P']
     
     # Running simulations
     num  = 1
     for params in params_samples:
-        generator = sem_gen.sem_generator(input_name)
-        (sem_insts, next_time, prop) = generator.next()
-        stdout.flush();
-        stdout.write(" Sim number: %i (%.2f%%)      %s" %(num,num/float(num_sims)*100,"\r"))
-
-        num += 1
-        utter = []
+        # Set up model
+        language_system_P = TCG_production_system() # Better if I could just reset the model...
+        conceptLTM = language_system_P.schemas['Concept_LTM']
+      
+        grammaticalWM_P = language_system_P.schemas['Grammatical_WM_P']
         
         grammaticalWM_P.dyn_params['tau'] = params['tau']
         grammaticalWM_P.dyn_params['act_inf'] = 0.0
@@ -130,10 +122,21 @@ def test_params(seed=None):
         grammaticalWM_P.style_params['activation'] = 0.7
         grammaticalWM_P.style_params['sem_length'] = 0.3
         
+        # Set up input
+        sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
+        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
+        generator = sem_gen.sem_generator(input_name)
+        (sem_insts, next_time, prop) = generator.next()
+        stdout.flush();
+        stdout.write(" Sim number: %i (%.2f%%)      %s" %(num,num/float(num_sims)*100,"\r"))
+
+        num += 1
+        utter = []
         
         set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
         max_time = 900
-
+        
+        # Run production simulation
         for t in range(set_up_time, max_time):
             if next_time != None and t>next_time:
                 (sem_insts, next_time, prop) = generator.next()
@@ -146,10 +149,10 @@ def test_params(seed=None):
         params['utter'] = ' '.join(utter)
         
     
-    file_name = 'test.csv'
+    file_name = 'test11.csv'
     params_name = ['tau', 'k', 'noise_std', 'conf_thresh', 'prune_thresh', 'coop_weight', 'comp_weight', 'utter']
     
-    line = lambda vals: ', '.join([str(v) for v in vals]) + '\n'
+    line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
     with open(file_name, 'w') as f:
         header = line(params_name)
         f.write(header)

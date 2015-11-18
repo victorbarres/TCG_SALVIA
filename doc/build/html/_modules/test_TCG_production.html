@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>test_TCG_production &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for test_TCG_production</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: Victor Barres</span>
+<span class="sd">Test cases for the language production schemas defined in language_schemas.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">language_schemas</span> <span class="kn">as</span> <span class="nn">ls</span>
+<span class="kn">from</span> <span class="nn">loader</span> <span class="kn">import</span> <span class="n">TCG_LOADER</span>
+<span class="kn">from</span> <span class="nn">TCG_models</span> <span class="kn">import</span> <span class="n">TCG_production_system</span>
+<span class="kn">from</span> <span class="nn">viewer</span> <span class="kn">import</span> <span class="n">TCG_VIEWER</span>
+    
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../code.html#test_TCG_production.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test Incremental Semantic Formulas sem inputs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">language_system_P</span> <span class="o">=</span> <span class="n">TCG_production_system</span><span class="p">()</span>
+<span class="c">#     Display schema system</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">system2dot</span><span class="p">(</span><span class="n">image_type</span><span class="o">=</span><span class="s">&#39;png&#39;</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+    <span class="n">conceptLTM</span> <span class="o">=</span> <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Concept_LTM&#39;</span><span class="p">]</span>
+
+    <span class="n">sem_inputs</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_sem_input</span><span class="p">(</span><span class="s">&quot;sem_inputs.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/sem_inputs/&quot;</span><span class="p">)</span>    
+    <span class="n">sem_gen</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">SEM_GENERATOR</span><span class="p">(</span><span class="n">sem_inputs</span><span class="p">,</span> <span class="n">conceptLTM</span><span class="p">)</span>
+
+    <span class="n">input_name</span> <span class="o">=</span> <span class="s">&#39;ditransitive_give&#39;</span>    
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">sem_gen</span><span class="o">.</span><span class="n">sem_generator</span><span class="p">(</span><span class="n">input_name</span><span class="p">)</span>
+    
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span>
+    
+    <span class="p">(</span><span class="n">sem_insts</span><span class="p">,</span> <span class="n">next_time</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+    
+    <span class="n">set_up_time</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span> <span class="c">#Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.</span>
+    <span class="n">max_time</span> <span class="o">=</span> <span class="mi">900</span>   
+    <span class="n">save_states</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">]</span>
+    
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">set_up_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">next_time</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">t</span><span class="o">&gt;</span><span class="n">next_time</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">sem_insts</span><span class="p">,</span> <span class="n">next_time</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">print</span> <span class="s">&quot;t:</span><span class="si">%i</span><span class="s">, sem: </span><span class="si">%s</span><span class="s"> (prop: </span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">inst</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">inst</span> <span class="ow">in</span> <span class="n">sem_insts</span><span class="p">]),</span> <span class="n">prop</span><span class="p">)</span>
+            <span class="n">language_system_P</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">sem_insts</span><span class="p">)</span>
+<span class="c">#            language_system_P.schemas[&#39;Semantic_WM&#39;].show_SemRep()</span>
+        <span class="n">language_system_P</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">language_system_P</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">]:</span>
+            <span class="k">print</span> <span class="s">&quot;t:</span><span class="si">%i</span><span class="s">, &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="o">-</span> <span class="n">set_up_time</span> <span class="ow">in</span> <span class="n">save_states</span><span class="p">:</span>
+            <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_gramWM_state</span><span class="p">(</span><span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">],</span> <span class="n">concise</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_lingWM_state</span><span class="p">(</span><span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">],</span><span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">],</span> <span class="n">concise</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_gramWM_state</span><span class="p">(</span><span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">],</span> <span class="n">concise</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_lingWM_state</span><span class="p">(</span><span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">],</span><span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">],</span> <span class="n">concise</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_SemRep</span><span class="p">()</span>
+    <span class="n">TCG_VIEWER</span><span class="o">.</span><span class="n">display_semWM_state</span><span class="p">(</span><span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">])</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_state</span><span class="p">()</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Phonological_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">save_sim</span><span class="p">(</span><span class="s">&#39;./tmp/test_language_output.json&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="test_params"><a class="viewcode-back" href="../code.html#test_TCG_production.test_params">[docs]</a><span class="k">def</span> <span class="nf">test_params</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    First quick function to test the impact of param on outputs</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdout</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+    
+    <span class="c"># Chose input name</span>
+    <span class="n">input_name</span> <span class="o">=</span> <span class="s">&#39;ditransitive_give&#39;</span>    
+    
+    <span class="c"># Set up parameter space</span>
+    <span class="n">sample_rate</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">tau_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">noise_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">k_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">)</span>
+    <span class="n">conf_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">0.4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">prune_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">coop_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">)</span>
+    <span class="n">comp_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    
+    <span class="n">params_samples</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tau_param</span> <span class="ow">in</span> <span class="n">tau_samples</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k_param</span> <span class="ow">in</span> <span class="n">k_samples</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">noise_param</span> <span class="ow">in</span> <span class="n">noise_samples</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">conf_param</span> <span class="ow">in</span> <span class="n">conf_samples</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">prune_param</span> <span class="ow">in</span> <span class="n">prune_samples</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">coop_param</span> <span class="ow">in</span> <span class="n">coop_samples</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">comp_param</span> <span class="ow">in</span> <span class="n">comp_samples</span><span class="p">:</span>
+                                <span class="n">param_set</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;tau&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">tau_param</span><span class="p">),</span> 
+                                             <span class="s">&#39;k&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">k_param</span><span class="p">),</span> 
+                                             <span class="s">&#39;noise_std&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">noise_param</span><span class="p">),</span> 
+                                             <span class="s">&#39;conf_thresh&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">conf_param</span><span class="p">),</span> 
+                                             <span class="s">&#39;prune_thresh&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">prune_param</span><span class="p">),</span> 
+                                             <span class="s">&#39;coop_weight&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">coop_param</span><span class="p">),</span> 
+                                             <span class="s">&#39;comp_weight&#39;</span><span class="p">:</span><span class="nb">float</span><span class="p">(</span><span class="n">comp_param</span><span class="p">)}</span>
+                                <span class="n">params_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">param_set</span><span class="p">)</span>
+                                
+    <span class="n">num_sims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_samples</span><span class="p">)</span>
+                                
+    
+    <span class="c"># Running simulations</span>
+    <span class="n">num</span>  <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">params_samples</span><span class="p">:</span>
+        <span class="c"># Set up model</span>
+        <span class="n">language_system_P</span> <span class="o">=</span> <span class="n">TCG_production_system</span><span class="p">()</span> <span class="c"># Better if I could just reset the model...</span>
+        <span class="n">conceptLTM</span> <span class="o">=</span> <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Concept_LTM&#39;</span><span class="p">]</span>
+      
+        <span class="n">grammaticalWM_P</span> <span class="o">=</span> <span class="n">language_system_P</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span>
+        
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;conf_thresh&#39;</span><span class="p">]</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;prune_thresh&#39;</span><span class="p">]</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="c"># When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;activation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+        <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;sem_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+        
+        <span class="c"># Set up input</span>
+        <span class="n">sem_inputs</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_sem_input</span><span class="p">(</span><span class="s">&quot;sem_inputs.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/sem_inputs/&quot;</span><span class="p">)</span>    
+        <span class="n">sem_gen</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">SEM_GENERATOR</span><span class="p">(</span><span class="n">sem_inputs</span><span class="p">,</span> <span class="n">conceptLTM</span><span class="p">)</span>
+        <span class="n">generator</span> <span class="o">=</span> <span class="n">sem_gen</span><span class="o">.</span><span class="n">sem_generator</span><span class="p">(</span><span class="n">input_name</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">sem_insts</span><span class="p">,</span> <span class="n">next_time</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+        <span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">();</span>
+        <span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot; Sim number: </span><span class="si">%i</span><span class="s"> (</span><span class="si">%.2f%%</span><span class="s">)      </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">num</span><span class="p">,</span><span class="n">num</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">num_sims</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="s">&quot;</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">))</span>
+
+        <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">utter</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="n">set_up_time</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span> <span class="c">#Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="mi">900</span>
+        
+        <span class="c"># Run production simulation</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">set_up_time</span><span class="p">,</span> <span class="n">max_time</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">next_time</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">t</span><span class="o">&gt;</span><span class="n">next_time</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">sem_insts</span><span class="p">,</span> <span class="n">next_time</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">language_system_P</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">sem_insts</span><span class="p">)</span>
+            <span class="n">language_system_P</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">language_system_P</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">]:</span>
+               <span class="n">utter</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">])</span>
+        
+        <span class="n">params</span><span class="p">[</span><span class="s">&#39;utter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">utter</span><span class="p">)</span>
+        
+    
+    <span class="n">file_name</span> <span class="o">=</span> <span class="s">&#39;test11.csv&#39;</span>
+    <span class="n">params_name</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">,</span> <span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="s">&#39;noise_std&#39;</span><span class="p">,</span> <span class="s">&#39;conf_thresh&#39;</span><span class="p">,</span> <span class="s">&#39;prune_thresh&#39;</span><span class="p">,</span> <span class="s">&#39;coop_weight&#39;</span><span class="p">,</span> <span class="s">&#39;comp_weight&#39;</span><span class="p">,</span> <span class="s">&#39;utter&#39;</span><span class="p">]</span>
+    
+    <span class="n">line</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">vals</span><span class="p">:</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">])</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">line</span><span class="p">(</span><span class="n">params_name</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">params_samples</span><span class="p">:</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">params_name</span><span class="p">]</span>
+            <span class="n">new_line</span> <span class="o">=</span> <span class="n">line</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="c">#    test(seed=1)</span>
+    <span class="n">test_params</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

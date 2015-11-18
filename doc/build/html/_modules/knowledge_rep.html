@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>knowledge_rep &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for knowledge_rep</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: Victor Barres</span>
+<span class="sd">Define knowledge representations for TCG.</span>
+<span class="sd">For now only implements semantic net.</span>
+
+<span class="sd">Uses NetworkX module to represent the semantic net.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="kn">as</span> <span class="nn">nx</span>
+
+<span class="c">####################</span>
+<span class="c">### SEMANTIC NET ###</span>
+<span class="c">####################</span>
+<div class="viewcode-block" id="K_ENT"><a class="viewcode-back" href="../code.html#knowledge_rep.K_ENT">[docs]</a><span class="k">class</span> <span class="nc">K_ENT</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Knowledge entity</span>
+<span class="sd">    Data:</span>
+<span class="sd">        - id (INT): Unique identifier of the knowlege entity.</span>
+<span class="sd">        - meaning: meaning associated with the knowledge entity.</span>
+<span class="sd">    </span>
+<span class="sd">    Note:</span>
+<span class="sd">        - &#39;==&#39; has to be defined for meaning.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ID_NEXT</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># Global knowledge entity counter    </span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">K_ENT</span><span class="o">.</span><span class="n">ID_NEXT</span>
+        <span class="n">K_ENT</span><span class="o">.</span><span class="n">ID_NEXT</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">=</span> <span class="n">meaning</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">is_equal</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span> <span class="ow">and</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">meaning</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">is_equal</span>
+    </div>
+<div class="viewcode-block" id="K_REL"><a class="viewcode-back" href="../code.html#knowledge_rep.K_REL">[docs]</a><span class="k">class</span> <span class="nc">K_REL</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Knowledge relation. Only 2 place relations are allowed. Relations are defined as directed.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - type (STR): Type of relation.</span>
+<span class="sd">        - pFrom (K_ENT):  Source knowledge entity.</span>
+<span class="sd">        - pTo (K_ENT): Target knowledge entity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aType</span> <span class="o">=</span> <span class="s">&#39;undefined&#39;</span><span class="p">,</span> <span class="n">from_ent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">to_ent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">aType</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pFrom</span> <span class="o">=</span> <span class="n">from_ent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pTo</span><span class="o">=</span> <span class="n">to_ent</span>
+        
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="n">is_equal</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span> <span class="ow">and</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFrom</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pFrom</span><span class="p">)</span> <span class="ow">and</span> 
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pTo</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">pTo</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">is_equal</span>
+    
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFrom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pTo</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span>
+</div>
+<div class="viewcode-block" id="K_NET"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET">[docs]</a><span class="k">class</span> <span class="nc">K_NET</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Semantic network.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - nodes ([K_ENT]): List of knowledge entity.</span>
+<span class="sd">        - edges ([K_REL]): List of knowledge relations.</span>
+<span class="sd">        - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.</span>
+<span class="sd">            Each node has an additional attribute meaning = k_ent.meaning</span>
+<span class="sd">            Each edge has an additional attribute type = k_rel.type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="p">[],</span> <span class="n">edges</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="bp">None</span>
+    
+<div class="viewcode-block" id="K_NET.clear"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear all.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_NX_graph</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="K_NET.add_ent"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.add_ent">[docs]</a>    <span class="k">def</span> <span class="nf">add_ent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k_ent</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a knowledge entity to the semantic network</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            k_ent (K_ENT): A knowlege entity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Check validity        </span>
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">k_ent</span><span class="p">,</span> <span class="n">K_ENT</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span><span class="p">(</span><span class="n">k_ent</span><span class="o">.</span><span class="n">meaning</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Check duplication</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="n">k_ent</span><span class="o">.</span><span class="n">meaning</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Add new semantic entity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_ent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_NX_graph</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+        </div>
+<div class="viewcode-block" id="K_NET.add_relation"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.add_relation">[docs]</a>    <span class="k">def</span> <span class="nf">add_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k_rel</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a relation to the semantic network</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            k_rel (K_REL): A knowledge relation</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="c"># Check validity</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">k_rel</span><span class="p">,</span> <span class="n">K_REL</span><span class="p">))</span> <span class="ow">or</span> 
+            <span class="p">(</span><span class="n">k_rel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s">&#39;undefined&#39;</span><span class="p">)</span> <span class="ow">or</span> 
+            <span class="ow">not</span><span class="p">(</span><span class="n">k_rel</span><span class="o">.</span><span class="n">pFrom</span><span class="p">)</span> <span class="ow">or</span> 
+            <span class="ow">not</span><span class="p">(</span><span class="n">k_rel</span><span class="o">.</span><span class="n">pTo</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Check duplication</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">k_rel</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Check that source and target of relation are defined.</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="n">k_rel</span><span class="o">.</span><span class="n">pFrom</span><span class="o">.</span><span class="n">meaning</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="n">k_rel</span><span class="o">.</span><span class="n">pTo</span><span class="o">.</span><span class="n">meaning</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        
+        <span class="c"># Add new relation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k_rel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_NX_graph</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="K_NET.shortest_path"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.shortest_path">[docs]</a>    <span class="k">def</span> <span class="nf">shortest_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_ent</span><span class="p">,</span> <span class="n">to_ent</span><span class="p">,</span> <span class="n">rel_types</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;is_a&#39;</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the length of the shortest path, if it exists, between from_cpt and to_cpt in the k_net graph.</span>
+<span class="sd">        Only considers the edges of type belonging to rel_types.</span>
+<span class="sd">        </span>
+<span class="sd">        If no path exists, returns -1</span>
+<span class="sd">        </span>
+<span class="sd">        Relies on NetworkX implementation of path length</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - from_ent (K_ENT): Origin</span>
+<span class="sd">            - to_ent (K_ENT): Target</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path_len</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c"># Not efficient...</span>
+        
+        <span class="c">#Only keep the relevant edges</span>
+        <span class="n">to_remove</span> <span class="o">=</span><span class="p">[]</span>
+        <span class="k">for</span> <span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges_iter</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">rel_types</span><span class="p">):</span>
+                <span class="n">to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">))</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">remove_edges_from</span><span class="p">(</span><span class="n">to_remove</span><span class="p">)</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">path_len</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">from_ent</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">to_ent</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">nx</span><span class="o">.</span><span class="n">NetworkXNoPath</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">path_len</span>
+            
+        <span class="k">return</span> <span class="n">path_len</span>
+            </div>
+<div class="viewcode-block" id="K_NET.find_meaning"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.find_meaning">[docs]</a>    <span class="k">def</span> <span class="nf">find_meaning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meaning</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find k_ent with meaning &quot;meaning&quot;. Returns the entity if found, else returns None.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - meaning (): Meaning of a knowledge entity.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">meaning</span> <span class="o">==</span> <span class="n">meaning</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">n</span>
+        
+        <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="K_NET.satisfy_rel"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.satisfy_rel">[docs]</a>    <span class="k">def</span> <span class="nf">satisfy_rel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ent1</span><span class="p">,</span> <span class="n">rel_type</span><span class="p">,</span> <span class="n">ent2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ent1</span> <span class="ow">and</span> <span class="n">ent2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="n">ent1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ent2</span><span class="o">.</span><span class="n">id</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">edge_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">get_edge_data</span><span class="p">(</span><span class="n">ent1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">ent2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">rel_type</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="p">[(</span><span class="n">ent1</span><span class="p">,</span> <span class="n">edge_data</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">],</span> <span class="n">ent2</span><span class="p">)]</span>
+                <span class="k">elif</span> <span class="n">edge_data</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">rel_type</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">[(</span><span class="n">ent1</span><span class="p">,</span> <span class="n">rel_type</span><span class="p">,</span> <span class="n">ent2</span><span class="p">)]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">[]</span>     
+        <span class="k">elif</span> <span class="n">ent1</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">ent2</span><span class="p">):</span>
+            <span class="n">successors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">successors</span><span class="p">(</span><span class="n">ent1</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">successors</span><span class="p">:</span>
+                <span class="n">node_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">s</span><span class="p">]</span>
+                <span class="n">ent2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="n">node_data</span><span class="p">[</span><span class="s">&#39;meaning&#39;</span><span class="p">])</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satisfy_rel</span><span class="p">(</span><span class="n">ent1</span><span class="p">,</span> <span class="n">rel_type</span><span class="p">,</span> <span class="n">ent2</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">res</span>
+        <span class="k">elif</span> <span class="ow">not</span><span class="p">(</span><span class="n">ent1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ent2</span><span class="p">:</span>
+            <span class="n">predecessors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">predecessors</span><span class="p">(</span><span class="n">ent2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">predecessors</span><span class="p">:</span>
+                <span class="n">node_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">p</span><span class="p">]</span>
+                <span class="n">ent1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="n">node_data</span><span class="p">[</span><span class="s">&#39;meaning&#39;</span><span class="p">])</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satisfy_rel</span><span class="p">(</span><span class="n">ent1</span><span class="p">,</span> <span class="n">rel_type</span><span class="p">,</span> <span class="n">ent2</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">res</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ent1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">ent2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">satisfy_rel</span><span class="p">(</span><span class="n">ent1</span><span class="p">,</span> <span class="n">rel_type</span><span class="p">,</span> <span class="n">ent2</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">res</span>
+    </div>
+<div class="viewcode-block" id="K_NET.similarity"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.similarity">[docs]</a>    <span class="k">def</span> <span class="nf">similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ent1</span><span class="p">,</span> <span class="n">ent2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a similarity score between ent1 and ent2.</span>
+<span class="sd">        Uses path similarity.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            - ent1 (K_ENT):</span>
+<span class="sd">            - ent2 (K_ENT):</span>
+<span class="sd">        </span>
+<span class="sd">        Examples for is-a taxonomy (e.g. Wordnet):</span>
+<span class="sd">            Path similarity: 1/(L+1), L=shortest path distance</span>
+<span class="sd">            Leackock-Chodrow Similarity: -log(L/2*D) where L=shortest path length, D=taxonomy depth</span>
+<span class="sd">            Wu-Palmer Similarlity: 2*depth(lcs)/(depth(s1) + depth(s2)), lcs = Least Common Subsumer.</span>
+<span class="sd">            Resnik Similarity (Corpus dependent): IC(lcs)</span>
+<span class="sd">            Lin Similarity (Corpus dependent): 2*IC(lcs)/(IC(s1) + IC(s2))</span>
+<span class="sd">            Jiang &amp; Conrath Similarity:  1/jcn_distance, jcn_distance =  IC(s1) + IC(s2) - 2 * IC(lcs). </span>
+<span class="sd">            See: http://maraca.d.umn.edu/umls_similarity/similarity_measures.html</span>
+<span class="sd">        Note:</span>
+<span class="sd">            - ONLY PATH SIMILARITY IMPLEMENTED</span>
+<span class="sd">            - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span><span class="n">ent1</span><span class="p">,</span> <span class="n">ent2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">L</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="c"># Case no path found</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sim</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">L</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sim</span>
+    </div>
+<div class="viewcode-block" id="K_NET.match"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ent1</span><span class="p">,</span> <span class="n">ent2</span><span class="p">,</span> <span class="n">match_type</span> <span class="o">=</span> <span class="s">&quot;is_a&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;        </span>
+<span class="sd">        Check if ent1 matches ent2. </span>
+<span class="sd">        Type = &quot;is_a&quot;:  ent1 matches ent2 if ent2 is a hyponym of ent2 (or equal to ent2)</span>
+<span class="sd">        Type = &quot;equal&quot;: ent1 matches ent2 iff ent1 is equal to ent2.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - ent1 (K_ENT)</span>
+<span class="sd">            - ent2 (K_ENT)</span>
+<span class="sd">            - match_type (STR): &quot;is_a&quot; or &quot;equal&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        Notes:</span>
+<span class="sd">            - In the currrent version matching is boolean. No impact of distance on similarity.</span>
+<span class="sd">            See similarity()</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shortest_path</span><span class="p">(</span><span class="n">ent1</span><span class="p">,</span> <span class="n">ent2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">match_type</span> <span class="o">==</span> <span class="s">&quot;is_a&quot;</span> <span class="ow">and</span> <span class="n">dist</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">match_type</span> <span class="o">==</span> <span class="s">&quot;equal&quot;</span> <span class="ow">and</span> <span class="n">dist</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="K_NET.show"><a class="viewcode-back" href="../code.html#knowledge_rep.K_NET.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">node_labels</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span><span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>        
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span> <span class="n">node_labels</span><span class="p">)</span>
+
+</div>
+    <span class="k">def</span> <span class="nf">_create_NX_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">meaning</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">pFrom</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">pTo</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span>
+        
+    
+    <span class="k">def</span> <span class="nf">_has_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ent_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns entity iff there is a entity with name &quot;name&quot;.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - entt_name (STR):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">ent_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="bp">None</span>
+        </div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

@@ -49,270 +49,167 @@
   <h1>Source code for concept</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on Tue Apr 29 13:21:41 2014</span>
-
 <span class="sd">@author: Victor Barres</span>
 
-<span class="sd">Define semantic knowledge related classes for TCG1.0</span>
+<span class="sd">Define semantic network related classes for TCG.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c">###############################################################################</span>
-<div class="viewcode-block" id="SEM_REL"><a class="viewcode-back" href="../code.html#concept.SEM_REL">[docs]</a><span class="k">class</span> <span class="nc">SEM_REL</span><span class="p">:</span>
+<span class="kn">from</span> <span class="nn">knowledge_rep</span> <span class="kn">import</span> <span class="n">K_ENT</span><span class="p">,</span> <span class="n">K_REL</span><span class="p">,</span> <span class="n">K_NET</span>
+
+<div class="viewcode-block" id="CONCEPT"><a class="viewcode-back" href="../code.html#concept.CONCEPT">[docs]</a><span class="k">class</span> <span class="nc">CONCEPT</span><span class="p">(</span><span class="n">K_ENT</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Semantic Relation</span>
+<span class="sd">    Conceptual knowledge entity</span>
 <span class="sd">    </span>
 <span class="sd">    Data:</span>
-<span class="sd">        - type (INT): UNDEFINED=0, IS_A =1</span>
-<span class="sd">        - supMeaning (STR): Hypernym of subMeaning</span>
-<span class="sd">        - subMeaning (STR): Hyponym of supMeaning</span>
-<span class="sd">        </span>
-<span class="sd">    Note:</span>
-<span class="sd">        - Only IS_A hyponymic relation is defined in c++ code.</span>
+<span class="sd">        - id (INT): Unique identifier of the entity.</span>
+<span class="sd">        - meaning (STR): Meaning associated with the semantic entity. A string for now.</span>
+<span class="sd">        - conceptual_knowledge (CONCEPTUAL_KNOWLEDGE): The conceptual knowledge instance the concept is part of.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># Relation types</span>
-    <span class="n">UNDEFINED</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">IS_A</span> <span class="o">=</span> <span class="mi">1</span> <span class="c"># C++ code for TCG1.0 only handles hyponymy</span>
+    <span class="n">CONCEPTUAL_KNOWLEDGE</span><span class="o">=</span> <span class="bp">None</span>  
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">conceptual_knowledge</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">K_ENT</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="n">meaning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conceptual_knowledge</span> <span class="o">=</span> <span class="n">conceptual_knowledge</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aType</span> <span class="o">=</span> <span class="n">UNDEFINED</span><span class="p">,</span> <span class="n">subMeaning</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">supMeaning</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">aType</span> <span class="c"># Relation type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span> <span class="o">=</span> <span class="n">supMeaning</span> <span class="c"># Superordinate meaning</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span><span class="o">=</span> <span class="n">subMeaning</span> <span class="c"># Subordinate meaning</span>
-    
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="n">is_equal</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span> <span class="ow">and</span> 
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="ow">and</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">)</span> <span class="ow">and</span> 
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">subMeaning</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">is_equal</span>
-    
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> IS_A </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">)</span>
+<div class="viewcode-block" id="CONCEPT.match"><a class="viewcode-back" href="../code.html#concept.CONCEPT.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpt</span><span class="p">,</span> <span class="n">match_type</span> <span class="o">=</span> <span class="s">&quot;is_a&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if it matches cpt. </span>
+<span class="sd">        Uses CONCEPTUAL_KNOWLEDGE.match() method.</span>
+<span class="sd">            Type = &quot;is_a&quot;:  concept1 matches concept2 if concept1 is a hyponym of concept2 (or equal to concept2)</span>
+<span class="sd">            Type = &quot;equal&quot;: concept1 matches concept2 if concept1 is equal to concept2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conceptual_knowledge</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conceptual_knowledge</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpt</span><span class="p">,</span> <span class="n">match_type</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="s">&quot;type: </span><span class="si">%i</span><span class="s">, subMeaning: </span><span class="si">%s</span><span class="s">, supMeaning: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">subMeaning</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">p</span>
-    
-<span class="c">###############################################################################</span></div>
-<div class="viewcode-block" id="SEM_NET"><a class="viewcode-back" href="../code.html#concept.SEM_NET">[docs]</a><span class="k">class</span> <span class="nc">SEM_NET</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;ERROR: The concept is not linked to any conceptual knowledge.&quot;</span>
+    </div>
+<div class="viewcode-block" id="CONCEPT.similarity"><a class="viewcode-back" href="../code.html#concept.CONCEPT.similarity">[docs]</a>    <span class="k">def</span> <span class="nf">similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a similarity score with cpt.</span>
+<span class="sd">        Uses CONCEPTUAL_KNOWLEDGE.similarity() method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conceptual_knowledge</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conceptual_knowledge</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="bp">self</span> <span class="p">,</span><span class="n">cpt</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;ERROR: The concept is not linked to any conceptual knowledge.&quot;</span>
+    </div></div>
+<div class="viewcode-block" id="SEM_REL"><a class="viewcode-back" href="../code.html#concept.SEM_REL">[docs]</a><span class="k">class</span> <span class="nc">SEM_REL</span><span class="p">(</span><span class="n">K_REL</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Semantic network (acting as world knowledge)</span>
+<span class="sd">    Semantic relation between concept</span>
 <span class="sd">    </span>
 <span class="sd">    Data:</span>
-<span class="sd">        - relation ([SEM_REL]): List of semantic relations</span>
+<span class="sd">        - type (STR): Type of relation.</span>
+<span class="sd">        - pFrom (CONCEPT):  Source concept.</span>
+<span class="sd">        - pTo (CONCEPT): Target concept.</span>
 <span class="sd">    </span>
-<span class="sd">    Notes: </span>
-<span class="sd">        - The network is simply defined as a list of semantic relations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relations</span> <span class="o">=</span> <span class="p">[]):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span> <span class="o">=</span> <span class="n">relations</span>
-    
-<div class="viewcode-block" id="SEM_NET.clear"><a class="viewcode-back" href="../code.html#concept.SEM_NET.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Clear all relations</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span> <span class="o">=</span> <span class="p">[]</span>
-    </div>
-<div class="viewcode-block" id="SEM_NET.add_relation"><a class="viewcode-back" href="../code.html#concept.SEM_NET.add_relation">[docs]</a>    <span class="k">def</span> <span class="nf">add_relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sem_rel</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add a relation to the semantic network</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            sem_rel = SEM_REL</span>
-<span class="sd">        &quot;&quot;&quot;</span>        
-        <span class="c"># Check validity</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">sem_rel</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">SEM_REL</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span> <span class="ow">or</span> 
-            <span class="p">(</span><span class="n">sem_rel</span><span class="o">.</span><span class="n">supMeaning</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="ow">or</span> 
-            <span class="p">(</span><span class="n">sem_rel</span><span class="o">.</span><span class="n">subMeaning</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="bp">False</span>
-        
-        <span class="c"># Check duplication</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">sem_rel</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">False</span>
-        
-        <span class="c"># Add new relation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sem_rel</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">True</span>
-    </div>
-<div class="viewcode-block" id="SEM_NET.root"><a class="viewcode-back" href="../code.html#concept.SEM_NET.root">[docs]</a>    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept</span><span class="p">,</span> <span class="n">relType</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the farthest semantic root of a given concept (concept) for a given relation type (relType)</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">            - concept (str)</span>
-<span class="sd">            - relType (int)</span>
-<span class="sd">        </span>
-<span class="sd">        Notes: </span>
-<span class="sd">            - Does not seem to be used anywhere in c++ code</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">None</span>
-    </div>
-<div class="viewcode-block" id="SEM_NET.distance"><a class="viewcode-back" href="../code.html#concept.SEM_NET.distance">[docs]</a>    <span class="k">def</span> <span class="nf">distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supMean</span><span class="p">,</span> <span class="n">subMean</span><span class="p">,</span> <span class="n">relType</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return the distance in the semantic network between a concept (subMean) and an hypernym (supMean).</span>
-<span class="sd">        Return -1 if supMean is not a hypernym of subMean.</span>
-<span class="sd">        If heuristic = True: -&gt; does not guarantee to find the shortest distance.</span>
-<span class="sd">        </span>
-<span class="sd">        Args:</span>
-<span class="sd">         - supMean (str)</span>
-<span class="sd">         - subMean (str)</span>
-<span class="sd">         - relType (int)</span>
-<span class="sd">         - heuristic (bool)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">visited</span> <span class="o">=</span> <span class="p">[]</span> <span class="c"># Explored elements of the semantic network</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span>
-        
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travel</span><span class="p">(</span><span class="n">supMean</span><span class="p">,</span> <span class="n">subMean</span><span class="p">,</span> <span class="n">relType</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">heuristic</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
-    </div>
-    <span class="k">def</span> <span class="nf">_travel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">supMean</span><span class="p">,</span> <span class="n">subMean</span><span class="p">,</span> <span class="n">relType</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">heuristic</span><span class="p">,</span> <span class="n">visited</span><span class="p">):</span>
-        
-        <span class="k">if</span> <span class="n">supMean</span> <span class="o">==</span> <span class="n">subMean</span><span class="p">:</span> <span class="c"># Match found</span>
-            <span class="k">return</span> <span class="n">dist</span>
-        
-        <span class="n">minDist</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">relType</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">subMeaning</span> <span class="o">!=</span> <span class="n">subMean</span><span class="p">):</span>
-                <span class="k">continue</span>
-            
-            <span class="c"># Visit the current relation</span>
-            <span class="n">visited</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-            
-            <span class="c"># Recursively travel</span>
-            <span class="n">nextDist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travel</span><span class="p">(</span><span class="n">supMean</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">supMeaning</span><span class="p">,</span> <span class="n">relType</span><span class="p">,</span> <span class="n">dist</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">heuristic</span><span class="p">,</span> <span class="n">visited</span><span class="p">)</span>
-            
-            <span class="c"># Un-visit</span>
-            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">heuristic</span><span class="p">):</span> <span class="c"># if heuristic: path does not have to be the shortest</span>
-                <span class="n">visited</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-                     
-            <span class="k">if</span> <span class="n">nextDist</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">minDist</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">minDist</span> <span class="o">&gt;</span> <span class="n">nextDist</span><span class="p">):</span>
-                    <span class="n">minDist</span> <span class="o">=</span> <span class="n">nextDist</span>
-                <span class="k">if</span> <span class="n">minDist</span> <span class="o">&lt;=</span> <span class="n">dist</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> 
-                    <span class="k">break</span> <span class="c"># assumed to be the possible minimum distance</span>
-                
-                <span class="k">if</span> <span class="n">heuristic</span><span class="p">:</span>
-                    <span class="k">break</span> <span class="c"># if heuristicL just find one possible path</span>
-            
-        <span class="k">return</span> <span class="n">minDist</span>
-    
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;### SEMANTIC NETWORK ###</span><span class="se">\n\n</span><span class="s">&#39;</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="k">return</span> <span class="n">p</span>
-            
-            
-<span class="c">###############################################################################    </span></div>
-<div class="viewcode-block" id="CONCEPT"><a class="viewcode-back" href="../code.html#concept.CONCEPT">[docs]</a><span class="k">class</span> <span class="nc">CONCEPT</span><span class="p">:</span>
+<span class="sd">    Note: ONLY is_a IMPLEMENTED FOR NOW.</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aType</span> <span class="o">=</span> <span class="s">&#39;UNDEFINED&#39;</span><span class="p">,</span> <span class="n">from_cpt</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">to_cpt</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">K_REL</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">aType</span> <span class="o">=</span> <span class="n">aType</span><span class="p">,</span> <span class="n">from_ent</span><span class="o">=</span><span class="n">from_cpt</span><span class="p">,</span> <span class="n">to_ent</span> <span class="o">=</span> <span class="n">to_cpt</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CONCEPTUAL_KNOWLEDGE"><a class="viewcode-back" href="../code.html#concept.CONCEPTUAL_KNOWLEDGE">[docs]</a><span class="k">class</span> <span class="nc">CONCEPTUAL_KNOWLEDGE</span><span class="p">(</span><span class="n">K_NET</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Concept (semantico-syntactic knowledge)</span>
+<span class="sd">    Conceptual knowledge. Implemented as a semantic network.</span>
 <span class="sd">    </span>
-<span class="sd">    Data:</span>
-<span class="sd">        - name (STR): Name of the concept.</span>
-<span class="sd">        - meaning (STR) : Meaning it carries.</span>
+<span class="sd">    Data(inherited):</span>
+<span class="sd">        - nodes ([CONCEPT]): List of concepts.</span>
+<span class="sd">        - edges ([SEM_REL]): List of semantic relations.</span>
+<span class="sd">        - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.</span>
+<span class="sd">            Each node has an additional attributes meaning = concept.meaning</span>
+<span class="sd">            Each edge has an additional attribute type = sem_rel.type</span>
+<span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">SEMANTIC_NETWORK</span> <span class="o">=</span> <span class="bp">None</span> <span class="c"># A constant SEM_NET</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="p">[],</span> <span class="n">edges</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="n">K_NET</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">[:],</span> <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">[:])</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="c"># Concept name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">=</span> <span class="n">meaning</span> <span class="c"># Concept meaning</span>
-        
-    <span class="c"># Create concept (temporary)</span>
-<div class="viewcode-block" id="CONCEPT.create"><a class="viewcode-back" href="../code.html#concept.CONCEPT.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">concept</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CONCEPTUAL_KNOWLEDGE.add_ent"><a class="viewcode-back" href="../code.html#concept.CONCEPTUAL_KNOWLEDGE.add_ent">[docs]</a>    <span class="k">def</span> <span class="nf">add_ent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Creates a concept from a meaning string or another concept.</span>
-<span class="sd">        (TEMPORARY)</span>
+<span class="sd">        Adds a concept to the the conceptual knowlege while also linking the conceptual knowledge back to the concept.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># set field (temporary)</span>
-        <span class="k">if</span> <span class="n">meaning</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">meaning</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">=</span> <span class="n">meaning</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        
-        <span class="c"># set field (temporary)</span>
-        <span class="k">if</span> <span class="n">concept</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">concept</span><span class="o">.</span><span class="n">name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">meaning</span> <span class="o">=</span> <span class="n">concept</span><span class="o">.</span><span class="n">meaning</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">flag</span>  <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CONCEPTUAL_KNOWLEDGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_ent</span><span class="p">(</span><span class="n">concept</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="n">concept</span><span class="o">.</span><span class="n">conceptual_knowledge</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">flag</span>
+       </div>
+<div class="viewcode-block" id="CONCEPTUAL_KNOWLEDGE.concepts"><a class="viewcode-back" href="../code.html#concept.CONCEPTUAL_KNOWLEDGE.concepts">[docs]</a>    <span class="k">def</span> <span class="nf">concepts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all the concepts</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
+    </div>
+<div class="viewcode-block" id="CONCEPTUAL_KNOWLEDGE.has_concept"><a class="viewcode-back" href="../code.html#concept.CONCEPTUAL_KNOWLEDGE.has_concept">[docs]</a>    <span class="k">def</span> <span class="nf">has_concept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concept_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns concept iff there is a concept with name &quot;name&quot;.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - concept_name (STR):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_entity</span><span class="p">(</span><span class="n">concept_name</span><span class="p">)</span>
         </div>
-<div class="viewcode-block" id="CONCEPT.match"><a class="viewcode-back" href="../code.html#concept.CONCEPT.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">inclusive</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;        </span>
-<span class="sd">        Check if two concept match. Case inclusive = False: concepts match only if they carry the same meaning.</span>
-<span class="sd">        Case inclusive = True: If a concept is tagged with + (e.g. ANIMAL+) it will match with any of its hyponyms.</span>
-<span class="sd">        Otherwise, concepts match if they carry the same meaning.</span>
+<div class="viewcode-block" id="CONCEPTUAL_KNOWLEDGE.find_meaning"><a class="viewcode-back" href="../code.html#concept.CONCEPTUAL_KNOWLEDGE.find_meaning">[docs]</a>    <span class="k">def</span> <span class="nf">find_meaning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meaning</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find concept with meaning &quot;meaning&quot;. Returns the concept if found, else returns None.</span>
 <span class="sd">        </span>
 <span class="sd">        Args:</span>
-<span class="sd">            - concept1 (CONCEPT)</span>
-<span class="sd">            - concept2 (CONCEPT)</span>
-<span class="sd">            - inclusive (BOOL)</span>
+<span class="sd">            - meaning (): Meaning of a concept</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CONCEPTUAL_KNOWLEDGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="n">meaning</span><span class="p">)</span>
+                     </div>
+<div class="viewcode-block" id="CONCEPTUAL_KNOWLEDGE.similarity"><a class="viewcode-back" href="../code.html#concept.CONCEPTUAL_KNOWLEDGE.similarity">[docs]</a>    <span class="k">def</span> <span class="nf">similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpt1</span><span class="p">,</span> <span class="n">cpt2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a similarity score between cpt1 and cpt2.</span>
+<span class="sd">        Uses path similarity.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            - cpt1 (CONCEPT):</span>
+<span class="sd">            - cpt2 (CONCEPT):</span>
+<span class="sd">        </span>
+<span class="sd">        Examples for is-a taxonomy (e.g. Wordnet):</span>
+<span class="sd">            Path similarity: 1/(L+1), L=shortest path distance</span>
+<span class="sd">            Leackock-Chodrow Similarity: -log(L/2*D) where L=shortest path length, D=taxonomy depth</span>
+<span class="sd">            Wu-Palmer Similarlity: 2*depth(lcs)/(depth(s1) + depth(s2)), lcs = Least Common Subsumer.</span>
+<span class="sd">            Resnik Similarity (Corpus dependent): IC(lcs)</span>
+<span class="sd">            Lin Similarity (Corpus dependent): 2*IC(lcs)/(IC(s1) + IC(s2))</span>
+<span class="sd">            Jiang &amp; Conrath Similarity:  1/jcn_distance, jcn_distance =  IC(concept1) + IC(concept2) - 2 * IC(lcs). </span>
+<span class="sd">            See: http://maraca.d.umn.edu/umls_similarity/similarity_measures.html</span>
+<span class="sd">        Note:</span>
+<span class="sd">            - ONLY PATH SIMILARITY IMPLEMENTED</span>
+<span class="sd">            - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CONCEPTUAL_KNOWLEDGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">similarity</span><span class="p">(</span><span class="n">cpt1</span><span class="p">,</span> <span class="n">cpt2</span><span class="p">)</span>        
+    </div>
+<div class="viewcode-block" id="CONCEPTUAL_KNOWLEDGE.match"><a class="viewcode-back" href="../code.html#concept.CONCEPTUAL_KNOWLEDGE.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cpt1</span><span class="p">,</span> <span class="n">cpt2</span><span class="p">,</span> <span class="n">match_type</span> <span class="o">=</span> <span class="s">&quot;is_a&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;        </span>
+<span class="sd">        Check if cpt1 matches cpt2. </span>
+<span class="sd">        Type = &quot;is_a&quot;:  cpt1 matches cpt2 if cpt2 is a hyponym of cpt2 (or equal to cpt2)</span>
+<span class="sd">        Type = &quot;equal&quot;: cpt1 matches cpt2 iff cpt1 is equal to cpt2.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - cpt1 (CONCEPT)</span>
+<span class="sd">            - cpt2 (CONCEPT)</span>
+<span class="sd">            - match_type (STR): &quot;is_a&quot; or &quot;equal&quot;</span>
 <span class="sd">        </span>
 <span class="sd">        Notes:</span>
-<span class="sd">            - In the c++ version matching is boolean. No impact of distance on similarity.</span>
+<span class="sd">            - In the currrent version matching is boolean. No impact of distance on similarity.</span>
+<span class="sd">            See similarity()</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
-        
-        <span class="n">mean1</span> <span class="o">=</span> <span class="n">concept1</span><span class="o">.</span><span class="n">meaning</span>
-        <span class="n">incl1</span> <span class="o">=</span> <span class="n">mean1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span>
-        <span class="k">if</span> <span class="n">incl1</span><span class="p">:</span>
-            <span class="n">mean1</span> <span class="o">=</span> <span class="n">mean1</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            
-        <span class="n">mean2</span> <span class="o">=</span> <span class="n">concept2</span><span class="o">.</span><span class="n">meaning</span>
-        <span class="n">incl2</span> <span class="o">=</span> <span class="n">mean2</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;+&#39;</span>
-        <span class="k">if</span> <span class="n">incl2</span><span class="p">:</span>
-            <span class="n">mean2</span> <span class="o">=</span> <span class="n">mean2</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        
-        <span class="c"># Forward direction</span>
-        <span class="n">dist1</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">mean1</span><span class="p">,</span> <span class="n">mean2</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">inclusive</span> <span class="ow">and</span> <span class="n">dist1</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">incl1</span><span class="p">):</span>
-            <span class="n">dist1</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># Inclusive</span>
-        
-        <span class="c"># Backward direction</span>
-        <span class="n">dist2</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">mean2</span><span class="p">,</span> <span class="n">mean1</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">inclusive</span> <span class="ow">and</span> <span class="n">dist2</span><span class="o">&gt;=</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">incl2</span><span class="p">):</span>
-            <span class="n">dist2</span> <span class="o">=</span> <span class="mi">0</span> <span class="c"># Inclusive</span>
-        
-        <span class="k">if</span> <span class="p">(</span><span class="n">dist1</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dist2</span><span class="o">!=</span><span class="mi">0</span><span class="p">):</span>
-         <span class="k">return</span> <span class="bp">False</span> <span class="c"># Only meaning with distance 0 are accepted as matched</span>
-        
-        <span class="c">#</span>
-        <span class="c"># Check other fields too</span>
-        <span class="mi">2</span>
-        <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CONCEPTUAL_KNOWLEDGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">cpt1</span><span class="p">,</span> <span class="n">cpt2</span><span class="p">,</span> <span class="n">match_type</span> <span class="o">=</span> <span class="n">match_type</span><span class="p">)</span>
 
 <span class="c">###############################################################################</span></div></div>
 <span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">s1</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="p">(</span><span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="s">&#39;cat&#39;</span><span class="p">,</span> <span class="s">&#39;animal&#39;</span><span class="p">)</span>
-    <span class="n">s2</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="p">(</span><span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="s">&#39;dog&#39;</span><span class="p">,</span> <span class="s">&#39;animal&#39;</span><span class="p">)</span>
-    <span class="n">s3</span> <span class="o">=</span> <span class="n">SEM_REL</span><span class="p">(</span><span class="n">SEM_REL</span><span class="o">.</span><span class="n">IS_A</span><span class="p">,</span> <span class="s">&#39;animal&#39;</span><span class="p">,</span> <span class="s">&#39;being&#39;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">loader</span> <span class="kn">as</span> <span class="nn">ld</span>
+    <span class="n">my_conceptual_knowledge</span> <span class="o">=</span> <span class="n">ld</span><span class="o">.</span><span class="n">load_conceptual_knowledge</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">)</span>
+    <span class="n">clothing</span> <span class="o">=</span> <span class="n">my_conceptual_knowledge</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="s">&#39;CLOTHING&#39;</span><span class="p">)</span>
+    <span class="n">dress</span> <span class="o">=</span>  <span class="n">my_conceptual_knowledge</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="s">&#39;DRESS&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">dress</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">clothing</span><span class="p">)</span>
     
-    <span class="k">print</span> <span class="n">s1</span>
-    <span class="k">print</span> <span class="n">s2</span>
-    <span class="k">print</span> <span class="n">s3</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">my_conceptual_knowledge</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="s">&#39;COLOR&#39;</span><span class="p">)</span>
+    <span class="n">blue</span> <span class="o">=</span>  <span class="n">my_conceptual_knowledge</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="s">&#39;BLUE&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">blue</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
     
-    <span class="n">semantic_network</span> <span class="o">=</span> <span class="n">SEM_NET</span><span class="p">(</span><span class="n">relations</span> <span class="o">=</span> <span class="p">[</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">])</span>
-
-    <span class="n">semantic_network</span><span class="o">.</span><span class="n">add_relation</span><span class="p">(</span><span class="n">s3</span><span class="p">)</span>
-    
-    <span class="k">print</span> <span class="n">semantic_network</span>
-    
-    <span class="n">concept1</span> <span class="o">=</span> <span class="s">&#39;being&#39;</span>
-    <span class="n">concept2</span> <span class="o">=</span> <span class="s">&#39;cat&#39;</span>
-    <span class="n">dist</span> <span class="o">=</span> <span class="n">semantic_network</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">heuristic</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
-    <span class="k">print</span> <span class="s">&quot;Distance between </span><span class="si">%s</span><span class="s"> and </span><span class="si">%s</span><span class="s"> = </span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">concept1</span><span class="p">,</span> <span class="n">concept2</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>  
-
-    <span class="n">CONCEPT</span><span class="o">.</span><span class="n">SEMANTIC_NETWORK</span> <span class="o">=</span> <span class="n">semantic_network</span>
-    
-    <span class="n">c1</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="p">(</span><span class="s">&#39;c1&#39;</span><span class="p">,</span> <span class="s">&#39;dog&#39;</span><span class="p">)</span>
-    <span class="n">c2</span> <span class="o">=</span> <span class="n">CONCEPT</span><span class="p">(</span><span class="s">&#39;c2&#39;</span><span class="p">,</span> <span class="s">&#39;animal+&#39;</span><span class="p">)</span>
-    
-    <span class="k">print</span> <span class="n">CONCEPT</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+    <span class="n">human</span> <span class="o">=</span> <span class="n">my_conceptual_knowledge</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="s">&#39;HUMAN&#39;</span><span class="p">)</span>
+    <span class="n">woman</span> <span class="o">=</span>  <span class="n">my_conceptual_knowledge</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="s">&#39;WOMAN&#39;</span><span class="p">)</span>
+    <span class="n">obj</span><span class="o">=</span>  <span class="n">my_conceptual_knowledge</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="s">&#39;OBJECT&#39;</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">woman</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">human</span><span class="p">)</span>
 
     
     

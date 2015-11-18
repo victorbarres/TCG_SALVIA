@@ -608,6 +608,9 @@ class GRAMMATICAL_LTM(LTM):
 ### GRAMMAR PROD ###  
 class GRAMMATICAL_WM_P(WM):
     """
+    TO DO!!
+    
+        - I AM NOT USING CXN GROUPS!...
     """
     def __init__(self, name='Grammatical_WM_P'):
         WM.__init__(self, name)
@@ -702,7 +705,6 @@ class GRAMMATICAL_WM_P(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
-#                eq_inst.content.show()
                 phon_WM_output.extend(phon_form)
                 sem_WM_output.extend(expressed)
                 assemblages.remove(winner_assemblage)
@@ -1843,8 +1845,6 @@ class GRAMMATICAL_WM_C(WM):
         NOTE: THIS IS COPIED FROM GRAMMATICAL_WM_P and uses methods from GRAMMATICAL_WM_P!!
         """
         inst_network = GRAMMATICAL_WM_P.build_instance_network(self.schema_insts, self.coop_links)
-        if self.t == 2016:
-            GRAMMATICAL_WM_P.draw_instance_network(inst_network)
 
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
         assemblages = []

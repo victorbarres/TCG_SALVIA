@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>test_TCG_dyad &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for test_TCG_dyad</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: Victor Barres</span>
+<span class="sd">Test cases for a system that incoporates production and comprehension</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">TCG_models</span> <span class="kn">import</span> <span class="n">TCG_language_system</span>
+    
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../code.html#test_TCG_dyad.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">language_system_1</span> <span class="o">=</span> <span class="n">TCG_language_system</span><span class="p">(</span><span class="s">&#39;Agent1&#39;</span><span class="p">)</span>
+    <span class="n">language_system_2</span> <span class="o">=</span> <span class="n">TCG_language_system</span><span class="p">(</span><span class="s">&#39;Agent2&#39;</span><span class="p">)</span>
+    
+<span class="c">#    language_system_1.system2dot(image_type=&#39;png&#39;, disp=True)</span>
+    
+    <span class="n">language_system_1</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Control&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s">&#39;listen&#39;</span><span class="p">)</span>
+    <span class="n">language_system_2</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Control&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+    
+    <span class="n">option</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">speech_rate</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">language_system_1</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;speech_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech_rate</span>
+    <span class="n">language_system_2</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;speech_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech_rate</span>
+    <span class="n">lang_inputs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">lang_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;woman&#39;</span><span class="p">,</span> <span class="s">&#39;kick&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;man&#39;</span><span class="p">,</span> <span class="s">&#39;in&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">]</span>
+    <span class="n">lang_inputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;woman&#39;</span><span class="p">,</span> <span class="s">&#39;kick&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;man&#39;</span><span class="p">,</span> <span class="s">&#39;in&#39;</span><span class="p">,</span>  <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="s">&#39;boxing&#39;</span><span class="p">,</span> <span class="s">&#39;ring&#39;</span><span class="p">]</span>
+    <span class="n">lang_inputs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;woman&#39;</span><span class="p">,</span> <span class="s">&#39;who&#39;</span><span class="p">,</span> <span class="s">&#39;is&#39;</span><span class="p">,</span> <span class="s">&#39;pretty&#39;</span><span class="p">,</span> <span class="s">&#39;kick&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;man&#39;</span><span class="p">,</span> <span class="s">&#39;in&#39;</span><span class="p">,</span> <span class="s">&#39;blue&#39;</span><span class="p">]</span>
+    <span class="n">lang_inputs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;woman&#39;</span><span class="p">,</span> <span class="s">&#39;kick&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;man&#39;</span><span class="p">]</span>
+    <span class="n">lang_inputs</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;woman&#39;</span><span class="p">]</span>
+    
+    <span class="n">lang_input</span> <span class="o">=</span> <span class="n">lang_inputs</span><span class="p">[</span><span class="n">option</span><span class="p">][:]</span>
+    <span class="n">lang_input</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+    <span class="n">max_time</span> <span class="o">=</span> <span class="mi">2500</span>
+    
+    <span class="n">flag1</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">flag2</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">print</span> <span class="s">&quot;VB speaks. Agt1 listens&quot;</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_time</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">&gt;</span><span class="mi">10</span> <span class="ow">and</span> <span class="p">(</span><span class="n">t</span> <span class="o">%</span> <span class="n">speech_rate</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="n">lang_input</span><span class="p">:</span> <span class="c"># Need some time to have the system set up before it receives the first input.</span>
+            <span class="n">word_form</span> <span class="o">=</span> <span class="n">lang_input</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">print</span> <span class="s">&#39;t: </span><span class="si">%i</span><span class="s">, VB says: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">word_form</span><span class="p">)</span>
+            <span class="n">language_system_1</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">word_form</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">language_system_1</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">schema_insts</span> <span class="ow">and</span> <span class="n">flag1</span><span class="p">:</span> <span class="c">#Switching from comprehension to production</span>
+            <span class="n">language_system_1</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_SemRep</span><span class="p">()</span>
+            <span class="n">language_system_1</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Control&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s">&#39;produce&#39;</span><span class="p">)</span>
+            <span class="n">flag1</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">print</span> <span class="s">&quot;Agt1 speaks. Agt2 listens&quot;</span>
+            
+        <span class="n">output</span> <span class="o">=</span> <span class="n">language_system_1</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">and</span>  <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">flag2</span><span class="p">:</span>
+            <span class="n">language_system_2</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Control&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s">&#39;listen&#39;</span><span class="p">)</span>
+            <span class="n">language_system_2</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> <span class="c"># Cheat!! Need to set up the system so that it&#39;s ready to receive the utterance...</span>
+            <span class="n">language_system_2</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">print</span> <span class="s">&#39;t: </span><span class="si">%i</span><span class="s">, Agt1 says: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">t</span><span class="p">,</span>  <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">])</span>  
+            <span class="n">language_system_2</span><span class="o">.</span><span class="n">set_input</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">language_system_2</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">schema_insts</span> <span class="ow">and</span> <span class="n">flag2</span><span class="p">:</span> <span class="c">#Switching from comprehension to production</span>
+            <span class="n">language_system_2</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_SemRep</span><span class="p">()</span>
+            <span class="n">language_system_2</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Control&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s">&#39;produce&#39;</span><span class="p">)</span>
+            <span class="n">language_system_1</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Control&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+            <span class="n">flag2</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">print</span> <span class="s">&quot;Agt2 speaks.&quot;</span>
+        
+        <span class="n">output</span> <span class="o">=</span> <span class="n">language_system_2</span><span class="o">.</span><span class="n">get_output</span><span class="p">()</span> 
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">and</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">]:</span>
+            <span class="k">print</span> <span class="s">&#39;t: </span><span class="si">%i</span><span class="s">, Agt2 says: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">output</span><span class="p">[</span><span class="s">&#39;Utter&#39;</span><span class="p">])</span>  
+            
+        <span class="n">language_system_1</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">language_system_2</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    
+    <span class="n">language_system_1</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">language_system_2</span><span class="o">.</span><span class="n">schemas</span><span class="p">[</span><span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">show_dynamics</span><span class="p">(</span><span class="n">inst_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">WM_act</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_levels</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c2_network</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+            
+</div>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">test</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

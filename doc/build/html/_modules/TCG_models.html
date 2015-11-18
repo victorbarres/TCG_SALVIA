@@ -1,0 +1,847 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>TCG_models &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for TCG_models</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Contains functions that can instantiate various TCG models and submodels.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">schema_theory</span> <span class="kn">as</span> <span class="nn">st</span>
+<span class="kn">import</span> <span class="nn">language_schemas</span> <span class="kn">as</span> <span class="nn">ls</span>
+<span class="kn">import</span> <span class="nn">perceptual_schemas</span> <span class="kn">as</span> <span class="nn">ps</span>
+<span class="kn">from</span> <span class="nn">loader</span> <span class="kn">import</span> <span class="n">TCG_LOADER</span>
+    
+
+<div class="viewcode-block" id="TCG_production_system"><a class="viewcode-back" href="../code.html#TCG_models.TCG_production_system">[docs]</a><span class="k">def</span> <span class="nf">TCG_production_system</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;language_system_P&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates and returns the TCG production schema system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Instantiating all the necessary procedural schemas</span>
+    <span class="n">semanticWM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">SEMANTIC_WM</span><span class="p">()</span>
+    <span class="n">conceptLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONCEPT_LTM</span><span class="p">()</span>
+    <span class="n">grammaticalWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_WM_P</span><span class="p">()</span>
+    <span class="n">grammaticalLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_LTM</span><span class="p">()</span>
+    <span class="n">cxn_retrieval_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CXN_RETRIEVAL_P</span><span class="p">()</span>
+    <span class="n">phonWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">PHON_WM_P</span><span class="p">()</span>
+    <span class="n">utter</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">UTTER</span><span class="p">()</span>
+    <span class="n">control</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONTROL</span><span class="p">()</span>
+    
+    <span class="c"># Defining schema to brain mappings.</span>
+    <span class="n">language_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">:[</span><span class="s">&#39;left_SFG&#39;</span><span class="p">,</span> <span class="s">&#39;LIP&#39;</span><span class="p">,</span> <span class="s">&#39;Hippocampus&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Concept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA45&#39;</span><span class="p">,</span> <span class="s">&#39;leftBA44&#39;</span><span class="p">],</span> 
+                        <span class="s">&#39;Grammatical_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;left_STG&#39;</span><span class="p">,</span> <span class="s">&#39;left_MTG&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Cxn_retrieval_P&#39;</span><span class="p">:[],</span> 
+                        <span class="s">&#39;Phonological_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA6&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Control&#39;</span><span class="p">:[</span><span class="s">&#39;DLPFC&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Utter&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
+                        <span class="p">}</span>
+   
+   <span class="c"># Initializing schema system</span>
+    <span class="n">language_system_P</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">SCHEMA_SYSTEM</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+    <span class="c"># Setting up schema to brain mappings</span>
+    <span class="n">language_brain_mapping</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">BRAIN_MAPPING</span><span class="p">()</span>
+    <span class="n">language_brain_mapping</span><span class="o">.</span><span class="n">schema_mapping</span> <span class="o">=</span> <span class="n">language_mapping</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">brain_mapping</span> <span class="o">=</span> <span class="n">language_brain_mapping</span>
+    
+    <span class="c"># Setting up language schema system.</span>
+    <span class="n">language_schemas</span> <span class="o">=</span> <span class="p">[</span><span class="n">conceptLTM</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="n">grammaticalLTM</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="n">control</span><span class="p">]</span>
+
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_schemas</span><span class="p">(</span><span class="n">language_schemas</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span><span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_LTM&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_cxn_retrieval_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_phonological_WM_P&#39;</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_utter&#39;</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">set_input_ports</span><span class="p">([</span><span class="n">semanticWM</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;from_conceptualizer&#39;</span><span class="p">)])</span>
+    <span class="n">language_system_P</span><span class="o">.</span><span class="n">set_output_ports</span><span class="p">([</span><span class="n">utter</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;to_output&#39;</span><span class="p">)])</span>
+    
+    <span class="c"># Parameters   </span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span> <span class="c"># Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span> <span class="c"># Need to analyze the impact of that factor.</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="c"># Manipulations can yield &quot;broca&#39;s aphasia&quot; (0.3)</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">4.0</span> <span class="c"># Needs to compensate for the dominance of cooperation link.</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="c"># When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;activation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;sem_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;form_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;continuity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">utter</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;speech_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    
+    <span class="n">control</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s">&#39;produce&#39;</span><span class="p">)</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;time_pressure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">500.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;start_produce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">500.0</span>
+    
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="mf">0.3</span>
+    
+    <span class="c"># Loading data</span>
+    <span class="n">grammar_name</span> <span class="o">=</span> <span class="s">&#39;TCG_grammar_VB&#39;</span>
+<span class="c">#    grammar_name = &#39;TCG_grammar_VB_naming&#39;</span>
+
+   
+    <span class="n">my_conceptual_knowledge</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_conceptual_knowledge</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">)</span>
+    <span class="n">grammar_file</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.json&quot;</span> <span class="o">%</span><span class="n">grammar_name</span>
+    <span class="n">my_grammar</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_grammar</span><span class="p">(</span><span class="n">grammar_file</span><span class="p">,</span> <span class="s">&quot;./data/grammars/&quot;</span><span class="p">,</span> <span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="c"># Initialize conceptual LTM content</span>
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+        
+    <span class="c"># Initialize grammatical LTM content</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_grammar</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">language_system_P</span>
+
+</div>
+<div class="viewcode-block" id="TCG_comprehension_system"><a class="viewcode-back" href="../code.html#TCG_models.TCG_comprehension_system">[docs]</a><span class="k">def</span> <span class="nf">TCG_comprehension_system</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;language_system_C&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates and returns the TCG comprehension schema system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Instantiating all the necessary procedural schemas</span>
+    <span class="n">grammaticalLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_LTM</span><span class="p">()</span>
+    <span class="n">cxn_retrieval_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CXN_RETRIEVAL_C</span><span class="p">()</span>
+    <span class="n">phonWM_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">PHON_WM_C</span><span class="p">()</span>
+    <span class="n">grammaticalWM_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_WM_C</span><span class="p">()</span>
+    <span class="n">semanticWM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">SEMANTIC_WM</span><span class="p">()</span>
+    <span class="n">conceptLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONCEPT_LTM</span><span class="p">()</span>
+    <span class="n">control</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONTROL</span><span class="p">()</span>
+    
+    <span class="c"># Defining schema to brain mappings.</span>
+    <span class="n">language_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Grammatical_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;left_STG&#39;</span><span class="p">,</span> <span class="s">&#39;left_MTG&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Cxn_retrieval_C&#39;</span><span class="p">:[],</span> 
+                    <span class="s">&#39;Phonological_WM_C&#39;</span><span class="p">:[</span><span class="s">&#39;Wernicke&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Grammatical_WM_C&#39;</span><span class="p">:[</span><span class="s">&#39;lBA44, lBA45&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Semantic_WM&#39;</span><span class="p">:[</span><span class="s">&#39;left_SFG&#39;</span><span class="p">,</span> <span class="s">&#39;LIP&#39;</span><span class="p">,</span> <span class="s">&#39;Hippocampus&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Concept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Control&#39;</span><span class="p">:[</span><span class="s">&#39;DLPFC&#39;</span><span class="p">]}</span>
+    
+    <span class="c"># Initializing schema system</span>
+    <span class="n">language_system_C</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">SCHEMA_SYSTEM</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+    <span class="c"># Setting up schema to brain mappings</span>
+    <span class="n">language_brain_mapping</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">BRAIN_MAPPING</span><span class="p">()</span>
+    <span class="n">language_brain_mapping</span><span class="o">.</span><span class="n">schema_mapping</span> <span class="o">=</span> <span class="n">language_mapping</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">brain_mapping</span> <span class="o">=</span> <span class="n">language_brain_mapping</span>
+    
+    <span class="c"># Setting up language schema system.</span>
+    <span class="n">language_schemas</span> <span class="o">=</span> <span class="p">[</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="n">phonWM_C</span><span class="p">,</span>  <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="n">conceptLTM</span><span class="p">,</span> <span class="n">control</span><span class="p">]</span>
+
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_schemas</span><span class="p">(</span><span class="n">language_schemas</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_C&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;from_grammatical_LTM&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_C</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_C&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_cxn_retrieval_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">conceptLTM</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_concept_LTM&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">set_input_ports</span><span class="p">([</span><span class="n">phonWM_C</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;from_input&#39;</span><span class="p">)])</span>
+    <span class="n">language_system_C</span><span class="o">.</span><span class="n">set_output_ports</span><span class="p">([</span><span class="n">semanticWM</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;to_visual_WM&#39;</span><span class="p">)])</span>
+    
+    
+    <span class="c"># Parameters</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.5</span>
+    
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">300.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;time_pressure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">500.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;start_produce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">500.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">set_mode</span><span class="p">(</span><span class="s">&#39;listen&#39;</span><span class="p">)</span>
+    
+    <span class="c"># Loading data</span>
+    <span class="n">grammar_name</span> <span class="o">=</span> <span class="s">&#39;TCG_grammar_VB&#39;</span>
+    
+    <span class="n">my_conceptual_knowledge</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_conceptual_knowledge</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">)</span>
+    <span class="n">grammar_file</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.json&quot;</span> <span class="o">%</span><span class="n">grammar_name</span>
+    <span class="n">my_grammar</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_grammar</span><span class="p">(</span><span class="n">grammar_file</span><span class="p">,</span> <span class="s">&quot;./data/grammars/&quot;</span><span class="p">,</span> <span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="c"># Initialize grammatical LTM content</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_grammar</span><span class="p">)</span>
+    
+    <span class="c"># Initialize conceptual LTM content</span>
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">language_system_C</span>
+</div>
+<div class="viewcode-block" id="TCG_language_system"><a class="viewcode-back" href="../code.html#TCG_models.TCG_language_system">[docs]</a><span class="k">def</span> <span class="nf">TCG_language_system</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;language_system&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates and returns the TCG language schema system, including both production and comprehension.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Instantiating all the necessary procedural schemas</span>
+    <span class="n">semanticWM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">SEMANTIC_WM</span><span class="p">()</span>
+    <span class="n">conceptLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONCEPT_LTM</span><span class="p">()</span>
+    <span class="n">grammaticalLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_LTM</span><span class="p">()</span>
+    <span class="n">grammaticalWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_WM_P</span><span class="p">()</span>
+    <span class="n">cxn_retrieval_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CXN_RETRIEVAL_P</span><span class="p">()</span>
+    <span class="n">grammaticalWM_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_WM_C</span><span class="p">()</span>
+    <span class="n">cxn_retrieval_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CXN_RETRIEVAL_C</span><span class="p">()</span>
+    <span class="n">phonWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">PHON_WM_P</span><span class="p">()</span>
+    <span class="n">utter</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">UTTER</span><span class="p">()</span>
+    <span class="n">phonWM_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">PHON_WM_C</span><span class="p">()</span>
+    <span class="n">control</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONTROL</span><span class="p">()</span>
+    
+    
+    <span class="c"># Defining schema to brain mappings.</span>
+    <span class="n">language_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Semantic_WM&#39;</span><span class="p">:[</span><span class="s">&#39;left_SFG&#39;</span><span class="p">,</span> <span class="s">&#39;LIP&#39;</span><span class="p">,</span> <span class="s">&#39;Hippocampus&#39;</span><span class="p">],</span> 
+                    <span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA45&#39;</span><span class="p">,</span> <span class="s">&#39;leftBA44&#39;</span><span class="p">],</span> 
+                    <span class="s">&#39;Grammatical_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;left_STG&#39;</span><span class="p">,</span> <span class="s">&#39;left_MTG&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Cxn_retrieval_P&#39;</span><span class="p">:[],</span> 
+                    <span class="s">&#39;Phonological_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA6&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Utter&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Cxn_retrieval_C&#39;</span><span class="p">:[],</span> 
+                    <span class="s">&#39;Phonological_WM_C&#39;</span><span class="p">:[</span><span class="s">&#39;Wernicke&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Grammatical_WM_C&#39;</span><span class="p">:[</span><span class="s">&#39;lBA44, lBA45&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Control&#39;</span><span class="p">:[</span><span class="s">&#39;DLPFC&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Concept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">]}</span>
+   
+    <span class="c"># Initializing schema system</span>
+    <span class="n">language_system</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">SCHEMA_SYSTEM</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+    <span class="c"># Setting up schema to brain mappings</span>
+    <span class="n">language_brain_mapping</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">BRAIN_MAPPING</span><span class="p">()</span>
+    <span class="n">language_brain_mapping</span><span class="o">.</span><span class="n">schema_mapping</span> <span class="o">=</span> <span class="n">language_mapping</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">brain_mapping</span> <span class="o">=</span> <span class="n">language_brain_mapping</span>
+    
+    <span class="c"># Setting up language schema system.</span>
+    <span class="n">language_schemas</span> <span class="o">=</span> <span class="p">[</span><span class="n">semanticWM</span><span class="p">,</span> <span class="n">conceptLTM</span><span class="p">,</span> <span class="n">grammaticalLTM</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="n">phonWM_C</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="n">control</span><span class="p">]</span>
+
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_schemas</span><span class="p">(</span><span class="n">language_schemas</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span><span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_LTM&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_cxn_retrieval_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_phonological_WM_P&#39;</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_utter&#39;</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_C&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;from_grammatical_LTM&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_C</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_C&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_cxn_retrieval_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">conceptLTM</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_concept_LTM&#39;</span><span class="p">)</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">set_input_ports</span><span class="p">([</span><span class="n">phonWM_C</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;from_input&#39;</span><span class="p">)])</span>
+    <span class="n">language_system</span><span class="o">.</span><span class="n">set_output_ports</span><span class="p">([</span><span class="n">utter</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;to_output&#39;</span><span class="p">)])</span>
+    
+    <span class="c"># Parameters</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">30.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;activation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;sem_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;form_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;continuity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.5</span>
+    
+    <span class="n">utter</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;speech_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;produce&#39;</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;time_pressure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;start_produce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
+    
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="c"># Loading data</span>
+    <span class="n">grammar_name</span> <span class="o">=</span> <span class="s">&#39;TCG_grammar_VB&#39;</span>
+   
+    <span class="n">my_conceptual_knowledge</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_conceptual_knowledge</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">)</span>
+    <span class="n">grammar_file</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.json&quot;</span> <span class="o">%</span><span class="n">grammar_name</span>
+    <span class="n">my_grammar</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_grammar</span><span class="p">(</span><span class="n">grammar_file</span><span class="p">,</span> <span class="s">&quot;./data/grammars/&quot;</span><span class="p">,</span> <span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="c"># Initialize conceptual LTM content</span>
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+        
+    <span class="c"># Initialize grammatical LTM content</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_grammar</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">language_system</span>
+    </div>
+<div class="viewcode-block" id="TCG_description_system"><a class="viewcode-back" href="../code.html#TCG_models.TCG_description_system">[docs]</a><span class="k">def</span> <span class="nf">TCG_description_system</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;description_system&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates and returns the TCG production schema system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Instantiating all the necessary procedural schemas</span>
+    <span class="n">subscene_rec</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SUBSCENE_RECOGNITION</span><span class="p">()</span>
+    <span class="n">perceptLTM</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PERCEPT_LTM</span><span class="p">()</span>
+    <span class="n">visualWM</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">VISUAL_WM</span><span class="p">()</span>
+    <span class="n">simpleSM</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SIMPLE_SALIENCY_MAP</span><span class="p">()</span>
+    
+    <span class="n">conceptualizer</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONCEPTUALIZER</span><span class="p">()</span>
+    <span class="n">conceptLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONCEPT_LTM</span><span class="p">()</span>
+    
+    <span class="n">semanticWM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">SEMANTIC_WM</span><span class="p">()</span>
+    <span class="n">grammaticalWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_WM_P</span><span class="p">()</span>
+    <span class="n">grammaticalLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_LTM</span><span class="p">()</span>
+    <span class="n">cxn_retrieval_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CXN_RETRIEVAL_P</span><span class="p">()</span>
+    <span class="n">phonWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">PHON_WM_P</span><span class="p">()</span>
+    <span class="n">control</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONTROL</span><span class="p">()</span>
+    <span class="n">utter</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">UTTER</span><span class="p">()</span>
+    
+    <span class="c"># Defining schema to brain mappings.</span>
+    <span class="n">brain_mappings</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Visual_WM&#39;</span><span class="p">:[</span><span class="s">&#39;ITG&#39;</span><span class="p">],</span> 
+                        <span class="s">&#39;Percept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Subscene_recognition&#39;</span><span class="p">:[</span><span class="s">&#39;Ventral stream&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Saliency_map&#39;</span><span class="p">:[</span><span class="s">&#39;Dorsal_stream&#39;</span><span class="p">,</span> <span class="s">&#39;IPS&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Conceptualizer&#39;</span><span class="p">:[</span><span class="s">&#39;aTP&#39;</span><span class="p">],</span> 
+                        <span class="s">&#39;Concept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Semantic_WM&#39;</span><span class="p">:[</span><span class="s">&#39;left_SFG&#39;</span><span class="p">,</span> <span class="s">&#39;LIP&#39;</span><span class="p">,</span> <span class="s">&#39;Hippocampus&#39;</span><span class="p">],</span> 
+                        <span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA45&#39;</span><span class="p">,</span> <span class="s">&#39;leftBA44&#39;</span><span class="p">],</span> 
+                        <span class="s">&#39;Grammatical_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;left_STG&#39;</span><span class="p">,</span> <span class="s">&#39;left_MTG&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Cxn_retrieval_P&#39;</span><span class="p">:[],</span> 
+                        <span class="s">&#39;Phonological_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA6&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Utter&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                        <span class="s">&#39;Control&#39;</span><span class="p">:[</span><span class="s">&#39;DLPFC&#39;</span><span class="p">],</span> 
+                        <span class="s">&#39;Concept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">]}</span>
+                        
+    <span class="n">schemas</span> <span class="o">=</span> <span class="p">[</span><span class="n">subscene_rec</span><span class="p">,</span> <span class="n">visualWM</span><span class="p">,</span> <span class="n">simpleSM</span><span class="p">,</span> <span class="n">perceptLTM</span><span class="p">,</span> <span class="n">conceptualizer</span><span class="p">,</span> <span class="n">conceptLTM</span><span class="p">,</span> <span class="n">grammaticalLTM</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="n">control</span><span class="p">]</span> 
+    <span class="c"># Creating schema system and adding procedural schemas</span>
+    <span class="n">description_system</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">SCHEMA_SYSTEM</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_schemas</span><span class="p">(</span><span class="n">schemas</span><span class="p">)</span>
+    
+    <span class="c"># Defining connections</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">perceptLTM</span><span class="p">,</span> <span class="s">&#39;to_subscene_rec&#39;</span><span class="p">,</span> <span class="n">subscene_rec</span><span class="p">,</span> <span class="s">&#39;from_percept_LTM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">subscene_rec</span><span class="p">,</span> <span class="s">&#39;to_visual_WM&#39;</span><span class="p">,</span> <span class="n">visualWM</span><span class="p">,</span> <span class="s">&#39;from_subscene_rec&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">simpleSM</span><span class="p">,</span> <span class="s">&#39;to_visual_WM&#39;</span><span class="p">,</span> <span class="n">visualWM</span><span class="p">,</span> <span class="s">&#39;from_saliency_map&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">visualWM</span><span class="p">,</span> <span class="s">&#39;to_saliency_map&#39;</span><span class="p">,</span> <span class="n">simpleSM</span><span class="p">,</span> <span class="s">&#39;from_visual_WM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">simpleSM</span><span class="p">,</span> <span class="s">&#39;to_subscene_rec&#39;</span><span class="p">,</span> <span class="n">subscene_rec</span><span class="p">,</span> <span class="s">&#39;from_saliency_map&#39;</span><span class="p">)</span>
+    
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">visualWM</span><span class="p">,</span> <span class="s">&#39;to_conceptualizer&#39;</span><span class="p">,</span> <span class="n">conceptualizer</span><span class="p">,</span> <span class="s">&#39;from_visual_WM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">conceptLTM</span><span class="p">,</span> <span class="s">&#39;to_conceptualizer&#39;</span><span class="p">,</span> <span class="n">conceptualizer</span><span class="p">,</span> <span class="s">&#39;from_concept_LTM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">conceptualizer</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_conceptualizer&#39;</span><span class="p">)</span>
+    
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span><span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_LTM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_cxn_retrieval_P&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_phonological_WM_P&#39;</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_utter&#39;</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    
+    
+    <span class="c"># Defining input and output ports </span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">set_input_ports</span><span class="p">([</span><span class="n">subscene_rec</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;from_input&#39;</span><span class="p">),</span> <span class="n">simpleSM</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;from_input&#39;</span><span class="p">)])</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">set_output_ports</span><span class="p">([</span><span class="n">utter</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;to_output&#39;</span><span class="p">),</span> <span class="n">subscene_rec</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;to_output&#39;</span><span class="p">)])</span>
+    
+    <span class="c"># Setting up schema to brain mappings</span>
+    <span class="n">description_brain_mapping</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">BRAIN_MAPPING</span><span class="p">()</span>
+    <span class="n">description_brain_mapping</span><span class="o">.</span><span class="n">schema_mapping</span> <span class="o">=</span> <span class="n">brain_mappings</span>
+    <span class="n">description_system</span><span class="o">.</span><span class="n">brain_mapping</span> <span class="o">=</span> <span class="n">description_brain_mapping</span>
+    
+    <span class="c"># Parameters</span>
+    <span class="n">subscene_rec</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;recognition_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+    
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">300.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">perceptLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="mf">1.0</span>
+    
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">300.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="mf">1.0</span>
+    
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;activation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;sem_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;form_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;continuity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span>
+    
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;produce&#39;</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;time_pressure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">500.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;start_produce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">500.0</span>
+    
+    <span class="c"># Loading data</span>
+    <span class="n">grammar_name</span> <span class="o">=</span> <span class="s">&#39;TCG_grammar_VB&#39;</span>
+    
+    <span class="n">my_perceptual_knowledge</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_perceptual_knowledge</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">)</span>
+    
+    <span class="n">my_conceptual_knowledge</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_conceptual_knowledge</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">)</span>
+    <span class="n">my_conceptualization</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_conceptualization</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">,</span> <span class="n">my_conceptual_knowledge</span><span class="p">,</span> <span class="n">my_perceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="n">grammar_file</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.json&quot;</span> <span class="o">%</span><span class="n">grammar_name</span>
+    <span class="n">my_grammar</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_grammar</span><span class="p">(</span><span class="n">grammar_file</span><span class="p">,</span> <span class="s">&quot;./data/grammars/&quot;</span><span class="p">,</span> <span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="c"># Initialize perceptual LTM content</span>
+    <span class="n">perceptLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_perceptual_knowledge</span><span class="p">)</span>
+        
+    <span class="c"># Initialize concept LTM content</span>
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="c"># Initialize conceptualizer</span>
+    <span class="n">conceptualizer</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_conceptualization</span><span class="p">)</span>
+    
+    <span class="c"># Initialize grammatical LTM content</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_grammar</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">description_system</span>
+</div>
+<div class="viewcode-block" id="TCG_full_system"><a class="viewcode-back" href="../code.html#TCG_models.TCG_full_system">[docs]</a><span class="k">def</span> <span class="nf">TCG_full_system</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;full_system&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates and returns the full TCG schema system, including both production, comprehension, and visual attention.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c"># Instantiating all the necessary procedural schemas</span>
+    <span class="n">subscene_rec</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">SUBSCENE_RECOGNITION</span><span class="p">()</span>
+    <span class="n">perceptLTM</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">PERCEPT_LTM</span><span class="p">()</span>
+    <span class="n">visualWM</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">VISUAL_WM</span><span class="p">()</span>
+    <span class="n">conceptualizer</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONCEPTUALIZER</span><span class="p">()</span>
+    <span class="n">semanticWM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">SEMANTIC_WM</span><span class="p">()</span>
+    <span class="n">conceptLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONCEPT_LTM</span><span class="p">()</span>
+    <span class="n">grammaticalLTM</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_LTM</span><span class="p">()</span>
+    <span class="n">grammaticalWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_WM_P</span><span class="p">()</span>
+    <span class="n">cxn_retrieval_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CXN_RETRIEVAL_P</span><span class="p">()</span>
+    <span class="n">grammaticalWM_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">GRAMMATICAL_WM_C</span><span class="p">()</span>
+    <span class="n">cxn_retrieval_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CXN_RETRIEVAL_C</span><span class="p">()</span>
+    <span class="n">phonWM_P</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">PHON_WM_P</span><span class="p">()</span>
+    <span class="n">utter</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">UTTER</span><span class="p">()</span>
+    <span class="n">phonWM_C</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">PHON_WM_C</span><span class="p">()</span>
+    <span class="n">control</span> <span class="o">=</span> <span class="n">ls</span><span class="o">.</span><span class="n">CONTROL</span><span class="p">()</span>
+    
+    
+    <span class="c"># Defining schema to brain mappings.</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Visual_WM&#39;</span><span class="p">:[</span><span class="s">&#39;ITG&#39;</span><span class="p">],</span> 
+                    <span class="s">&#39;Percept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Subscene_recognition&#39;</span><span class="p">:[</span><span class="s">&#39;Ventral stream&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Conceptualizer&#39;</span><span class="p">:[</span><span class="s">&#39;aTP&#39;</span><span class="p">],</span> 
+                    <span class="s">&#39;Semantic_WM&#39;</span><span class="p">:[</span><span class="s">&#39;left_SFG&#39;</span><span class="p">,</span> <span class="s">&#39;LIP&#39;</span><span class="p">,</span> <span class="s">&#39;Hippocampus&#39;</span><span class="p">],</span> 
+                    <span class="s">&#39;Grammatical_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA45&#39;</span><span class="p">,</span> <span class="s">&#39;leftBA44&#39;</span><span class="p">],</span> 
+                    <span class="s">&#39;Grammatical_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;left_STG&#39;</span><span class="p">,</span> <span class="s">&#39;left_MTG&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Cxn_retrieval_P&#39;</span><span class="p">:[],</span> 
+                    <span class="s">&#39;Phonological_WM_P&#39;</span><span class="p">:[</span><span class="s">&#39;left_BA6&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Utter&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Cxn_retrieval_C&#39;</span><span class="p">:[],</span> 
+                    <span class="s">&#39;Phonological_WM_C&#39;</span><span class="p">:[</span><span class="s">&#39;Wernicke&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Grammatical_WM_C&#39;</span><span class="p">:[</span><span class="s">&#39;lBA44, lBA45&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Control&#39;</span><span class="p">:[</span><span class="s">&#39;DLPFC&#39;</span><span class="p">],</span>
+                    <span class="s">&#39;Concept_LTM&#39;</span><span class="p">:[</span><span class="s">&#39;&#39;</span><span class="p">]}</span>
+   
+   <span class="c"># Initializing schema system</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">SCHEMA_SYSTEM</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    
+    <span class="c"># Setting up schema to brain mappings</span>
+    <span class="n">brain_mapping</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">BRAIN_MAPPING</span><span class="p">()</span>
+    <span class="n">brain_mapping</span><span class="o">.</span><span class="n">schema_mapping</span> <span class="o">=</span> <span class="n">mapping</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">brain_mapping</span> <span class="o">=</span> <span class="n">brain_mapping</span>
+    
+    <span class="c"># Setting up language schema system.</span>
+    <span class="n">schemas</span> <span class="o">=</span> <span class="p">[</span><span class="n">subscene_rec</span><span class="p">,</span> <span class="n">perceptLTM</span><span class="p">,</span> <span class="n">conceptualizer</span><span class="p">,</span> <span class="n">visualWM</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="n">conceptLTM</span><span class="p">,</span> <span class="n">grammaticalLTM</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="n">phonWM_C</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="n">control</span><span class="p">]</span>
+
+    <span class="n">system</span><span class="o">.</span><span class="n">add_schemas</span><span class="p">(</span><span class="n">schemas</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">perceptLTM</span><span class="p">,</span> <span class="s">&#39;to_subscene_rec&#39;</span><span class="p">,</span> <span class="n">subscene_rec</span><span class="p">,</span> <span class="s">&#39;from_percept_LTM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">subscene_rec</span><span class="p">,</span> <span class="s">&#39;to_visual_WM&#39;</span><span class="p">,</span> <span class="n">visualWM</span><span class="p">,</span> <span class="s">&#39;from_subscene_rec&#39;</span><span class="p">)</span>
+
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">visualWM</span><span class="p">,</span> <span class="s">&#39;to_conceptualizer&#39;</span><span class="p">,</span> <span class="n">conceptualizer</span><span class="p">,</span> <span class="s">&#39;from_visual_WM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">conceptualizer</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_conceptualizer&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span><span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_P&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_LTM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">cxn_retrieval_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_cxn_retrieval_P&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;to_phonological_WM_P&#39;</span><span class="p">,</span> <span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_semantic_WM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_control&#39;</span><span class="p">,</span> <span class="n">control</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_P</span><span class="p">,</span> <span class="s">&#39;to_utter&#39;</span><span class="p">,</span> <span class="n">utter</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_P&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_P&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_P</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalLTM</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_C&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;from_grammatical_LTM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">phonWM_C</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_phonological_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;to_cxn_retrieval_C&#39;</span><span class="p">,</span> <span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">cxn_retrieval_C</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_cxn_retrieval_C&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="s">&#39;to_grammatical_WM_C&#39;</span><span class="p">,</span> <span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;from_control&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">grammaticalWM_C</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_grammatical_WM_C&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">add_connection</span><span class="p">(</span><span class="n">conceptLTM</span><span class="p">,</span> <span class="s">&#39;to_semantic_WM&#39;</span><span class="p">,</span> <span class="n">semanticWM</span><span class="p">,</span> <span class="s">&#39;from_concept_LTM&#39;</span><span class="p">)</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">set_input_ports</span><span class="p">([</span><span class="n">phonWM_C</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;from_input&#39;</span><span class="p">),</span> <span class="n">subscene_rec</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;from_input&#39;</span><span class="p">)])</span>
+    <span class="n">system</span><span class="o">.</span><span class="n">set_output_ports</span><span class="p">([</span><span class="n">utter</span><span class="o">.</span><span class="n">find_port</span><span class="p">(</span><span class="s">&#39;to_output&#39;</span><span class="p">)])</span>
+    
+    <span class="c"># Parameters</span>
+    <span class="n">subscene_rec</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;recognition_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+    
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">300.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">visualWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">semanticWM</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">30.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;activation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;sem_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;form_length&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">style_params</span><span class="p">[</span><span class="s">&#39;continuity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">phonWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">init_act</span> <span class="o">=</span> <span class="n">grammaticalWM_P</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.5</span>
+    
+    <span class="n">utter</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s">&#39;speech_rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;produce&#39;</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;time_pressure&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
+    <span class="n">control</span><span class="o">.</span><span class="n">task_params</span><span class="p">[</span><span class="s">&#39;start_produce&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">200.0</span>
+    
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">phonWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;act_inf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;L&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;k&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;x0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">dyn_params</span><span class="p">[</span><span class="s">&#39;noise_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;confidence_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;prune_threshold&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;coop_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;comp_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;sub_threshold_r&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">grammaticalWM_C</span><span class="o">.</span><span class="n">C2_params</span><span class="p">[</span><span class="s">&#39;deact_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    
+    <span class="c"># Loading data</span>
+    <span class="n">grammar_name</span> <span class="o">=</span> <span class="s">&#39;TCG_grammar_VB&#39;</span>
+   
+    <span class="n">my_conceptual_knowledge</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_conceptual_knowledge</span><span class="p">(</span><span class="s">&quot;TCG_semantics.json&quot;</span><span class="p">,</span> <span class="s">&quot;./data/semantics/&quot;</span><span class="p">)</span>
+    <span class="n">grammar_file</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.json&quot;</span> <span class="o">%</span><span class="n">grammar_name</span>
+    <span class="n">my_grammar</span> <span class="o">=</span> <span class="n">TCG_LOADER</span><span class="o">.</span><span class="n">load_grammar</span><span class="p">(</span><span class="n">grammar_file</span><span class="p">,</span> <span class="s">&quot;./data/grammars/&quot;</span><span class="p">,</span> <span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+    
+    <span class="c"># Initialize conceptual LTM content</span>
+    <span class="n">conceptLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_conceptual_knowledge</span><span class="p">)</span>
+        
+    <span class="c"># Initialize grammatical LTM content</span>
+    <span class="n">grammaticalLTM</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">my_grammar</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">system</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">production_system</span> <span class="o">=</span> <span class="n">TCG_production_system</span><span class="p">()</span>
+    <span class="n">st</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">production_system</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

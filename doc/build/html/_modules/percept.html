@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>percept &mdash; TCG 1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TCG 1.1 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for percept</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">@author: Victor Barres</span>
+
+<span class="sd">Define perceptual knowledge related classes for TCG.</span>
+
+<span class="sd">Uses NetworkX module to represent the semantic net.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">knowledge_rep</span> <span class="kn">import</span> <span class="n">K_ENT</span><span class="p">,</span> <span class="n">K_REL</span><span class="p">,</span> <span class="n">K_NET</span>
+
+<div class="viewcode-block" id="PERCEPT"><a class="viewcode-back" href="../code.html#percept.PERCEPT">[docs]</a><span class="k">class</span> <span class="nc">PERCEPT</span><span class="p">(</span><span class="n">K_ENT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perceptual knowledge entity</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - id (INT): Unique identifier of the entity.</span>
+<span class="sd">        - meaning (): Meaning associated with the percept</span>
+<span class="sd">        - perceptual_knowledge (PERCEPTUAL_KNOWLEDGE): The perceptual knowledge instance the precept is part of.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">perceptual_knowledge</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">K_ENT</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="n">meaning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perceptual_knowledge</span> <span class="o">=</span> <span class="n">perceptual_knowledge</span>
+        </div>
+<div class="viewcode-block" id="PERCEPT_CAT"><a class="viewcode-back" href="../code.html#percept.PERCEPT_CAT">[docs]</a><span class="k">class</span> <span class="nc">PERCEPT_CAT</span><span class="p">(</span><span class="n">PERCEPT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perceptual knowledge category</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - id (INT): Unique identifier of the entity.</span>
+<span class="sd">        - meaning (): Meaning associated with the category</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SEMANTIC_NETWORK</span> <span class="o">=</span> <span class="bp">None</span>  
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">PERCEPT</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="n">meaning</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PERCEPT_TOKEN"><a class="viewcode-back" href="../code.html#percept.PERCEPT_TOKEN">[docs]</a><span class="k">class</span> <span class="nc">PERCEPT_TOKEN</span><span class="p">(</span><span class="n">PERCEPT</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perceptual knowledge TOKEN PERCEPT</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - id (INT): Unique identifier of the entity.</span>
+<span class="sd">        - meaning (): Meaning associated with the category</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SEMANTIC_NETWORK</span> <span class="o">=</span> <span class="bp">None</span>  
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>  <span class="n">meaning</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">PERCEPT</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">meaning</span><span class="o">=</span><span class="n">meaning</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="PERCEPT_TOKEN.category"><a class="viewcode-back" href="../code.html#percept.PERCEPT_TOKEN.category">[docs]</a>    <span class="k">def</span> <span class="nf">category</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the perceptual cateory of the token</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        </div></div>
+<div class="viewcode-block" id="SEM_REL"><a class="viewcode-back" href="../code.html#percept.SEM_REL">[docs]</a><span class="k">class</span> <span class="nc">SEM_REL</span><span class="p">(</span><span class="n">K_REL</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Semantic relation between pecepts.</span>
+<span class="sd">    Type implemented:</span>
+<span class="sd">        - &#39;is_a&#39;</span>
+<span class="sd">        - &#39;is_token&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - type (STR): Type of relation.</span>
+<span class="sd">        - pFrom (PERCEPT):  Source percept.</span>
+<span class="sd">        - pTo (PERCEPT): Target precept.</span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aType</span> <span class="o">=</span> <span class="s">&#39;UNDEFINED&#39;</span><span class="p">,</span> <span class="n">from_per</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">to_per</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">K_REL</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">aType</span> <span class="o">=</span> <span class="n">aType</span><span class="p">,</span> <span class="n">from_ent</span><span class="o">=</span><span class="n">from_per</span><span class="p">,</span> <span class="n">to_ent</span> <span class="o">=</span> <span class="n">to_per</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="PERCEPTUAL_KNOWLEDGE"><a class="viewcode-back" href="../code.html#percept.PERCEPTUAL_KNOWLEDGE">[docs]</a><span class="k">class</span> <span class="nc">PERCEPTUAL_KNOWLEDGE</span><span class="p">(</span><span class="n">K_NET</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Semantic network.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - nodes ([PERCEPT]): List of percepts.</span>
+<span class="sd">        - edges ([SEM_REL]): List of semantic relations.</span>
+<span class="sd">        - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.</span>
+<span class="sd">            Each node has an additional attributes meaning = percept.meaning</span>
+<span class="sd">            Each edge has an additional attribute type = sem_rel.type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="p">[],</span> <span class="n">edges</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="n">K_NET</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">[:],</span> <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">[:])</span>
+    
+<div class="viewcode-block" id="PERCEPTUAL_KNOWLEDGE.add_ent"><a class="viewcode-back" href="../code.html#percept.PERCEPTUAL_KNOWLEDGE.add_ent">[docs]</a>    <span class="k">def</span> <span class="nf">add_ent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percept</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a percept to the the perceptual knowlege while also linking the perceptual knowledge back to the perceptt.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">flag</span>  <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PERCEPTUAL_KNOWLEDGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_ent</span><span class="p">(</span><span class="n">percept</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="n">percept</span><span class="o">.</span><span class="n">conceptual_knowledge</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">flag</span>
+    </div>
+<div class="viewcode-block" id="PERCEPTUAL_KNOWLEDGE.percepts"><a class="viewcode-back" href="../code.html#percept.PERCEPTUAL_KNOWLEDGE.percepts">[docs]</a>    <span class="k">def</span> <span class="nf">percepts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&#39;ALL&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of all percepts (type=&#39;ALL&#39;), of all perceptual_category (type=&#39;CAT&#39;), of all tokens (&#39;type&#39;=&#39;TOKEN&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="o">==</span><span class="s">&#39;ALL&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="o">==</span><span class="s">&#39;CAT&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">per</span> <span class="k">for</span> <span class="n">per</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">per</span><span class="p">,</span> <span class="n">PERCEPT_CAT</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="o">==</span><span class="s">&#39;TOKEN&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">per</span> <span class="k">for</span> <span class="n">per</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">per</span><span class="p">,</span> <span class="n">PERCEPT_TOKEN</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;invalid type&#39;</span>
+            <span class="k">return</span> <span class="bp">None</span>
+    </div>
+<div class="viewcode-block" id="PERCEPTUAL_KNOWLEDGE.has_percept"><a class="viewcode-back" href="../code.html#percept.PERCEPTUAL_KNOWLEDGE.has_percept">[docs]</a>    <span class="k">def</span> <span class="nf">has_percept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percept_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true iff there is a percept with name &quot;name&quot;.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - percept_name (STR):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_entity</span><span class="p">(</span><span class="n">percept_name</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="PERCEPTUAL_KNOWLEDGE.find_meaning"><a class="viewcode-back" href="../code.html#percept.PERCEPTUAL_KNOWLEDGE.find_meaning">[docs]</a>    <span class="k">def</span> <span class="nf">find_meaning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meaning</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find percept with meaning &quot;meaning&quot;. Returns the percept if found, else returns None.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - meaning (): Meaning of a percept</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PERCEPTUAL_KNOWLEDGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">find_meaning</span><span class="p">(</span><span class="n">meaning</span><span class="p">)</span>
+<span class="c">#        return self._find_meaning(meaning)</span>
+    </div>
+<div class="viewcode-block" id="PERCEPTUAL_KNOWLEDGE.match"><a class="viewcode-back" href="../code.html#percept.PERCEPTUAL_KNOWLEDGE.match">[docs]</a>    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">per1</span><span class="p">,</span> <span class="n">per2</span><span class="p">,</span> <span class="n">match_type</span> <span class="o">=</span> <span class="s">&quot;is_a&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;        </span>
+<span class="sd">        Check if per1 matches per2. </span>
+<span class="sd">        Type = &quot;is_a&quot;:  per1 matches per2 if cpt2 is a hyponym of per2 (or equal to per2)</span>
+<span class="sd">        Type = &quot;equal&quot;: per1 matches per2 iff per1 is equal to per2.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            - per1 (PERCEPT)</span>
+<span class="sd">            - per2 (PERCEPT)</span>
+<span class="sd">            - match_type (STR): &quot;is_a&quot; or &quot;equal&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        Notes:</span>
+<span class="sd">            - In the currrent version matching is boolean. No impact of distance on similarity.</span>
+<span class="sd">            See similarity()</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PERCEPTUAL_KNOWLEDGE</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">per1</span><span class="p">,</span> <span class="n">per2</span><span class="p">,</span> <span class="n">match_type</span> <span class="o">=</span> <span class="n">match_type</span><span class="p">)</span> 
+<span class="c">#        return self._match(per1, per2, match_type=match_type)`</span>
+</div></div>
+<div class="viewcode-block" id="CONCEPTUALIZATION"><a class="viewcode-back" href="../code.html#percept.CONCEPTUALIZATION">[docs]</a><span class="k">class</span> <span class="nc">CONCEPTUALIZATION</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Knowledge of conceptualization relations mapping percepts onto concepts.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - per2cpt (DICT): Mapping from percept to concept.</span>
+<span class="sd">    </span>
+<span class="sd">    Note:</span>
+<span class="sd">        - For now a percept is only associated with a single conept.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">per2cpt</span> <span class="o">=</span> <span class="p">{}</span>
+    
+<div class="viewcode-block" id="CONCEPTUALIZATION.add_mapping"><a class="viewcode-back" href="../code.html#percept.CONCEPTUALIZATION.add_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">add_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">per</span><span class="p">,</span> <span class="n">cpt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a mapping from per (STR) name of a percept (PERCEPT) to cpt (str) name of concept (CONCEPT)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">per</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">per2cpt</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">per2cpt</span><span class="p">[</span><span class="n">per</span><span class="p">]</span> <span class="o">=</span> <span class="n">cpt</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Percept </span><span class="si">%s</span><span class="s"> already associated with concept </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">per</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">per2cpt</span><span class="p">[</span><span class="n">per</span><span class="p">])</span>
+        
+    </div>
+<div class="viewcode-block" id="CONCEPTUALIZATION.conceptualize"><a class="viewcode-back" href="../code.html#percept.CONCEPTUALIZATION.conceptualize">[docs]</a>    <span class="k">def</span> <span class="nf">conceptualize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">per</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For now simply returns the concept associated with per.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">per2cpt</span><span class="p">[</span><span class="n">per</span><span class="p">]</span>
+    
+<span class="c">###############################################################################</span></div></div>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;NOTHING IMPLEMENTED&quot;</span>
+
+    
+    
+    
+    
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">TCG 1.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Victor Barres.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3b3.
+    </div>
+  </body>
+</html>

@@ -49,162 +49,195 @@
   <h1>Source code for scene</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on Mon May 05 12:07:09 2014</span>
-
 <span class="sd">@author: Victor Barres</span>
 
-<span class="sd">Define visual scene structure related classes for TCG1.0</span>
+<span class="sd">Defines visual scene structure related classes for TCG.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c">###############################################################################</span>
-<span class="c">### Perceptual schemas ###</span>
-
-<div class="viewcode-block" id="SCHEMA"><a class="viewcode-back" href="../code.html#scene.SCHEMA">[docs]</a><span class="k">class</span> <span class="nc">SCHEMA</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Perceptual schema</span>
-<span class="sd">    </span>
-<span class="sd">    Data:</span>
-<span class="sd">        - type (INT): Schema type (UNDEFINED, OBJECT or RELATION).</span>
-<span class="sd">        - name (STRING): Schema name.</span>
-<span class="sd">        - concept (CONCEPT): Concept associated with the schema.</span>
-<span class="sd">        - region (REGION): Region of the visual scene associated with the schema.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># Schema types</span>
-    <span class="n">UNDEFINED</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">OBJECT</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">RELATION</span> <span class="o">=</span> <span class="mi">2</span>
-    
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="o">.</span><span class="n">UNDEFINED</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">concept</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="bp">None</span>
-</div>
-<div class="viewcode-block" id="SC_OBJECT"><a class="viewcode-back" href="../code.html#scene.SC_OBJECT">[docs]</a><span class="k">class</span> <span class="nc">SC_OBJECT</span><span class="p">(</span><span class="n">SCHEMA</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Object schema</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SCHEMA</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="o">.</span><span class="n">OBJECT</span>
-    
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;type: perceptual object</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;concept: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;region: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">return</span> <span class="n">p</span>
-</div>
-<div class="viewcode-block" id="SC_REL"><a class="viewcode-back" href="../code.html#scene.SC_REL">[docs]</a><span class="k">class</span> <span class="nc">SC_REL</span><span class="p">(</span><span class="n">SCHEMA</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Relation schema. Define relation (edge) between two object schemas (SC_OBJECT) pFrom and pTo.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">SCHEMA</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">SCHEMA</span><span class="o">.</span><span class="n">RELATION</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pFrom</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pTo</span> <span class="o">=</span> <span class="bp">None</span>
-    
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;type: perceptual relation</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;concept: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;from: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pFrom</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;to: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">pTo</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;region: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">return</span> <span class="n">p</span>
-<span class="c">###############################################################################</span>
-<span class="c">### Perceptual process ###</span>
-</div>
-<div class="viewcode-block" id="PERCEPT"><a class="viewcode-back" href="../code.html#scene.PERCEPT">[docs]</a><span class="k">class</span> <span class="nc">PERCEPT</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Schema perception.</span>
-<span class="sd">    </span>
-<span class="sd">    Data:</span>
-<span class="sd">        - schema (SCHEMA): Perceived schema.</span>
-<span class="sd">        - concept (CONCEPT): Perceived concept (can be different from original concept carried by schema).</span>
-<span class="sd">        - replace_concept (BOOL): Flag for replacing concept.</span>
-<span class="sd">    </span>
-<span class="sd">    Notes:</span>
-<span class="sd">        - If replace_concept = False -&gt; the concept associated with the percept is the one linked to the schema</span>
-<span class="sd">        if replace_concept = True -&gt; override schema concept and use the one associated directly with the percept.</span>
-<span class="sd">        - This class is a first attempt to represent conceptualization process going from perceptual schemas</span>
-<span class="sd">        to semantic reprsentation. Needs to be improved.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">concept</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">replace_concept</span> <span class="o">=</span> <span class="bp">False</span>
-        
-    
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;schema: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;concept: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;concept: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;replace: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">replace_concept</span>
-        <span class="k">return</span> <span class="n">p</span>
-        
-        </div>
-<div class="viewcode-block" id="REGION"><a class="viewcode-back" href="../code.html#scene.REGION">[docs]</a><span class="k">class</span> <span class="nc">REGION</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Scene region.</span>
-<span class="sd">    </span>
-<span class="sd">    Data:</span>
-<span class="sd">        - name (STRING): Name of region</span>
-<span class="sd">        - x, y (INT): Location</span>
-<span class="sd">        - w, h (INT): Size</span>
-<span class="sd">        - saliency (INT): Perceptual saliency of region</span>
-<span class="sd">        - uncertainty (INT): How uncertain is the perception of this region.</span>
-<span class="sd">        - percepts ([PERCEPT]): List of percepts associated with this region.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> 
-        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">saliency</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="mi">0</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">percepts</span> <span class="o">=</span> <span class="p">[]</span>
-    
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;type: visual scene region</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;location: (</span><span class="si">%i</span><span class="s">, </span><span class="si">%i</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;size: (</span><span class="si">%i</span><span class="s">, </span><span class="si">%i</span><span class="s">)</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;saliency: </span><span class="si">%i</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">saliency</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;uncertainty: </span><span class="si">%i</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;percepts:</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="k">for</span> <span class="n">per</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">percepts</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">+=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">per</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()])</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="k">return</span> <span class="n">p</span>
-<span class="c">###############################################################################</span>
+<span class="kn">import</span> <span class="nn">perceptual_schemas</span> <span class="kn">as</span> <span class="nn">ps</span>  
+<span class="c">###########################</span>
+<span class="c">#### Perceptual process ###</span>
+<span class="c">###########################</span>
+<span class="c">#class PERCEPT:</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    Schema perception. ## -&gt; THIS NEEDS TO BE REPLACED!!! It should use the conceptualizer.</span>
+<span class="c">#    </span>
+<span class="c">#    Data:</span>
+<span class="c">#        - schema (SCHEMA): Perceived schema.</span>
+<span class="c">#        - concept (CONCEPT): Perceived concept (can be different from original concept carried by schema).</span>
+<span class="c">#        - replace_concept (BOOL): Flag for replacing concept.</span>
+<span class="c">#    </span>
+<span class="c">#    Notes:</span>
+<span class="c">#        - If replace_concept = False -&gt; the concept associated with the percept is the one linked to the schema</span>
+<span class="c">#        if replace_concept = True -&gt; override schema concept and use the one associated directly with the percept.</span>
+<span class="c">#        - This class is a first attempt to represent conceptualization process going from perceptual schemas</span>
+<span class="c">#        to semantic reprsentation. Needs to be improved.</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    def __init__(self):</span>
+<span class="c">#        self.schema = None</span>
+<span class="c">#        self.concept = None</span>
+<span class="c">#        self.replace_concept = False </span>
+<span class="c">#        </span>
+<span class="c">#    </span>
+<span class="c">#    def __str__(self):</span>
+<span class="c">#        p = &#39;&#39;</span>
+<span class="c">#        p += &#39;schema: %s\n&#39; % self.schema.name</span>
+<span class="c">#        if self.concept:</span>
+<span class="c">#            p += &#39;concept: %s\n&#39; % self.concept.name</span>
+<span class="c">#        else:</span>
+<span class="c">#            p += &#39;concept: %s\n&#39; % self.concept</span>
+<span class="c">#        p += &#39;replace: %s\n&#39; % self.replace_concept</span>
+<span class="c">#        return p</span>
+<span class="c">#        </span>
+<span class="c">#        </span>
+<span class="c">#class REGION:</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    Scene region.</span>
+<span class="c">#    </span>
+<span class="c">#    Data:</span>
+<span class="c">#        - name (STRING): Name of region</span>
+<span class="c">#        - x, y (INT): Location</span>
+<span class="c">#        - w, h (INT): Size</span>
+<span class="c">#        - saliency (INT): Perceptual saliency of region</span>
+<span class="c">#        - uncertainty (INT): How uncertain is the perception of this region.</span>
+<span class="c">#        - percepts ([PERCEPT]): List of percepts associated with this region.</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    def __init__(self):</span>
+<span class="c">#        self.name = &#39;&#39;</span>
+<span class="c">#        </span>
+<span class="c">#        self.x = -1 </span>
+<span class="c">#        self.y = -1</span>
+<span class="c">#        self.w = 0</span>
+<span class="c">#        self.h = 0</span>
+<span class="c">#        </span>
+<span class="c">#        self.saliency = 0</span>
+<span class="c">#        self.uncertainty = 0</span>
+<span class="c">#        </span>
+<span class="c">#        self.percepts = []</span>
+<span class="c">####################</span>
 <span class="c">### Visual scene ###</span>
-</div>
-<div class="viewcode-block" id="SCENE"><a class="viewcode-back" href="../code.html#scene.SCENE">[docs]</a><span class="k">class</span> <span class="nc">SCENE</span><span class="p">:</span>
+<span class="c">####################    </span>
+<div class="viewcode-block" id="SUB_SCENE"><a class="viewcode-back" href="../code.html#scene.SUB_SCENE">[docs]</a><span class="k">class</span> <span class="nc">SUB_SCENE</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A subscene represents a structured perceptual units.</span>
+<span class="sd">    It is defined as a graph of perceptual schemas.</span>
+<span class="sd">    </span>
+<span class="sd">    Data:</span>
+<span class="sd">        - name (str): sub-scene name</span>
+<span class="sd">        - nodes ([PERCEPT_SCHEMA_INST]): the nodes of the graph. Has to be an instance of a perceptual schema that is not a relation.</span>
+<span class="sd">        - edges ([PERCEPT_SCHEMA_INST]): the edges of the graph. Has to be an instance of a perceptual schema that is  a relation.</span>
+<span class="sd">        - area (AREA): The area associated with the sub-scenes -&gt; Defined as the hull of the areas associated with all the subscenes perceptual schema instances.</span>
+<span class="sd">        - anchor (PERCEPT_SCHEMA_INST): The perceptual anchor of the subscene. Should not be a relation.</span>
+<span class="sd">        - uncertainty (INT): How uncertain is the perception of this region.</span>
+<span class="sd">        - saliency (FLOAT):  Perceptual saliency of subscene</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NEXT_ID</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">SUB_SCENE</span><span class="o">.</span><span class="n">NEXT_ID</span>
+        <span class="n">SUB_SCENE</span><span class="o">.</span><span class="n">NEXT_ID</span> <span class="o">+=</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anchor</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saliency</span> <span class="o">=</span> <span class="mi">0</span>
+    
+<div class="viewcode-block" id="SUB_SCENE.add_per_schema"><a class="viewcode-back" href="../code.html#scene.SUB_SCENE.add_per_schema">[docs]</a>    <span class="k">def</span> <span class="nf">add_per_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_inst</span><span class="p">,</span> <span class="n">update_uncertainty</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a percetual schema to the sub_scenes.</span>
+<span class="sd">        If the perceptual schema instantiates a relation schemas, it is added to edges. Else it is added to nodes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Check duplication</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_schema</span><span class="p">(</span><span class="n">schema_inst</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">schema_inst</span><span class="o">.</span><span class="n">trace</span><span class="p">,</span> <span class="n">ps</span><span class="o">.</span><span class="n">PERCEPT_SCHEMA_REL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema_inst</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_area</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">update_uncertainty</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_uncertainty</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema_inst</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_area</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">update_uncertainty</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_uncertainty</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        
+        <span class="k">return</span> <span class="bp">False</span>
+    </div>
+<div class="viewcode-block" id="SUB_SCENE.set_anchor"><a class="viewcode-back" href="../code.html#scene.SUB_SCENE.set_anchor">[docs]</a>    <span class="k">def</span> <span class="nf">set_anchor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_inst</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the anchor schema instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anchor</span> <span class="o">=</span> <span class="n">schema_inst</span>
+    </div>
+<div class="viewcode-block" id="SUB_SCENE.find_schema"><a class="viewcode-back" href="../code.html#scene.SUB_SCENE.find_schema">[docs]</a>    <span class="k">def</span> <span class="nf">find_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find schema instance with name &quot;name&#39;. If found, return instance, else, return None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">schema_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">schema_inst</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">schema_inst</span>
+        <span class="k">return</span> <span class="bp">None</span>
+            </div>
+<div class="viewcode-block" id="SUB_SCENE.update_area"><a class="viewcode-back" href="../code.html#scene.SUB_SCENE.update_area">[docs]</a>    <span class="k">def</span> <span class="nf">update_area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recalculates the area associated with the subscene based on associated schema instances.</span>
+<span class="sd">        Note:</span>
+<span class="sd">            - For now doesn&#39;t account for edges since the area is not well defined for edges.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">schema_insts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema_insts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="n">schema_insts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s">&#39;area&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">schema_inst</span> <span class="ow">in</span> <span class="n">schema_insts</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">AREA</span><span class="o">.</span><span class="n">hull</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="p">,</span> <span class="n">schema_inst</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s">&#39;area&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="SUB_SCENE.update_uncertainty"><a class="viewcode-back" href="../code.html#scene.SUB_SCENE.update_uncertainty">[docs]</a>    <span class="k">def</span> <span class="nf">update_uncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recalculates the uncertainty associated with the subscene based on associated schema instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">schema_insts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema_insts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">schema_inst</span> <span class="ow">in</span> <span class="n">schema_insts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">+=</span> <span class="n">schema_inst</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="s">&#39;uncertainty&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    
+    <span class="c">####################</span>
+    <span class="c">### JSON METHODS ###</span>
+    <span class="c">####################</span></div>
+<div class="viewcode-block" id="SUB_SCENE.get_info"><a class="viewcode-back" href="../code.html#scene.SUB_SCENE.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;id&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s">&#39;uncertainty&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span><span class="p">,</span> <span class="s">&#39;saliency&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">saliency</span><span class="p">}</span>
+        <span class="n">data</span><span class="p">[</span><span class="s">&#39;area&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="o">.</span><span class="n">get_info</span><span class="p">()</span>
+        <span class="n">data</span><span class="p">[</span><span class="s">&#39;nodes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="s">&#39;edges&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">data</span>
+        
+</div></div>
+<div class="viewcode-block" id="SCENE"><a class="viewcode-back" href="../code.html#scene.SCENE">[docs]</a><span class="k">class</span> <span class="nc">SCENE</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Scene being perceived.</span>
+<span class="sd">    Defines the visual input to the model.</span>
 <span class="sd">    </span>
 <span class="sd">    Data:</span>
 <span class="sd">        - width, height (INT): Scene resolution</span>
-<span class="sd">        - schemas ([SCHEMA]): List of perceptual schemas associated with the scene.</span>
-<span class="sd">        - regions ([REGION]): List of regions associated with the scene.</span>
+<span class="sd">        - subscenes ([SUB_SCENE]): List of all subscenes associated with the scene.</span>
+<span class="sd">        - schemas ([SCHEMA_INST]): List of perceptual schemas instances associated with the scene.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subscenes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
-    
     
 <div class="viewcode-block" id="SCENE.clear"><a class="viewcode-back" href="../code.html#scene.SCENE.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -212,8 +245,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subscenes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">focus_regions</span> <span class="o">=</span> <span class="p">[]</span>
 </div>
 <div class="viewcode-block" id="SCENE.find_schema"><a class="viewcode-back" href="../code.html#scene.SCENE.find_schema">[docs]</a>    <span class="k">def</span> <span class="nf">find_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -224,62 +258,34 @@
                 <span class="k">return</span> <span class="n">s</span>
         <span class="k">return</span> <span class="bp">None</span>
         </div>
-<div class="viewcode-block" id="SCENE.find_region"><a class="viewcode-back" href="../code.html#scene.SCENE.find_region">[docs]</a>    <span class="k">def</span> <span class="nf">find_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="SCENE.find_subscene"><a class="viewcode-back" href="../code.html#scene.SCENE.find_subscene">[docs]</a>    <span class="k">def</span> <span class="nf">find_subscene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find region with name &#39;name&#39; (STR) in scene.</span>
+<span class="sd">        Find subscene with name &#39;name&#39; (STR) in scene.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">r</span>
+        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subscenes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ss</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ss</span>
         <span class="k">return</span> <span class="bp">None</span>
     </div>
-<div class="viewcode-block" id="SCENE.add_schema"><a class="viewcode-back" href="../code.html#scene.SCENE.add_schema">[docs]</a>    <span class="k">def</span> <span class="nf">add_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+<div class="viewcode-block" id="SCENE.add_subscene"><a class="viewcode-back" href="../code.html#scene.SCENE.add_subscene">[docs]</a>    <span class="k">def</span> <span class="nf">add_subscene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add schema (SCHEMA) to scene if no duplication.</span>
+<span class="sd">        Add subscene ss (SUB_SCENE) to scene if no duplication.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># Check validity</span>
-        <span class="k">if</span><span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span> <span class="ow">or</span> <span class="n">schema</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="ow">or</span> <span class="n">ss</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">False</span>
         
         <span class="c"># Check duplication</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_schema</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_subscene</span><span class="p">(</span><span class="n">ss</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">False</span>
         
         <span class="c"># Add new schema</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subscenes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">schema_inst</span> <span class="ow">in</span> <span class="n">ss</span><span class="o">.</span><span class="n">nodes</span> <span class="o">+</span> <span class="n">ss</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_schema</span><span class="p">(</span><span class="n">schema_inst</span><span class="o">.</span><span class="n">name</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema_inst</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">True</span>
-        </div>
-<div class="viewcode-block" id="SCENE.add_region"><a class="viewcode-back" href="../code.html#scene.SCENE.add_region">[docs]</a>    <span class="k">def</span> <span class="nf">add_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Add region (REGION) to scene if no duplication.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># Check validity</span>
-        <span class="k">if</span><span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">region</span><span class="p">)</span> <span class="ow">or</span> <span class="n">region</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
-        
-        <span class="c"># Check duplication</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_region</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
-        
-        <span class="c"># Add new region</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">True</span>
-        </div>
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;### VISUAL SCENE ###</span><span class="se">\n\n</span><span class="s">&quot;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;width: </span><span class="si">%i</span><span class="s"> , height: </span><span class="si">%i</span><span class="se">\n\n</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;REGIONS (num=</span><span class="si">%i</span><span class="s">):</span><span class="se">\n\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">regions</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="n">p</span> <span class="o">+=</span> <span class="s">&quot;PERCEPTUAL SCHEMAS (num=</span><span class="si">%i</span><span class="s">):</span><span class="se">\n\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schemas</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schemas</span><span class="p">:</span>
-            <span class="n">p</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span>
-        <span class="k">return</span> <span class="n">p</span>
-            
-
-<span class="c">###############################################################################</span>
-</div>
+<span class="c">###############################################################################</span></div></div>
 <span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="k">print</span> <span class="s">&quot;No test case implemented.&quot;</span>
 </pre></div>
