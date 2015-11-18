@@ -352,7 +352,7 @@ class CONCEPT_LTM(LTM):
         self.add_port('OUT', 'to_conceptualizer')
         self.add_port('OUT', 'to_semantic_WM')
         self.cpt_knowledge = None
-        self.init_act = 1
+        self.params['init_act'] = 1
         
     def initialize(self, cpt_knowledge):
         """
@@ -370,13 +370,13 @@ class CONCEPT_LTM(LTM):
         for concept in cpt_knowledge.concepts():
             new_schema = None
             if cpt_knowledge.match(concept, entity, match_type="is_a"):
-                new_schema = CPT_ENTITY_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+                new_schema = CPT_ENTITY_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])
             elif cpt_knowledge.match(concept, action, match_type="is_a"):
-                new_schema = CPT_ACTION_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+                new_schema = CPT_ACTION_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])
             elif cpt_knowledge.match(concept, prop, match_type="is_a"):
-                new_schema = CPT_PROPERTY_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+                new_schema = CPT_PROPERTY_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])
             elif cpt_knowledge.match(concept, rel, match_type="is_a"):
-                new_schema = CPT_RELATION_SCHEMA(name=concept.name, concept=concept, init_act=self.init_act)
+                new_schema = CPT_RELATION_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])
             else:
                 print "%s: unknown concept type" %concept.meaning
             
@@ -394,7 +394,7 @@ class CONCEPT_LTM(LTM):
         """
         """
         data = super(CONCEPT_LTM, self).get_info()
-        data['init_act'] = self.init_act
+        data['params'] = self.params
         return data
         
 class SEMANTIC_WM(WM):
@@ -411,8 +411,8 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_visual_WM')
-        self.dyn_params = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
-        self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.params['dyn'] = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
     def update(self):
@@ -572,7 +572,7 @@ class GRAMMATICAL_LTM(LTM):
         self.grammar = None
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_cxn_retrieval_C')
-        self.init_act = 0.5 #The initial activation value for cxn schema.
+        self.params['init_act'] = 0.5 #The initial activation value for cxn schema.
     
     def initialize(self, grammar):
         """
@@ -585,7 +585,7 @@ class GRAMMATICAL_LTM(LTM):
             preference = 1
             if cxn.preference:
                 preference = cxn.preference
-            new_cxn_schema = CXN_SCHEMA(cxn, self.init_act*preference)
+            new_cxn_schema = CXN_SCHEMA(cxn, self.params['init_act']*preference)
             self.add_schema(new_cxn_schema)
 
     def update(self):
@@ -601,7 +601,7 @@ class GRAMMATICAL_LTM(LTM):
         """
         """
         data = super(GRAMMATICAL_LTM, self).get_info()
-        data['init_act'] = self.init_act
+        data['params'] = self.params
         return data
         
 ####################
@@ -620,9 +620,9 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_P')
-        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
-        self.style_params = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
+        self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
+        self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         
     def update(self):
         """
@@ -639,7 +639,7 @@ class GRAMMATICAL_WM_P(WM):
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
-            self.style_params = ctrl_input['style_params']
+            self.params['style'] = ctrl_input['params_style']
             output = self.produce_form(sem_input,phon_input)
             if output:
                 self.set_output('to_phonological_WM_P', output['phon_WM_output'])
@@ -684,9 +684,9 @@ class GRAMMATICAL_WM_P(WM):
 #        Applies pressure by ramping up C2
 #        """
 #        for link in [l for l in self.coop_links if l.weight != 0]: # Make sure not to reactivate old weights.
-#            link.update_weight(self.C2_params['coop_weight'] + self.C2_params['coop_weight']*pressure)
+#            link.update_weight(self.params['C2']['coop_weight'] + self.params['C2']['coop_weight']*pressure)
 #        for link in self.comp_links:
-#            link.update_weight(self.C2_params['comp_weight'] + self.C2_params['comp_weight']*pressure)
+#            link.update_weight(self.params['C2']['comp_weight'] + self.params['C2']['comp_weight']*pressure)
 
     def produce_form(self,sem_input, phon_input):
         """
@@ -698,7 +698,7 @@ class GRAMMATICAL_WM_P(WM):
             - Note that the only reason I don't just take the 1 winner above threshold is because of the issue of having multipe none overlapping assemblages.
             Might want to revisit assemble.
         """
-        score_threshold = self.style_params['activation']*self.C2_params['confidence_threshold'] + self.style_params['sem_length'] + self.style_params['form_length'] + self.style_params['continuity']
+        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -757,10 +757,10 @@ class GRAMMATICAL_WM_P(WM):
             in their current form, since they could be expanded by adding elements that would change the order of phons.
         
         """
-        w1 = self.style_params['activation'] # Activation weight
-        w2 = self.style_params['sem_length'] # SemRep covered weight
-        w3 = self.style_params['form_length'] # SynForm length weight  
-        w4 = self.style_params['continuity'] # Utterance continuity weight  
+        w1 = self.params['style']['activation'] # Activation weight
+        w2 = self.params['style']['sem_length'] # SemRep covered weight
+        w3 = self.params['style']['form_length'] # SynForm length weight  
+        w4 = self.params['style']['continuity'] # Utterance continuity weight  
         winner = None
         scores = {'sem_length':[], 'form_length':[], 'utterance_continuity': [], 'continuity': [], 'eq_insts':[]}
             
@@ -823,7 +823,7 @@ class GRAMMATICAL_WM_P(WM):
 #        """
 #        eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
 #        # Sets the activation below confidence threshold so that it is not re-used right away. 
-#        eq_inst.set_activation(self.C2_params['confidence_threshold'])
+#        eq_inst.set_activation(self.params['C2']['confidence_threshold'])
 #        for inst in assemblage.schema_insts:
 #            inst.alive = False
 #        self.add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
@@ -844,7 +844,7 @@ class GRAMMATICAL_WM_P(WM):
 #        """
 #        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
 #        for inst in assemblage.schema_insts:
-#            inst.set_activation(self.C2_params['confidence_threshold'])
+#            inst.set_activation(self.params['C2']['confidence_threshold'])
 #    
 #    def dismantle_assemblage2(self, assemblage):
 #        """
@@ -856,11 +856,11 @@ class GRAMMATICAL_WM_P(WM):
 #        """
 #        eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
 #        # Sets the activation below confidence threshold so that it is not re-used right away. 
-#        eq_inst.set_activation(self.C2_params['confidence_threshold'])
+#        eq_inst.set_activation(self.params['C2']['confidence_threshold'])
 #        
 #        self.remove_coop_links(inst_from=assemblage.schema_insts, inst_to=assemblage.schema_insts)
 #        for inst in assemblage.schema_insts:
-#            inst.set_activation(self.C2_params['confidence_threshold'])
+#            inst.set_activation(self.params['C2']['confidence_threshold'])
 #        
 #        self.add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
 #    
@@ -874,10 +874,10 @@ class GRAMMATICAL_WM_P(WM):
 #        r = 0.9
 #        eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
 #        # Sets the activation below confidence threshold so that it is not re-used right away. 
-#        eq_inst.set_activation(self.C2_params['confidence_threshold']*r)
+#        eq_inst.set_activation(self.params['C2']['confidence_threshold']*r)
 #
 #        for inst in assemblage.schema_insts:
-#            inst.set_activation(self.C2_params['confidence_threshold']*r)
+#            inst.set_activation(self.params['C2']['confidence_threshold']*r)
 #        
 #        self.add_new_insts([{"cxn_inst":eq_inst, "match_qual":1}])
     
@@ -895,23 +895,23 @@ class GRAMMATICAL_WM_P(WM):
         
     def set_subthreshold(self, insts):
         """
-        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.C2_paramss['sub_threshold_r']
+        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.params['C2']['sub_threshold_r']
         Args:
             - insts ([CXN_INST])
         NOTE:
             If the score of the assemblage is not just the avereage cxn inst activation, the value needs to be place low enough
             so that the system does not repeat the same utterance twice. 
         """
-        r= self.C2_params['sub_threshold_r']
+        r= self.params['C2']['sub_threshold_r']
         for inst in insts:
-            inst.set_activation(r*self.C2_params['confidence_threshold'])
+            inst.set_activation(r*self.params['C2']['confidence_threshold'])
             
     def deactivate_coop_weigts(self):
         """
-        Sets all the coop_links to weight = self.C2_params['deact_weight']
+        Sets all the coop_links to weight = self.params['C2']['deact_weight']
         """
         for coop_link in self.coop_links:
-            coop_link.weight = self.C2_params['deact_weight']
+            coop_link.weight = self.params['C2']['deact_weight']
                 
     def deactivate_coop_weigts2(self, assemblage, deact_weight=0.0):
         """
@@ -1424,8 +1424,8 @@ class PHON_WM_P(WM):
         self.add_port('OUT', 'to_utter')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_control')
-        self.dyn_params = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
-        self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.params['dyn'] = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
     
     def update(self):
@@ -1493,8 +1493,8 @@ class PHON_WM_C(WM):
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_control')
-        self.dyn_params = {'tau':2.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
-        self.C2_params = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.params['dyn'] = {'tau':2.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
 
     
@@ -1527,9 +1527,9 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('IN', 'from_cxn_retrieval_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
-        self.dyn_params = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
-        self.C2_params = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':0, 'comp_asymmetry':0,'P_comp':1.0, 'P_coop':1.0,  'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
-        self.pred_params = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
+        self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':0, 'comp_asymmetry':0,'P_comp':1.0, 'P_coop':1.0,  'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
+        self.params['pred'] = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
         
@@ -1640,7 +1640,7 @@ class GRAMMATICAL_WM_C(WM):
         assemblages = self.assemble()
         if assemblages:
             winner_assemblage = self.get_winner_assemblage(assemblages)
-            if winner_assemblage.activation > self.C2_params['confidence_threshold']:
+            if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
                 sem_frame =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
                 self.set_output('to_semantic_WM', sem_frame)
                 
@@ -1678,24 +1678,24 @@ class GRAMMATICAL_WM_C(WM):
     
     def set_subthreshold(self, insts):
         """
-        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.C2_paramss['sub_threshold_r']
+        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.params['C2']['sub_threshold_r']
         Args:
             - insts ([CXN_INST])
         
         NOTE: directly taken from the production model.
         """
-        r= self.C2_params['sub_threshold_r']
+        r= self.params['C2']['sub_threshold_r']
         for inst in insts:
-            inst.set_activation(r*self.C2_params['confidence_threshold'])
+            inst.set_activation(r*self.params['C2']['confidence_threshold'])
             
     def deactivate_coop_weigts(self):
         """
-        Sets all the coop_links to weight = self.C2_params['deact_weight']
+        Sets all the coop_links to weight = self.params['C2']['deact_weight']
         
         NOTE: directly taken from the production model.
         """
         for coop_link in self.coop_links:
-            coop_link.weight = self.C2_params['deact_weight']
+            coop_link.weight = self.params['C2']['deact_weight']
     
     def set_pred_init(self):
         """
@@ -1703,7 +1703,7 @@ class GRAMMATICAL_WM_C(WM):
         The stacks is refilled as soon a state != 0.
         Reinitialize state to state == 0 will then trigger the init predictions.
         """
-        self.pred_init = self.pred_params['pred_init'][:]
+        self.pred_init = self.params['pred']['pred_init'][:]
     
     ###############################
     ### cooperative computation ###
@@ -1970,7 +1970,7 @@ class GRAMMATICAL_WM_C(WM):
         cxn_c = inst_c.content        
         
         (new_cxn, c) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
-        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
+        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0.0)
         
         # Define new_cxn trace
         new_trace = {"schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} 
@@ -2086,8 +2086,8 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_grammatical_WM_C')
-        self.task_params = {'time_pressure':100, 'start_produce':1000}
-        self.style_params = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0}
+        self.params['task'] = {'time_pressure':100, 'start_produce':1000}
+        self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0}
         self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'produce': False}
     
     def set_mode(self, mode):
@@ -2098,7 +2098,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             self.state['last_prod_time'] = self.t
             self.state['produce'] = False
             self.state['unexpressed_sem'] = False
-            self.task_params['start_produce'] += self.t
+            self.params['task']['start_produce'] += self.t
     
     def update(self):
         """
@@ -2113,21 +2113,21 @@ class CONTROL(PROCEDURAL_SCHEMA):
                 
             self.state['unexpressed_sem'] = self.get_input('from_semantic_WM')
             
-            if self.t == self.task_params['start_produce']:
+            if self.t == self.params['task']['start_produce']:
                 self.state['last_prod_time'] = self.t
                 
-            if self.t >= self.task_params['start_produce'] and self.state['unexpressed_sem']:
+            if self.t >= self.params['task']['start_produce'] and self.state['unexpressed_sem']:
                 self.state['produce'] = True
             else:
                 self.state['produce'] = False
             
-            if self.t < self.task_params['start_produce'] or not(self.state['unexpressed_sem']):
+            if self.t < self.params['task']['start_produce'] or not(self.state['unexpressed_sem']):
                 pressure = 0
                 self.state['last_prod_time'] = self.t
             else:
-                pressure = min((self.t - self.state['last_prod_time'])/self.task_params['time_pressure'], 1) #Pressure ramps up linearly to 1
+                pressure = min((self.t - self.state['last_prod_time'])/self.params['task']['time_pressure'], 1) #Pressure ramps up linearly to 1
 
-            output = {'produce':self.state['produce'], 'pressure':pressure, 'style_params':self.style_params.copy()}
+            output = {'produce':self.state['produce'], 'pressure':pressure, 'params_style':self.params['style'].copy()}
             self.set_output('to_grammatical_WM_P', output)
         else:
             self.set_output('to_grammatical_WM_P', None)
@@ -2145,7 +2145,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         """
         data = super(CONTROL, self).get_info()
-        data['task_params'] = self.task_params
+        data['params'] = self.params
         return data
     
     def get_state(self):
