@@ -25,7 +25,7 @@ def test(seed=None):
     input_name = 'ditransitive_give'    
     generator = sem_gen.sem_generator(input_name)
     
-    language_system_P.schemas['Grammatical_WM_P'].C2_params['prune_threshold'] = 0.4
+    language_system_P.schemas['Grammatical_WM_P'].params['C2']['prune_threshold'] = 0.4
     
     (sem_insts, next_time, prop) = generator.next()
     
@@ -106,21 +106,21 @@ def test_params(seed=None):
       
         grammaticalWM_P = language_system_P.schemas['Grammatical_WM_P']
         
-        grammaticalWM_P.dyn_params['tau'] = params['tau']
-        grammaticalWM_P.dyn_params['act_inf'] = 0.0
-        grammaticalWM_P.dyn_params['L'] = 1.0
-        grammaticalWM_P.dyn_params['k'] = params['k']
-        grammaticalWM_P.dyn_params['x0'] = 0.5
-        grammaticalWM_P.dyn_params['noise_mean'] = 0.0
-        grammaticalWM_P.dyn_params['noise_std'] = params['noise_std']
-        grammaticalWM_P.C2_params['confidence_threshold'] = params['conf_thresh']
-        grammaticalWM_P.C2_params['prune_threshold'] = params['prune_thresh']
-        grammaticalWM_P.C2_params['coop_weight'] = params['coop_weight']
-        grammaticalWM_P.C2_params['comp_weight'] = params['comp_weight']
-        grammaticalWM_P.C2_params['sub_threshold_r'] = 0.8
-        grammaticalWM_P.C2_params['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
-        grammaticalWM_P.style_params['activation'] = 0.7
-        grammaticalWM_P.style_params['sem_length'] = 0.3
+        grammaticalWM_P.params['dyn']['tau'] = params['tau']
+        grammaticalWM_P.params['dyn']['act_inf'] = 0.0
+        grammaticalWM_P.params['dyn']['L'] = 1.0
+        grammaticalWM_P.params['dyn']['k'] = params['k']
+        grammaticalWM_P.params['dyn']['x0'] = 0.5
+        grammaticalWM_P.params['dyn']['noise_mean'] = 0.0
+        grammaticalWM_P.params['dyn']['noise_std'] = params['noise_std']
+        grammaticalWM_P.params['C2']['confidence_threshold'] = params['conf_thresh']
+        grammaticalWM_P.params['C2']['prune_threshold'] = params['prune_thresh']
+        grammaticalWM_P.params['C2']['coop_weight'] = params['coop_weight']
+        grammaticalWM_P.params['C2']['comp_weight'] = params['comp_weight']
+        grammaticalWM_P.params['C2']['sub_threshold_r'] = 0.8
+        grammaticalWM_P.params['C2']['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
+        grammaticalWM_P.params['style']['activation'] = 0.7
+        grammaticalWM_P.params['style']['sem_length'] = 0.3
         
         # Set up input
         sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
@@ -163,8 +163,8 @@ def test_params(seed=None):
 
 
 if __name__=='__main__':
-#    test(seed=1)
-    test_params(seed=1)
+    test(seed=1)
+#    test_params(seed=1)
         
 
 

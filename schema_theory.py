@@ -219,7 +219,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         """
         self.inputs = {}
         for port in self.in_ports:
-            self.inputs(port.name) = port.value
+            self.inputs[port.name] = port.value
             port.value = None # Reset port value
     
     def get_input(self, port_name):
@@ -294,7 +294,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         """
         Returns a JSON formated string containing the schema's description info.
         """
-        data = {"name":self.name, "type":self.__class__.__name__, "parameters":{"dt":self.dt}, 
+        data = {"name":self.name, "type":self.__class__.__name__, "params":{"dt":self.dt}, 
                      "in_ports":[p.name for p in self.in_ports], "out_ports":[p.name for p in self.out_ports]}
         return data
         
@@ -715,7 +715,7 @@ class WM(PROCEDURAL_SCHEMA):
         """
         data = super(WM, self).get_info()
         data['params']['dyn'] = self.params['dyn']
-        data['params']['C2'] = self.C2
+        data['params']['C2'] = self.params['C2']
         return data
         
     def get_state(self):

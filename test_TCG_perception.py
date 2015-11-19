@@ -52,18 +52,18 @@ def test_subscene_rec():
     perceptual_system.system2dot(image_type='png', disp=True)
     
     # Parameters   
-    visualWM.dyn_params['tau'] = 300
-    visualWM.dyn_params['act_inf'] = 0.0
-    visualWM.dyn_params['L'] = 1.0
-    visualWM.dyn_params['k'] = 10.0
-    visualWM.dyn_params['x0'] = 0.5
-    visualWM.dyn_params['noise_mean'] = 0
-    visualWM.dyn_params['noise_std'] = 1
+    visualWM.params['dyn']['tau'] = 300
+    visualWM.params['dyn']['act_inf'] = 0.0
+    visualWM.params['dyn']['L'] = 1.0
+    visualWM.params['dyn']['k'] = 10.0
+    visualWM.params['dyn']['x0'] = 0.5
+    visualWM.params['dyn']['noise_mean'] = 0
+    visualWM.params['dyn']['noise_std'] = 1
     
-    visualWM.C2_params['confidence_threshold'] = 0
-    visualWM.C2_params['prune_threshold'] = 0.3
-    visualWM.C2_params['coop_weight'] = 0
-    visualWM.C2_params['comp_weight'] = 0
+    visualWM.params['C2']['confidence_threshold'] = 0
+    visualWM.params['C2']['prune_threshold'] = 0.3
+    visualWM.params['C2']['coop_weight'] = 0
+    visualWM.params['C2']['comp_weight'] = 0
     
     perceptLTM.init_act = 1
     conceptLTM.init_act = 1
@@ -133,7 +133,7 @@ def test_BUsaliency():
     BUsaliency_system.system2dot(image_type='png', disp=True)
     
     # Parameters   
-    saliency_map.IOR_params = {'IOR_radius': 5, 'IOR_decay': 0.99, 'IOR_max': 100}
+    saliency_map.params['IOR'] = {'IOR_radius': 5, 'IOR_decay': 0.99, 'IOR_max': 100}
     
     # Loading data
     scene_name = 'TCG_cholitas'
