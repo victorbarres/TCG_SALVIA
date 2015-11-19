@@ -296,7 +296,7 @@ class SALIENCY_MAP(PROCEDURAL_SCHEMA):
         
         #Compute final saliency_map: BU_saliency - mask
         self.saliency_map = self.BU_saliency_map.copy() - self.IOR_mask        
-        self.set_output('to_saccade_system', self.saliency_map)
+        self.post_output('to_saccade_system', self.saliency_map)
     
     def _IOR(self, fixation):
         """
@@ -330,8 +330,8 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
         self.next_fixation = self._WTA(saliency_map)
         if self.next_fixation != self.eye_pos: #Updates next-saccedes if the result of the WTA differs from previously computed value.
             self.eye_pos = self.next_fixation
-            self.set_output('to_fixation', self.eye_pos)
-            self.set_output('to_saliency_map', self.eye_pos)
+            self.post_output('to_fixation', self.eye_pos)
+            self.post_output('to_saliency_map', self.eye_pos)
     
     def _WTA(self, saliency_map):
         """
@@ -413,7 +413,7 @@ class VISUAL_WM(WM):
             self.update_SceneRep(new_insts)
         self.update_activations()
         self.prune()
-        self.set_output('to_conceptualizer', self.SceneRep)
+        self.post_output('to_conceptualizer', self.SceneRep)
     
     def update_SceneRep(self, per_insts):
         """
@@ -504,7 +504,7 @@ class PERCEPT_LTM(LTM):
     def update(self):
         """
         """
-        self.set_output('to_subscene_rec', self.schemas)
+        self.post_output('to_subscene_rec', self.schemas)
     
     ####################
     ### JSON METHODS ###
@@ -640,11 +640,11 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
                 self.next_saccade = True
                 output['next_saccade'] = self.t
                 print 't: %i, trigger next saccade' % self.t
-                self.set_output('to_visual_WM', {'subscene':self.subscene, 'init_act':self.subscene.saliency})
+                self.post_output('to_visual_WM', {'subscene':self.subscene, 'init_act':self.subscene.saliency})
                 self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
                 self.subscene = None
         
-        self.set_output('to_output', output)
+        self.post_output('to_output', output)
 
     def get_subscene(self):
         """
@@ -715,8 +715,8 @@ class SIMPLE_SALIENCY_MAP(PROCEDURAL_SCHEMA):
         # NOTHING IS DONE HERE...                
         
         # Send saliency value to visualWM and subscene_rec
-        self.set_output('to_visual_WM', self.BU_saliency_map)
-        self.set_output('to_subscene_rec', self.BU_saliency_map)
+        self.post_output('to_visual_WM', self.BU_saliency_map)
+        self.post_output('to_subscene_rec', self.BU_saliency_map)
 
 ###############################################################################
 if __name__=='__main__':

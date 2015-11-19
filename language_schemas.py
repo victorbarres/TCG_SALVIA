@@ -304,7 +304,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         cpt_schemas = self.get_input('from_concept_LTM')
         if cpt_schemas and SceneRep:
             cpt_insts  = self.conceptualize(SceneRep, cpt_schemas)
-            self.set_output('to_semantic_WM', cpt_insts)
+            self.post_output('to_semantic_WM', cpt_insts)
         
             # Set all SceneRep elements to new=False
             for n in SceneRep.nodes_iter():
@@ -384,8 +384,8 @@ class CONCEPT_LTM(LTM):
                 self.add_schema(new_schema)
     
     def update(self):
-        self.set_output('to_conceptualizer', self.schemas)
-        self.set_output('to_semantic_WM', self.schemas)
+        self.post_output('to_conceptualizer', self.schemas)
+        self.post_output('to_semantic_WM', self.schemas)
         
     ####################
     ### JSON METHODS ###
@@ -448,12 +448,12 @@ class SEMANTIC_WM(WM):
                 self.SemRep.node[name]['expressed'] = True
     
         output_to_gram = self.gram_WM_P_ouput()
-        self.set_output('to_grammatical_WM_P', output_to_gram)
+        self.post_output('to_grammatical_WM_P', output_to_gram)
         
         if mode=='produce' and self.has_new_sem():
-            self.set_output('to_cxn_retrieval_P', self.SemRep)
+            self.post_output('to_cxn_retrieval_P', self.SemRep)
         if mode=='produce':
-            self.set_output('to_control', self.has_unexpressed_sem())
+            self.post_output('to_control', self.has_unexpressed_sem())
     
     def instantiate_cpts(self, SemFrame, cpt_schemas):
         """
@@ -591,8 +591,8 @@ class GRAMMATICAL_LTM(LTM):
     def update(self):
         """
         """
-        self.set_output('to_cxn_retrieval_P', self.schemas)
-        self.set_output('to_cxn_retrieval_C', self.schemas)
+        self.post_output('to_cxn_retrieval_P', self.schemas)
+        self.post_output('to_cxn_retrieval_C', self.schemas)
     
     ####################
     ### JSON METHODS ###
@@ -642,8 +642,8 @@ class GRAMMATICAL_WM_P(WM):
             self.params['style'] = ctrl_input['params_style']
             output = self.produce_form(sem_input,phon_input)
             if output:
-                self.set_output('to_phonological_WM_P', output['phon_WM_output'])
-                self.set_output('to_semantic_WM', output['sem_WM_output'])
+                self.post_output('to_phonological_WM_P', output['phon_WM_output'])
+                self.post_output('to_semantic_WM', output['sem_WM_output'])
     
     def add_new_insts(self, new_insts):
         """
@@ -1331,7 +1331,7 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         cxn_schemas = self.get_input('from_grammatical_LTM')
         if cxn_schemas and SemRep:
             self.instantiate_cxns(SemRep, cxn_schemas)
-            self.set_output('to_grammatical_WM_P', self.cxn_instances)
+            self.post_output('to_grammatical_WM_P', self.cxn_instances)
             # Set all SemRep elements to new=False
             for n in SemRep.nodes_iter():
                 SemRep.node[n]['new'] = False
@@ -1440,14 +1440,14 @@ class PHON_WM_P(WM):
                 self.add_instance(phon_inst)
                 new_phon_sequence.append(phon_inst)
             self.phon_sequence.extend(new_phon_sequence)
-            self.set_output('to_utter', [phon_inst.content['word_form'] for phon_inst in new_phon_sequence])
-            self.set_output('to_control', True)
+            self.post_output('to_utter', [phon_inst.content['word_form'] for phon_inst in new_phon_sequence])
+            self.post_output('to_control', True)
         else:
-            self.set_output('to_utter', None)
+            self.post_output('to_utter', None)
         
         self.update_activations()
         self.prune()
-        self.set_output('to_grammatical_WM_P', [phon_inst.content['word_form'] for phon_inst in self.phon_sequence])
+        self.post_output('to_grammatical_WM_P', [phon_inst.content['word_form'] for phon_inst in self.phon_sequence])
         
     
     ####################
@@ -1476,7 +1476,7 @@ class UTTER(PROCEDURAL_SCHEMA):
         new_utterance =  self.get_input('from_phonological_WM_P')
         if self.utterance_stack and (self.t % self.params['speech_rate']) == 0:
             word_form = self.utterance_stack.pop()
-            self.set_output('to_output', word_form)
+            self.post_output('to_output', word_form)
         if new_utterance:
             new_utterance.reverse()
             self.utterance_stack =  new_utterance + self.utterance_stack
@@ -1507,11 +1507,11 @@ class PHON_WM_C(WM):
             phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
             self.add_instance(phon_inst)
             self.phon_sequence.append(phon_inst)
-            self.set_output('to_cxn_retrieval_C', phon_inst)
-            self.set_output('to_grammatical_WM_C', phon_inst)
-            self.set_output('to_control', True)
+            self.post_output('to_cxn_retrieval_C', phon_inst)
+            self.post_output('to_grammatical_WM_C', phon_inst)
+            self.post_output('to_control', True)
         else:
-            self.set_output('to_cxn_retrieval_C', None)
+            self.post_output('to_cxn_retrieval_C', None)
         
         self.update_activations()     
         self.prune()
@@ -1584,7 +1584,7 @@ class GRAMMATICAL_WM_C(WM):
             predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
         else:
             predictions = None
-        self.set_output('to_cxn_retrieval_C', predictions)
+        self.post_output('to_cxn_retrieval_C', predictions)
     
     def scanner(self, phon_inst):
         """
@@ -1642,7 +1642,7 @@ class GRAMMATICAL_WM_C(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
                 sem_frame =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
-                self.set_output('to_semantic_WM', sem_frame)
+                self.post_output('to_semantic_WM', sem_frame)
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
@@ -2039,7 +2039,7 @@ class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
         predictions = self.get_input('from_grammatical_WM_C')
         if predictions and cxn_schemas:
             self.instantiate_cxns(predictions, cxn_schemas)
-            self.set_output('to_grammatical_WM_C', self.cxn_instances)
+            self.post_output('to_grammatical_WM_C', self.cxn_instances)
             self.cxn_instances = []
                     
     def instantiate_cxns(self, predictions, cxn_schemas):
@@ -2104,7 +2104,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
         """
         """
         # Communicating with semantic_WM
-        self.set_output('to_semantic_WM', self.state['mode'])
+        self.post_output('to_semantic_WM', self.state['mode'])
         
         # Communicating with grammatical_WM_P
         if self.state['mode'] == 'produce':
@@ -2128,15 +2128,15 @@ class CONTROL(PROCEDURAL_SCHEMA):
                 pressure = min((self.t - self.state['last_prod_time'])/self.params['task']['time_pressure'], 1) #Pressure ramps up linearly to 1
 
             output = {'produce':self.state['produce'], 'pressure':pressure, 'params_style':self.params['style'].copy()}
-            self.set_output('to_grammatical_WM_P', output)
+            self.post_output('to_grammatical_WM_P', output)
         else:
-            self.set_output('to_grammatical_WM_P', None)
+            self.post_output('to_grammatical_WM_P', None)
                 
         # Communicating with grammatical_WM_C
         if self.state['mode'] == 'listen':
-            self.set_output('to_grammatical_WM_C', True)
+            self.post_output('to_grammatical_WM_C', True)
         else:
-            self.set_output('to_grammatical_WM_C', False)
+            self.post_output('to_grammatical_WM_C', False)
                 
     ####################
     ### JSON METHODS ###

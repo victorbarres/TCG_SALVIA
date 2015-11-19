@@ -4,14 +4,15 @@
 
 Defines the based schema theory classes.
 
-Uses abc to define abstract classes
-Uses time only to provide execution timing for procedural schema updating.
-Uses random
-Uses numpy to implement the schema instances activation values.
-Uses matplotlib.plt to visualize WM state dynamics
-Uses networkx to visualize WM state
-Uses json to save simulation data in json format.
-Uses pickle to save schema_systems.
+Dependencies:
+    - abc to define abstract classes
+    - time only to provide execution timing for procedural schema updating.
+    - random
+    - numpy to implement the schema instances activation values.
+    - matplotlib.plt to visualize WM state dynamics
+    - networkx to visualize WM state
+    - json to save simulation data in json format.
+    - pickle to save schema_systems.
 """
 import abc
 import time
@@ -198,40 +199,105 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.t = 0
         self.dt = 1.0
     
+    def get(self):
+        """
+        Get all inputs and store them in the local self.inputs DICT. 
+        """
+        for input_name in self.inputs.keys():
+            self.get_input(input_name)
+    
+    def post(self):
+        """
+        Post all the process outputs.
+        """
+        for output_name, val in self.outputs.iteritems():
+            self.post_output(output_name, val)
+    
+    @abc.abstractmethod    
+    def update(self):
+        """
+        This function should be specified for every specific PROCEDURAL_SCHEMA class.
+        When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the procedural schema
+        and post values at the output ports.
+        """
+        return
+    
+    def process(self):
+        """
+        Runs the process
+        """
+        self.get()
+        self.update()
+        self.post()
+    
     def add_port(self, port_type, port_name='', port_data=None, port_value=None):
         """
         Adds a new port to the procedural schema. Port_type (str) ['IN' or 'OUT'], port_name (str), and a value port_value for the port.
+        Updates the input and output dictionary to hanlde the data receives or posted from input ports or to output ports respectively.
         If sucessessful, returns the port id. Else returns None.
         """
         new_port = PORT(port_type, port_schema=self, port_name=port_name, port_data=port_data, port_value=port_value)
+        
         if port_type == PORT.TYPE_IN:
-            self.in_ports.append(new_port)
+            if self.inputs.has_key(new_port.name):
+                print "ERROR: Already exising input port name %s. Cannot add the port to schema." %new_port.name
+                return None
+            else:
+                self.in_ports.append(new_port)
+                self.inputs[new_port.name] = None
             return new_port.id
         elif port_type == PORT.TYPE_OUT:
-            self.out_ports.append(new_port)
+            if self.output.has_key(new_port.name):
+                print "ERROR: Already existing output port name %s. Cannot add the port to schema." %new_port.name
+            else:
+                self.out_ports.append(new_port)
+                self.outputs[new_port.name] = None
             return new_port.id
         else:
+            print "ERROR: Unknown port type."
             return None
-        
-    def get_inputs(self):
-        """
-        Get all inputs and store them in the local self.inputs DICT.
-        """
-        self.inputs = {}
-        for port in self.in_ports:
-            self.inputs[port.name] = port.value
-            port.value = None # Reset port value
     
+    def set_params(self, params):
+        """
+        Set the procedural schemas parameters to params (DICT)
+        
+        Args:
+            - params (DICT): contains all the parameters.
+        """
+        self.params = params
+    
+#    def _check_local_namespace_consistency(self):
+#        """
+#        Checks that the inputs and outputs namespaces are consistent with the existing input and output ports.
+#        """
+#        port_names = set([])
+#        input_names = set(self.inputs.keys())
+#        # Check if there are discrepencies between ports and inputs namespace.
+#        unknown_ports = port_names.difference(input_names)
+#        unused_inputs = input_names.difference(port_names)
+#        flag1 = True
+#        flag2 = True
+#        if unknown_ports:
+#            print "ERROR: Those input ports are undefined in the inputs namespace %s" %(", ".join([port_name for port_name in unknown_ports]))
+#            flag1 = False
+#        if unused_inputs:
+#            print "ERROR: Those input ports are undefined in the inputs namespace %s" %(", ".join([input_name for input_name in unused_inputs]))
+#            flag2 = False
+#        
+#        return flag1 and flag2
+        
     def get_input(self, port_name):
         """
-        Return the current value of the port with name 'port_name' and resets the port value to None. If the port is not an input port, if multiple ports shared the same name or if the port is 
+        Return the current value of the port with name 'port_name', stores the value in the inputs namesapce, and resets the port value to None. If the port is not an input port, if multiple ports shared the same name or if the port is 
         not found, returns None.
         """
         port = self.find_port(port_name)
         if port and (port.type == PORT.TYPE_IN):
-            val = port.value
-            port.value = None # Resets port value
-            return val
+            if self.inputs.has_key(port.name):
+                val = port.value
+                self.inputs[port.name] = val # Stores value in inputs namespace
+                port.value = None # Reset port value
+                return val
         elif port and (port.type == PORT.TYPE_OUT):
             print("ERROR: port %s refers to an output port" % port_name)
             return None
@@ -239,7 +305,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             print("ERROR: port %s does not exist or could refer to multiple ports" % port_name)
             return None
     
-    def set_output(self, port_name, val):
+    def post_output(self, port_name, val):
         """
         Sets the value of the output port with name 'port_name' to 'val'. If the port is not an output port, if multiple ports shared the same name or if the port is 
         not found, returns False, else returns True.
@@ -268,24 +334,6 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             print("ERROR: port %s does not exist or could refer to multiple ports" % port_name)
             return None
         return found[0]
-    
-    def set_params(self, params):
-        """
-        Set the procedural schemas parameters to params (DICT)
-        
-        Args:
-            - params (DICT): contains all the parameters.
-        """
-        self.params = params
-        
-    @abc.abstractmethod    
-    def update(self):
-        """
-        This function should be specified for every specific PROCEDURAL_SCHEMA class.
-        When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the procedural schema
-        and post values at the output ports.
-        """
-        return
     
     ####################
     ### JSON METHODS ###
