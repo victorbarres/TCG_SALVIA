@@ -217,14 +217,14 @@ class PROCEDURAL_SCHEMA(SCHEMA):
     def update(self):
         """
         This function should be specified for every specific PROCEDURAL_SCHEMA class.
-        When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the procedural schema
-        and post values at the output ports.
+        When called the function updates the state of the procedural schema 
+        based on the values stored in inputs and sets the output values in outputs.
         """
         return
     
-    def process(self):
+    def call(self):
         """
-        Runs the process
+        Gathers the input, update the state, posts the outputs.
         """
         self.get()
         self.update()
@@ -265,26 +265,6 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             - params (DICT): contains all the parameters.
         """
         self.params = params
-    
-#    def _check_local_namespace_consistency(self):
-#        """
-#        Checks that the inputs and outputs namespaces are consistent with the existing input and output ports.
-#        """
-#        port_names = set([])
-#        input_names = set(self.inputs.keys())
-#        # Check if there are discrepencies between ports and inputs namespace.
-#        unknown_ports = port_names.difference(input_names)
-#        unused_inputs = input_names.difference(port_names)
-#        flag1 = True
-#        flag2 = True
-#        if unknown_ports:
-#            print "ERROR: Those input ports are undefined in the inputs namespace %s" %(", ".join([port_name for port_name in unknown_ports]))
-#            flag1 = False
-#        if unused_inputs:
-#            print "ERROR: Those input ports are undefined in the inputs namespace %s" %(", ".join([input_name for input_name in unused_inputs]))
-#            flag2 = False
-#        
-#        return flag1 and flag2
         
     def get_input(self, port_name):
         """
@@ -365,6 +345,8 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - name (str): schema name
         - in_ports ([PORT]):
         - out_ports ([PORT]):
+        - inputs (DICT): At each time steps stores the inputs
+        - outputs (DICT): At each time steps stores the ouputs
         - params (DICT)
         - activity (float):
     Data:
@@ -512,6 +494,8 @@ class LTM(PROCEDURAL_SCHEMA):
         - name (str): schema name
         - in_ports ([PORT]):
         - out_ports ([PORT]):
+        - inputs (DICT): At each time steps stores the inputs
+        - outputs (DICT): At each time steps stores the ouputs
         - activity (float): The activity level of the schema.
     Data:
         - schemas ([SCHEMA]): Schema content of the long term memory
@@ -553,7 +537,8 @@ class WM(PROCEDURAL_SCHEMA):
         - id (int): Unique id
         - name (str): schema name
         - in_ports ([PORT]):
-        - out_ports ([PORT]):
+        - out_ports ([PORT]):- inputs (DICT): At each time steps stores the inputs
+        - outputs (DICT): At each time steps stores the ouputs
         - params (DICT):
         - activity (float): The activity level of the schema.
     Data:
@@ -724,7 +709,6 @@ class WM(PROCEDURAL_SCHEMA):
         """
         Computes the overall activity of the working memory.
         The activity reflects the amount of cooperation and competition going on.
-        
         """
         tot_act = 0
         for inst in self.schema_insts:
@@ -1202,9 +1186,9 @@ class SCHEMA_SYSTEM(object):
         
         # Update the system output
         self.outputs[self.t] = {}
-        for p in self.output_ports:
-            self.outputs[self.t][p.schema.name] = p.value
-            p.value = None
+        for port in self.output_ports:
+            self.outputs[self.t][port.schema.name] = port.value
+            port.value = None
         
         # Save simulation data
         if not(self.sim_data['schema_system']):

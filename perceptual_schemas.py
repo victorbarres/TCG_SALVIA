@@ -3,8 +3,15 @@
 @author: Victor Barres
 Defines perceptual schemas for TCG.
 
-Uses numpy for the saliency map.
-Uses NetworkX for the implementation of the content of the Visual Working Memory (SceneRep graph)
+Dependencies:
+    - Uses numpy for the saliency map.
+    - Uses NetworkX for the implementation of the content of the Visual Working Memory (SceneRep graph)
+    - Uses random
+    - Uses matplotlib.pyplot
+    
+    - Uses schema_theory
+    - Uses viewer
+    - Uses scene
 """
 import numpy as np
 import matplotlib.pyplot as plt
