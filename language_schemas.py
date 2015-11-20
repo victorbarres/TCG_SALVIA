@@ -3,10 +3,15 @@
 @author: Victor Barres
 Defines language schemas for TCG.
 
-Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
-Uses Numpy for vectorial operations.
-Uses pyttsx for the text to speech implementation (optional!)
-Uses re for regular expression parsing of sem inputs (optional)
+Dependencies:
+    - Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
+    - Uses Numpy for vectorial operations.
+    - Uses pyttsx for the text to speech implementation (optional!)
+    - Uses re for regular expression parsing of sem inputs (optional)
+    
+    - Uses schema_theory
+    - Uses construction
+    - Uses TCG_graph
 """
 import matplotlib.pyplot as plt
 import re
@@ -56,6 +61,8 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - content (CXN):
             - in_ports ([PORT]):
             - out_ports ([PORT]):
+            - inputs (DICT): At each time steps stores the inputs
+            - outputs (DICT): At each time steps stores the ouputs
             - alive (bool): status flag
             - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schemas":[CXN_SCHEMA]}): Pointer to the elements that triggered the instantiation.
             - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
@@ -63,16 +70,20 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
     def __init__(self, cxn_schema, trace, mapping, copy=True):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
         if copy:
-                (cxn_copy, c) = cxn_schema.content.copy()
-                self.content = cxn_copy
-                if mapping:
-                    new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
-                    new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
-                    new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
-                    self.covers = new_mapping
+            (cxn_copy, c) = cxn_schema.content.copy()
+            self.content = cxn_copy
+            if mapping:
+                new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
+                new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
+                new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
+                self.covers = new_mapping
+            
+            # Reset ports to get proper links to content copy.
+            self.remove_ports()
+            self.set_ports() 
+        
         else:
              self.covers = mapping
-        self.set_ports()
     
     def set_ports(self, in_ports=None, out_ports=None):
         """
@@ -1213,7 +1224,6 @@ class GRAMMATICAL_WM_P(WM):
         
         # Define port correspondence
         in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
-        new_cxn_inst.set_ports()
         
         port_corr = {'in_ports':{}, 'out_ports':{}}
         for port in in_ports:
@@ -1977,13 +1987,13 @@ class GRAMMATICAL_WM_C(WM):
         
         # Defines new_cxn mapping
         new_mapping = {} # TO DEFINE        
+        
         new_cxn_inst = CXN_SCHEMA_INST_C(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False)
         new_cxn_inst.phon_cover = inst_p.phon_cover + inst_c.phon_cover
         new_cxn_inst.covers = inst_p.covers
         
         # Define port correspondence
         in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
-        new_cxn_inst.set_ports()
         
         port_corr = {'in_ports':{}, 'out_ports':{}}
         for port in in_ports:

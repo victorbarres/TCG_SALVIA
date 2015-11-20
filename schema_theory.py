@@ -240,15 +240,15 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         
         if port_type == PORT.TYPE_IN:
             if self.inputs.has_key(new_port.name):
-                print "ERROR: Already exising input port name %s. Cannot add the port to schema." %new_port.name
+                print "ERROR: Already exising input port name %s. Cannot add the port to schema %s." %(new_port.name, self.name)              
                 return None
             else:
                 self.in_ports.append(new_port)
                 self.inputs[new_port.name] = None
             return new_port.id
         elif port_type == PORT.TYPE_OUT:
-            if self.output.has_key(new_port.name):
-                print "ERROR: Already existing output port name %s. Cannot add the port to schema." %new_port.name
+            if self.outputs.has_key(new_port.name):
+                print "ERROR: Already existing output port name %s. Cannot add the port to schema %s." %(new_port.name, self.name)
             else:
                 self.out_ports.append(new_port)
                 self.outputs[new_port.name] = None
@@ -256,6 +256,15 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         else:
             print "ERROR: Unknown port type."
             return None
+    
+    def remove_ports(self):
+        """
+        Removes all the input and output ports and resets the inputs and outputs namespaces.
+        """
+        self.in_ports = []
+        self.out_ports = []
+        self.inputs = {}
+        self.outputs = {}
     
     def set_params(self, params):
         """
@@ -368,7 +377,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         self.params['act'] = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
-        self.act_port_out = PORT("OUT", port_schema=self, port_name="act_in", port_value=0);
+        self.act_port_out = PORT("OUT", port_schema=self, port_name="act_out", port_value=0);
         self.instantiate(schema, trace)
      
     def initialize_activation(self):
