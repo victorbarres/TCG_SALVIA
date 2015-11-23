@@ -224,11 +224,18 @@ class PROCEDURAL_SCHEMA(SCHEMA):
     
     def call(self):
         """
-        Gathers the input, update the state, posts the outputs.
+        Gathers the input, update the state, posts the outputs, resets inputs and outputs namespaces.
         """
         self.get()
         self.update()
         self.post()
+        
+        # Reset input and output namespace values.
+        for input_name in self.inputs.keys():
+            self.inputs[input_name] = None
+        
+        for output_name in self.outputs.keys():
+            self.outputs[output_name] = None
     
     def add_port(self, port_type, port_name='', port_data=None, port_value=None):
         """
@@ -1183,7 +1190,7 @@ class SCHEMA_SYSTEM(object):
         # Update all the schema states
         for schema_name, schema in self.schemas.iteritems():
             init_t = time.time()
-            schema.update()
+            schema.call()
             end_t = time.time()
             schema.t = self.t
             if self.verbose:
