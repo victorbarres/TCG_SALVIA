@@ -13,6 +13,7 @@ Dependencies:
     - networkx to visualize WM state
     - json to save simulation data in json format.
     - pickle to save schema_systems.
+    - pprint for printing data
 """
 import abc
 import time
@@ -20,6 +21,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+import pprint
 
 import networkx as nx
 import json
@@ -281,6 +283,23 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             - params (DICT): contains all the parameters.
         """
         self.params = params
+    
+    def update_param(self, param_path, param_value):
+        """
+        Update the parameter value defined by the param_path to param_value.
+        
+        Args:
+            - param_path (str): String giving the path to the param using . chain (e.g. "dynamics.activation' would set the path to params['dynamics']['activation'])
+            - param_value (): New value of the parameter
+        """
+        path_list = param_path.split('.')
+        param_name = path_list.pop()
+        parent = self.params
+        for key in path_list:
+            parent = parent[key]
+        
+        if param_name in parent.key():
+            parent[param_name] = param_value
         
     def get_input(self, port_name):
         """
@@ -1310,7 +1329,18 @@ class SCHEMA_SYSTEM(object):
                 plt.title(title)
                 img = plt.imread(img_name)
                 plt.imshow(img)
-                
+    
+    def show_params(self):
+        """
+        Display all the parameters of the schema system.
+        """
+        for schema in self.schemas:
+            print '########################'
+            print schema.name
+            print '########################'
+            pprint.pprint(schema.params, indent=1, width=1)
+            print ''
+            
 ########################
 ### MODULE FUNCTIONS ###
 ########################
