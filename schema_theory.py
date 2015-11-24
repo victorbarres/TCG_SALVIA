@@ -581,7 +581,7 @@ class WM(PROCEDURAL_SCHEMA):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
         - params (DICT): {'dyn': {'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
-                          'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT}}
+                          'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT, 'coop_asymmetry':FLOAT, 'comp_asymmetry':FLOAT, 'P_comp':FLOAT, 'P_coop':FLOAT}}
             Note:
             - coop_weight (FLOAT): weight of cooperation f-links
             - comp_weight (FLOAT): weight of competition f-links
@@ -1256,6 +1256,15 @@ class SCHEMA_SYSTEM(object):
             data['schema_states'][schema_name] = schema.get_state()
         return data
     
+    def get_params(self):
+        """
+        """
+        sys_params = {}
+        for schema_name, schema in self.schemas.iteritems():
+            sys_params[schema_name] = schema.params
+        
+        return sys_params
+    
     def save_sim(self, file_name = 'output.json'):
         """
         """
@@ -1334,12 +1343,9 @@ class SCHEMA_SYSTEM(object):
         """
         Display all the parameters of the schema system.
         """
-        for schema in self.schemas:
-            print '########################'
-            print schema.name
-            print '########################'
-            pprint.pprint(schema.params, indent=1, width=1)
-            print ''
+        print "MODEL PARAMETERS"
+        sys_params = self.get_params()
+        pprint.pprint(sys_params, indent=1, width=1)
             
 ########################
 ### MODULE FUNCTIONS ###
