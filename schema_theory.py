@@ -298,7 +298,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         for key in path_list:
             parent = parent[key]
         
-        if param_name in parent.key():
+        if param_name in parent.keys():
             parent[param_name] = param_value
         
     def get_input(self, port_name):
@@ -1180,6 +1180,18 @@ class SCHEMA_SYSTEM(object):
         Sets system input to 'sys_input'
         """
         self.input = sys_input
+    
+    def update_param(self, schema_name, param_path, param_value):
+        """
+        Update the parameter valuein schema_name defined by the param_path to param_value.
+        
+         Args:
+            - schema_name (str): name of the target schema
+            - param_path (str): String giving the path to the param using . chain (e.g. "dynamics.activation' would set the path to params['dynamics']['activation'])
+            - param_value (): New value of the parameter
+        """
+        schema = self.schemas[schema_name]
+        schema.update_param(param_path, param_value)
         
     def get_output(self):
         """
