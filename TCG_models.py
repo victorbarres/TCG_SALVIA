@@ -35,7 +35,7 @@ def TCG_production_system(name='language_system_P'):
                         'Utter':['']
                         }
    
-   # Initializing schema system
+    # Initializing schema system
     language_system_P = st.SCHEMA_SYSTEM(name)
     
     # Setting up schema to brain mappings

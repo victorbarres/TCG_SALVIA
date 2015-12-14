@@ -308,7 +308,7 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
         """
         self.conceptualization = conceptualization
     
-    def update(self):
+    def process(self):
         """
         """
         SceneRep = self.inputs['from_visual_WM']
@@ -394,7 +394,7 @@ class CONCEPT_LTM(LTM):
             if new_schema:
                 self.add_schema(new_schema)
     
-    def update(self):
+    def process(self):
         self.outputs['to_conceptualizer'] =  self.schemas
         self.outputs['to_semantic_WM'] = self.schemas
         
@@ -426,7 +426,7 @@ class SEMANTIC_WM(WM):
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
-    def update(self):
+    def process(self):
         """
         """
         mode = self.inputs['from_control']
@@ -599,7 +599,7 @@ class GRAMMATICAL_LTM(LTM):
             new_cxn_schema = CXN_SCHEMA(cxn, self.params['init_act']*preference)
             self.add_schema(new_cxn_schema)
 
-    def update(self):
+    def process(self):
         """
         """
         self.outputs['to_cxn_retrieval_P'] =  self.schemas
@@ -635,7 +635,7 @@ class GRAMMATICAL_WM_P(WM):
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         
-    def update(self):
+    def process(self):
         """
         """
         sem_input = self.inputs['from_semantic_WM'] # I need to tie the activity of the cxn_instances to that of the SemRep.
@@ -1334,7 +1334,7 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.cxn_instances = []
     
-    def update(self):
+    def process(self):
         """
         """
         SemRep = self.inputs['from_semantic_WM']
@@ -1438,7 +1438,7 @@ class PHON_WM_P(WM):
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
     
-    def update(self):
+    def process(self):
         """
         """
         phon_sequence = self.inputs['from_grammatical_WM_P']
@@ -1480,7 +1480,7 @@ class UTTER(PROCEDURAL_SCHEMA):
         self.params = {'speech_rate':10}
         self.utterance_stack = []
     
-    def update(self):
+    def process(self):
         """
         """
         new_utterance =  self.inputs['from_phonological_WM_P']
@@ -1508,7 +1508,7 @@ class PHON_WM_C(WM):
         self.phon_sequence = []
 
     
-    def update(self):
+    def process(self):
         """
         """
         phon_form = self.inputs['from_input']
@@ -1544,7 +1544,7 @@ class GRAMMATICAL_WM_C(WM):
         self.pred_init = None
         
     
-    def update(self):
+    def process(self):
         """
         NOTES:
             - NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
@@ -2042,7 +2042,7 @@ class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.cxn_instances = []
     
-    def update(self):
+    def process(self):
         """
         """
         cxn_schemas = self.inputs['from_grammatical_LTM']
@@ -2110,7 +2110,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             self.state['unexpressed_sem'] = False
             self.params['task']['start_produce'] += self.t
     
-    def update(self):
+    def process(self):
         """
         """
         # Communicating with semantic_WM

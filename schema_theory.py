@@ -216,7 +216,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             self.post_output(output_name, val)
     
     @abc.abstractmethod    
-    def update(self):
+    def process(self):
         """
         This function should be specified for every specific PROCEDURAL_SCHEMA class.
         When called the function updates the state of the procedural schema 
@@ -224,12 +224,12 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         """
         return
     
-    def call(self):
+    def update(self):
         """
         Gathers the input, update the state, posts the outputs, resets inputs and outputs namespaces.
         """
         self.get()
-        self.update()
+        self.process()
         self.post()
         
         # Reset input and output namespace values.
@@ -1221,7 +1221,7 @@ class SCHEMA_SYSTEM(object):
         # Update all the schema states
         for schema_name, schema in self.schemas.iteritems():
             init_t = time.time()
-            schema.call()
+            schema.update()
             end_t = time.time()
             schema.t = self.t
             if self.verbose:

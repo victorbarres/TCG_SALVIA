@@ -281,7 +281,7 @@ class SALIENCY_MAP(PROCEDURAL_SCHEMA):
         self.IOR_mask = None
         self.saliency_map = None
     
-    def update(self):
+    def process(self):
         """
         """
         cur_fixation = self.inputs['from_saccade_system']
@@ -330,7 +330,7 @@ class SACCADE_SYSTEM(PROCEDURAL_SCHEMA):
         self.eye_pos = None # Current  eye position (x,y)
         self.next_fixation = None # Next saccade coordinates (x,y)
     
-    def update(self):
+    def process(self):
         """
         """
         saliency_map  = self.inputs['from_saliency_map']
@@ -376,7 +376,7 @@ class FIXATION(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_output')
         self.eye_pos = (0,0)
     
-    def update(self):
+    def process(self):
         """
         """
         eye_pos = self.inputs['from_saccade_system']
@@ -404,7 +404,7 @@ class VISUAL_WM(WM):
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SceneRep = nx.DiGraph()
         
-    def update(self):
+    def process(self):
         """
         """
         ss_input= self.inputs['from_subscene_rec']
@@ -508,7 +508,7 @@ class PERCEPT_LTM(LTM):
             if new_schema:
                 self.add_schema(new_schema)
     
-    def update(self):
+    def process(self):
         """
         """
         self.outputs['to_subscene_rec'] =  self.schemas
@@ -609,7 +609,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         # Initialize eye_pos to center of scene.
         self.eye_pos = (my_scene.width/2, my_scene.height/2)
             
-    def update(self):
+    def process(self):
         """
         """
         scene_input = self.inputs['from_input']
@@ -705,7 +705,7 @@ class SIMPLE_SALIENCY_MAP(PROCEDURAL_SCHEMA):
         self.BU_saliency_map = None
         self.areas = []
     
-    def update(self):
+    def process(self):
         """
         """
         areas = self.inputs['from_visual_WM']
