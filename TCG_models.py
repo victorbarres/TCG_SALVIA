@@ -605,7 +605,7 @@ def TCG_full_system(name='full_system'):
                     'Control':['DLPFC'],
                     'Concept_LTM':['']}
    
-   # Initializing schema system
+    # Initializing schema system
     system = st.SCHEMA_SYSTEM(name)
     
     # Setting up schema to brain mappings
@@ -751,6 +751,43 @@ def TCG_full_system(name='full_system'):
     grammaticalLTM.initialize(my_grammar)
     
     return system
+
+def TCG_SemWM(name='Semantic_WM'):
+    """
+    Test model that only includes the Semantic WM. 
+    Note that Control is required to send the "produce" signal.
+    """
+    
+    # Instantiating all the necessary procedural schemas
+    semanticWM = ls.SEMANTIC_WM()
+    conceptLTM = ls.CONCEPT_LTM()
+    control = ls.CONTROL()
+    
+    # Defining schema to brain mappings.    
+    mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus']}
+    
+    # Initializing schema system
+    language_system_sem = st.SCHEMA_SYSTEM('Semantic_WM')
+    language_schemas = [conceptLTM, semanticWM, control]
+    language_system_sem.add_schemas(language_schemas)
+    
+    # Setting up schema to brain mappings
+    brain_mapping = st.BRAIN_MAPPING()
+    brain_mapping.schema_mapping = mapping
+    language_system_sem.brain_mapping = brain_mapping
+    
+    # Setting up language schema system.
+    language_system_sem.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    language_system_sem.set_input_ports([semanticWM.find_port('from_conceptualizer')])
+    language_system_sem.set_output_ports([semanticWM.find_port('to_cxn_retrieval_P')])
+        
+    # Loading data
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    
+    # Initialize conceptual LTM content
+    conceptLTM.initialize(my_conceptual_knowledge)
+    
+    return language_system_sem
 
 if __name__ == '__main__':
     production_system = TCG_production_system()

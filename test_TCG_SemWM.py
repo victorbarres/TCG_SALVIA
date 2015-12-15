@@ -4,39 +4,18 @@
 SemanticWM test cases.
 """
 
-import schema_theory as st
 import language_schemas as ls
 from loader import TCG_LOADER
+from TCG_models import TCG_SemWM
 from viewer import TCG_VIEWER
 
+language_system_sem = TCG_SemWM()
 
-# Instantiating all the necessary procedural schemas
-semanticWM = ls.SEMANTIC_WM()
-conceptLTM = ls.CONCEPT_LTM()
-control = ls.CONTROL()
-
-
-language_system_sem = st.SCHEMA_SYSTEM('Semantic_WM')
-language_schemas = [conceptLTM, semanticWM, control]
-language_system_sem.add_schemas(language_schemas)
-
-# Setting up schema to brain mappings
-brain_mapping = st.BRAIN_MAPPING()
-brain_mapping.schema_mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus']}
-language_system_sem.brain_mapping = brain_mapping
-
-language_system_sem.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
-language_system_sem.set_input_ports([semanticWM.find_port('from_conceptualizer')])
-language_system_sem.set_output_ports([semanticWM.find_port('to_cxn_retrieval_P')])
-
+# Display system
 language_system_sem.system2dot(image_type='png', disp=True)
 
-# Loading data
-my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-# Initialize conceptual LTM content
-conceptLTM.initialize(my_conceptual_knowledge)
-
 # Setting up semantic inputs
+conceptLTM = language_system_sem.schemas['Concept_LTM']
 sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
 sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
 
