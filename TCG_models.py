@@ -9,7 +9,6 @@ import language_schemas as ls
 import perceptual_schemas as ps
 from loader import TCG_LOADER
     
-
 def TCG_production_system(name='language_system_P'):
     """
     Creates and returns the TCG production schema system.
@@ -47,6 +46,7 @@ def TCG_production_system(name='language_system_P'):
     language_schemas = [conceptLTM, semanticWM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, control]
 
     language_system_P.add_schemas(language_schemas)
+    
     language_system_P.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
     language_system_P.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
     language_system_P.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')

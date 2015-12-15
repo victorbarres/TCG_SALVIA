@@ -826,7 +826,8 @@ class WM(PROCEDURAL_SCHEMA):
         
         
         # Plot global activity values.
-        num_plots =  len([val==True for val in [WM_act, c2_levels]])
+        num_plots =  len([val for val in [WM_act, c2_levels] if val==True])
+        
         if num_plots != 0:
             plt.figure(facecolor='white')
             i=0

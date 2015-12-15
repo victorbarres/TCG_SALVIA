@@ -29,7 +29,7 @@ def test(seed=None):
     
     (sem_insts, next_time, prop) = generator.next()
     
-    set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
+    set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900   
     save_states = [100]
     
