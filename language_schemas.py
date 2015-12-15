@@ -456,10 +456,9 @@ class SEMANTIC_WM(WM):
         expressed = self.inputs['from_grammatical_WM_P']
         if expressed:
             for name in expressed:
-                self.SemRep.node[name]['expressed'] = True
+                self.SemRep.node[name]['expressed'] = True # NEED TO EXTENT TO RELATIONS.
     
-        output_to_gram = self.gram_WM_P_ouput()
-        self.outputs['to_grammatical_WM_P'] =  output_to_gram
+        self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_ouput()
         
         if mode=='produce' and self.has_new_sem():
             self.outputs['to_cxn_retrieval_P'] = self.SemRep
@@ -675,7 +674,7 @@ class GRAMMATICAL_WM_P(WM):
         expressed. 2. The SemFrame node that covers is linked to a TP_PHON.
         This is more inclusive that only lexical items and should probably be replaced by:
             - 1. Create a specific set of lexical construction
-            - 2. Define higher level consstruction which include lexical items as requiring to slot in the lexical construction.
+            - 2. Define higher level construction which include lexical items as requiring to slot in the lexical construction.
         """
         for inst in self.schema_insts:
             cover_nodes = inst.covers['nodes']
@@ -707,7 +706,7 @@ class GRAMMATICAL_WM_P(WM):
         
             - Need to clarify how the score_threshold is defined.
             - Note that the only reason I don't just take the 1 winner above threshold is because of the issue of having multipe none overlapping assemblages.
-            Might want to revisit assemble.
+            - Might want to revisit assemble.
         """
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         assemblages = self.assemble()
