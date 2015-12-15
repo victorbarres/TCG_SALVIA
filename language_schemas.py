@@ -286,7 +286,7 @@ class PHON_SCHEMA_INST(SCHEMA_INST):
         self.content = content_copy
 
 ###################################
-### Language procedural schemas ###
+### LANGUAGE PROCEDURAL SCHEMAS ###
 ###################################
 
 #################
@@ -573,8 +573,8 @@ class SEMANTIC_WM(WM):
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
 
-###############
-### GRAMMAR ###
+###################
+### GRAMMAR LTM ###
 class GRAMMATICAL_LTM(LTM):
     """
     """
@@ -615,8 +615,8 @@ class GRAMMATICAL_LTM(LTM):
         data['params'] = self.params
         return data
         
-####################
-### GRAMMAR PROD ###  
+##################
+### PRODUCTION ###  
 class GRAMMATICAL_WM_P(WM):
     """
     TO DO!!
@@ -1491,8 +1491,8 @@ class UTTER(PROCEDURAL_SCHEMA):
             new_utterance.reverse()
             self.utterance_stack =  new_utterance + self.utterance_stack
             
-####################
-### GRAMMAR COMP ###
+#####################
+### COMPREHENSION ###
 class PHON_WM_C(WM):
     """
     Receives input one word at a time.

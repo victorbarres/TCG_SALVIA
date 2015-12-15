@@ -141,7 +141,8 @@ class CONNECT(SCHEMA):
         """
         data = {"id":self.id, "name":self.name, "port_from":self.port_from.name, "port_to":self.port_to.name, "weight":self.weight, "delay":self.delay}
         return data
-
+        
+### KNOWLDGE AND PROCEDURAL SCHEMAS ###
 class KNOWLEDGE_SCHEMA(SCHEMA):
     """
     Knowledge schema base class (Declarative schema)
@@ -517,7 +518,7 @@ class INST_ACTIVATION(object):
     def logistic(self, x):
         return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
         
-## LONG TERM MEMORY ###
+### LONG TERM MEMORY ###
 class LTM(PROCEDURAL_SCHEMA):
     """
     Long term memory. 
