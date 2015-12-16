@@ -56,7 +56,7 @@ def test(seed=None):
     language_system_P.schemas['Grammatical_WM_P'].show_state()
     language_system_P.schemas['Phonological_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     language_system_P.save_sim('./tmp/test_language_output.json')
-    language_system_P.show_params()
+#    language_system_P.show_params()
 
 def test_params(seed=None):
     """

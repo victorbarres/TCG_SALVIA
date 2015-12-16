@@ -7,7 +7,6 @@ SemanticWM test cases.
 import language_schemas as ls
 from loader import TCG_LOADER
 from TCG_models import TCG_SemWM
-from viewer import TCG_VIEWER
 
 language_system_sem = TCG_SemWM()
 

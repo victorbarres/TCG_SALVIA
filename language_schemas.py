@@ -455,8 +455,11 @@ class SEMANTIC_WM(WM):
         
         expressed = self.inputs['from_grammatical_WM_P']
         if expressed:
-            for name in expressed:
+            for name in expressed['nodes']:
                 self.SemRep.node[name]['expressed'] = True # NEED TO EXTENT TO RELATIONS.
+            for name in expressed['edges']:
+                d = self.SemRep.get_edge_data(name[0], name[1])
+                d['expressed'] = True
     
         self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_ouput()
         
@@ -523,11 +526,13 @@ class SEMANTIC_WM(WM):
         NOTE:   
             - NEED TO EXTEND TO RELATIONS.
         """
-        output = {}
+        output = {'nodes':{}, 'edges':{}}
         for n,d in self.SemRep.nodes(data=True):
             if not(d['expressed']):
-                output[n] = d['cpt_inst'].activity
-                
+                output['nodes'][n] = d['cpt_inst'].activity
+        for u,v,d in self.SemRep.edges(data=True):
+            if not(d['expressed']):
+                output['edges'][(u,v)] = d['cpt_inst'].activity
         return output
         
     
@@ -655,6 +660,9 @@ class GRAMMATICAL_WM_P(WM):
                 self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
                 self.outputs['to_semantic_WM'] =  output['sem_WM_output']
     
+    ############################
+    ### state update methods ###
+    ############################
     def add_new_insts(self, new_insts):
         """
         Args:
@@ -670,8 +678,10 @@ class GRAMMATICAL_WM_P(WM):
     
     def convey_sem_activations(self, sem_input):
         """
-        For now, a construction receives activations from semantic working memory if 1. It's semframe covers at least one semrep that has not yet been 
-        expressed. 2. The SemFrame node that covers is linked to a TP_PHON.
+        For now, a construction receives activations from semantic working memory if 
+            - 1. It's semframe covers at least one semrep  node that has not yet been 
+        expressed. 
+            - 2. The SemFrame node that covers is linked to a TP_PHON.
         This is more inclusive that only lexical items and should probably be replaced by:
             - 1. Create a specific set of lexical construction
             - 2. Define higher level construction which include lexical items as requiring to slot in the lexical construction.
@@ -680,12 +690,12 @@ class GRAMMATICAL_WM_P(WM):
             cover_nodes = inst.covers['nodes']
             
             act = 0
-            for node in sem_input:
+            for node in sem_input['nodes']:
                 inst_node = next((k for k,v in cover_nodes.items() if v==node), None) # Instances covers the node through sf_node
                 if inst_node:
                     inst_form = inst.content.node2form(inst_node)
                     if isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form. (Lexicalization)
-                        act += sem_input[node]              
+                        act += sem_input['nodes'][node]              
             act = act/len(cover_nodes.keys())
             inst.activation.E += act
     
@@ -698,7 +708,7 @@ class GRAMMATICAL_WM_P(WM):
 #        for link in self.comp_links:
 #            link.update_weight(self.params['C2']['comp_weight'] + self.params['C2']['comp_weight']*pressure)
 
-    def produce_form(self,sem_input, phon_input):
+    def produce_form(self, sem_input, phon_input):
         """
         NOTE: 
             - There is an issue with the fact that it takes 2 steps for the fact that part of the SemRep has been expressed gets
@@ -712,14 +722,15 @@ class GRAMMATICAL_WM_P(WM):
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
-            sem_WM_output = []
+            sem_WM_output = {'nodes':[], 'edges':[]}
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
                 phon_WM_output.extend(phon_form)
-                sem_WM_output.extend(expressed)
+                sem_WM_output['nodes'].extend(expressed['nodes'])
+                sem_WM_output['edges'].extend(expressed['edges'])
                 assemblages.remove(winner_assemblage)
-            
+                
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
                 
@@ -779,7 +790,10 @@ class GRAMMATICAL_WM_P(WM):
         for assemblage in assemblages:
 #            eq_inst = self.assemblage2inst(assemblage)
             (phon_form, missing_info, expressed, eq_inst) = self.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage.
-            sem_length = len([sf_node for sf_node in eq_inst.content.SemFrame.nodes if eq_inst.covers['nodes'][sf_node.name] in sem_input])
+            sem_length_nodes = len([sf_node for sf_node, semrep_node in eq_inst.covers['nodes'].iteritems() if semrep_node in sem_input['nodes']]) # Only counts nodes that have NOT alrady been expressed.
+            sem_length_edges = len([sf_edge for sf_edge, semrep_edge in eq_inst.covers['edges'].iteritems() if semrep_edge in sem_input['edges']]) # Only counts edges that have NOT alrady been expressed. 
+
+            sem_length = sem_length_nodes + sem_length_edges          
             form_length = len(phon_form)         
             continuity = 0
             for i in range(1, min(len(phon_form)+1, len(phon_input)+1)):
@@ -1059,7 +1073,7 @@ class GRAMMATICAL_WM_P(WM):
         return {"match_cat":match_cat, "links":links}
     
     ##################
-    ### Assemblage ###
+    ### assemblage ###
     ##################    
     def assemble(self): # THIS IS VERY DIFFERENT FROM THE ASSEMBLE ALGORITHM OF TCG 1.0
         """
@@ -1270,10 +1284,10 @@ class GRAMMATICAL_WM_P(WM):
         Returns: (phon_form, missing_info, expressed) with:
             - phon_form = the longest consecutive TP_PHON sequence that can be uttered.
             - missing_info = pointer to the SemRep node associated with the first TP_SLOT encountered, represented the missing information.
-            - expressed = the set of semrep nodes that the assemblage expresses.
+            - expressed = the semrep that the assemblage expresses (nodes and relations) as defined in the instance trace.
         """
         eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
-        expressed = eq_inst.trace['semrep']['nodes']
+        expressed = eq_inst.trace['semrep']
         phon_form = []
         missing_info = None
         for form in eq_inst.content.SynForm.form:
