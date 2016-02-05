@@ -73,6 +73,17 @@
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boy"}],
 		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "GIRL",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "GIRL", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "girl"}],
+		"SymLinks" : {"N1" : "S1"}
 	}
 
 	]

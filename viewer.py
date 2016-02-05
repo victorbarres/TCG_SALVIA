@@ -28,20 +28,20 @@ class TCG_VIEWER:
     Connects the simulation to the the TCG viewer.
     
     Data:
-        - server_port (INT): Server port value, default 8080.
-        - viewer_path (STR): path to the viewer main directory.
+        - SERVER_PORT (INT): Server port value, default 8080.
+        - VIEWER_PATH (STR): path to the viewer main directory: "viewer/"
         - data_path (STR): Path to the data folder that needs to be displayed.
         - tmp (STR): Temp folder.
     """
 
-    def __init__(self, data_path, PORT=8000, viewer_path="viewer/"):
+    def __init__(self, data_path, viewer_path="viewer/"):
         """
         Requires the path (data_path) to the folder that contains the data to be diplayed in the viewer.
         """
-        self.server_port = PORT
-        self.viewer_path = viewer_path
+        self.SEVER_PORT = 8000
+        self.VIEWER_PATH = "viewer/"
+        self.VIEWER_TMP = self.VIEWER_PATH + "tmp/"
         self.data_path = data_path
-        self.tmp = "tmp/"
         self.conceptual_knowledge = None
         self.perceptual_knowledge = None
         self.conceptualization = None
@@ -60,9 +60,9 @@ class TCG_VIEWER:
         Setting up server at port PORT serving the viewer folder defined by viewer_path
         and opens default browser to "http://localhost:PORT"
         """
-        PORT = self.server_port
+        PORT = self.SERVER_PORT
     
-        os.chdir(self.viewer_path)
+        os.chdir(self.VIEWER_PATH)
     
         Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
     
@@ -76,16 +76,16 @@ class TCG_VIEWER:
         """
         Copies and creates all the required data in viewer/tmp directory.
         """
-        if os.path.exists(self.viewer_path + self.tmp):
-            shutil.rmtree(self.viewer_path + self.tmp)
+        if os.path.exists(self.VIEWER_TMP):
+            shutil.rmtree(self.VIEWER_TMP)
         print os.getcwd()
-        shutil.copytree(self.data_path, self.viewer_path + self.tmp)
+        shutil.copytree(self.data_path, self.VIEWER_TMP)
         
-        self.conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", self.viewer_path + self.tmp)
-        self.perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", self.viewer_path + self.tmp)
-        self.conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", self.viewer_path + self.tmp, self.conceptual_knowledge, self.perceptual_knowledge)
-        self.grammar = TCG_LOADER.load_grammar("TCG_grammar.json", self.viewer_path + self.tmp, self.conceptual_knowledge)
-        self.scene = TCG_LOADER.load_scene("TCG_scene.json", self.viewer_path + self.tmp)
+        self.conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", self.VIEWER_TMP)
+        self.perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", self.VIEWER_TMP)
+        self.conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", self.VIEWER_TMP, self.conceptual_knowledge, self.perceptual_knowledge)
+        self.grammar = TCG_LOADER.load_grammar("TCG_grammar.json", self.VIEWER_TMP, self.conceptual_knowledge)
+        self.scene = TCG_LOADER.load_scene("TCG_scene.json", self.VIEWER_TMP)
         
         self._create_cxn_imgs()
         self._create_concept_img()
@@ -100,7 +100,7 @@ class TCG_VIEWER:
         prog = 'neato'
         file_type = 'svg'
         
-        cpt_folder = self.viewer_path + self.tmp + 'cpt/'        
+        cpt_folder = self.VIEWER_TMP + 'cpt/'        
         
         if os.path.exists(cpt_folder):
             shutil.rmtree(cpt_folder)
@@ -138,7 +138,7 @@ class TCG_VIEWER:
         prog = 'neato'
         file_type = 'svg'
         
-        per_folder = self.viewer_path + self.tmp + 'per/'        
+        per_folder = self.VIEWER_TMP + 'per/'        
         
         if os.path.exists(per_folder):
             shutil.rmtree(per_folder)
@@ -178,7 +178,7 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
-        czer_folder = self.viewer_path + self.tmp + 'czer/'        
+        czer_folder = self.VIEWER_TMP + 'czer/'        
         
         if os.path.exists(czer_folder):
             shutil.rmtree(czer_folder)
@@ -225,7 +225,7 @@ class TCG_VIEWER:
         prog = 'dot'
         file_type = 'svg'
         
-        cxn_folder = self.viewer_path + self.tmp + 'cxn/'  
+        cxn_folder = self.VIEWER_TMP + 'cxn/'  
         
         if os.path.exists(cxn_folder):
             shutil.rmtree(cxn_folder)
@@ -256,6 +256,10 @@ class TCG_VIEWER:
         for cxn_file in cxn_graphs:
             cmd = "%s -T%s %s > %s.%s" %(prog, file_type, cxn_folder + cxn_file, cxn_folder + cxn_file, file_type)
             subprocess.call(cmd, shell=True)
+    
+    ##########################
+    # STATIC DISPLAY METHODS #
+    ##########################
     
     @staticmethod
     def _create_concepts_cluster(cpt_knowledge, name=None):
@@ -688,7 +692,7 @@ class TCG_VIEWER:
         return WMs_cluster
         
     @staticmethod
-    def display_cxn(cxn):
+    def display_cxn(cxn, folder='./tmp/'):
         """
         Create graph images for the construction 'cxn'.
         Uses graphviz with pydot implementation.
@@ -696,7 +700,10 @@ class TCG_VIEWER:
         Args:
             - cxn (CXN): the construction object to be displayed.
         """        
-        tmp_folder = './tmp/'        
+        tmp_folder = folder   
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
+
         
         prog = 'dot'
         file_type = 'png'
@@ -728,11 +735,14 @@ class TCG_VIEWER:
         plt.imshow(img)
         
     @staticmethod
-    def display_cxn_instance(cxn_inst, name=''):
+    def display_cxn_instance(cxn_inst, name='', folder='./tmp/'):
         """
         Display a construction instance.
         """
-        tmp_folder = './tmp/'        
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
+            
         prog = 'dot'
         file_type = 'png'
         
@@ -757,12 +767,15 @@ class TCG_VIEWER:
         plt.imshow(img)
         
     @staticmethod
-    def display_cxn_assemblage(cxn_assemblage, name='cxn_assembalge', concise=False):
+    def display_cxn_assemblage(cxn_assemblage, name='cxn_assembalge', concise=False, folder='./tmp/'):
         """
         Nicer display for assemblage.
         Should have a concise=True/False option (concise does not show the inside of cxn. Ideally, clicking on a cxn would expand it)
         """
-        tmp_folder = './tmp/'        
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
+            
         prog = 'dot'
         file_type = 'svg'
         
@@ -791,11 +804,14 @@ class TCG_VIEWER:
 #        plt.imshow(img)
     
     @staticmethod
-    def display_gramWM_state(WM, concise=False):
+    def display_gramWM_state(WM, concise=False, folder='./tmp/'):
         """
         Nicer display for wm state.
         """
-        tmp_folder = './tmp/'        
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
+            
         prog = 'dot'
         file_type = 'svg'
         
@@ -817,12 +833,14 @@ class TCG_VIEWER:
         subprocess.call(cmd, shell=True)
     
     @staticmethod
-    def display_semWM_state(semWM):
+    def display_semWM_state(semWM, folder='./tmp/'):
         """
         Create graph images for the semanic working memory
         Uses graphviz with pydot implementation.
         """        
-        tmp_folder = './tmp/'   
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
         
         prog = 'dot'
         file_type = 'svg'
@@ -849,12 +867,14 @@ class TCG_VIEWER:
 #        plt.imshow(img)
         
     @staticmethod
-    def display_lingWM_state(semWM, gramWM, concise=False):
+    def display_lingWM_state(semWM, gramWM, concise=False, folder='./tmp/'):
         """
         Create graph images for the ling working memory (semantic WM + grammatical WM)
         Uses graphviz with pydot implementation.
         """        
-        tmp_folder = './tmp/'   
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
         
         prog = 'dot'
         file_type = 'svg'
@@ -883,12 +903,14 @@ class TCG_VIEWER:
 #        plt.imshow(img)
         
     @staticmethod
-    def display_visWM_state(visWM):
+    def display_visWM_state(visWM, folder='./tmp/'):
         """
         Create graph images for the visual working memory.
         Uses graphviz with pydot implementation.
         """
-        tmp_folder = './tmp/'
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
         
         prog = 'neato' # Need to use neato or fdp to make use of node positions in rendering
         file_type = 'svg'
@@ -906,11 +928,14 @@ class TCG_VIEWER:
         subprocess.call(cmd, shell=True)
     
     @staticmethod
-    def display_WMs_state(visWM, semWM, gramWM, concise=True):
+    def display_WMs_state(visWM, semWM, gramWM, concise=True, folder='./tmp/'):
         """
         Create graph images for including both visual and linguisitc working memory.
         """
-        tmp_folder = './tmp/'
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
+        
         
         prog = 'dot' # Need to use neato or fdp to make use of node positions in rendering
         file_type = 'svg'

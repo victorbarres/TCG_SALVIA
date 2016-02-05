@@ -144,6 +144,17 @@
 			"timing":[],
 			
 			"comments":"test the case of two transitive actions with same participants"
+		},
+		
+		"two_transitives_shared_agent":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["MAN(m1)", "BOY(b1)", "GIRL(g1)", "KICK(a1)", "HIT(a2)", "AGENT(r1)", "AGENT(r2)", "PATIENT(r3)", "PATIENT(r4)", "r1(a1,m1)", "r2(a2,m1)", "r3(a1,b1)", "r4(a2,g1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			
+			"comments":"test the case of two transitive actions with only a shared agent."
 		}
 	}
 

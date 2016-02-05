@@ -17,6 +17,7 @@ Dependencies:
 """
 import abc
 import time
+import os
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -1288,7 +1289,7 @@ class SCHEMA_SYSTEM(object):
     #######################
     ### DISPLAY METHODS ###
     #######################
-    def system2dot(self, image_type='svg', disp=False, show_brain_regions=False):
+    def system2dot(self, image_type='svg', disp=False, show_brain_regions=False, folder='./tmp/'):
         """
         Generates a dot file of the system's graph.
         Also creates an image.
@@ -1296,7 +1297,9 @@ class SCHEMA_SYSTEM(object):
         import subprocess
         import pydot
         
-        tmp_folder = './tmp/'          
+        tmp_folder = folder
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)       
         
         prog = 'dot'
         file_type = image_type
