@@ -1,0 +1,150 @@
+{ 
+	"inputs":{
+		"test": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"P1": ["WOMAN(w1)"],
+				"P2":["MAN(m1)"],
+				"P3":["MAN(m2)"],
+				"P4":["KICK(a1)"],
+				"P5":["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
+				"P6":["WEAR(a2)"],
+				"P7":["AGENT(r3)", "r3(a2, w1)"],
+				"P8":["PATIENT(r4)", "?ENTITY(e1)", "r4(a2, e1)"],
+				"P9":["DRESS(e1)"] 
+			  },
+			  "sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"],
+			  "timing":[],
+			  "comments": "Test semantic input. The ? is optional but indicates that this concept does not have a possible lexicalization. Needs to be updated before it can be expressed."
+			},
+		"test_name": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"P1": ["WOMAN(w1)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": ""
+			},
+		"woman_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 1.0)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test naming"
+			},
+		"kick_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 1.0)", "MAN(m1, 1.0)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive"
+			},
+		"blue_woman": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"P1": ["WOMAN(w1, 0.9)"],
+				"P2": ["BLUE(b1, 0.8)"],
+				"P3": ["MODIFY(m1, 0.7)", "m1(b1, w1)"]
+			  },
+			  "sequence" :["P1", "P2", "P3"],
+			  "timing":[],
+			  "comments": ""
+			},
+		"blue_woman_kick_man":{
+			"sem_rate":10,
+			"propositions"  : {
+				"P1":["WOMAN(w1)"],
+				"P2":["MAN(m1)"],
+				"P3":["KICK(a1)"],
+				"P4":["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
+				"P5":["WEAR(a2)"],
+				"P6":["AGENT(r3)", "r3(a2, w1)"],
+				"P7":["PATIENT(r4)", "DRESS(d1)", "r4(a2, d1)"],
+				"P8":["BLUE(q1)", "MODIFY(r5)", "r5(q1,d1)"]
+			  },
+			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+			"timing":[],
+			"comments":""
+			}, 
+			
+		"kick_static_focus_agent":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 0.9)", "MAN(m1, 0.7)", "KICK(a1, 0.9)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test agent focus on static representation. This does not seem to work since there is also an effect of lexical competition on WOMAN"
+		},
+		
+		"kick_static_focus_patient":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 0.7)", "MAN(m1, 0.9)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test patient focus on static representation. This does not seem to work since there is also an effect of lexical competition on WOMAN"
+		},
+		
+		"kick_static_focus_agent2":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["BOY(w1, 0.9)", "MAN(m1, 0.7)", "KICK(a1, 0.9)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test agent focus on static representation."
+		},
+		
+		"kick_static_focus_patient2":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["BOY(w1, 0.7)", "MAN(m1, 0.9)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test patient focus on static representation."
+		},
+		
+		"kick_dynamic_focus_patient2":{
+			"sem_rate":50,
+			"propositions": {
+				"P1":["MAN(m1, 0.9)"],
+				"P2":["KICK(a1, 0.8)"],
+				"P3":["BOY(w1, 0.7)"],
+				"P4":["AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1", "P2", "P3", "P4"],
+			"timing":[],
+			"comments":"In this case I want to show that the initial advantage of given to the patient can be overrun by the decay in grammatical WM. By playing on the rate, we can see at which point the system produces exclusively BOY focused utterances (r=20?)."
+		},
+		
+		"ditransitive_give":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["TURTLE(o1)", "BOY(o2)", "GIRL(o3)", "GIVE(a1)", "THEME(r1)", "AGENT(r2)", "RECIPIENT(r3)", "r2(a1, o2)", "r1(a1,o1)", "r3(a1, o3)"]
+			},
+			"sequence": ["P1"],
+			"timing":[],
+			"comments":"test double object and oblique dative argument structure constructions"
+		},
+		
+		"two_transitives":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["MAN(m1)", "BOY(b1)", "KICK(a1)", "HIT(a2)", "AGENT(r1)", "AGENT(r2)", "PATIENT(r3)", "PATIENT(r4)", "r1(a1,m1)", "r2(a2,b1)", "r3(a1,b1)", "r4(a2,m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			
+			"comments":"test the case of two transitive actions with same participants"
+		}
+	}
+
+}

@@ -78,7 +78,8 @@
 				"HIT" : {},
 				"KICK" : {},
 				"WEAR" : {},
-				"SPLASH" : {}
+				"SPLASH" : {},
+				"MEET" : {}
 			},
 			"INTRANSITIVE" :
 			{
@@ -179,7 +180,8 @@
 			"A5_KICK",
 			"A6_LAUGH",
 			"A7_WATCH",
-			"A8_SPLASH"
+			"A8_SPLASH",
+			"A9_MEET"
 		],
 		"QUALITY":
 		{
@@ -282,6 +284,7 @@
 		"LAUGH" : ["A6_LAUGH"],
 		"WATCH" : ["A7_WATCH"],
 		"SPLASH" : ["A8_SPLASH"],
+		"MEET" : ["A9_MEET"],
 		
 		"RED" : ["Q1_RED"],
 		"BLUE" : ["Q2_BLUE"],

@@ -12,26 +12,27 @@ def test(seed=None):
     """
     Test Incremental Semantic Formulas sem inputs
     """
+    SEM_INPUT = 'sem_inputs_debug.json'
+    INPUT_NAME = 'two_transitives'
     
     language_system_P = TCG_production_system()
 #     Display schema system
-    language_system_P.system2dot(image_type='png', disp=True)
+    language_system_P.system2dot(image_type='png', disp=False)
     
     conceptLTM = language_system_P.schemas['Concept_LTM']
 
-    sem_inputs = TCG_LOADER.load_sem_input("sem_inputs.json", "./data/sem_inputs/")    
+    sem_inputs = TCG_LOADER.load_sem_input(SEM_INPUT, "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
-
-    input_name = 'ditransitive_give'    
-    generator = sem_gen.sem_generator(input_name)
+ 
+    generator = sem_gen.sem_generator(INPUT_NAME)
     
-    language_system_P.schemas['Grammatical_WM_P'].params['C2']['prune_threshold'] = 0.4
+    language_system_P.schemas['Grammatical_WM_P'].params['C2']['prune_threshold'] = 0.1
     
     (sem_insts, next_time, prop) = generator.next()
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900   
-    save_states = [100]
+    save_states = [50, 100, 150, 200]
     
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:

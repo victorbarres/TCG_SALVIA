@@ -1,0 +1,38 @@
+{ 
+	"inputs":{		
+		"kick_joint_reciprocal":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["MAN(m1)"],
+				"P2":["GIRL(w1)"],
+				"P3":["KICK(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1,m1)", "r2(a1 ,w1)" ],
+				"P4":["KICK(a2)", "AGENT(r3)", "PATIENT(r4)", "r3(a2,w1)", "r4(a2 ,m1)" ]
+			},
+			"sequence":["P1", "P2", "P4", "P3"],
+			"timing":[],
+			"comments":"This case illustrates a joint action R(x,y) & R(y,x). Look at how it can be expressed as 'X R Y and Y R X' or 'X and Y R each other' "
+		},
+		
+		"kick_joint_reciprocal_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["MAN(m1)", "GIRL(w1)", "KICK(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1,m1)", "r2(a1 ,w1)", "KICK(a2)", "AGENT(r3)", "PATIENT(r4)", "r3(a2,w1)", "r4(a2 ,m1)" ]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"This case illustrates a joint action R(x,y) & R(y,x). Look at how it can be expressed as 'X R Y and Y R X' or 'X and Y R each other' "
+		},
+		
+		"meet_symmetrical":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["MAN(m1)"],
+				"P2":["GIRL(w1)"],
+				"P3":["MEET(a1)", "AGENT(r1)", "PATIENT(r2)", "AGENT(r3)", "PATIENT(r4)", "r1(a1,m1)", "r2(a1 ,w1)", "r3(a1,w1)", "r4(a1, m1)"]
+			},
+			"sequence": ["P1"],
+			"timing":[],
+			"comments":"This case illustrate a symmetrical action R(x,y) <=> R(y,x). Contrary to joint action, here a SINGLE action node is created."
+		}
+	}
+}

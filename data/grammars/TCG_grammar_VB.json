@@ -516,6 +516,19 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "send"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
+	
+	{
+		"name" : "MEET",
+		"class" : "V",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "MEET", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "meet"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
 
 	{
 		"name" : "BLUE",

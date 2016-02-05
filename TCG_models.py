@@ -115,7 +115,9 @@ def TCG_production_system(name='language_system_P'):
     grammaticalLTM.init_act = 0.3
     
     # Loading data
-    grammar_name = 'TCG_grammar_VB'
+#    grammar_name = 'TCG_grammar_VB'
+#    grammar_name = 'TCG_grammar_VB_light'
+    grammar_name = 'TCG_grammar_VB_super_light'
 #    grammar_name = 'TCG_grammar_VB_naming'
 
    

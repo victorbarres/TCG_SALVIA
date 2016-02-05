@@ -1069,7 +1069,7 @@ class GRAMMATICAL_WM_P(WM):
                 if links:
                     match_cat = 1
                 else:
-                    match_cat = -1      
+                    match_cat = 0     
         return {"match_cat":match_cat, "links":links}
     
     ##################
