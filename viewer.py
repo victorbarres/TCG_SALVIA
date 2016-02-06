@@ -47,7 +47,9 @@ class TCG_VIEWER:
         self.conceptualization = None
         self.grammar = None
         self.scene = None
-    
+    ######################
+    ### Server methods ### 
+        
     def start_viewer(self):
         """
         Starts the viewer.
@@ -91,6 +93,9 @@ class TCG_VIEWER:
         self._create_concept_img()
         self._create_percept_img()
         self._create_conceptualizer_img()
+
+    #####################################
+    ### LTM knowledge display methods ###   
     
     def _create_concept_img(self):
         """
@@ -257,9 +262,9 @@ class TCG_VIEWER:
             cmd = "%s -T%s %s > %s.%s" %(prog, file_type, cxn_folder + cxn_file, cxn_folder + cxn_file, file_type)
             subprocess.call(cmd, shell=True)
     
-    ##########################
-    # STATIC DISPLAY METHODS #
-    ##########################
+    ##############################
+    ### Static display methods ###
+    
     
     @staticmethod
     def _create_concepts_cluster(cpt_knowledge, name=None):
@@ -704,7 +709,6 @@ class TCG_VIEWER:
         if not(os.path.exists(tmp_folder)):
             os.mkdir(tmp_folder)
 
-        
         prog = 'dot'
         file_type = 'png'
 

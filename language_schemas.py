@@ -963,8 +963,16 @@ class GRAMMATICAL_WM_P(WM):
     ###############################
     ### cooperative computation ###
     ###############################
-    def cooperate(self, new_inst):
+    def cooperate(self, new_inst):        
        """
+       For each cxn instance already active in GrammaticalWM, checks whether it can enter in cooperation with the new_inst.
+       
+       Args:
+           - new_inst (CXN_SCHEMA_INST): A cxn schema instance (that was just instantiated in GrammaticalWM)
+          
+       Notes:
+           - For now, the match quality (match_qual) is still binary so it is used to define or not a cooperative functional link.
+           - This should be updated to use match_qual to account for the strength of the cooperative functional link created.
        """
        for old_inst in self.schema_insts:
            if new_inst != old_inst:
@@ -976,6 +984,10 @@ class GRAMMATICAL_WM_P(WM):
     
     def compete(self, new_inst):
         """
+        For each cxn instance already active in GrammaticalWM, checks whether it competes with the new_inst
+        
+        Args:
+           - new_inst (CXN_SCHEMA_INST): A cxn schema instance (that was just instantiated in GrammaticalWM)
         """
         for old_inst in self.schema_insts:
            if new_inst != old_inst:
@@ -1013,11 +1025,14 @@ class GRAMMATICAL_WM_P(WM):
     @staticmethod    
     def link(inst_p, inst_c, SR_node):
         """
+        Returns functional link between cooperating construction if it exists as well as quality of match (match_qual).
         Args:
             - inst_p (CXN_SCHEMA_INST): A cxn instance (parent)
             - inst_c (CXN_SCHEMA_INST): A cxn instance (child)
             - SR_node (): SemRep node on which both instances overlap
+        
         NOTE:
+            - For now match_qual is actualy categorical!
             - NO LIGHT SEMANTICS!!!
         """
         cxn_p = inst_p.content
@@ -1042,7 +1057,11 @@ class GRAMMATICAL_WM_P(WM):
     @staticmethod
     def match(inst1, inst2):
         """
-        IMPORTANT NOTE: IT IS NOT CLEAR WHY THE ABSCENSE OF LINK SHOULD NECESSARILY MEAN COMPETITION....
+        Args:
+            - inst1 (CXN_SCHEMA_INST): A cxn instance
+            - inst2 (CXN_SCHEMA_INST): A cxn instance
+            
+        IMPORTANT NOTE: IT IS NOT CLEAR WHY THE ABSENCE OF LINK SHOULD NECESSARILY MEAN COMPETITION....
             Think about the case of a lexical cxn LEX_CXN linking to a Det_CXN itself linking to a SVO_CXN, we don't want LEX_CXN to enter in competition with
             SVO_CXN, even though they can't link since the LEX_CXN doesn't match the class restriction of SVO_CXN (LEX_CXN is N, not NP).
         
@@ -1798,6 +1817,7 @@ class GRAMMATICAL_WM_C(WM):
         Args:
             - inst_p (CXN_SCHEMA_INST_C): An incomplete cxn instance (parent)
             - inst_c (CXN_SCHEMA_INST_C): A completed cxn instance (child)
+            
         NOTE:
             - Light semantics is required to limit for example the possibility of an intransitive verb to link into an SV cxn.
         """
@@ -1828,6 +1848,7 @@ class GRAMMATICAL_WM_C(WM):
             
         NOTE:
             - Not sure that this method is really necessary.
+            - IS THERE NOT AN ISSUE HERE? SEEMS LIKE THE CODE TREATS SUCCESSIVELY EACH CXN INST AS PARENT AND CHILD?
         """            
         match_cat = 0
         links = []
