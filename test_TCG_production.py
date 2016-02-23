@@ -3,6 +3,8 @@
 @author: Victor Barres
 Test cases for the language production schemas defined in language_schemas.py
 """
+import random
+
 import language_schemas as ls
 from loader import TCG_LOADER
 from TCG_models import TCG_production_system
@@ -12,6 +14,7 @@ def test(seed=None):
     """
     Test Incremental Semantic Formulas sem inputs
     """
+    random.seed(seed)
     SEM_INPUT = 'sem_inputs_debug.json'
     INPUT_NAME = 'two_transitives_shared_agent'
     FOLDER = './tmp/TEST1/'
@@ -67,6 +70,7 @@ def test_params(seed=None):
     from sys import stdout
     import numpy as np
     
+    random.seed(seed)
     # Chose input name
     input_name = 'ditransitive_give'    
     
