@@ -319,5 +319,7 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boxing ring"}],
 		"SymLinks" : {"N1" : "S1"}
 	}
-	]
+	],
+	
+"comments": "Light version of TCG_grammar_VB. Contains 1 case of lexical synonymy"
 }

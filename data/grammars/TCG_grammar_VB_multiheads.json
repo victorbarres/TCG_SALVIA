@@ -876,5 +876,7 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "wagon"}],
 		"SymLinks" : {"N1" : "S1"}
 	}
-]
+],
+
+"comments": "Incomplete analysis of the possibility to use multiple heads in the grammar (for CJN_AND etc.)"
 }

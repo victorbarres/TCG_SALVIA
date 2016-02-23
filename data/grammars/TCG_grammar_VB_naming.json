@@ -218,5 +218,7 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boxing ring"}],
 		"SymLinks" : {"N1" : "S1"}
 	}
-	]
+	],
+	
+"comments":"This grammar only contains lexical items. Does not include preferences or group (need to be updated.). It can be used as a basis to simulate naming without any recourse to higher level constructions, which should be possible"
 }

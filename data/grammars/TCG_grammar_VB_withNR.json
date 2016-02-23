@@ -1019,5 +1019,7 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "wagon"}],
 		"SymLinks" : {"N1" : "S1"}
 	}
-]
+],
+
+"comments": "Attempt to include non-restrictive relative clauses alongside restrictive relative clauses"
 }

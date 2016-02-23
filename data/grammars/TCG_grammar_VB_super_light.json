@@ -86,5 +86,7 @@
 		"SymLinks" : {"N1" : "S1"}
 	}
 
-	]
+	],
+	
+"comments":"Super light version of TCG_grammar_VB. Includes only 1 arg-struct cxn (SVO), only 2 verbs and 3 nouns without synonyms."
 }

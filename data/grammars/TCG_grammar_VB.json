@@ -84,7 +84,7 @@
 			"nodes"  : [{"name" : "AGT", "concept" : "ENTITY", "focus" : true, "head" : false},
 						{"name" : "THEME", "concept" : "ENTITY", "focus" : false, "head" : false},
 						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true},
-						{"name" : "RCPT", "concept" : "ENTITY", "focus" : false, "head" : false}],
+						{"name" : "RCPT", "concept" : "ANIMATE", "focus" : false, "head" : false}],
 			"edges" : [{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
 						{"name" : "ACT_THEME", "concept" : "THEME", "from" : "ACT", "to" : "THEME"},
 						{"name" : "ACT_RCPT", "concept" : "RECIPIENT", "from" : "ACT", "to" : "RCPT"}]
@@ -985,5 +985,7 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "tree"}],
 		"SymLinks" : {"N1" : "S1"}
 	}
-]
+],
+
+"comments": "Full grammar"
 }
