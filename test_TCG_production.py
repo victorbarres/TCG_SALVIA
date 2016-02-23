@@ -17,7 +17,7 @@ def test(seed=None):
     random.seed(seed)
     SEM_INPUT = 'sem_inputs_debug.json'
     INPUT_NAME = 'two_transitives_shared_agent'
-    FOLDER = './tmp/TEST1/'
+    FOLDER = './tmp/TEST_random/'
     
     language_system_P = TCG_production_system()
 #     Display schema system
@@ -36,7 +36,7 @@ def test(seed=None):
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900   
-    save_states = [600]
+    save_states = [450, 550, 650]
     
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
@@ -170,7 +170,7 @@ def test_params(seed=None):
 
 
 if __name__=='__main__':
-    test(seed=1)
+    test(seed='maddie2')
 #    test_params(seed=1)
         
 

@@ -1522,6 +1522,16 @@ class UTTER(PROCEDURAL_SCHEMA):
         if new_utterance:
             new_utterance.reverse()
             self.utterance_stack =  new_utterance + self.utterance_stack
+
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def get_state(self):
+        """
+        """
+        data = super(UTTER, self).get_state()
+        data['utterance_stack'] = self.utterance_stack[:]
+        return data
             
 #####################
 ### COMPREHENSION ###
