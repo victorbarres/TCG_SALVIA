@@ -21,7 +21,7 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs_debug.json'
-    INPUT_NAME = 'two_transitives_shared_agent'
+    INPUT_NAME = 'two_transitives'
     FOLDER = './tmp/TEST_random/'
     
     language_system_P = TCG_production_system()
