@@ -1019,9 +1019,34 @@ class GRAMMATICAL_WM_P(WM):
         if not(overlap['nodes']) and not(overlap['edges']):
             return None
         return overlap
+    
+    
+    @staticmethod
+    def comp_link(inst_1, inst_2, SR_node):
+        """
+        Checks whether inst1 and inst2 are in competition if they overlap on a SemRep node.
+        Args:
+            - inst1 (CXN_SCHEMA_INST): A cxn instance
+            - inst2 (CXN_SCHEMA_INST): A cxn instance
+            - SR_node (): SemRep node on which both instances overlap
+        Note:
+            The case of an overlap on an edge is handled directly by the match function.
+        """
+        competition = False
+        cxn_1 = inst_1.content
+        sf_1 = [cxn_1.find_elem(k) for k,v in inst_1.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
+        cxn_2 = inst_2.content
+        sf_2 = [cxn_2.find_elem(k) for k,v in inst_2.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+        
+        cond1 = (sf_1.name not in cxn_1.SymLinks.SL) or isinstance(cxn_1.node2form(sf_1), construction.TP_PHON) # cxn_1 formalizes the node entity
+        cond2 = (sf_2.name not in cxn_2.SymLinks.SL) or isinstance(cxn_2.node2form(sf_2), construction.TP_PHON) # cxn_2 formalizes the node entity
+        
+        if cond1 and cond2:
+            competition = True
+        return competition
         
     @staticmethod    
-    def link(inst_p, inst_c, SR_node):
+    def coop_link(inst_p, inst_c, SR_node):
         """
         Returns functional link between cooperating construction if it exists as well as quality of match (match_qual).
         Args:
@@ -1036,6 +1061,7 @@ class GRAMMATICAL_WM_P(WM):
         sf_p = [cxn_p.find_elem(k) for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
         cxn_c = inst_c.content
         sf_c = [cxn_c.find_elem(k) for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+             
         
         # Type constraints (Obligatory)
         syn1 = (sf_p.name in cxn_p.SymLinks.SL) and isinstance(cxn_p.node2form(sf_p), construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
@@ -1072,24 +1098,38 @@ class GRAMMATICAL_WM_P(WM):
         links = []
         if inst1 == inst2:
            match_cat = 0 # CHECK THAT
+           return {"match_cat":match_cat, "links":links}
+         
+        overlap = GRAMMATICAL_WM_P.overlap(inst1, inst2)
+        
+        #Check that relation exists
+        if not(overlap):
+            match_cat = 0
+            return {"match_cat":match_cat, "links":links}
+        
+        #Check competition
+        if overlap["edges"]: # Syntactic competition
+            match_cat = -1
+            return {"match_cat":match_cat, "links":links}
         else:
-            overlap = GRAMMATICAL_WM_P.overlap(inst1, inst2)
-            if not(overlap):
-                match_cat = 0
-            elif overlap["edges"]:
-                match_cat = -1
-            else:
-                for n in overlap["nodes"]:
-                    link = GRAMMATICAL_WM_P.link(inst1, inst2, n)
-                    if link:
-                        links.append(link)
-                    link = GRAMMATICAL_WM_P.link(inst2, inst1, n)
-                    if link:
-                        links.append(link)
-                if links:
-                    match_cat = 1
-                else:
-                    match_cat = 0     
+            for n in overlap["nodes"]:
+                competition = GRAMMATICAL_WM_P.comp_link(inst1, inst2, n)
+                if competition:
+                    match_cat = -1
+                    return {"match_cat":match_cat, "links":links}
+        
+        #Check cooperation
+        for n in overlap["nodes"]:
+            link = GRAMMATICAL_WM_P.coop_link(inst1, inst2, n)
+            if link:
+                links.append(link)
+            link = GRAMMATICAL_WM_P.coop_link(inst2, inst1, n)
+            if link:
+                links.append(link)
+        if links:
+            match_cat = 1
+        else:
+            match_cat = 0 # since we have already ruled out the possibiliyt of competition
         return {"match_cat":match_cat, "links":links}
     
     ##################
