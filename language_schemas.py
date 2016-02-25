@@ -1031,21 +1031,24 @@ class GRAMMATICAL_WM_P(WM):
         
         NOTE:
             - For now match_qual is actualy categorical!
-            - NO LIGHT SEMANTICS!!!
         """
         cxn_p = inst_p.content
         sf_p = [cxn_p.find_elem(k) for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
         cxn_c = inst_c.content
         sf_c = [cxn_c.find_elem(k) for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
         
-        cond1 = (sf_p.name in cxn_p.SymLinks.SL) and isinstance(cxn_p.node2form(sf_p), construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
-        cond2 = sf_c.head # sf_c is a head node
-        if cond1 and cond2:
+        # Type constraints (Obligatory)
+        syn1 = (sf_p.name in cxn_p.SymLinks.SL) and isinstance(cxn_p.node2form(sf_p), construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
+        sem1 = sf_c.head # sf_c is a head node
+        
+        # Metric constraints (Qualitative)
+        if syn1 and sem1:
             slot_p = cxn_p.node2form(sf_p)
-            cond3 = cxn_c.clss in slot_p.cxn_classes
-            # NEED TO ADD A LIGHT_SEM CONDITION (cond4?)
+            syn2 = cxn_c.clss in slot_p.cxn_classes # Syntactic match
+            sem2 = sf_c.concept.match(sf_p.concept) # Semantic match (Light semantics)
             link = {"inst_from": inst_c, "port_from":inst_c.find_port("output"), "inst_to": inst_p, "port_to":inst_p.find_port(slot_p.order)}
-            if cond3:
+            # For now syn2 and sem2 are treated as categorical, but should be anlalogical.
+            if syn2 and sem2:
                 match_qual = 1
             else:
                 match_qual = 0
@@ -1068,7 +1071,7 @@ class GRAMMATICAL_WM_P(WM):
         match_cat = 0
         links = []
         if inst1 == inst2:
-           match_cat = -1 # CHECK THAT
+           match_cat = 0 # CHECK THAT
         else:
             overlap = GRAMMATICAL_WM_P.overlap(inst1, inst2)
             if not(overlap):
