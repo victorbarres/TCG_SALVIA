@@ -788,7 +788,6 @@ class GRAMMATICAL_WM_P(WM):
         # Computing the equivalent instance for each assemblage.
         # For each assemblage stores the values of relevant scores.
         for assemblage in assemblages:
-#            eq_inst = self.assemblage2inst(assemblage)
             (phon_form, missing_info, expressed, eq_inst) = self.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage.
             sem_length_nodes = len([sf_node for sf_node, semrep_node in eq_inst.covers['nodes'].iteritems() if semrep_node in sem_input['nodes']]) # Only counts nodes that have NOT alrady been expressed.
             sem_length_edges = len([sf_edge for sf_edge, semrep_edge in eq_inst.covers['edges'].iteritems() if semrep_edge in sem_input['edges']]) # Only counts edges that have NOT alrady been expressed. 
@@ -828,7 +827,6 @@ class GRAMMATICAL_WM_P(WM):
         
         max_score = None
         for i in range(len(assemblages)):
-#            print "t:%i - %f, %f, %f, %f" % (self.t, assemblages[i].activation,  scores['sem_length'][i], (1-scores['form_length'][i]), scores['continuity'][i])
             score = w1*assemblages[i].activation + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i]
             assemblages[i].score = score
             if not(max_score):

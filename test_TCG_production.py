@@ -14,6 +14,11 @@ def test(seed=None):
     """
     Test Incremental Semantic Formulas sem inputs
     """
+    
+    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
+        random.seed(seed)
+        seed = random.randint(0,10**9)
+        print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs_debug.json'
     INPUT_NAME = 'two_transitives_shared_agent'
@@ -170,7 +175,7 @@ def test_params(seed=None):
 
 
 if __name__=='__main__':
-    test(seed='maddie2')
+    test(seed=None)
 #    test_params(seed=1)
         
 
