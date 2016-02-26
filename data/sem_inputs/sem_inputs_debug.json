@@ -155,7 +155,51 @@
 			"timing":[],
 			
 			"comments":"test the case of two transitive actions with only a shared agent."
+		},
+		
+		"transitive_gist":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["ENTITY(e1)", "ENTITY(e2)", "ACTION(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1,e1)", "r2(a1,e2)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			
+			"comments":"Only presents the gist skeleton of a transitive action."
+		},
+		
+		"test_spec_cxn0":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["ENTITY(e1)", "SPECIFY(r1)", "MAN(m1)", "r1(m1,e1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			
+			"comments":"Test use of SPECIFY."
+		},
+		
+		"test_spec_cxn":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["ENTITY(e1)", "ENTITY(e2)", "ACTION(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1,e1)", "r2(a1,e2)", 
+						"SPECIFY(r3)", "MAN(m1)", "r3(m1,e1)", "SPECIFY(r4)", "BOY(b1)", "r4(b1,e2)", "SPECIFY(r5)", "HIT(a2)", "r5(a2,a1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			
+			"comments":"Test use of SPECIFY."
+		},
+		"test_spec_cxn_incremental":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["ENTITY(e1)", "ENTITY(e2)", "ACTION(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1,e1)", "r2(a1,e2)"],
+				"P2":["SPECIFY(r3)", "MAN(m1)", "r3(m1,e1)", "SPECIFY(r4)", "BOY(b1)", "r4(b1,e2)", "SPECIFY(r5)", "HIT(a2)", "r5(a2,a1)"]
+			},
+			"sequence":["P1", "P2"],
+			"timing":[],
+			
+			"comments":"Test use of SPECIFY incrementally"
 		}
 	}
-
 }

@@ -368,6 +368,8 @@ class CXN:
         - SynForm (TP_SYNFORM): cxn SynForm.
         - SymLinks (TP_SYMLINKS): cxn SymLinks.
     """ 
+    NEUTRAL_CLASS = "?"
+    
     def __init__(self):
         self.name = ''
         self.clss = ''
@@ -376,6 +378,21 @@ class CXN:
         self.SemFrame = TP_SEMFRAME() # Semantic frame
         self.SynForm = TP_SYNFORM() # Syntactic form
         self.SymLinks = TP_SYMLINKS() # Symbolic links
+    
+    def class_match(self, slot):
+        """
+        Returns true iff the class of the construction matches the class requirements set up by slot.
+        Args:
+            - slot (TP_SLOT): a slot.
+        """
+        match = False
+        # First check neutral class
+        if (self.clss == CXN.NEUTRAL_CLASS) or (CXN.NEUTRAL_CLASS in slot.cxn_classes):
+            match =  True
+        else:
+            match = self.clss in slot.cxn_classes
+        
+        return match
     
     def find_elem(self, name):
         """

@@ -21,8 +21,8 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs_debug.json'
-    INPUT_NAME = 'two_transitives'
-    FOLDER = './tmp/TEST_random/'
+    INPUT_NAME = 'test_spec_cxn_incremental'
+    FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system()
 #     Display schema system
@@ -41,7 +41,7 @@ def test(seed=None):
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900   
-    save_states = [450, 550, 650]
+    save_states = [50, 100, 450, 550, 650]
     
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
@@ -54,17 +54,17 @@ def test(seed=None):
         if output['Utter']:
             print "t:%i, '%s'" %(t, output['Utter'])
         if t - set_up_time in save_states:
-            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
+#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
             TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
-            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=False, folder = FOLDER)
-            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=False, folder = FOLDER)
+#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=False, folder = FOLDER)
+#            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=False, folder = FOLDER)
     
-    language_system_P.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+#    language_system_P.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     language_system_P.schemas['Semantic_WM'].show_SemRep()
-    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'], folder = FOLDER)
-    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
-    language_system_P.schemas['Grammatical_WM_P'].show_state()
-    language_system_P.schemas['Phonological_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+#    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'], folder = FOLDER)
+    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+#    language_system_P.schemas['Grammatical_WM_P'].show_state()
+#    language_system_P.schemas['Phonological_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     language_system_P.save_sim(FOLDER + 'test_language_output.json')
 #    language_system_P.show_params()
 

@@ -68,9 +68,30 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             Each node has an additional attributes meaning = concept.meaning
             Each edge has an additional attribute type = sem_rel.type
     
+    Data:
+        - neutral (CONCEPT): A neutral concept that is similar to to and matches any concept.
+    
     """
+    NEUTRAL_CONCEPT = "?"
+    
     def __init__(self, nodes=[], edges=[]):
         K_NET.__init__(self, nodes=nodes[:], edges=edges[:])
+        self.neutral = None
+        self._set_neutral(CONCEPTUAL_KNOWLEDGE.NEUTRAL_CONCEPT)
+        
+    def _set_neutral(self, val=None):
+        """
+        Set the meaning and name of the neutral element to val.
+        The neutral element in the CONCEPTUAL_KNOWLEDGE is such that it is similar to and matches every other element in the network.
+        Args:
+            - val (STR): The arbitrary value of the neutral element.
+            
+        Note:
+            - In the contex of subsumption network, I could define the neutral element as the bottom of the inverted tree.
+            Note however, that this would lead to a different treatment in terms of similarity based on distances.
+        """
+        self.neutral = CONCEPT(name=val, meaning=val, conceptual_knowledge=self)
+        self.nodes.append(self.neutral)
     
     def add_ent(self, concept):
         """
@@ -125,6 +146,11 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             - ONLY PATH SIMILARITY IMPLEMENTED
             - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...
         """
+        # First check if one of the concept is the neutral element.
+        if self.neutral and ((cpt1 == self.neutral) or (cpt2 == self.neutral)):
+            sim = 1
+            return sim
+            
         return super(CONCEPTUAL_KNOWLEDGE, self).similarity(cpt1, cpt2)        
     
     def match(self, cpt1, cpt2, match_type = "is_a"):
@@ -143,12 +169,17 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             See similarity()
         
         """
+        # First check if one of the concept is the neutral element.
+        if self.neutral and ((cpt1 == self.neutral) or (cpt2 == self.neutral)):
+            return True
+            
         return super(CONCEPTUAL_KNOWLEDGE, self).match(cpt1, cpt2, match_type = match_type)
 
 ###############################################################################
 if __name__=='__main__':
-    import loader as ld
-    my_conceptual_knowledge = ld.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    import viewer # I have a bug in the module loading (circularity). This is a cheap hack to make it work for now.
+    from loader import TCG_LOADER
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     clothing = my_conceptual_knowledge.find_meaning('CLOTHING')
     dress =  my_conceptual_knowledge.find_meaning('DRESS')
     print dress.match(clothing)
@@ -161,6 +192,12 @@ if __name__=='__main__':
     woman =  my_conceptual_knowledge.find_meaning('WOMAN')
     obj=  my_conceptual_knowledge.find_meaning('OBJECT')
     print woman.match(human)
+    
+    clothing = my_conceptual_knowledge.find_meaning('CLOTHING')
+    neutral =  my_conceptual_knowledge.find_meaning('?')
+    print clothing.match(neutral)
+    print neutral.match(clothing)
+    
 
     
     

@@ -1070,7 +1070,7 @@ class GRAMMATICAL_WM_P(WM):
         # Metric constraints (Qualitative)
         if syn1 and sem1:
             slot_p = cxn_p.node2form(sf_p)
-            syn2 = cxn_c.clss in slot_p.cxn_classes # Syntactic match
+            syn2 = cxn_c.class_match(slot_p) # Syntactic match
             sem2 = sf_c.concept.match(sf_p.concept) # Semantic match (Light semantics)
             link = {"inst_from": inst_c, "port_from":inst_c.find_port("output"), "inst_to": inst_p, "port_to":inst_p.find_port(slot_p.order)}
             # For now syn2 and sem2 are treated as categorical, but should be anlalogical.
@@ -1130,6 +1130,9 @@ class GRAMMATICAL_WM_P(WM):
             match_cat = 1
         else:
             match_cat = 0 # since we have already ruled out the possibiliyt of competition
+        print "inst1: %s, inst2: %s -> match: " %(inst1.name, inst2.name)
+        print match_cat
+        print links
         return {"match_cat":match_cat, "links":links}
     
     ##################

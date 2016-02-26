@@ -1,0 +1,105 @@
+{"grammar" :[
+	{
+		"name":"SPEC_CXN",
+		"class" : "?",
+		"preference": 1,
+		"SemFrame" :
+		{
+			"nodes" : [{"name" : "SPECIFIER", "concept" : "?", "focus" : false, "head": false},
+					   {"name" : "SPECIFIED", "concept" : "?", "focus" : false, "head": true}],
+			"edges" : [{"name": "SPEC", "concept" : "SPECIFY", "from": "SPECIFIER", "to" : "SPECIFIED"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["?"]}],
+		"SymLinks" : {"SPECIFIER" : "S1", "SPECIFIED" : "S1"}
+	},
+	
+	{
+		"name" : "SVO",
+		"class" : "S",
+		"preference" : 1,
+		"SemFrame" :
+		{
+			"nodes" : [	{"name" : "AGT", "concept" : "ENTITY", "focus" : true, "head" : false},
+						{"name" : "PT", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true}],
+			"edges" : [	{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "PT"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["VP", "V"]},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]}],
+		"SymLinks" : {"AGT" : "S1", "ACT" : "S2" , "PT" : "S3"}
+	},
+	
+	{
+		"name" : "A_DET_NOUN",
+		"class" : "NP",
+		"SemFrame" : 
+		{
+			"nodes" : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : true}],
+			"edges" : []
+		},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "a"},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" : {"OBJ" : "S2"}		
+	},
+	
+	{
+		"name" : "HIT",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "HIT", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "hit"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "KICK",
+		"class" : "V",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "KICK", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "kick"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+
+	{
+		"name" : "MAN",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "MAN", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "man"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "BOY",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "BOY", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "boy"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "GIRL",
+		"class" : "N",
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "GIRL", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "girl"}],
+		"SymLinks" : {"N1" : "S1"}
+	}
+
+	],
+	
+"comments":"Super light version of TCG_grammar_VB. Includes only 1 arg-struct cxn (SVO), only 2 verbs and 3 nouns without synonyms."
+}

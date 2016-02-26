@@ -232,7 +232,7 @@ class K_NET(object):
         Note:
             - ONLY PATH SIMILARITY IMPLEMENTED
             - Question: What does it mean how similar is DOG to ANIMAL? Using path lengths, DALMATIAN being an hyponym of DOG, is necessarily less similar to ANIMAL than DOG...
-        """
+        """        
         L = self.shortest_path(ent1, ent2)
         if L == -1: # Case no path found
             sim = 0
