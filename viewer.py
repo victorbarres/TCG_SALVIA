@@ -885,7 +885,7 @@ class TCG_VIEWER:
         if not(concise):
             name='LinguisticWM'
         else:
-            name='LingusiticWM_concise'
+            name='LinguisticWM_concise'
         
         lingWM_graph = pydot.Dot(name, graph_type = 'digraph', rankdir='LR', labeljust='l', compound='true', style='rounded', penwidth ='2')
 
