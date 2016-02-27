@@ -13,7 +13,7 @@ def test(seed=None):
     full_system = TCG_full_system()
 
     # Generating schema system graph visualization
-    full_system.system2dot(image_type='svg', disp=False)
+    full_system.system2dot(image_type='png', disp=True)
 
 if __name__=='__main__':
     test(seed=None)

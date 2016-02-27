@@ -15,7 +15,6 @@ Dependencies:
 """
 import matplotlib.pyplot as plt
 import re
-import numpy as np
 
 import networkx as nx
 import pyttsx
