@@ -3,48 +3,87 @@
 		"scene_demo": {
 			"sem_rate": 10,
 			 "propositions"  : {
-				
+				"GIST":["ACTION(a1)", "ENTITY(e1)", "ENTITY(e2)", "AGENT(r1)", "PATIENT(e2)", "r1(a1, e1)", "r2(a1, e2)"],
+				"MAN_AREA":["SPECIFY(r3)", "MAN(m1)", "r3(m1,e2)"],
+				"HIT_AREA":["SPECIFY(r4)", "HIT(a2)", "r4(a2,a1)"],
+				"WOMAN_AREA":["SPECIFY(r5)", "WOMAN(w1)", "r5(w1,e1)"],
+				"MAN_FACE_AREA": ["MODIFY(r6)", "HANDSOME(q1)", "r6(q1,m1)"]
 			  },
-			  "sequence" :[],
+			  "sequence" :["GIST", "MAN_AREA", "HIT_AREA", "WOMAN_AREA", "MAN_FACE_AREA"],
 			  "timing":[],
 			  "comments": "Layout of the hitting event is given first. TCG Scene: Woman-hit-man"
 			},
-		"scene_demo": {
+			
+		"scene_cholita": {
 			"sem_rate": 10,
 			 "propositions"  : {
-				
+			     "LEFT_WOMAN_AREA":["WOMAN(w1)", "DRESS(d1)", "WEAR(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1, w1)", "r2(a1, d1)"],
+				 "LEFT_DRESS_AREA": ["MODIFY(r3)", "GREEN(g1)", "r3(g1,d1)"],
+				 "KICK_AREA": ["KICK(a2)", "AGENT(r4)", "PATIENT(r5)", "HUMAN(h1)", "r4(a2,w1)", "r5(a2,h1)"],
+				 "RIGHT_WOMAN_AREA": ["SPECIFY(r6)", "WOMAN(w2)", "r6(w2, h1)", "DRESS(d2)", "WEAR(a3)", "AGENT(r7)", "PATIENT(r8)", "r7(a3, w2)", "r8(a3, d2)"],
+				 "RIGHT_DRESS_AREA": ["MODIFY(r9)", "BLUE(b1)", "r8(b1,d2)"],
+				 "BOXING_AREA": ["BOXINGRING(l1)", "IN(r10)", "r10(a2, l1)"],
+				 "PEOPLE_AREA": ["PEOPLE(p1)"],
+				 "PEOPLE_FOCUS_AREA": ["WATCH(a4)", "AGENT(r11)" "r11(a4, p1)", "CONCURRENT(r12)", "r12(a2, a4)"]
 			  },
-			  "sequence" :[],
+			  "sequence" :["LEFT_WOMAN_AREA", "LEFT_DRESS_AREA", "KICK_AREA", "RIGHT_WOMAN_AREA", "RIGHT_DRESS_AREA", "BOXING_AREA", "PEOPLE_AREA", "PEOPLE_FOCUS_AREA"],
 			  "timing":[],
-			  "comments": "TCG Scene: Cholita scene"
+			  "comments": "TCG Scene: Cholita scene. Not sure that CONCURRENT and IN are properly handled. Also think about whether it makes a difference to link r7 to w2 vs to h1 (ie to the specified object are to the pre-specified object."
 			},
+			
 		"scene_girlkickboy": {
 			"sem_rate": 10,
 			 "propositions"  : {
-				
+			     "BOY_AREA": ["BOY(b1)"],
+				 "KICK_AREA": ["KICK(a1), "AGENT(r1)", "PATIENT(r2)", "HUMAN(h1)", "r1(a1, b1), "r2(a1, h1)"],
+				 "GIRL_AREA": ["SPECIFY(r3)", "GIRL(g1)", "r3(g1, h1)"],
+				 "GIRL_FACE_AREA": [LAUGH(a2)", "AGENT(r4)", "r4(a2, g1)"]
 			  },
-			  "sequence" :[],
+			  "sequence" :["BOY_AREA", "KICK_AREA", "GIRL_AREA", "GIRL_FACE_AREA"],
 			  "timing":[],
 			  "comments": "Scene setting induces a passive expression."
 			},
+			
 		"scene_incremental": {
 			"sem_rate": 10,
 			 "propositions"  : {
-				
+				"WOMAN_AREA_CUED": ["WOMAN(w1)"],
+				"TALK_AREA": ["TALK(a1)", "HUMAN(h1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1, w1)", "r2(a1, h1)"],
+				"PEOPLE_AREA": ["SPECIFY(r3)", "PEOPLE(p1)", "r3(p1, h1)"]
 			  },
-			  "sequence" :[],
+			  "sequence" :["WOMAN_AREA_CUED", "TALK_AREA", "PEOPLE_AREA"],
 			  "timing":[],
 			  "comments": "Kuchinsky's example of difficult event and easy objects. TCG Scene: incremental strategy."
 			},
+			
 		"scene_structural": {
 			"sem_rate": 10,
 			 "propositions"  : {
+				"GIST": ["OBJECT(o1)", "OBJECT(o2)", "ACTION(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1, o1), "r2(a1, o2)"], 
+				"TURTLE_AREA_CUED": ["SPECIFY(r3)", "TURTLE(t1)", "r3(t1, o2)"],
+				"SQUIRT_AREA" : ["SQUIRT(a2)", "SPECIFY(r4)", "r4(a2, a1)"],
+				"MOUSE_AREA" : ["MOUSE(m1), "SPECIFY(r5)", "r5(m1, o1)"]
 				
 			  },
-			  "sequence" :[],
+			  "sequence" :["GIST", "TURTLE_AREA_CUED", "SQUIRT_AREA", "MOUSE_AREA"],
 			  "timing":[],
 			  "comments": "Kuchinsky's example of easy event with difficult objects. TCG Scene: structural strategy."
 			},
+			
+		"scene_womanhitman": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"WOMAN_AREA" : ["WOMAN(w1)"],
+				"HIT_AREA" : ["HIT(a1)", "MAN(m1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1, w1)", "r2(a1, m1)"], 
+				"WOMAN_FACE_AREA" : ["PRETTY(q1)", "MODIFY(r3)", "r3(q1, w1)"],
+				"DRESS_AREA": ["DRESS(d1)", "WEAR(a2)", "AGENT(r4)", "PATIENT(r5)", "r4(a2, w1)", "r5(a2, d1)"],
+				"DRESS_FOCUS_AREA" ["BLUE(q2)", "MODIFY(r6)", "r6(q2, d1)"]
+			  },
+			  "sequence" :["WOMAN_AREA", "HIT_AREA", "WOMAN_FACE_AREA", "DRESS_AREA", "DRESS_FOCUS_AREA"],
+			  "timing":[],
+			  "comments": "The famous "pretty woman in blue hit man" example. TCG Scene: Woman-hit-man."
+			},
+			
 		"scene_test": {
 			"sem_rate": 10,
 			 "propositions"  : {
@@ -53,15 +92,6 @@
 			  "sequence" :[],
 			  "timing":[],
 			  "comments": "TCG Scene: Test Scene."
-			},
-		"scene_womanhitman": {
-			"sem_rate": 10,
-			 "propositions"  : {
-				
-			  },
-			  "sequence" :[],
-			  "timing":[],
-			  "comments": "The famous "pretty woman in blue hit man" example. TCG Scene: Woman-hit-man."
 			}
 	}
 }
