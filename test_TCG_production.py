@@ -20,8 +20,8 @@ def test(seed=None):
         seed = random.randint(0,10**9)
         print "seed = %i" %seed
     random.seed(seed)
-    SEM_INPUT = 'sem_inputs_debug.json'
-    INPUT_NAME = 'test_spec_cxn_incremental'
+    SEM_INPUT = 'sem_inputs_jin.json'
+    INPUT_NAME = 'scene_cholita'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system()

@@ -1129,9 +1129,6 @@ class GRAMMATICAL_WM_P(WM):
             match_cat = 1
         else:
             match_cat = 0 # since we have already ruled out the possibiliyt of competition
-        print "inst1: %s, inst2: %s -> match: " %(inst1.name, inst2.name)
-        print match_cat
-        print links
         return {"match_cat":match_cat, "links":links}
     
     ##################
