@@ -452,13 +452,18 @@ class SEMANTIC_WM(WM):
         self.update_SemRep(cpt_insts)        
         self.prune()
         
-        expressed = self.inputs['from_grammatical_WM_P']
-        if expressed:
-            for name in expressed['nodes']:
+        if self.inputs['from_grammatical_WM_P']:
+            # Note nodes and edges as expressed
+            for name in self.inputs['from_grammatical_WM_P']['nodes']:
                 self.SemRep.node[name]['expressed'] = True # NEED TO EXTENT TO RELATIONS.
-            for name in expressed['edges']:
+            for name in self.inputs['from_grammatical_WM_P']['edges']:
                 d = self.SemRep.get_edge_data(name[0], name[1])
                 d['expressed'] = True
+            
+            # Request for missing info
+            missing_info = self.inputs['from_grammatical_WM_P']['missing_info']
+            if missing_info:
+                print "Requesting more info about %s" %missing_info
     
         self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_ouput()
         
@@ -710,9 +715,7 @@ class GRAMMATICAL_WM_P(WM):
             # Propagate semantic relation activation
             for edge in sem_input['edges']:
                 inst_edge = next((k for k,v in cover_edges.items() if v==edge), None)
-                print inst_edge
                 if inst_edge:
-                    print sem_input['edges'][edge]
                     act += sem_input['edges'][edge] # Edge always propagate their activation since they are obligatory formalized in a TCG cxn.
             
             # Normalization
@@ -750,13 +753,14 @@ class GRAMMATICAL_WM_P(WM):
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
-            sem_WM_output = {'nodes':[], 'edges':[]}
+            sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
                 phon_WM_output.extend(phon_form)
                 sem_WM_output['nodes'].extend(expressed['nodes'])
                 sem_WM_output['edges'].extend(expressed['edges'])
+                sem_WM_output['missing_info'] = missing_info
                 assemblages.remove(winner_assemblage)
                 
                 # Option1: Replace the assemblage by it's equivalent instance
@@ -773,7 +777,7 @@ class GRAMMATICAL_WM_P(WM):
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
-                if assemblages:
+                if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblate then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED!
                     for assemblage in assemblages:
                         assemblage.update_activation()
                     winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
@@ -942,10 +946,12 @@ class GRAMMATICAL_WM_P(WM):
     def set_subthreshold(self, insts):
         """
         Sets the activation of all the instances in insts to r*confidence_threshold where r= self.params['C2']['sub_threshold_r']
+        
         Args:
             - insts ([CXN_INST])
-        NOTE:
-            If the score of the assemblage is not just the avereage cxn inst activation, the value needs to be place low enough
+            
+        Notes:
+            - If the score of the assemblage is not just the avereage cxn inst activation, the value needs to be place low enough
             so that the system does not repeat the same utterance twice. 
         """
         r= self.params['C2']['sub_threshold_r']
@@ -962,6 +968,7 @@ class GRAMMATICAL_WM_P(WM):
     def deactivate_coop_weigts2(self, assemblage, deact_weight=0.0):
         """
         Sets all the coop_links that are associated with an instance in assemblage to weight = deact_weight
+        
         Args:
             - assemblage (ASSEMBLAGE)
             - deact_weight (FLOAT)
@@ -1049,11 +1056,13 @@ class GRAMMATICAL_WM_P(WM):
     def comp_link(inst_1, inst_2, SR_node):
         """
         Checks whether inst1 and inst2 are in competition if they overlap on a SemRep node.
+        
         Args:
             - inst1 (CXN_SCHEMA_INST): A cxn instance
             - inst2 (CXN_SCHEMA_INST): A cxn instance
             - SR_node (): SemRep node on which both instances overlap
-        Note:
+        
+        Notes:
             The case of an overlap on an edge is handled directly by the match function.
         """
         competition = False
@@ -1073,12 +1082,13 @@ class GRAMMATICAL_WM_P(WM):
     def coop_link(inst_p, inst_c, SR_node):
         """
         Returns functional link between cooperating construction if it exists as well as quality of match (match_qual).
+        
         Args:
             - inst_p (CXN_SCHEMA_INST): A cxn instance (parent)
             - inst_c (CXN_SCHEMA_INST): A cxn instance (child)
             - SR_node (): SemRep node on which both instances overlap
         
-        NOTE:
+        Notes:
             - For now match_qual is actualy categorical!
         """
         cxn_p = inst_p.content
@@ -1430,7 +1440,7 @@ class GRAMMATICAL_WM_P(WM):
     #######################
     def draw_assemblages(self):
         """
-        Draw all the assemblages currently defined by the working memory.
+        Draws all the assemblages currently defined by the working memory.
         """
         assemblages = self.assemble()
         i=0
