@@ -677,25 +677,46 @@ class GRAMMATICAL_WM_P(WM):
     
     def convey_sem_activations(self, sem_input):
         """
-        For now, a construction receives activations from semantic working memory if 
-            - 1. It's semframe covers at least one semrep  node that has not yet been 
-        expressed. 
-            - 2. The SemFrame node that covers is linked to a TP_PHON.
-        This is more inclusive that only lexical items and should probably be replaced by:
-            - 1. Create a specific set of lexical construction
-            - 2. Define higher level construction which include lexical items as requiring to slot in the lexical construction.
+        Args:
+            - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
+        
+        Notes:
+            For now, a construction receives activations from semantic working memory if :
+                - 1. It's semframe covers at least one semrep node that has not yet been 
+            expressed. 
+                - 2. The SemFrame node that covers is linked to a TP_PHON.
+                - 3. It's semframe covers a semrep relations that has not yet been expressed.
+            The overarching principles is that a cxn_inst receives activation from an unexpressed semantic schema that it formalizes.
+            In the case of nodes, formalization means lexicalizations. Relations are necessarily formalized in the current framework.
+            
+            This is more inclusive that only lexical items and should probably be replaced by:
+                - 1. Create a specific set of lexical construction
+                - 2. Define higher level construction which include lexical items as requiring to slot in the lexical construction.
+            
         """
         for inst in self.schema_insts:
             cover_nodes = inst.covers['nodes']
+            cover_edges = inst.covers['edges']
             
             act = 0
+            # Propagate semantic node activation
             for node in sem_input['nodes']:
                 inst_node = next((k for k,v in cover_nodes.items() if v==node), None) # Instances covers the node through sf_node
                 if inst_node:
                     inst_form = inst.content.node2form(inst_node)
                     if isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form. (Lexicalization)
-                        act += sem_input['nodes'][node]              
-            act = act/len(cover_nodes.keys())
+                        act += sem_input['nodes'][node]
+            
+            # Propagate semantic relation activation
+            for edge in sem_input['edges']:
+                inst_edge = next((k for k,v in cover_edges.items() if v==edge), None)
+                print inst_edge
+                if inst_edge:
+                    print sem_input['edges'][edge]
+                    act += sem_input['edges'][edge] # Edge always propagate their activation since they are obligatory formalized in a TCG cxn.
+            
+            # Normalization
+            act = act/(len(cover_nodes.keys()) + len(cover_edges.keys()))
             inst.activation.E += act
     
 #    def apply_pressure(self, pressure):
@@ -709,13 +730,21 @@ class GRAMMATICAL_WM_P(WM):
 
     def produce_form(self, sem_input, phon_input):
         """
-        NOTE: 
+        Generates the meanining to form transduction based on the current C2 state.
+        
+        Args:
+            - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
+            - phon_input ([STR]): Sequence of phon content. Used to compute continuity score
+       
+       Notes: 
             - There is an issue with the fact that it takes 2 steps for the fact that part of the SemRep has been expressed gets
         registered by the semantic_WM. This leads to the repetition of the same assemblage twice.
-        
             - Need to clarify how the score_threshold is defined.
-            - Note that the only reason I don't just take the 1 winner above threshold is because of the issue of having multipe none overlapping assemblages.
+            - Note that the only reason I don't just take the 1 winner above threshold is because of the issue of having multiple none overlapping assemblages.
+            A better solution might be to return all the assemblages that have a different TOP instance (but then this would only work if I terminate all the competition at the read-out time.)
             - Might want to revisit assemble.
+            - Need to think about whether or not read-out means terminating all the competitions.
+            Make sure to revisit all the different options below.
         """
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         assemblages = self.assemble()
@@ -725,8 +754,6 @@ class GRAMMATICAL_WM_P(WM):
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
-                print self.t,
-                print missing_info
                 phon_WM_output.extend(phon_form)
                 sem_WM_output['nodes'].extend(expressed['nodes'])
                 sem_WM_output['edges'].extend(expressed['edges'])
@@ -762,19 +789,16 @@ class GRAMMATICAL_WM_P(WM):
     def get_winner_assemblage(self, assemblages, sem_input, phon_input):
         """
         Returns the winner assemblages and their equivalent instances.
+        
         Args: 
             - assemblages ([ASSEMBLAGE])
+            - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
+            - phon_input ([STR]): Sequence of phon content. Used to compute continuity score
         
-        Note: Need to discuss the criteria that come into play in choosing the winner assemblages.
-        As for the SemRep covered weight, the constructions should receive activation from the SemRep instances. This could help directly factoring in the SemRep covered factor.
-        The formula is biased by the fact that not all variables have the same range. This needs to be accounted for.   
-        
-        NOTE: 
-             -NEED TO SOMEHOW ACCOUNT FOR WETHER OR NOT THE ASSEMBLAGE EXPRESSES NOVEL INFORMATION. Otherwise, I get the situation in which assemblage get reused
-        because they are boosted by new construction while scoring higher that the novel assemblages.
-             - I need to include relations, not just nodes.
-             
-        Note:
+        Notes:
+            - Need to discuss the criteria that come into play in choosing the winner assemblages.
+            - As for the SemRep covered weight, the constructions should receive activation from the SemRep instances. 
+            This could help directly factoring in the SemRep covered factor.   
             - For the continuity, this requires an access to what was posted to phonWM. Cannot be done simply by reactivating assemblages, at least
             in their current form, since they could be expanded by adding elements that would change the order of phons.
         
@@ -789,7 +813,7 @@ class GRAMMATICAL_WM_P(WM):
         # Computing the equivalent instance for each assemblage.
         # For each assemblage stores the values of relevant scores.
         for assemblage in assemblages:
-            (phon_form, missing_info, expressed, eq_inst) = self.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage.         
+            (phon_form, missing_info, expressed, eq_inst) = self.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage.                
             sem_length_nodes = len([sf_node for sf_node, semrep_node in eq_inst.covers['nodes'].iteritems() if semrep_node in sem_input['nodes']]) # Only counts nodes that have NOT alrady been expressed.
             sem_length_edges = len([sf_edge for sf_edge, semrep_edge in eq_inst.covers['edges'].iteritems() if semrep_edge in sem_input['edges']]) # Only counts edges that have NOT alrady been expressed. 
 
@@ -800,7 +824,6 @@ class GRAMMATICAL_WM_P(WM):
                 if phon_form[:i] == phon_input[-1*i:]:
                     continuity = len(phon_form[:i])
                     
-            
             scores['sem_length'].append(sem_length)
             scores['form_length'].append(form_length)
             scores['continuity'].append(continuity)
