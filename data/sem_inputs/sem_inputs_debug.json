@@ -17,6 +17,7 @@
 			  "timing":[],
 			  "comments": "Test semantic input. The ? is optional but indicates that this concept does not have a possible lexicalization. Needs to be updated before it can be expressed."
 			},
+			
 		"test_name": {
 			"sem_rate": 10,
 			 "propositions"  : {
@@ -26,6 +27,7 @@
 			  "timing":[],
 			  "comments": ""
 			},
+			
 		"woman_static":{
 			"sem_rate":10,
 			"propositions": {
@@ -35,6 +37,7 @@
 			"timing":[],
 			"comments":"test naming"
 			},
+			
 		"kick_static":{
 			"sem_rate":10,
 			"propositions": {
@@ -44,6 +47,7 @@
 			"timing":[],
 			"comments":"test transitive"
 			},
+			
 		"blue_woman": {
 			"sem_rate": 10,
 			 "propositions"  : {
@@ -55,6 +59,7 @@
 			  "timing":[],
 			  "comments": ""
 			},
+			
 		"blue_woman_kick_man":{
 			"sem_rate":10,
 			"propositions"  : {
@@ -190,6 +195,7 @@
 			
 			"comments":"Test use of SPECIFY."
 		},
+		
 		"test_spec_cxn_incremental":{
 			"sem_rate":10,
 			"propositions":{
@@ -200,6 +206,17 @@
 			"timing":[],
 			
 			"comments":"Test use of SPECIFY incrementally"
+		},
+		
+		"test_missing_info":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["MAN(m1)", "ENTITY(e2)", "HIT(a1)", "AGENT(r1)", "PATIENT(r2)", "r1(a1,m1)", "r2(a1,e2)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			
+			"comments":"Test for the read out of assemblage with missing info."
 		}
 	}
 }

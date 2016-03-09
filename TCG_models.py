@@ -119,7 +119,9 @@ def TCG_production_system(name='language_system_P'):
 #    grammar_name = 'TCG_grammar_VB_light'
 #    grammar_name = 'TCG_grammar_VB_super_light'
 #    grammar_name = 'TCG_grammar_VB_naming'
-    grammar_name = 'TCG_grammar_VB_semrep_update'
+#    grammar_name = 'TCG_grammar_VB_semrep_update'
+#    grammar_name = 'TCG_grammar_VB_super_light_semrep_update'
+    grammar_name = 'TCG_grammar_VB_super_light_semrep_update2'
 
 #    semantics_name = 'TCG_semantics.json'
     semantics_name = 'TCG_semantics _semrep_update'
