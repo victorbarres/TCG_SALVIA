@@ -325,6 +325,14 @@ class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
     
     def conceptualize(self, SceneRep, cpt_schemas):
         """
+        For a given SceneRep, returns the set of CPT_SCHEMA_INSTS that conceptualize the SceneRep
+
+        Args:
+            - SceneRep ()
+            - cpt_schemas ()
+            
+        Notes:
+            - For now the conceptualization scheme is trivial: many-to-one mapping.
         """
         cpt_insts  = []
         for n,d in SceneRep.nodes(data=True): # First process the nodes.
@@ -459,13 +467,11 @@ class SEMANTIC_WM(WM):
             for name in self.inputs['from_grammatical_WM_P']['edges']:
                 d = self.SemRep.get_edge_data(name[0], name[1])
                 d['expressed'] = True
-            
-            # Request for missing info
-            missing_info = self.inputs['from_grammatical_WM_P']['missing_info']
-            if missing_info:
-                print "Requesting more info about %s" %missing_info
     
         self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_ouput()
+        
+        # TD request for missing info
+        self.outputs['to_visual_WM'] = self.vis_WM_output()
         
         if mode=='produce' and self.has_new_sem():
             self.outputs['to_cxn_retrieval_P'] = self.SemRep
@@ -525,10 +531,7 @@ class SEMANTIC_WM(WM):
     def gram_WM_P_ouput(self):
         """
         Returns the output to send to gram_WM_P.
-        The signal sent to gram_WM_P contains the activation levels of the node instance that so far have not been expressed.
-        
-        NOTE:   
-            - NEED TO EXTEND TO RELATIONS.
+        The signal sent to gram_WM_P contains the activation levels of the node and edge instance that so far have not been expressed.
         """
         output = {'nodes':{}, 'edges':{}}
         for n,d in self.SemRep.nodes(data=True):
@@ -538,8 +541,23 @@ class SEMANTIC_WM(WM):
             if not(d['expressed']):
                 output['edges'][(u,v)] = d['cpt_inst'].activity
         return output
-        
     
+    def vis_WM_output(self):
+        """
+        Returns the output to send to vis_WM. This output contains the TD attential signal that can bias the 
+        BU saliency.
+        """
+        output = None
+        if not(self.inputs['from_grammatical_WM_P']) or not(self.inputs['from_grammatical_WM_P']['missing_info']):
+            return output
+        
+        missing_info = self.inputs['from_grammatical_WM_P']['missing_info']
+        print "Requesting more info about %s" %missing_info
+        
+        cpt_schema_inst = self.find_instance(missing_info)
+        output = cpt_schema_inst.trace['per_inst']
+        return output
+        
     def has_new_sem(self):
         """
         Returns true if there is at least 1 new element in the SemRep. False otherwise.
@@ -2355,8 +2373,15 @@ class TEXT2SPEECH(object):
 
 class SEM_GENERATOR(object):
     """
+    Notes: 
+        - Does not allow for verbal guidance. Designed for purely serial update of semanticWM state.
     """
     def __init__(self, sem_inputs, conceptLTM):
+        """
+        Args:
+            - sem_input: a semantic input dict loaded using TCG_LOADER.load_sem_input()
+            - conceptLTM (CONCEPT_LTM): Contains concept schemas.
+        """ 
         self.sem_inputs = sem_inputs
         self.conceptLTM = conceptLTM
         self.preprocess_inputs()
@@ -2395,10 +2420,11 @@ class SEM_GENERATOR(object):
         """
         Creates a generator based on a semantic_data loaded by TCG_LOADER.load_sem_input().
         Eeach time next() function is called, returns a set of concept instances as well as the next time at which the generator should be called.
+        
         Args:
-            - sem_input: a semantic input dict loaded using load_sem_input()
-            - conceptLTM (CONCEPT_LTM): Contains concept schemas.
-        """        
+            - input_name (STR): name of the sem_input to be loaded in the generator.
+            - verbose (BOOL): Flag
+        """
         # For reference.
     #        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
     #        cpt_pattern = r"[A-Z0-9_]+"

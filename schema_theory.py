@@ -617,6 +617,15 @@ class WM(PROCEDURAL_SCHEMA):
     
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
+    
+    def find_instance(self, schema_inst_name):
+        """
+        Returns the schema instance with name schema_inst_name if it exists.
+        Args:
+            schema_inst_name (STR): name of a schema instance.
+        """
+        schema_inst = next((inst for inst in self.schema_insts if inst.name == schema_inst_name), None)
+        return schema_inst
         
     def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None):
         if weight == None:
