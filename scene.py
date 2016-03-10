@@ -150,6 +150,9 @@ class SUB_SCENE(object):
     def update_uncertainty(self):
         """
         Recalculates the uncertainty associated with the subscene based on associated schema instances.
+        
+        Notes: 
+            - The uncertainty is simply the sum of the uncertainy of all the schemas contained in the subscene.
         """
         schema_insts = self.nodes + self.edges
         if len(schema_insts) == 0:
