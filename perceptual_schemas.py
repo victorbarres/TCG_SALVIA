@@ -399,7 +399,9 @@ class VISUAL_WM(WM):
         WM.__init__(self, name)
         self.add_port('IN', 'from_subscene_rec')
         self.add_port('IN', 'from_saliency_map')
+        self.add_port('IN', 'from_semantic_WM')
         self.add_port('OUT', 'to_saliency_map')
+        self.add_port('OUT', 'to_subscene_rec')
         self.add_port('OUT', 'to_conceptualizer')
         self.params['dyn'] = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
@@ -542,6 +544,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_percept_LTM')
         self.add_port('IN', 'from_saliency_map')
+        self.add_port('IN', 'from_visual_WM')
         self.add_port('OUT','to_visual_WM')
         self.add_port('OUT','to_output')
         self.params = {'recognition_time':10}

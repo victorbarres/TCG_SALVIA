@@ -569,171 +569,46 @@ def TCG_description_system(name='description_system'):
     
     return description_system
     
+def TCG_description_system_verbal_guidance(name='description_system_verbal_guidance'):
+    """
+    Creates and returns the TCG production schema system with verbal guidance.
+    """
+    
+    description_system = TCG_description_system(name)
+    semanticWM = description_system.schemas['Semantic_WM']
+    visualWM = description_system.schemas['Visual_WM']
+    subscene_rec = description_system.schemas['Subscene_recognition']
+    description_system.add_connection(semanticWM, 'to_visual_WM', visualWM, 'from_semantic_WM')
+    description_system.add_connection(visualWM, 'to_subscene_rec', subscene_rec, 'from_visual_WM')
+    
+    return description_system
+    
 def TCG_description_system_saliency(name='description_system_saliency'):
     """
-    Creates and returns the TCG production schema system.
+    Creates and returns the TCG production schema system that include a simple saliency map
     """
+    description_system = TCG_description_system(name)
+    
     # Instantiating all the necessary procedural schemas
-    subscene_rec = ps.SUBSCENE_RECOGNITION()
-    perceptLTM = ps.PERCEPT_LTM()
-    visualWM = ps.VISUAL_WM()
     simpleSM = ps.SIMPLE_SALIENCY_MAP()
     
-    conceptualizer = ls.CONCEPTUALIZER()
-    conceptLTM = ls.CONCEPT_LTM()
-    
-    semanticWM = ls.SEMANTIC_WM()
-    grammaticalWM_P = ls.GRAMMATICAL_WM_P()
-    grammaticalLTM = ls.GRAMMATICAL_LTM()
-    cxn_retrieval_P = ls.CXN_RETRIEVAL_P()
-    phonWM_P = ls.PHON_WM_P()
-    control = ls.CONTROL()
-    utter = ls.UTTER()
-    
     # Defining schema to brain mappings.
-    brain_mappings = {'Visual_WM':['ITG'], 
-                        'Percept_LTM':[''],
-                        'Subscene_recognition':['Ventral stream'],
-                        'Saliency_map':['Dorsal_stream', 'IPS'],
-                        'Conceptualizer':['aTP'], 
-                        'Concept_LTM':[''],
-                        'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
-                        'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
-                        'Grammatical_LTM':['left_STG', 'left_MTG'],
-                        'Cxn_retrieval_P':[], 
-                        'Phonological_WM_P':['left_BA6'],
-                        'Utter':[''],
-                        'Control':['DLPFC'], 
-                        'Concept_LTM':['']}
-                        
-    schemas = [subscene_rec, visualWM, simpleSM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
-    # Creating schema system and adding procedural schemas
-    description_system = st.SCHEMA_SYSTEM(name)
+    description_system.brain_mapping['Saliency_map'] = ['Dorsal_stream', 'IPS']
+    
+    # Adding procedural schemas
+    schemas = [simpleSM] 
     description_system.add_schemas(schemas)
     
     # Defining connections
-    description_system.add_connection(perceptLTM, 'to_subscene_rec', subscene_rec, 'from_percept_LTM')
-    description_system.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
+    visualWM = description_system.schemas['Visual_WM']
+    subscene_rec = description_system.schemas['Subscene_recognition']
+
     description_system.add_connection(simpleSM, 'to_visual_WM', visualWM, 'from_saliency_map')
     description_system.add_connection(visualWM, 'to_saliency_map', simpleSM, 'from_visual_WM')
     description_system.add_connection(simpleSM, 'to_subscene_rec', subscene_rec, 'from_saliency_map')
     
-    description_system.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
-    description_system.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
-    description_system.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
-    
-    description_system.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
-    description_system.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
-    description_system.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
-    description_system.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
-    description_system.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
-    description_system.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
-    description_system.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
-    description_system.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
-    description_system.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
-    description_system.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
-    description_system.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
-    description_system.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
-    
-    
     # Defining input and output ports 
-    description_system.set_input_ports([subscene_rec.find_port('from_input'), simpleSM.find_port('from_input')])
-    description_system.set_output_ports([utter.find_port('to_output'), subscene_rec.find_port('to_output')])
-    
-    # Setting up schema to brain mappings
-    description_brain_mapping = st.BRAIN_MAPPING()
-    description_brain_mapping.schema_mapping = brain_mappings
-    description_system.brain_mapping = description_brain_mapping
-    
-    # Parameters
-    subscene_rec.params['recognition_time'] = 10
-    
-    visualWM.params['dyn']['tau'] = 300.0
-    visualWM.params['dyn']['act_inf'] = 0.0
-    visualWM.params['dyn']['L'] = 1.0
-    visualWM.params['dyn']['k'] = 10.0
-    visualWM.params['dyn']['x0'] = 0.5
-    visualWM.params['dyn']['noise_mean'] = 0.0
-    visualWM.params['dyn']['noise_std'] = 1.0
-    visualWM.params['C2']['confidence_threshold'] = 0.0
-    visualWM.params['C2']['prune_threshold'] = 0.01
-    visualWM.params['C2']['coop_weight'] = 0.0
-    visualWM.params['C2']['comp_weight'] = 0.0
-    
-    perceptLTM.init_act = 1.0
-    
-    semanticWM.params['dyn']['tau'] = 300.0
-    semanticWM.params['dyn']['act_inf'] = 0.0
-    semanticWM.params['dyn']['L'] = 1.0
-    semanticWM.params['dyn']['k'] = 10.0
-    semanticWM.params['dyn']['x0'] = 0.5
-    semanticWM.params['dyn']['noise_mean'] = 0.0
-    semanticWM.params['dyn']['noise_std'] = 0.2
-    semanticWM.params['C2']['confidence_threshold'] = 0.0
-    semanticWM.params['C2']['prune_threshold'] = 0.01
-    semanticWM.params['C2']['coop_weight'] = 0.0
-    semanticWM.params['C2']['comp_weight'] = 0.0
-    
-    conceptLTM.init_act = 1.0
-    
-    grammaticalWM_P.params['dyn']['tau'] = 100.0
-    grammaticalWM_P.params['dyn']['act_inf'] = 0.0
-    grammaticalWM_P.params['dyn']['L'] = 1.0
-    grammaticalWM_P.params['dyn']['k'] = 10.0
-    grammaticalWM_P.params['dyn']['x0'] = 0.5
-    grammaticalWM_P.params['dyn']['noise_mean'] = 0.0
-    grammaticalWM_P.params['dyn']['noise_std'] = 0.2
-    grammaticalWM_P.params['C2']['confidence_threshold'] = 0.7
-    grammaticalWM_P.params['C2']['prune_threshold'] = 0.1
-    grammaticalWM_P.params['C2']['coop_weight'] = 1.0
-    grammaticalWM_P.params['C2']['comp_weight'] = -1.0
-    grammaticalWM_P.params['C2']['sub_threshold_r'] = 0.8
-    grammaticalWM_P.params['C2']['deact_weight'] = 0.0
-    
-    grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']
-    
-    phonWM_P.params['dyn']['tau'] = 100.0
-    phonWM_P.params['dyn']['act_inf'] = 0.0
-    phonWM_P.params['dyn']['L'] = 1.0
-    phonWM_P.params['dyn']['k'] = 10.0
-    phonWM_P.params['dyn']['x0'] = 0.5
-    phonWM_P.params['dyn']['noise_mean'] = 0
-    phonWM_P.params['dyn']['noise_std'] = 0.2
-    phonWM_P.params['C2']['confidence_threshold'] = 0
-    phonWM_P.params['C2']['prune_threshold'] = 0.01
-    phonWM_P.params['C2']['coop_weight'] = 0
-    phonWM_P.params['C2']['comp_weight'] = 0
-    
-    control.params['task']['mode'] = 'produce'
-    control.params['task']['time_pressure'] = 500.0
-    control.params['task']['start_produce'] = 500.0
-    control.params['style']['activation'] = 0.7
-    control.params['style']['sem_length'] = 0.3
-    control.params['style']['form_length'] = 0
-    control.params['style']['continuity'] = 0
-    
-    # Loading data
-    grammar_name = 'TCG_grammar_VB'
-    
-    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    
-    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
-    
-    grammar_file = "%s.json" %grammar_name
-    my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
-    
-    # Initialize perceptual LTM content
-    perceptLTM.initialize(my_perceptual_knowledge)
-        
-    # Initialize concept LTM content
-    conceptLTM.initialize(my_conceptual_knowledge)
-    
-    # Initialize conceptualizer
-    conceptualizer.initialize(my_conceptualization)
-    
-    # Initialize grammatical LTM content
-    grammaticalLTM.initialize(my_grammar)
+    description_system.input_ports.append(simpleSM.find_port('from_input'))
     
     return description_system
 

@@ -6,7 +6,7 @@ Test TCG description
 """
 import random
 
-from TCG_models import TCG_description_system
+from TCG_models import TCG_description_system, TCG_description_system_verbal_guidance
 from viewer import TCG_VIEWER
 from loader import TCG_LOADER
 
@@ -19,7 +19,7 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     
-    description_system = TCG_description_system()
+    description_system = TCG_description_system_verbal_guidance()
 
     # Generating schema system graph visualization
     description_system.system2dot(image_type='png', disp=True)
