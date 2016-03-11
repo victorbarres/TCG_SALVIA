@@ -57,8 +57,9 @@ def test(seed=None):
              print "t:%i, '%s'" %(t, output['Utter'])
             if output['Subscene_recognition']:
                 eye_pos = output['Subscene_recognition']['eye_pos']
+                focus_size = output['Subscene_recognition']['focus_size']
                 if eye_pos:
-                    fixations.append({'time':t, 'pos':eye_pos})
+                    fixations.append({'time':t, 'pos':eye_pos, 'focus_size':focus_size})
                 vals = [(u,v) for u,v in output['Subscene_recognition'].iteritems() if v]
                 if vals:
                     print "t:%i, '%s'" %(t, vals)
@@ -74,7 +75,7 @@ def test(seed=None):
     description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
     description_system.schemas['Grammatical_WM_P'].show_state()
     
-    TCG_VIEWER.display_saccades(fixations, IMG_FILE)
+    TCG_VIEWER.display_saccades(fixations, IMG_FILE, fix_radius=False)
     
 #    description_system.save_sim('./tmp/test_description_output.json')
 

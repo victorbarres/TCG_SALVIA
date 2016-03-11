@@ -66,7 +66,12 @@ class AREA(object):
         x = self.x + self.h/2
         y = self.y + self.w/2
         return (x,y)
-           
+    
+    def radius(self):
+        """
+        Defines a radius value for the area (so that it can be considered a circle instead of a box)
+        """
+        return max(self.h/2, self.w/2)  
     
     def set_BU_saliency(self, BU_saliency_map=None):
         """
@@ -528,6 +533,7 @@ class PERCEPT_LTM(LTM):
 
 class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
     """
+    Packages the selective attention processes assuming that for now the pre-attentive parallel perceptual processing phase as already taken place.
     Data
         - params: {'recognition_time':FLOAT}: Defines the time it takes to perceive a schema of uncertainty 1.
         - data (DICT): Stores the schema's data.
@@ -537,6 +543,8 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         - subscene (SUB_SCENE): Currently perceived sub_scene.
         - uncertainty (INT): Remaining uncertainy in subscene perception.
         - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
+        - eye_pos ((FLOAT, FLOAT)): Current eye position
+        - focus_size (FLOAT): current radius of focus window.
         
     """
     def __init__(self, name='Subscene_recognition'):
@@ -554,6 +562,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.uncertainty = 0
         self.next_saccade = False 
         self.eye_pos = (0,0)
+        self.focus_size = 0
         
     def initialize(self, scene_input, per_schemas, BU_saliency_map=None):
         """
@@ -625,17 +634,17 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         
         # Wait to have received all info to initalize
         if self.data['scene_input'] and per_schemas and not(self.scene_data):
-            print "here!"
             self.initialize(self.data['scene_input'], per_schemas)
             self.next_saccade = True
         
         # Start saccade and subscene recognition process   
-        output = {'eye_pos':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
+        output = {'eye_pos':None, 'focus_size':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
         if self.next_saccade:
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
                 output['eye_pos'] = self.eye_pos
+                output['focus_size'] = self.focus_size
                 output['subscene'] = self.subscene.name
                 output['saliency'] = self.subscene.saliency
                 print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene.name, self.subscene.saliency)
@@ -667,6 +676,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
                 max_saliency = ss.saliency
                 self.subscene = ss
                 self.eye_pos = self.subscene.area.center()
+                self.focus_size = self.subscene.area.radius()
     
     #######################
     ### DISPLAY METHODS ###

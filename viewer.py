@@ -1017,11 +1017,18 @@ class TCG_VIEWER:
         plt.show()
     
     @staticmethod
-    def display_saccades(fixations, img_file):
+    def display_saccades(fixations, img_file, fix_radius=False):
         """
         Args:
-            -fixation [DICT]. Format {'time':FLOAT, 'pos':(FLOAT, FLOAT)}
+            - fixation [DICT]. Format {'time':FLOAT, 'pos':(FLOAT, FLOAT), 'focus_size':FLOAT}
+            - img_file
+            - fix_radius (BOOL): If True, focus_size is kept at a constant value.
         """
+        FIX_FOCUS_SIZE = 80.0
+        HEAD_SIZE = 20
+        COLOR = 'b'
+        ALPHA = 0.3
+        FONT_SIZE = 12
         # Load scene image
         imgPIL = Image.open(img_file)
         
@@ -1035,19 +1042,17 @@ class TCG_VIEWER:
         fig = plt.gcf()
         ax = fig.gca()
         
-        # Fixation point
-        fix_radius = 80.0
-        head_size = 20
         
         prev_pos = None
         for fix in fixations:
             pos = fix['pos']
-            fixation = plt.Circle((pos[1],pos[0]), fix_radius , color='r', alpha=0.5)
+            radius = fix['focus_size'] if not(fix_radius) else FIX_FOCUS_SIZE
+            fixation = plt.Circle((pos[1],pos[0]), radius , color=COLOR, alpha=ALPHA)
             ax.add_patch(fixation)
             info = 't:%.1f' %fix['time']
-            plt.text(pos[1] + fix_radius, pos[0], info, fontsize=12)
+            plt.text(pos[1] + radius, pos[0], info, fontsize=FONT_SIZE)
             if prev_pos:
-                plt.arrow(prev_pos[1], prev_pos[0], pos[1]-prev_pos[1], pos[0]-prev_pos[0], length_includes_head=True, head_width=head_size/2, head_length=head_size, fc='k', ec='k')
+                plt.arrow(prev_pos[1], prev_pos[0], pos[1]-prev_pos[1], pos[0]-prev_pos[0], length_includes_head=True, head_width=HEAD_SIZE/2, head_length=HEAD_SIZE, fc='k', ec='k')
             prev_pos = pos
         
         plt.show()
