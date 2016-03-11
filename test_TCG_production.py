@@ -21,7 +21,7 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs_debug.json'
-    INPUT_NAME = 'test_missing_info'
+    INPUT_NAME = 'test_spec_cxn'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system()
@@ -35,7 +35,7 @@ def test(seed=None):
  
     generator = sem_gen.sem_generator(INPUT_NAME)
     
-    language_system_P.schemas['Grammatical_WM_P'].params['C2']['prune_threshold'] = 0.01 #0.1
+    language_system_P.schemas['Grammatical_WM_P'].params['C2']['prune_threshold'] = 0.1 #0.1
     
     (sem_insts, next_time, prop) = generator.next()
     

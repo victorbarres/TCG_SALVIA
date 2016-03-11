@@ -1255,26 +1255,29 @@ class GRAMMATICAL_WM_P(WM):
                 NOTE: I think it does...
             - ALSO, it returns also sub-optimal trees. (Not only the tree that contains all the cooperating instances in the WM).
         """
-        print "get_tree",
-        print self.t
         new_frontiers = [[]] # Each frontier correspond to a possible choice between multiple cooperation options to a same port.
-#        print frontier        s
+        
         for node, link in frontier:
+            # Update assemblage
             assemblage.add_instance(node)
-#            print assemblage.schema_insts
             if link:
                 assemblage.add_link(link)
+            
+            # For each element in the frontier, try to expand the tree.
             ports = graph.predecessors(node)
             for port in ports:
-                children = graph.predecessors(port)
+                children = graph.predecessors(port) # A port can be linked to multiple children, each representing a different hypothesis.
                 updated_frontiers = []
-                for child in children:
-                    flag =  child in assemblage.schema_insts
-                    if not(flag):
-                        link = self.find_coop_links(inst_from=[child], inst_to=[node], port_from=[child.find_port("output")], port_to=[port])
-                        for f in new_frontiers:
-                            updated_frontiers.append(f[:] + [(child, link[0])])
-                    new_frontiers = updated_frontiers
+                if not(children):
+                    pass
+                else:
+                    for child in children:
+                        flag =  child in assemblage.schema_insts
+                        if not(flag):
+                            link = self.find_coop_links(inst_from=[child], inst_to=[node], port_from=[child.find_port("output")], port_to=[port])
+                            for f in new_frontiers:
+                                updated_frontiers.append(f[:] + [(child, link[0])])
+                    new_frontiers = updated_frontiers # Wrong indentation. Not handling frontiers properly.
         if new_frontiers == [[]]:
             results.append(assemblage)
         else:
