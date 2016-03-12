@@ -1017,14 +1017,14 @@ class TCG_VIEWER:
         plt.show()
     
     @staticmethod
-    def display_saccades(fixations, img_file, fix_radius=False):
+    def display_saccades(fixations, img_file, ss_radius=False):
         """
         Args:
-            - fixation [DICT]. Format {'time':FLOAT, 'pos':(FLOAT, FLOAT), 'focus_size':FLOAT}
+            - fixation [DICT]. Format {'time':FLOAT, 'pos':(FLOAT, FLOAT), 'subscene':{'name':STR, 'radius':FLOAT}}
             - img_file
-            - fix_radius (BOOL): If True, focus_size is kept at a constant value.
+            - ssradius (BOOL): If True, fixtion radius is set to the value of the fixated subscene's radius.
         """
-        FIX_FOCUS_SIZE = 80.0
+        RADIUS = 80.0
         HEAD_SIZE = 20
         COLOR = 'b'
         ALPHA = 0.3
@@ -1046,7 +1046,7 @@ class TCG_VIEWER:
         prev_pos = None
         for fix in fixations:
             pos = fix['pos']
-            radius = fix['focus_size'] if not(fix_radius) else FIX_FOCUS_SIZE
+            radius = fix['subscene']['radius'] if ss_radius else RADIUS
             fixation = plt.Circle((pos[1],pos[0]), radius , color=COLOR, alpha=ALPHA)
             ax.add_patch(fixation)
             info = 't:%.1f' %fix['time']

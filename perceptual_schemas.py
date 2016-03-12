@@ -58,7 +58,6 @@ class AREA(object):
        res = (x>=self.x) and (x<=self.x+self.h) and (y>=self.y) and (y<=self.y+self.w)
        return res
       
-     
     def center(self):
         """
         Returns the coordinates of the center of th area.
@@ -71,7 +70,22 @@ class AREA(object):
         """
         Defines a radius value for the area (so that it can be considered a circle instead of a box)
         """
-        return max(self.h/2, self.w/2)  
+        return max(self.h/2, self.w/2) 
+    
+    def include(self, area):
+        """                    
+        Returns True if self includes area.
+        The definition is not as stringent as classic area inclusion.
+        self includes area if the center of area2 falls within self and area is smaller in surface than self.
+        This is quite ad hoc, but will serve as a placeholder for now!
+        
+        Args:
+            - area (AREA)
+        """
+        cond1  = self.contains(area.center())
+        cond2 = (self.w*self.h) > (area.w*area.h)
+        
+        return (cond1 and cond2)
     
     def set_BU_saliency(self, BU_saliency_map=None):
         """
@@ -96,7 +110,7 @@ class AREA(object):
         merge_area.h = max([area1.x + area1.h, area2.x + area2.h]) - merge_area.x
         merge_area.saliency = (area1.saliency + area2.saliency)/2 # THIS MIGHT NOT BE A GOOD IDEA!!
         return merge_area
-    
+        
     ####################
     ### JSON METHODS ###
     ####################
@@ -544,7 +558,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         - uncertainty (INT): Remaining uncertainy in subscene perception.
         - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
         - eye_pos ((FLOAT, FLOAT)): Current eye position
-        - focus_size (FLOAT): current radius of focus window.
+        - focus_area (AREA): Current focus area. None -> no specific focus area.
         
     """
     def __init__(self, name='Subscene_recognition'):
@@ -562,7 +576,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.uncertainty = 0
         self.next_saccade = False 
         self.eye_pos = (0,0)
-        self.focus_size = 0
+        self.focus_area = None
         
     def initialize(self, scene_input, per_schemas, BU_saliency_map=None):
         """
@@ -638,14 +652,13 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             self.next_saccade = True
         
         # Start saccade and subscene recognition process   
-        output = {'eye_pos':None, 'focus_size':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
+        output = {'eye_pos':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
         if self.next_saccade:
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
                 output['eye_pos'] = self.eye_pos
-                output['focus_size'] = self.focus_size
-                output['subscene'] = self.subscene.name
+                output['subscene'] = {'name':self.subscene.name, 'radius': self.subscene.area.radius()}
                 output['saliency'] = self.subscene.saliency
                 print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene.name, self.subscene.saliency)
                 print "Eye pos: (%.1f,%.1f)" %(self.eye_pos[0], self.eye_pos[1])
@@ -667,17 +680,45 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
 
     def get_subscene(self):
         """
-        Get the subscene with highest saliency that hasn't yet been processed.
+        Get the subscene in focus with highest saliency that hasn't yet been processed.
         Sets the eye position to the center of the subscene area.
         """
         max_saliency = 0
-        for ss in self.scene_data.subscenes:
+        in_focus_ss = self.in_focus()
+        for ss in in_focus_ss:
             if ss.saliency > max_saliency:
                 max_saliency = ss.saliency
                 self.subscene = ss
                 self.eye_pos = self.subscene.area.center()
-                self.focus_size = self.subscene.area.radius()
+#                ############ Test of strategy of zoom-in first. #############
+#                if not(self.focus_area):
+#                    self.focus_area = self.subscene.area 
     
+    def in_focus(self):
+        """
+        Returns the set of subscenes that are currently in focus.
+        A subscene is in focus if the current focus area includes the subscene's area.
+        If the focus area is not defined, all the subscenes are in focus.
+        If there are no sub_scene to return within the focus area, all the subscenes are in focus and reset focus_area to None.
+        
+        Notes:
+            - The definition of what is "in focus" is incorrect
+        """
+        in_focus_ss = []
+        candidates = [ss for ss in self.scene_data.subscenes if ss.saliency >0] # Don't consider the subscenes whose saliency has already been set to -1
+        
+        if self.focus_area:
+            for ss in candidates:
+                if ss.area != self.focus_area and self.focus_area.include(ss.area):
+                    in_focus_ss.append(ss)
+                    
+            if not(in_focus_ss): # No subscene in focus
+                self.focus_area = None
+        
+        if not(self.focus_area):
+            in_focus_ss = candidates
+        
+        return in_focus_ss
     #######################
     ### DISPLAY METHODS ###
     #######################

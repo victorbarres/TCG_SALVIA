@@ -27,7 +27,7 @@ def test(seed=None):
     # Defining scene input
     FOLDER  = "./data/scenes/"
     SCENE_FILE = "TCG_scene.json"
-    SCENE_NAME = 'KC06_1_1'
+    SCENE_NAME = 'KC06_1_1_zoom_in'
     SCENE_FOLDER = "%s%s/" %(FOLDER, SCENE_NAME)
     IMG_FILE = SCENE_FOLDER + 'scene.png'
     
@@ -57,9 +57,9 @@ def test(seed=None):
              print "t:%i, '%s'" %(t, output['Utter'])
             if output['Subscene_recognition']:
                 eye_pos = output['Subscene_recognition']['eye_pos']
-                focus_size = output['Subscene_recognition']['focus_size']
+                subscene = output['Subscene_recognition']['subscene']
                 if eye_pos:
-                    fixations.append({'time':t, 'pos':eye_pos, 'focus_size':focus_size})
+                    fixations.append({'time':t, 'pos':eye_pos, 'subscene':subscene})
                 vals = [(u,v) for u,v in output['Subscene_recognition'].iteritems() if v]
                 if vals:
                     print "t:%i, '%s'" %(t, vals)
@@ -75,7 +75,7 @@ def test(seed=None):
     description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
     description_system.schemas['Grammatical_WM_P'].show_state()
     
-    TCG_VIEWER.display_saccades(fixations, IMG_FILE, fix_radius=False)
+    TCG_VIEWER.display_saccades(fixations, IMG_FILE, ss_radius=True)
     
 #    description_system.save_sim('./tmp/test_description_output.json')
 
