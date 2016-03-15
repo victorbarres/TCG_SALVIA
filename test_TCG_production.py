@@ -21,7 +21,7 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs_debug.json'
-    INPUT_NAME = 'test_spec_cxn'
+    INPUT_NAME = 'test_missing_info'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system()

@@ -27,7 +27,7 @@ def test(seed=None):
     # Defining scene input
     FOLDER  = "./data/scenes/"
     SCENE_FILE = "TCG_scene.json"
-    SCENE_NAME = 'KC06_1_1_zoom_in'
+    SCENE_NAME = 'KC06_1_1_ActPt'
     SCENE_FOLDER = "%s%s/" %(FOLDER, SCENE_NAME)
     IMG_FILE = SCENE_FOLDER + 'scene.png'
     
@@ -37,10 +37,10 @@ def test(seed=None):
     description_system.set_input(my_scene)
     description_system.verbose = False
     
-    description_system.schemas['Control'].params['task']['start_produce'] = 300
+    description_system.schemas['Control'].params['task']['start_produce'] = 30
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 500
+    max_time = 300
     save_states = [130]
     
     fixations = []

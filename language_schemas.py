@@ -544,7 +544,7 @@ class SEMANTIC_WM(WM):
     
     def vis_WM_output(self):
         """
-        Returns the output to send to vis_WM. This output contains the TD attential signal that can bias the 
+        Returns the output to send to vis_WM. This output contains the TD attentional signal that can bias the 
         BU saliency.
         """
         output = None

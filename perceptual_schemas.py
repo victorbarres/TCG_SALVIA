@@ -72,7 +72,7 @@ class AREA(object):
         """
         return max(self.h/2, self.w/2) 
     
-    def include(self, area):
+    def includes(self, area):
         """                    
         Returns True if self includes area.
         The definition is not as stringent as classic area inclusion.
@@ -460,6 +460,9 @@ class VISUAL_WM(WM):
         self.update_activations()
         self.prune()
         self.outputs['to_conceptualizer'] =  self.SceneRep
+        
+        missing_info = self.inputs['from_semantic_WM']
+        self.outputs['to_subscene_rec'] = missing_info # For now just passing the message.
     
     def update_SceneRep(self, per_insts):
         """
@@ -486,16 +489,16 @@ class VISUAL_WM(WM):
     
     def show_SceneRep(self):
         node_labels = dict((n, '%s(%.1f)' %(n, d['per_inst'].activity)) for n,d in self.SceneRep.nodes(data=True))
-#        edge_labels = dict(((u,v), '%s(%.1f)' %(d['percept'].name, d['per_inst'].activity)) for u,v,d in self.SceneRep.edges(data=True))s
-#        pos = nx.spring_layout(self.SceneRep)
-        pos=nx.get_node_attributes(self.SceneRep,'pos')
+        edge_labels = dict(((u,v), '%s(%.1f)' %(d['percept'].name, d['per_inst'].activity)) for u,v,d in self.SceneRep.edges(data=True))
+#        pos = nx.spring_layout(self.SceneRep) # uses a spring layout.
+        pos=nx.get_node_attributes(self.SceneRep,'pos') #Uses the position attribute in SceneRep to position nodes.
         plt.figure(facecolor='white')
         plt.axis('off')
         title = '%s state (t=%i)' %(self.name,self.t)
         plt.title(title)
         nx.draw_networkx(self.SceneRep, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.SceneRep, pos=pos, labels= node_labels)
-#        nx.draw_networkx_edge_labels(self.SceneRep, pos=pos, edge_labels=edge_labels)
+        nx.draw_networkx_edge_labels(self.SceneRep, pos=pos, edge_labels=edge_labels)
     
 class PERCEPT_LTM(LTM):
     """
@@ -674,7 +677,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             self.initialize(self.data['scene_input'], per_schemas)
             self.next_saccade = True
         
-        # Start saccade and subscene recognition process   
+        # Start saccade and subscene recognition process        
         output = {'eye_pos':None, 'focus_area':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
         if self.next_saccade:
             self.get_subscene()
@@ -699,6 +702,11 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
                 self.outputs['to_visual_WM'] =  {'subscene':self.subscene, 'init_act':self.subscene.saliency}
                 self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
                 self.subscene = None
+        
+        percept_schema_inst = self.inputs['from_visual_WM']
+        if percept_schema_inst:
+            self.focus_area = percept_schema_inst.content['area']
+            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccaddes.
         
         self.outputs['to_output'] =  output
 
@@ -733,7 +741,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         
         if self.focus_area:
             for ss in candidates:
-                if ss.area != self.focus_area and self.focus_area.include(ss.area):
+                if ss.area != self.focus_area and self.focus_area.includes(ss.area):
                     in_focus_ss.append(ss)
                     
             if not(in_focus_ss): # No subscene in focus
