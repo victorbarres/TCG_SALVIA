@@ -706,7 +706,10 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         percept_schema_inst = self.inputs['from_visual_WM']
         if percept_schema_inst:
             self.focus_area = percept_schema_inst.content['area']
-            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccaddes.
+            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccade.
+            area_center = self.focus_area.center()
+            area_radius = self.focus_area.radius()
+            print "t:%i, TD focus orientation to %s, area (x=%i, y=%i, r=%i)" %(self.t, percept_schema_inst.name, area_center[0], area_center[1], area_radius)
         
         self.outputs['to_output'] =  output
 
