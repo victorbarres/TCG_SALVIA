@@ -145,8 +145,10 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     # Schema types
     UNDEFINED = 'UNDEFINED'
     OBJECT = 'OBJECT'
+    PLACE = 'PLACE'
     ACTION = 'ACTION'
     QUALITY = 'QUALITY'
+    SCENE_REL = 'SCENE_REL'
     SPATIAL_REL = 'SPATIAL_REL'
     ACTION_REL = 'ACTION_REL'
     QUALITY_REL = 'QUALITY_REL'
@@ -163,7 +165,6 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     ### -> Set the initial activation
     # To be done.
 
-
 class PERCEPT_OBJECT(PERCEPT_SCHEMA):
     """
     Object schema
@@ -171,6 +172,14 @@ class PERCEPT_OBJECT(PERCEPT_SCHEMA):
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.OBJECT
+
+class PERCEPT_PLACE(PERCEPT_SCHEMA):
+    """
+    Place schema
+    """
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
+        self.type = PERCEPT_SCHEMA.PLACE
 
 class PERCEPT_ACTION(PERCEPT_SCHEMA):
     """
@@ -205,6 +214,14 @@ class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMA
             return False
         self.area = AREA.hull(self.content['pFrom'].content['area'], self.content['pTo'].content['area'])
         return True
+
+class PERCEPT_SCENE_REL(PERCEPT_SCHEMA_REL):
+    """
+    Scene relation schema. Define relation (edge) between two schemas (PERCEPT_OBJECT) pFrom and pTo.
+    """
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
+        self.type = PERCEPT_SCHEMA.SCENE_REL
 
 class PERCEPT_SPATIAL_REL(PERCEPT_SCHEMA_REL):
     """
@@ -499,8 +516,10 @@ class PERCEPT_LTM(LTM):
         self.perceptual_knowledge = per_knowledge
         
         obj = per_knowledge.find_meaning('OBJECT')
+        place = per_knowledge.find_meaning('PLACE')
         action = per_knowledge.find_meaning('ACTION')
         qual = per_knowledge.find_meaning('QUALITY')
+        scene_rel = per_knowledge.find_meaning('SCENE_REL')
         action_rel = per_knowledge.find_meaning('ACTION_REL')
         spatial_rel = per_knowledge.find_meaning('SPATIAL_REL')
         qual_rel = per_knowledge.find_meaning('QUALITY_REL')
@@ -512,6 +531,8 @@ class PERCEPT_LTM(LTM):
             per_cat = res[0][2]
             if per_knowledge.match(per_cat, obj, match_type="is_a"):
                 new_schema = PERCEPT_OBJECT(name=percept.name, percept=percept, init_act=self.params['init_act'])
+            elif per_knowledge.match(per_cat, place, match_type="is_a"):
+                 new_schema = PERCEPT_PLACE(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, action, match_type="is_a"):
                  new_schema = PERCEPT_ACTION(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, qual, match_type="is_a"):
@@ -524,6 +545,8 @@ class PERCEPT_LTM(LTM):
                  new_schema = PERCEPT_QUALITY_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, temp_rel, match_type="is_a"):
                  new_schema = PERCEPT_TEMP_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
+            elif per_knowledge.match(per_cat, scene_rel, match_type="is_a"):
+                 new_schema = PERCEPT_SCENE_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             else:
                 print "%s: unknown percept type" %percept.meaning
             
@@ -652,7 +675,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
             self.next_saccade = True
         
         # Start saccade and subscene recognition process   
-        output = {'eye_pos':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
+        output = {'eye_pos':None, 'focus_area':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
         if self.next_saccade:
             self.get_subscene()
             self.next_saccade = False
@@ -660,6 +683,7 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
                 output['eye_pos'] = self.eye_pos
                 output['subscene'] = {'name':self.subscene.name, 'radius': self.subscene.area.radius()}
                 output['saliency'] = self.subscene.saliency
+                output['focus_area'] = (self.focus_area.center(), self.focus_area.radius()) if self.focus_area else None
                 print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene.name, self.subscene.saliency)
                 print "Eye pos: (%.1f,%.1f)" %(self.eye_pos[0], self.eye_pos[1])
                 self.uncertainty = self.subscene.uncertainty*self.params['recognition_time']

@@ -1024,10 +1024,10 @@ class TCG_VIEWER:
             - img_file
             - ssradius (BOOL): If True, fixtion radius is set to the value of the fixated subscene's radius.
         """
-        RADIUS = 80.0
         HEAD_SIZE = 20
-        COLOR = 'b'
-        ALPHA = 0.3
+        RADIUS_FIX = 80.0
+        COLOR_FIX = 'b'
+        ALPHA_FIX = 0.3
         FONT_SIZE = 12
         # Load scene image
         imgPIL = Image.open(img_file)
@@ -1046,8 +1046,8 @@ class TCG_VIEWER:
         prev_pos = None
         for fix in fixations:
             pos = fix['pos']
-            radius = fix['subscene']['radius'] if ss_radius else RADIUS
-            fixation = plt.Circle((pos[1],pos[0]), radius , color=COLOR, alpha=ALPHA)
+            radius = fix['subscene']['radius'] if ss_radius else RADIUS_FIX
+            fixation = plt.Circle((pos[1],pos[0]), radius , color=COLOR_FIX, alpha=ALPHA_FIX)
             ax.add_patch(fixation)
             info = 't:%.1f' %fix['time']
             plt.text(pos[1] + radius, pos[0], info, fontsize=FONT_SIZE)

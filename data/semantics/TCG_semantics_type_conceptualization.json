@@ -1,0 +1,336 @@
+{
+	"CONCEPTUAL_KNOWLEDGE" : 
+	{
+		"ENTITY" : 
+		{
+			"OBJECT" : 
+			{
+				"HUMAN" :
+				{
+					"MAN" : {},
+					"BOY" : {}, 
+					"WOMAN" : {}, 
+					"GIRL" : {},
+					"PEOPLE" : {},
+					"BALLERINA" : {},
+					"CELLIST" :{},
+					"FENCER" : {},
+					"ROBBER" : {},
+					"POLICEMAN" : {},
+					"HUNTER" : {}
+				},
+				"ITEM" : 
+				{
+					"CLOTHING" : 
+					{
+						"DRESS" : {},
+						"TSHIRT" : {},
+						"SHIRT" : {},
+						"SUIT" : {}
+					},
+					"CELLO" : {},
+					"TREE" : {},
+					"BAG" :{},
+					"WATERING_CAN" : {}, 
+					"HOOK" : {},
+					"BOOKSHELF" :{},
+					"WAGON" : {}
+				},
+				"ANIMAL" : 
+				{
+					"MOUSE" :{},
+					"TURTLE" : {},
+					"DOG" : {}
+				}
+			},
+			"PLACE" :
+			{
+				"BOXINGRING" : {},
+				"PARK" : {}
+			},
+
+			"ANIMATE" : 
+			{ 
+				"HUMAN" : {},
+				"ANIMAL" : {} 
+			},
+
+			"MALE" : 
+			{ 
+				"MAN" : {},
+				"BOY" : {}
+			},
+
+			"FEMALE"  : 
+			{ 
+				"WOMAN" : {},
+				"GIRL" : {},
+				"BALLERINA" :{}
+			}
+		},
+		
+		"ACTION" : 
+		{
+			"TRANSITIVE" :
+			{
+				"SQUIRT" : {},
+				"TALK" : {},
+				"HIT" : {},
+				"KICK" : {},
+				"WEAR" : {},
+				"SPLASH" : {},
+				"MEET" : {}
+			},
+			"INTRANSITIVE" :
+			{
+				"LAUGH" : {},
+				"WATCH" : {}
+			},
+			"DITRANSITIVE" :
+			{
+				"GIVE": {},
+				"SEND": {}
+			}
+		},
+		
+		"PROPERTY" :
+		{
+			"COLOR" :
+			{
+				"BLACK" : {},
+				"WHITE" : {},
+				"BLUE" : {},
+				"GREEN" : {},
+				"RED" : {}
+			},
+			"SIZE" :
+			{
+				"SMALL" : {},
+				"BIG" : {}
+			},		
+			"APPEARANCE" :
+			{
+				"PRETTY" : {},
+				"HANDSOME" : {}
+			}
+		},
+		
+		"RELATION" : 
+		{
+			"MODIFY" : {},
+			"SPECIFY" : {},
+			"THEMATIC" :
+			{
+				"AGENT" : {},
+				"PATIENT" : {},
+				"THEME" : {},
+				"RECIPIENT" : {}
+			},
+			"TEMPORAL" :
+			{
+				"SUCCESSIVE" : {},
+				"CONCURRENT" : {}
+			},
+			"SPATIAL" : 
+			{ 
+				"IN" : {} 
+			}
+		}
+	},
+
+	"PERCEPTUAL_KNOWLEDGE" :
+	{
+		"OBJECT":
+		[
+			"O?_ENTITY",
+			"O?_OBJECT",
+			"O1_MAN",
+			"O2_BOY",
+			"O3_WOMAN",
+			"O4_GIRL",
+			"O5_HUMAN",
+			"O6_ANIMAL",
+			"O7_MOUSE",
+			"O8_TURTLE",
+			"O9_DRESS",
+			"O10_TSHIRT",
+			"O13_PEOPLE",
+			"O14_BALLERINA",
+			"O15_CELLIST",
+			"O16_FENCER", 
+			"O17_CELLO",
+			"O18_TREE",
+			"O19_BAG",
+			"O20_WATERING_CAN",
+			"O21_SHIRT",
+			"O22_SUIT",
+			"O23_ROBBER",
+			"O24_POLICEMAN",
+			"O25_HUNTER",
+			"O26_DOG",
+			"O27_HOOK",
+			"O28_BOOKSHELF",
+			"O29_WAGON"
+		],
+		
+		"PLACE":
+		[
+			"P?_PLACE",
+			"O11_BOXINGRING",
+			"O12_PARK"
+		],
+		
+		"ACTION":
+		[
+			"A?_ACTION",
+			"A1_SQUIRT",
+			"A2_TALK",
+			"A3_HIT",
+			"A4_WEAR",
+			"A5_KICK",
+			"A6_LAUGH",
+			"A7_WATCH",
+			"A8_SPLASH",
+			"A9_MEET"
+		],
+		
+		"QUALITY":
+		{
+			"COLOR":
+			[
+				"Q?_COLOR",
+				"Q1_RED",
+				"Q2_BLUE",
+				"Q3_GREEN",
+				"Q6_BLACK",
+				"Q7_WHITE"
+			],
+			"SIZE":
+			[
+				"Q4_SMALL",
+				"Q5_BIG"
+			]
+		},
+		
+		"RELATION":
+		{
+			"SCENE_REL":
+			[
+				"R1_SPECIFY"
+			],
+			
+			"ACTION_REL":
+			[
+				"R1_SQUIRTER",
+				"R2_TALKER",
+				"R3_HITER",
+				"R4_WEARER",
+				"R5_KICKER",
+				"R6_LAUGHER",
+				"R7_WATCHER",
+				"R8_SQUIRTEE",
+				"R9_HEARER",
+				"R10_HITEE",
+				"R11_WEAREE",
+				"R12_KICKEE",
+				"R13_WATCHEE",
+				"R14_SPLASHER",
+				"R15_SPLASHEE",
+				"R16_GIVER",
+				"R17_GIVEE",
+				"R18_GIVEN",
+				"R19_SENDER",
+				"R20_SENDEE",
+				"R21_SENT"
+			],
+			"SPATIAL_REL":
+			[
+				"R8_CONTAIN" 
+			],
+			"QUALITY_REL":
+			[
+				"R9_HAS_PARAM"
+			],
+			"TEMP_REL":
+			[
+				"R11_CONCURRENT",
+				"R12_SUCCESSIVE"
+			]
+		}
+	},
+	
+	"CONCEPTUALIZATION":
+	{
+		
+		"ENTITY": ["O?_ENTITY"],
+		"OBJECT": ["O?_OBJECT"],
+		"PLACE": ["P?_PLACE"],
+		
+		"MAN" : ["O1_MAN"],
+		"BOY" : ["O2_BOY"],
+		"WOMAN" : ["O3_WOMAN"],
+		"GIRL" : ["O4_GIRL"],
+		"PEOPLE" : ["O1_MAN"],
+		"HUMAN" : ["O5_HUMAN"],
+		"ANIMAL" : ["O6_ANIMAL"],
+		"MOUSE" : ["O7_MOUSE"],
+		"TURTLE" : ["O8_TURTLE"],
+		"DRESS" : ["O9_DRESS"],
+		"TSHIRT" : ["O10_TSHIRT"],
+		"BOXINGRING" : ["O11_BOXINGRING"],
+		"PARK" : ["O12_PARK"],
+		"PEOPLE" : ["O13_PEOPLE"],
+		"BALLERINA" : ["O14_BALLERINA"],
+		"CELLIST" : ["O15_CELLIST"],
+		"FENCER" : ["O16_FENCER"],
+		"CELLO" : ["O17_CELLO"],
+		"TREE" : ["O18_TREE"],
+		"BAG" : ["O19_BAG"],
+		"WATERING_CAN" :["O20_WATERING_CAN"],
+		"SHIRT" :["O21_SHIRT"],
+		"SUIT" :["O22_SUIT"],
+		"ROBBER" : ["O23_ROBBER"],
+		"POLICEMAN" : ["O24_POLICEMAN"],
+		"HUNTER" : ["O25_HUNTER"],
+		"DOG" : ["O26_DOG"],
+		"HOOK" : ["O27_HOOK"],
+		"BOOKSHELF" : ["O28_BOOKSHELF"],
+		"WAGON" : ["O29_WAGON"],
+		
+		"ACTION" : ["A?_ACTION"],
+		
+		"SQUIRT" : ["A1_SQUIRT"],
+		"TALK" : ["A2_TALK"],
+		"HIT" : ["A3_HIT"],
+		"WEAR" : ["A4_WEAR"],
+		"KICK" : ["A5_KICK"],
+		"LAUGH" : ["A6_LAUGH"],
+		"WATCH" : ["A7_WATCH"],
+		"SPLASH" : ["A8_SPLASH"],
+		"MEET" : ["A9_MEET"],
+		
+		"COLOR" : ["Q?_COLOR"],
+		
+		"RED" : ["Q1_RED"],
+		"BLUE" : ["Q2_BLUE"],
+		"GREEN" : ["Q3_GREEN"],
+		"BLACK" : ["Q6_BLACK"],
+		"WHITE" : ["Q7_WHITE"],
+		"BIG" : ["Q5_BIG"],
+		"SMALL" : ["Q4_SMALL"],
+		
+		"SPECIFY" : ["R1_SPECIFY"],
+		"MODIFY" : ["R9_HAS_PARAM"],
+		
+		"IN" : ["R8_CONTAIN"],
+		
+		"SUCCESSIVE" : ["R12_SUCCESSIVE"],
+		"CONCURRENT" : ["R11_CONCURRENT"],
+
+		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER", "R14_SPLASHER", "R16_GIVER", "R19_SENDER"],
+		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE", "R15_SPLASHEE"],
+		"THEME": ["R18_GIVEN", "R21_SENT"],
+		"RECIPIENT" : ["R17_GIVEE", "R20_SENDEE"]
+	}
+}
+

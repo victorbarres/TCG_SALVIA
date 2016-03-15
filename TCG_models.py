@@ -124,7 +124,7 @@ def TCG_production_system(name='language_system_P'):
 #    grammar_name = 'TCG_grammar_VB_super_light_semrep_update2'
 
 #    semantics_name = 'TCG_semantics.json'
-    semantics_name = 'TCG_semantics _semrep_update'
+    semantics_name = 'TCG_semantics_semrep_update'
     
     semantics_file = "%s.json" % semantics_name
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, "./data/semantics/")
@@ -391,12 +391,24 @@ def TCG_language_system(name='language_system'):
     grammaticalWM_C.params['C2']['sub_threshold_r'] = 0.8
     grammaticalWM_C.params['C2']['deact_weight'] = 0.0
     
+    
     # Loading data
-    grammar_name = 'TCG_grammar_VB'
-   
-    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+#    grammar_name = 'TCG_grammar_VB'
+#    grammar_name = 'TCG_grammar_VB_light'
+#    grammar_name = 'TCG_grammar_VB_super_light'
+#    grammar_name = 'TCG_grammar_VB_naming'
+    grammar_name = 'TCG_grammar_VB_semrep_update'
+#    grammar_name = 'TCG_grammar_VB_super_light_semrep_update'
+#    grammar_name = 'TCG_grammar_VB_super_light_semrep_update2'
+
+#    semantics_name = 'TCG_semantics.json'
+    semantics_name = 'TCG_semantics_semrep_update'
+    
+    semantics_file = "%s.json" % semantics_name
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
     my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
+    
     
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
@@ -545,12 +557,23 @@ def TCG_description_system(name='description_system'):
     control.params['style']['continuity'] = 0
     
     # Loading data
-    grammar_name = 'TCG_grammar_VB'
+#    grammar_name = 'TCG_grammar_VB'
+#    grammar_name = 'TCG_grammar_VB_light'
+#    grammar_name = 'TCG_grammar_VB_super_light'
+#    grammar_name = 'TCG_grammar_VB_naming'
+    grammar_name = 'TCG_grammar_VB_semrep_update'
+#    grammar_name = 'TCG_grammar_VB_super_light_semrep_update'
+#    grammar_name = 'TCG_grammar_VB_super_light_semrep_update2'
+
+#    semantics_name = 'TCG_semantics.json'
+#    semantics_name = 'TCG_semantics_semrep_update'
+    semantics_name = 'TCG_semantics_type_conceptualization'
     
-    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    semantics_file = "%s.json" % semantics_name
+    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge(semantics_file, "./data/semantics/")
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, "./data/semantics/")
     
-    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
+    my_conceptualization = TCG_LOADER.load_conceptualization(semantics_file, "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
     
     grammar_file = "%s.json" %grammar_name
     my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)

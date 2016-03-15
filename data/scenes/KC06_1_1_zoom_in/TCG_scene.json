@@ -6,52 +6,82 @@
   ],
   "schemas": {
    "sc_0": {
-    "name": "BALLERINA",
+    "name": "HUMAN_LEFT",
     "location": [
-     164,
-     530
+     201,
+     159
     ],
     "size": [
-     192,
-     451
+     184,
+     515
     ],
     "saliency": "auto",
     "uncertainty": "1",
     "type": "OBJECT",
-    "schema": "O14_BALLERINA"
+    "schema": "O?_ENTITY"
    },
    "sc_1": {
-    "name": "CELLIST",
+    "name": "HUMAN_RIGHT",
     "location": [
-     197,
-     131
+     162,
+     520
     ],
     "size": [
-     171,
-     530
+     228,
+     474
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O?_ENTITY"
+   },
+   "sc_2": {
+    "name": "CELLIST",
+    "location": [
+     301,
+     169
+    ],
+    "size": [
+     129,
+     392
     ],
     "saliency": "auto",
     "uncertainty": "1",
     "type": "OBJECT",
     "schema": "O15_CELLIST"
    },
-   "sc_2": {
-    "name": "SPLASH",
+   "sc_3": {
+    "name": "BALLERINA",
     "location": [
-     316,
-     307
+     212,
+     568
     ],
     "size": [
-     255,
-     102
+     161,
+     269
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O14_BALLERINA"
+   },
+   "sc_4": {
+    "name": "SPLASH",
+    "location": [
+     304,
+     344
+    ],
+    "size": [
+     175,
+     117
     ],
     "saliency": "auto",
     "uncertainty": "1",
     "type": "ACTION",
     "schema": "A8_SPLASH"
    },
-   "sc_3": {
-    "name": "SPLASH_AGT",
+   "sc_5": {
+    "name": "SPLASHER",
     "location": [
      0,
      0
@@ -65,10 +95,10 @@
     "type": "RELATION",
     "schema": "R14_SPLASHER",
     "from": "SPLASH",
-    "to": "BALLERINA"
+    "to": "HUMAN_RIGHT"
    },
-   "sc_4": {
-    "name": "SPLASH_PT",
+   "sc_6": {
+    "name": "SPLASHEE",
     "location": [
      0,
      0
@@ -82,55 +112,10 @@
     "type": "RELATION",
     "schema": "R15_SPLASHEE",
     "from": "SPLASH",
-    "to": "CELLIST"
-   },
-   "sc_5": {
-    "name": "FENCER",
-    "location": [
-     162,
-     764
-    ],
-    "size": [
-     194,
-     286
-    ],
-    "saliency": "auto",
-    "uncertainty": "1",
-    "type": "OBJECT",
-    "schema": "O16_FENCER"
-   },
-   "sc_6": {
-    "name": "BAG",
-    "location": [
-     615,
-     684
-    ],
-    "size": [
-     161,
-     106
-    ],
-    "saliency": "auto",
-    "uncertainty": "1",
-    "type": "OBJECT",
-    "schema": "O19_BAG"
+    "to": "HUMAN_LEFT"
    },
    "sc_7": {
-    "name": "RED",
-    "location": [
-     631,
-     712
-    ],
-    "size": [
-     142,
-     86
-    ],
-    "saliency": "auto",
-    "uncertainty": "1",
-    "type": "QUALITY",
-    "schema": "Q1_RED"
-   },
-   "sc_8": {
-    "name": "RED_MOD",
+    "name": "IS_CELLIST",
     "location": [
      0,
      0
@@ -142,80 +127,60 @@
     "saliency": "auto",
     "uncertainty": "1",
     "type": "RELATION",
-    "schema": "R9_HAS_PARAM",
-    "from": "RED",
-    "to": "BAG"
+    "schema": "R1_SPECIFY",
+    "from": "CELLIST",
+    "to": "HUMAN_LEFT"
    },
-   "sc_9": {
-    "name": "TREE",
+   "sc_8": {
+    "name": "IS_BALLERINA",
     "location": [
-     24,
-     31
+     0,
+     0
     ],
     "size": [
-     207,
-     275
+     0,
+     0
     ],
     "saliency": "auto",
     "uncertainty": "1",
-    "type": "OBJECT",
-    "schema": "O18_TREE"
+    "type": "RELATION",
+    "schema": "R1_SPECIFY",
+    "from": "BALLERINA",
+    "to": "HUMAN_RIGHT"
    }
   },
   "subscenes": {
-  "ss_0": {
-    "name": "BALLERINA",
+   "ss_0": {
+    "name": "SPLASH_ACTION",
     "schemas": [
-     "BALLERINA"
+     "HUMAN_LEFT",
+     "HUMAN_RIGHT",
+     "SPLASH",
+     "SPLASHER",
+     "SPLASHEE"
     ],
-	"saliency":0.95,
-	"uncertainty":"auto"
+    "saliency": "1.0",
+    "uncertainty": "1"
    },
    "ss_1": {
-    "name": "CELLIST",
+    "name": "ZOOM_CELLIST",
     "schemas": [
-     "CELLIST"
+     "HUMAN_LEFT",
+     "CELLIST",
+     "IS_CELLIST"
     ],
-	"saliency":0.98,
-	"uncertainty":"auto"
+    "saliency": "0.9",
+    "uncertainty": "1"
    },
    "ss_2": {
-    "name": "SPLASH_EVT",
+    "name": "ZOOM_BALLERINA",
     "schemas": [
+     "HUMAN_RIGHT",
      "BALLERINA",
-     "CELLIST",
-     "SPLASH",
-     "SPLASH_AGT",
-     "SPLASH_PT"
+     "IS_BALLERINA"
     ],
-	"saliency":1.0,
-	"uncertainty":"auto"
-   },
-   "ss_3": {
-    "name": "FENCER",
-    "schemas": [
-     "FENCER"
-    ],
-	"saliency":0.9,
-	"uncertainty":"auto"
-   },
-   "ss_4": {
-    "name": "BAG",
-    "schemas": [
-     "BAG",
-     "RED",
-     "RED_MOD"
-    ],
-	"saliency":0.85,
-	"uncertainty":"auto"
-   },
-   "ss_5": {
-    "name": "TREE",
-    "schemas": [
-     "TREE"
-    ],
-	"saliency":0.84,
-	"uncertainty":"auto"
+    "saliency": "0.8",
+    "uncertainty": "1"
    }
   }
  }
