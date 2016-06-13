@@ -490,7 +490,7 @@ def TCG_description_system(name='description_system'):
     description_system.brain_mapping = description_brain_mapping
     
     # Parameters
-    subscene_rec.params['recognition_time'] = 10
+    subscene_rec.params['recognition_time'] = 50
     
     visualWM.params['dyn']['tau'] = 300.0
     visualWM.params['dyn']['act_inf'] = 0.0
@@ -519,20 +519,6 @@ def TCG_description_system(name='description_system'):
     semanticWM.params['C2']['comp_weight'] = 0.0
     
     conceptLTM.init_act = 1.0
-#    
-#    grammaticalWM_P.params['dyn']['tau'] = 100.0
-#    grammaticalWM_P.params['dyn']['act_inf'] = 0.0
-#    grammaticalWM_P.params['dyn']['L'] = 1.0
-#    grammaticalWM_P.params['dyn']['k'] = 10.0
-#    grammaticalWM_P.params['dyn']['x0'] = 0.5
-#    grammaticalWM_P.params['dyn']['noise_mean'] = 0.0
-#    grammaticalWM_P.params['dyn']['noise_std'] = 0.2
-#    grammaticalWM_P.params['C2']['confidence_threshold'] = 0.7
-#    grammaticalWM_P.params['C2']['prune_threshold'] = 0.1
-#    grammaticalWM_P.params['C2']['coop_weight'] = 1.0
-#    grammaticalWM_P.params['C2']['comp_weight'] = -1.0
-#    grammaticalWM_P.params['C2']['sub_threshold_r'] = 0.8
-#    grammaticalWM_P.params['C2']['deact_weight'] = 0.0
     
     grammaticalWM_P.params['dyn']['tau'] = 30 # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
     grammaticalWM_P.params['dyn']['act_inf'] = 0.0
@@ -563,10 +549,10 @@ def TCG_description_system(name='description_system'):
     phonWM_P.params['C2']['comp_weight'] = 0
     
     control.params['task']['mode'] = 'produce'
-    control.params['task']['time_pressure'] = 500.0
+    control.params['task']['time_pressure'] = 100.0
     control.params['task']['start_produce'] = 500.0
-    control.params['style']['activation'] = 0.7
-    control.params['style']['sem_length'] = 0.3
+    control.params['style']['activation'] = 1.0
+    control.params['style']['sem_length'] = 0.0
     control.params['style']['form_length'] = 0
     control.params['style']['continuity'] = 0
     

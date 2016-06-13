@@ -37,7 +37,7 @@ def test(seed=None):
     description_system.set_input(my_scene)
     description_system.verbose = False
     
-    description_system.schemas['Control'].params['task']['start_produce'] = 30
+    description_system.schemas['Control'].params['task']['start_produce'] = 20
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 300
@@ -69,10 +69,10 @@ def test(seed=None):
                 TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
     
     description_system.schemas['Visual_WM'].show_SceneRep()
-    description_system.schemas['Visual_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+#    description_system.schemas['Visual_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     description_system.schemas['Semantic_WM'].show_SemRep()
-    description_system.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
-    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=True, c2_levels=True, c2_network=True)
+#    description_system.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+    description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     description_system.schemas['Grammatical_WM_P'].show_state()
     
     TCG_VIEWER.display_saccades(fixations, IMG_FILE, ss_radius=True)

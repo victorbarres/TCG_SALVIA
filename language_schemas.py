@@ -767,7 +767,8 @@ class GRAMMATICAL_WM_P(WM):
             - Need to think about whether or not read-out means terminating all the competitions.
             Make sure to revisit all the different options below.
         """
-        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']        
+        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
+#        score_threshold -= self.inputs['from_control']['pressure']      
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -881,6 +882,7 @@ class GRAMMATICAL_WM_P(WM):
             if score>max_score:
                 max_score = score
                 winner = assemblages[i]
+                
         return winner
  
 #    def replace_assemblage(self, assemblage):

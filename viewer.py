@@ -1050,7 +1050,7 @@ class TCG_VIEWER:
             fixation = plt.Circle((pos[1],pos[0]), radius , color=COLOR_FIX, alpha=ALPHA_FIX)
             ax.add_patch(fixation)
             info = 't:%.1f' %fix['time']
-            plt.text(pos[1] + radius, pos[0], info, fontsize=FONT_SIZE)
+            plt.text(pos[1] + radius/10, pos[0] + radius/10, info, fontsize=FONT_SIZE)
             if prev_pos:
                 plt.arrow(prev_pos[1], prev_pos[0], pos[1]-prev_pos[1], pos[0]-prev_pos[0], length_includes_head=True, head_width=HEAD_SIZE/2, head_length=HEAD_SIZE, fc='k', ec='k')
             prev_pos = pos
