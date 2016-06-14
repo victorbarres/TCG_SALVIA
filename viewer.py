@@ -38,7 +38,7 @@ class TCG_VIEWER:
         """
         Requires the path (data_path) to the folder that contains the data to be diplayed in the viewer.
         """
-        self.SEVER_PORT = 8000
+        self.SERVER_PORT = 8000
         self.VIEWER_PATH = "viewer/"
         self.VIEWER_TMP = self.VIEWER_PATH + "tmp/"
         self.data_path = data_path
@@ -54,8 +54,8 @@ class TCG_VIEWER:
         """
         Starts the viewer.
         """
-        self.load_data()
-        self.start_server()
+        self._load_data()
+        self._start_server()
         
     def _start_server(self):
         """

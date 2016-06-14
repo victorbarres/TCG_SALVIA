@@ -12,7 +12,7 @@ from viewer import TCG_VIEWER
     
 def test(seed=None):
     """
-    Test Incremental Semantic Formulas sem inputs
+    Test Incremental Semantic Representation Format (ISRF) sem inputs
     """
     
     if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
@@ -20,8 +20,8 @@ def test(seed=None):
         seed = random.randint(0,10**9)
         print "seed = %i" %seed
     random.seed(seed)
-    SEM_INPUT = 'sem_inputs_debug.json'
-    INPUT_NAME = 'test_missing_info'
+    SEM_INPUT = 'sem_inputs_gleitman.json'
+    INPUT_NAME = 'meet_symmetrical'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system()

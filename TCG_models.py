@@ -119,12 +119,14 @@ def TCG_production_system(name='language_system_P'):
 #    grammar_name = 'TCG_grammar_VB_light'
 #    grammar_name = 'TCG_grammar_VB_super_light'
 #    grammar_name = 'TCG_grammar_VB_naming'
-    grammar_name = 'TCG_grammar_VB_semrep_update'
+#    grammar_name = 'TCG_grammar_VB_semrep_update'
 #    grammar_name = 'TCG_grammar_VB_super_light_semrep_update'
 #    grammar_name = 'TCG_grammar_VB_super_light_semrep_update2'
+    grammar_name = 'TCG_grammar_VB_super_light_Gleitman'
 
-#    semantics_name = 'TCG_semantics.json'
-    semantics_name = 'TCG_semantics_semrep_update'
+#    semantics_name = 'TCG_semantics'
+#    semantics_name = 'TCG_semantics_semrep_update'
+    semantics_name = 'TCG_semantics_agt_pt'
     
     semantics_file = "%s.json" % semantics_name
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, "./data/semantics/")

@@ -1,4 +1,46 @@
 {"grammar" :[
+
+	{
+		"name" : "SYMMETRIC_TRANS1",
+		"class" : "S",
+		"preference" : 1,
+		"SemFrame" :
+		{
+			"nodes" : [	{"name" : "ACTOR_1", "concept" : "ENTITY", "focus" : true, "head" : false},
+						{"name" : "ACTOR_2", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true}],
+			"edges" : [	{"name" : "AGT_1", "concept" : "AGENT", "from" : "ACT", "to" : "ACTOR_1"},
+						{"name" : "PT_1", "concept" : "PATIENT", "from" : "ACT", "to" : "ACTOR_1"},
+						{"name" : "AGT_2", "concept" : "AGENT", "from" : "ACT", "to" : "ACTOR_2"},
+						{"name" : "PT_2", "concept" : "PATIENT", "from" : "ACT", "to" : "ACTOR_2"}]
+		},
+		
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S2", "type" : "PHON", "phon" : "and"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["VP", "V"]}],
+		"SymLinks" : {"ACTOR_1" : "S1", "ACTOR_2" : "S3" , "ACT" : "S4"}
+	},
+	
+	{
+		"name" : "SYMMETRIC_TRANS2",
+		"class" : "S",
+		"preference" : 1,
+		"SemFrame" :
+		{
+			"nodes" : [	{"name" : "ACTOR_1", "concept" : "ENTITY", "focus" : true, "head" : false},
+						{"name" : "ACTOR_2", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true}],
+			"edges" : [	{"name" : "AGT_PT_1", "concept" : "AGT_PT", "from" : "ACT", "to" : "ACTOR_1"},
+						{"name" : "AGT_PT_2", "concept" : "AGT_PT", "from" : "ACT", "to" : "ACTOR_2"}]
+		},
+		
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S2", "type" : "PHON", "phon" : "and"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP"]},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["VP", "V"]}],
+		"SymLinks" : {"ACTOR_1" : "S1", "ACTOR_2" : "S3" , "ACT" : "S4"}
+	},
 	
 	{
 		"name" : "SVO",
@@ -82,11 +124,7 @@
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "girl"}],
 		"SymLinks" : {"N1" : "S1"}
-	}
-
-	],
+	}],
 	
-"comments":"Super light version of TCG_grammar_VB adapted to test the processing of symmetric predicates (and reciprocal situation) as well as active passive contrasts used by Gleitman. 
-			Does not include any synonyms.
-			Treats N as NP (not DET_CXN)"
+	"comments": "Super light version of TCG_grammar_VB adapted to test the processing of symmetric predicates (and reciprocal situation) as well as active passive contrasts used by Gleitman. Does not include any synonyms. Treats N as NP (not DET_CXN)"
 }
