@@ -20,22 +20,18 @@ def test(seed=None):
         seed = random.randint(0,10**9)
         print "seed = %i" %seed
     random.seed(seed)
-    SEM_INPUT = 'sem_inputs_gleitman.json'
-    INPUT_NAME = 'meet_symmetrical'
+    SEM_INPUT = 'sem_inputs.json'
+    INPUT_NAME = 'blue_woman_kick_man'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
-    language_system_P = TCG_production_system()
-#     Display schema system
-    language_system_P.system2dot(image_type='png', disp=False, folder = FOLDER)
+    language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB')
     
+    # Set up semantic input generator    
     conceptLTM = language_system_P.schemas['Concept_LTM']
-
     sem_inputs = TCG_LOADER.load_sem_input(SEM_INPUT, "./data/sem_inputs/")    
     sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
  
     generator = sem_gen.sem_generator(INPUT_NAME)
-    
-    language_system_P.schemas['Grammatical_WM_P'].params['C2']['prune_threshold'] = 0.1 #0.1
     
     (sem_insts, next_time, prop) = generator.next()
     
@@ -48,35 +44,29 @@ def test(seed=None):
             (sem_insts, next_time, prop) = generator.next()
             print "t:%i, sem: %s (prop: %s)" %(t, ', '.join([inst.name for inst in sem_insts]), prop)
             language_system_P.set_input(sem_insts)
-#            language_system_P.schemas['Semantic_WM'].show_SemRep()
         language_system_P.update()
         output = language_system_P.get_output()
         if output['Utter']:
             print "t:%i, '%s'" %(t, output['Utter'])
         if t - set_up_time in save_states:
-#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
             TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
-#            TCG_VIEWER.display_gramWM_state(language_system_P.schemas['Grammatical_WM_P'], concise=False, folder = FOLDER)
-#            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=False, folder = FOLDER)
     
-#    language_system_P.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     language_system_P.schemas['Semantic_WM'].show_SemRep()
-#    TCG_VIEWER.display_semWM_state(language_system_P.schemas['Semantic_WM'], folder = FOLDER)
     language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
-#    language_system_P.schemas['Grammatical_WM_P'].show_state()
-#    language_system_P.schemas['Phonological_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     language_system_P.save_sim(FOLDER + 'test_language_output.json')
-#    language_system_P.show_params()
+    
+    return language_system_P
 
-def test_params(seed=None):
+def test_params_dyn(seed=None):
     """
-    First quick function to test the impact of param on outputs
+    Grid search algorithm.
+    First quick function to test the impact of params on outputs.
     """
     from sys import stdout
     import numpy as np
     
     random.seed(seed)
-    # Chose input name
+    # Choose input name
     input_name = 'ditransitive_give'    
     
     # Set up parameter space
@@ -161,7 +151,7 @@ def test_params(seed=None):
         params['utter'] = ' '.join(utter)
         
     
-    file_name = 'test11.csv'
+    file_name = 'test.csv'
     params_name = ['tau', 'k', 'noise_std', 'conf_thresh', 'prune_thresh', 'coop_weight', 'comp_weight', 'utter']
     
     line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
@@ -173,10 +163,87 @@ def test_params(seed=None):
             new_line = line(vals)
             f.write(new_line)
 
-
+def test_time_pressure(seed=None):
+    
+    """
+    Grid search algorithm.
+    Impact of time pressure
+    """
+    from sys import stdout
+    import numpy as np
+    
+    random.seed(seed)
+    
+    # Input name
+    input_file = 'sem_inputs.json'
+    input_name = 'blue_woman_kick_man'
+    
+    # Set up parameter space
+    start_produce_samples =np.linspace(1,500,20)
+    
+    params_samples = []
+    for start_produce in start_produce_samples:
+        param_set = {'start_produce':start_produce}
+        params_samples.append(param_set)
+        
+    num_sims = len(params_samples)
+                                
+    
+    # Running simulations
+    num  = 1
+    for params in params_samples:
+        # Set up model
+        language_system_P = TCG_production_system() # Better if I could just reset the model...
+        conceptLTM = language_system_P.schemas['Concept_LTM']
+        
+        control = language_system_P.schemas['Control']
+        control.params['task']['start_produce'] = params['start_produce']
+        
+        # Set up input
+        sem_inputs = TCG_LOADER.load_sem_input(input_file, "./data/sem_inputs/")    
+        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
+        generator = sem_gen.sem_generator(input_name)
+        (sem_insts, next_time, prop) = generator.next()
+        stdout.flush();
+        stdout.write(" Sim number: %i (%.2f%%)      %s" %(num,num/float(num_sims)*100,"\r"))
+        
+        num += 1
+        utter = []
+        
+        set_up_time = -10 #Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
+        max_time = 900
+        
+        # Run production simulation
+        for t in range(set_up_time, max_time):
+            if next_time != None and t>next_time:
+                (sem_insts, next_time, prop) = generator.next()
+                language_system_P.set_input(sem_insts)
+            language_system_P.update()
+            output = language_system_P.get_output()
+            if output['Utter']:
+                prod = "[%i, %s]" %(t, output['Utter'])
+                utter.append(prod)
+        
+        params['utter'] = ' '.join(utter)
+        
+    
+    file_name = 'test.csv'
+    params_name = ['start_produce', 'utter']
+    
+    line = lambda vals: ', '.join([str(v) for v in vals]) + '\n'
+    with open(file_name, 'w') as f:
+        header = line(params_name)
+        f.write(header)
+        for params in params_samples:
+            vals = [params[name] for name in params_name]
+            new_line = line(vals)
+            f.write(new_line)
+    
+    
 if __name__=='__main__':
     test(seed=None)
-#    test_params(seed=1)
+#    test_params_dyn(seed=1)
+#    test_time_pressure(seed=1)
         
 
 

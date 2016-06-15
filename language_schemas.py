@@ -1558,7 +1558,7 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         SemFrame_graph = cxn_schema.content.SemFrame.graph 
             
         node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "is" for strict matching
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
         

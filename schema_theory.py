@@ -69,6 +69,13 @@ class PORT(object):
         PORT.ID_NEXT += 1
         self.type = port_type
         self.schema = port_schema
+    
+    def reset(self):
+        """
+        Reset port state.
+        """
+        self.port_data = None
+        self.port_value = None
 
 class CONNECT(SCHEMA):
     """
@@ -90,6 +97,22 @@ class CONNECT(SCHEMA):
         self.port_to = port_to
         self.weight = weight
         self.delay = delay
+        
+    def reset(self):
+        """
+        Reset the set of each connected port.
+        """
+        self.port_from.reset()
+        self.port_to.reset()
+    
+    def update(self):
+        """
+        For now does not involve weight or delay!
+        Sets the value of port_rom to the value of port_to.
+        Resets the port_from value to None.
+        """
+        self.port_to.value = self.port_from.value
+        self.port_from.value = None
     
     def set_from(self, port):
         """
@@ -124,15 +147,6 @@ class CONNECT(SCHEMA):
         """
         new_connect = CONNECT(name=self.name, port_from = self.port_from, port_to = self.port_to, weight=self.weight, delay=self.delay)
         return new_connect
-        
-    def update(self):
-        """
-        For now does not involve weight or delay!
-        Sets the value of port_rom to the value of port_to.
-        Resets the port_from value to None.
-        """
-        self.port_to.value = self.port_from.value
-        self.port_from.value = None
     
     ####################
     ### JSON METHODS ###
@@ -197,6 +211,13 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.in_ports = []
         self.out_ports = []
         self.params = {}
+        self.inputs = {}
+        self.outputs = {}
+        self.activity = 0
+        self.t = 0
+        self.dt = 1.0
+    
+    def reset(self):
         self.inputs = {}
         self.outputs = {}
         self.activity = 0
@@ -599,6 +620,17 @@ class WM(PROCEDURAL_SCHEMA):
         self.params['dyn'] = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}}
+    
+    def reset(self):
+        """
+        Reset state of the schema
+        """
+        super(WM, self).reset()
+        self.schema_insts = []
+        self.coop_links = []
+        self.comp_links = []
+        self.save_state = {'insts':{}}
+        
        
     def add_instance(self,schema_inst, act0=None):
         if schema_inst in self.schema_insts:
@@ -1122,6 +1154,8 @@ class SCHEMA_SYSTEM(object):
     Data:
         - name (str):
         - schemas({schema_name:PROCEDURAL_SCHEMAS}):
+        - params (DICT): offers direct access to all the parameters in the model.
+        - default_params (DICT): can store default parameter values.
         - connections ([CONNECT]):
         - input_port ([PORT]): the list of ports that read the input
         - output_ports ([PORT]): The list of ports that defines the output value
@@ -1138,6 +1172,8 @@ class SCHEMA_SYSTEM(object):
     def __init__(self, name=''):
         self.name = name
         self.schemas = {}
+        self.params = None
+        self.default_params = None
         self.connections = []
         self.input_ports = None
         self.output_ports = None
@@ -1148,6 +1184,21 @@ class SCHEMA_SYSTEM(object):
         self.dt = SCHEMA_SYSTEM.TIME_STEP
         self.verbose = False
         self.sim_data = {'schema_system':{}, 'system_states':{}}
+        
+    def reset(self):
+        """
+        Reset the system to its initial state t=0
+        """      
+        self.input = None
+        self.outputs = {}
+        self.t = SCHEMA_SYSTEM.T0
+        self.sim_data = {'schema_system':{}, 'system_states':{}}
+        for schema_name in self.schemas:
+            schema = self.schemas[schema_name]
+            schema.t = self.t
+            schema.reset()
+        for connection in self.connections:
+            connection.reset()
     
     def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
         """
@@ -1176,6 +1227,8 @@ class SCHEMA_SYSTEM(object):
             else:
                 self.schemas[schema.name] = schema
                 schema.schema_system = self
+        
+        self.params = self.get_params() # update the params value to account for new parameters.
     
     def set_input_ports(self, ports):
         """
@@ -1254,6 +1307,23 @@ class SCHEMA_SYSTEM(object):
             self.sim_data['schema_system'] = self.get_info()
         self.sim_data[self.t] = self.get_state()    
     
+    def set_default_params(self, params=None):
+        """
+        Set default model parameters to params if params != None. Else set default params to self.params.
+        If params != None, the model does not check for compatibility of the input with the parameter space of the model!
+        """
+        if params:
+            self.default_params = params
+        else:
+            self.default_params = params.copy()
+            
+    def reset_default_params(self):
+        """
+        Resets the params to the default parameters
+        """
+        self.params = self.default_params.copy()
+        
+    
     ####################
     ### JSON METHODS ###
     ####################
@@ -1282,6 +1352,7 @@ class SCHEMA_SYSTEM(object):
     
     def get_params(self):
         """
+        Returns a dictionary containing pointers to the parameters for each procedural schema in the model.
         """
         sys_params = {}
         for schema_name, schema in self.schemas.iteritems():
@@ -1370,8 +1441,7 @@ class SCHEMA_SYSTEM(object):
         Display all the parameters of the schema system.
         """
         print "MODEL PARAMETERS"
-        sys_params = self.get_params()
-        pprint.pprint(sys_params, indent=1, width=1)
+        pprint.pprint(self.params, indent=1, width=1)
             
 ########################
 ### MODULE FUNCTIONS ###
