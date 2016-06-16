@@ -24,16 +24,22 @@ def test(seed=None):
     INPUT_NAME = 'blue_woman_kick_man'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
-    language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB')
+    language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main', semantics_name='TCG_semantics_main')
     
     # Set up semantic input generator    
     conceptLTM = language_system_P.schemas['Concept_LTM']
-    sem_inputs = TCG_LOADER.load_sem_input(SEM_INPUT, "./data/sem_inputs/")    
-    sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM)
+    sem_inputs = TCG_LOADER.load_sem_input(SEM_INPUT, "./data/sem_inputs/")   
+    speed_param = 1
+    sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param)
  
     generator = sem_gen.sem_generator(INPUT_NAME)
     
     (sem_insts, next_time, prop) = generator.next()
+    
+    # Test paramters
+    language_system_P.params['Control']['task']['start_produce'] = 20
+    language_system_P.params['Control']['task']['time_pressure'] = 20
+    language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900

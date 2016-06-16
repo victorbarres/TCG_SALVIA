@@ -573,16 +573,18 @@ class SEMANTIC_WM(WM):
     
     def has_unexpressed_sem(self):
         """
-        Returns true if there is at least 1 unexpresed node in the SemRep. False otherwise.
+        Returns true if there is at least 1 unexpresed node or relation in the SemRep. False otherwise.
         
-        NOTE:   
-            - NEED TO EXTEND TO RELATIONS.
         """
         for n,d in self.SemRep.nodes(data=True):
             if not(d['expressed']):
                 return True
         return False
         
+        for u,v,d in self.SemRep.edges(data=True):
+            if d['expressed']:
+                return True
+        return False
         
     #######################
     ### DISPLAY METHODS ###
@@ -677,6 +679,7 @@ class GRAMMATICAL_WM_P(WM):
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']
+#            self.apply_pressure(ctrl_input['pressure'])
             output = self.produce_form(sem_input, phon_input)
             if output:
                 self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
@@ -768,7 +771,6 @@ class GRAMMATICAL_WM_P(WM):
             Make sure to revisit all the different options below.
         """
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
-#        score_threshold -= self.inputs['from_control']['pressure']      
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -962,6 +964,7 @@ class GRAMMATICAL_WM_P(WM):
         self.set_winners(winner_assemblage)
         self.deactivate_coop_weigts()
 #        self.deactivate_coop_weigts2(winner_assemblage)
+        self.end_competitions()
         
     def set_subthreshold(self, insts):
         """
@@ -1558,6 +1561,7 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         SemFrame_graph = cxn_schema.content.SemFrame.graph 
             
         node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+#        print cxn_schema.name
         edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "is" for strict matching
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
@@ -2319,7 +2323,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             self.state['unexpressed_sem'] = self.inputs['from_semantic_WM']
             
             if self.t == self.params['task']['start_produce']:
-                self.state['last_prod_time'] = self.t
+                self.state['last_prod_time'] = self.t #pressure only starts building up once the start_produce time has been reached.
                 
             if self.t >= self.params['task']['start_produce'] and self.state['unexpressed_sem']:
                 self.state['produce'] = True
@@ -2328,7 +2332,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             
             if self.t < self.params['task']['start_produce'] or not(self.state['unexpressed_sem']):
                 pressure = 0
-                self.state['last_prod_time'] = self.t
+                self.state['last_prod_time'] = self.t # This option allows to have the pressure start to ramp up only once a new sem element has been introduced in semWM.
             else:
                 pressure = min((self.t - self.state['last_prod_time'])/self.params['task']['time_pressure'], 1) #Pressure ramps up linearly to 1
 
@@ -2342,7 +2346,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             self.outputs['to_grammatical_WM_C'] =  True
         else:
             self.outputs['to_grammatical_WM_C'] =  False
-                
+        
     ####################
     ### JSON METHODS ###
     ####################
@@ -2383,23 +2387,26 @@ class SEM_GENERATOR(object):
     Notes: 
         - Does not allow for verbal guidance. Designed for purely serial update of semanticWM state.
     """
-    def __init__(self, sem_inputs, conceptLTM):
+    def __init__(self, sem_inputs, conceptLTM, speed_param=1):
         """
         Args:
             - sem_input: a semantic input dict loaded using TCG_LOADER.load_sem_input()
             - conceptLTM (CONCEPT_LTM): Contains concept schemas.
+            - speed_param (FLOAT): speed_param >0. Factor applied to the  timing of the input.
         """ 
         self.sem_inputs = sem_inputs
         self.conceptLTM = conceptLTM
+        self.speed_param = speed_param
+        
         self.preprocess_inputs()
     
     def preprocess_inputs(self):
         """
         """
         for name, sem_input in self.sem_inputs.iteritems():
-            sem_rate = sem_input['sem_rate']
+            sem_rate = sem_input['sem_rate']*self.speed_param
             sequence = sem_input['sequence']
-            timing = sem_input['timing']
+            timing = [t*self.speed_param for t in sem_input['timing']]
             if sem_rate and not(timing):
                 sem_input['timing'] = [i*sem_rate for i in range(len(sequence))]
             if not(timing) and not(sem_rate):
