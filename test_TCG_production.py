@@ -42,7 +42,7 @@ def test(seed=None):
     language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 20
+    max_time = 900
     save_states = [50, 100, 450, 550, 650]
     
     for t in range(set_up_time, max_time):
