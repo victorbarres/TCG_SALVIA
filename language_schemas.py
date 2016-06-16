@@ -678,7 +678,6 @@ class GRAMMATICAL_WM_P(WM):
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
-            print "t: %i --> tries to produce!" %self.t
             self.params['style'] = ctrl_input['params_style']
             output = self.produce_form(sem_input, phon_input)
             if output:
@@ -1561,6 +1560,7 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         SemFrame_graph = cxn_schema.content.SemFrame.graph 
             
         node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+#        print cxn_schema.name
         edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "is" for strict matching
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
@@ -2346,8 +2346,6 @@ class CONTROL(PROCEDURAL_SCHEMA):
         else:
             self.outputs['to_grammatical_WM_C'] =  False
         
-        print 't: %i, pressure: %.2f' %(self.t, pressure)
-                
     ####################
     ### JSON METHODS ###
     ####################
