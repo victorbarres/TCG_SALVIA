@@ -662,6 +662,7 @@ class GRAMMATICAL_WM_P(WM):
         self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
+        self.save_state['assemblage_out'] = []
         
     def process(self):
         """
@@ -769,7 +770,7 @@ class GRAMMATICAL_WM_P(WM):
             - Might want to revisit assemble.
             - Need to think about whether or not read-out means terminating all the competitions.
             Make sure to revisit all the different options below.
-        """
+        """        
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         assemblages = self.assemble()
         if assemblages:
@@ -783,6 +784,10 @@ class GRAMMATICAL_WM_P(WM):
                 sem_WM_output['edges'].extend(expressed['edges'])
                 sem_WM_output['missing_info'] = missing_info
                 assemblages.remove(winner_assemblage)
+                
+                # Save winner assembalge to state
+                data = {'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0]}
+                self.save_state['assemblage_out'].append(data)
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)

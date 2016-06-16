@@ -37,7 +37,7 @@ def test(seed=None):
     (sem_insts, next_time, prop) = generator.next()
     
     # Test paramters
-    language_system_P.params['Control']['task']['start_produce'] = 10
+    language_system_P.params['Control']['task']['start_produce'] = 20
     language_system_P.params['Control']['task']['time_pressure'] = 200
     language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
