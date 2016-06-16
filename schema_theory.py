@@ -924,6 +924,11 @@ class WM(PROCEDURAL_SCHEMA):
         
     def show_state(self):
         """
+        Uses NetworX draw methods to display the WM state.
+        
+        Note:
+            - NetworkX display methods are quite bad. Migrate to DOT format or to another way of 
+            rendering the graph.
         """
         state = nx.DiGraph()
         for inst in self.schema_insts:
@@ -1075,8 +1080,8 @@ class ASSEMBLAGE(object):
         
     def add_link(self, link):
         """
-        Add an cooperation link 'lin'k (COOP_LINK) to the assemblage.
-        A link can only be added does not add a connection to an already used in port or out port.
+        Add an cooperation link 'link' (COOP_LINK) to the assemblage.
+        A link can only be added that does not add a connection to an already used in port or out port.
         Returns True if the link was sucessfully added, False otherwise.
         """
         for l in self.coop_links:
@@ -1092,7 +1097,7 @@ class ASSEMBLAGE(object):
         FOR NOW SIMPLY THE AVERAGE (or SUM) ACTIVATION OF THE INSTANCES CONTAINED IN THE ASSEMBLAGE.
         """
         self.activation = sum([inst.activity for inst in self.schema_insts])/len(self.schema_insts) # Average
-#        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum
+#        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum (favors larger assemblage)
     
     def copy(self):
         """
