@@ -37,12 +37,12 @@ def test(seed=None):
     (sem_insts, next_time, prop) = generator.next()
     
     # Test paramters
-    language_system_P.params['Control']['task']['start_produce'] = 20
-    language_system_P.params['Control']['task']['time_pressure'] = 20
+    language_system_P.params['Control']['task']['start_produce'] = 10
+    language_system_P.params['Control']['task']['time_pressure'] = 200
     language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 900
+    max_time = 20
     save_states = [50, 100, 450, 550, 650]
     
     for t in range(set_up_time, max_time):

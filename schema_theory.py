@@ -748,7 +748,6 @@ class WM(PROCEDURAL_SCHEMA):
         # Update all instances activation and sets alive=False for instances that fall below threshold.
         for inst in self.schema_insts:
             inst.update_activation()
-            print self.save_state
             if inst.activity<self.params['C2']['prune_threshold']:
                 inst.alive = False
         
