@@ -679,6 +679,7 @@ class GRAMMATICAL_WM_P(WM):
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']
+#            self.apply_pressure(ctrl_input['pressure'])
             output = self.produce_form(sem_input, phon_input)
             if output:
                 self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
@@ -770,7 +771,6 @@ class GRAMMATICAL_WM_P(WM):
             Make sure to revisit all the different options below.
         """
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
-#        score_threshold -= self.inputs['from_control']['pressure']      
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -964,6 +964,7 @@ class GRAMMATICAL_WM_P(WM):
         self.set_winners(winner_assemblage)
         self.deactivate_coop_weigts()
 #        self.deactivate_coop_weigts2(winner_assemblage)
+        self.end_competitions()
         
     def set_subthreshold(self, insts):
         """
@@ -2322,7 +2323,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             self.state['unexpressed_sem'] = self.inputs['from_semantic_WM']
             
             if self.t == self.params['task']['start_produce']:
-                self.state['last_prod_time'] = self.t
+                self.state['last_prod_time'] = self.t #pressure only starts building up once the start_produce time has been reached.
                 
             if self.t >= self.params['task']['start_produce'] and self.state['unexpressed_sem']:
                 self.state['produce'] = True
@@ -2331,7 +2332,7 @@ class CONTROL(PROCEDURAL_SCHEMA):
             
             if self.t < self.params['task']['start_produce'] or not(self.state['unexpressed_sem']):
                 pressure = 0
-#                self.state['last_prod_time'] = self.t # This option allows to have the pressure start to ramp up only once a new sem element has been introduced in semWM.
+                self.state['last_prod_time'] = self.t # This option allows to have the pressure start to ramp up only once a new sem element has been introduced in semWM.
             else:
                 pressure = min((self.t - self.state['last_prod_time'])/self.params['task']['time_pressure'], 1) #Pressure ramps up linearly to 1
 
