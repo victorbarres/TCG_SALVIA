@@ -796,7 +796,7 @@ class GRAMMATICAL_WM_P(WM):
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
-                if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblate then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED!
+                if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblage then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED!
                     for assemblage in assemblages:
                         assemblage.update_activation()
                     winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
