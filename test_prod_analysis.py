@@ -59,7 +59,8 @@ def syntactic_complexity(data):
 def cxn_usage_frequency(data):
     """
     Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
-    Returns a count of how many time each cxn type has been used.
+    Returns
+        - a count of how many time each cxn type has been used.
     """
     cxn_usage = {}
     for d in data:
@@ -70,13 +71,15 @@ def cxn_usage_frequency(data):
                 cxn_usage[cxn_name] += 1
             else:
                 cxn_usage[cxn_name] = 1
+                
     return cxn_usage
     
 
 def utterance_intervals(data):
     """
     Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
-    Returns a list of the time intervals between each utterance produced.
+    Returns
+        - a list of the time intervals between each utterance produced.
     """
     utter_intervals= []
     t = data[0]['t']
@@ -88,23 +91,45 @@ def utterance_intervals(data):
         
     return utter_intervals
 
-for dat in data:
-    print "t: %i" %dat['t']
-    print "form_output: %s" %' '.join(dat['phon_form'])
-    print "num_cxn_insts: %i" %len(dat['assemblage'].schema_insts)
-    print "num_coop_links %i" %len(dat['assemblage'].coop_links)
+def utterance_length(data):
+    """
+    Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
+    Returns
+        - a list of the utternances lengths.
+    """
+    utter_length = [len(dat['phon_form']) for dat in data]
     
-    (outter_nodes, inner_nodes) = tree_data(dat['assemblage'])
-    
-    print [n.name for n in outter_nodes]
-    print [n.name for n in inner_nodes]
+    return utter_length
+
+###############
+# ANALYSIS
+import pprint as pp
+
+
+section_title = lambda x: "\n###### %s ######\n" %(str(x))
+
+print section_title('CXN USAGE')
     
 cxn_usage = cxn_usage_frequency(data)
-print cxn_usage
+pp.pprint(cxn_usage) 
+
+num_types = len(cxn_usage.keys())
+num_tokens = sum([cxn_usage.values()])
+print '\nnum_types = %i\n' %num_types
+print 'num_tokens = %i\n' %num_tokens
+
+print section_title('SYNTACTIC COMPLEXITY')
 
 syn_complexity = syntactic_complexity(data)
-print syn_complexity
+pp.pprint(syn_complexity)
+
+print section_title('UTTERANCE INTERVALS')
 
 utter_intervals = utterance_intervals(data)
-print utter_intervals
+pp.pprint(utter_intervals)
+
+print section_title('UTTERANCE LENGTHS')
+
+utter_length = utterance_length(data)
+pp.pprint(utter_length)
     
