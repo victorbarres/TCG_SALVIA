@@ -14,7 +14,13 @@ gram_WM = model.schemas['Grammatical_WM_P']
 data = gram_WM.save_state['assemblage_out']
 
 
-def tree_complexity(assemblage):
+def tree_data(assemblage):
+    """
+    Given an cxn_assemblage(Tree), returns the number of inner_nodes and outter_nodes (leaves)
+    
+    Args:
+        assemblage (ASSEMBLAGE): A CXN assemblage.
+    """
     nodes = assemblage.schema_insts[:]
     edges = assemblage.coop_links[:]
     
@@ -38,15 +44,23 @@ def tree_complexity(assemblage):
     
 
 def syntactic_complexity(data):
+    """
+    Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
+    Returns the list of tree_data() applied to each output cxn_assemblage.
+    """
     syn_complexity = {'nodes':[], 'inner_nodes':[]}
     for dat in data:
-        (outter_nodes, inner_nodes) = tree_complexity(dat['assemblage'])
+        (outter_nodes, inner_nodes) = tree_data(dat['assemblage'])
         syn_complexity['nodes'].append(len(outter_nodes) + len(inner_nodes))
         syn_complexity['inner_nodes'].append(len(inner_nodes))
     return syn_complexity
 
             
 def cxn_usage_frequency(data):
+    """
+    Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
+    Returns a count of how many time each cxn type has been used.
+    """
     cxn_usage = {}
     for d in data:
         cxn_insts = d['assemblage'].schema_insts
@@ -59,16 +73,20 @@ def cxn_usage_frequency(data):
     return cxn_usage
     
 
-def utterance_time_delays(data):
-    utter_delays = []
+def utterance_intervals(data):
+    """
+    Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
+    Returns a list of the time intervals between each utterance produced.
+    """
+    utter_intervals= []
     t = data[0]['t']
     for dat in data[1:]:
         next_t = dat['t']
-        delay = (next_t - t)
-        utter_delays.append(delay)
+        interval = (next_t - t)
+        utter_intervals.append(interval)
         t = next_t
         
-    return utter_delays
+    return utter_intervals
 
 for dat in data:
     print "t: %i" %dat['t']
@@ -76,7 +94,7 @@ for dat in data:
     print "num_cxn_insts: %i" %len(dat['assemblage'].schema_insts)
     print "num_coop_links %i" %len(dat['assemblage'].coop_links)
     
-    (outter_nodes, inner_nodes) = tree_complexity(dat['assemblage'])
+    (outter_nodes, inner_nodes) = tree_data(dat['assemblage'])
     
     print [n.name for n in outter_nodes]
     print [n.name for n in inner_nodes]
@@ -87,6 +105,6 @@ print cxn_usage
 syn_complexity = syntactic_complexity(data)
 print syn_complexity
 
-utter_delays = utterance_time_delays(data)
-print utter_delays
+utter_intervals = utterance_intervals(data)
+print utter_intervals
     
