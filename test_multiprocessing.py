@@ -7,7 +7,7 @@ Created on Fri Jun 17 14:26:46 2016
 
 from joblib import Parallel, delayed
 
-from test_TCG_production import test
+from test_TCG_production import run_model
 
 
 def multi_proc(num_tests=1, n_jobs=-1, verbose=1):
@@ -21,7 +21,7 @@ def multi_proc(num_tests=1, n_jobs=-1, verbose=1):
     """
     
     # Mapping data 
-    Parallel(n_jobs=n_jobs, verbose=verbose)(delayed(test)() for i in range(num_tests))
+    Parallel(n_jobs=n_jobs, verbose=verbose)(delayed(run_model)() for i in range(num_tests))
 
 
 if __name__=='__main__':
@@ -31,4 +31,3 @@ if __name__=='__main__':
     verbose = int(sys.argv[3])
     print "num_tests=%i; n_jobs=%i; verbose=%i" %(num_tests, n_jobs, verbose)
     multi_proc(num_tests, n_jobs, verbose)
-    

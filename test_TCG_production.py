@@ -4,6 +4,7 @@
 Test cases for the language production schemas defined in language_schemas.py
 """
 import random
+import os
 
 import language_schemas as ls
 from loader import TCG_LOADER
@@ -59,7 +60,7 @@ def test(seed=None):
     
     language_system_P.schemas['Semantic_WM'].show_SemRep()
     language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
-    language_system_P.save_sim(FOLDER + 'test_language_output.json')
+    language_system_P.save_sim(FOLDER, 'test_language_output.json')
     
     return language_system_P
 
@@ -244,6 +245,47 @@ def test_time_pressure(seed=None):
             vals = [params[name] for name in params_name]
             new_line = line(vals)
             f.write(new_line)
+
+def run_model(seed=None):
+    """
+    """
+    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
+        random.seed(seed)
+        seed = random.randint(0,10**9)
+    random.seed(seed)
+    SEM_INPUT = 'sem_inputs.json'
+    INPUT_NAME = 'blue_woman_kick_man'
+    FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
+    
+    language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main', semantics_name='TCG_semantics_main')
+    
+    # Set up semantic input generator    
+    conceptLTM = language_system_P.schemas['Concept_LTM']
+    sem_inputs = TCG_LOADER.load_sem_input(SEM_INPUT, "./data/sem_inputs/")   
+    speed_param = 1
+    sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param)
+ 
+    generator = sem_gen.sem_generator(INPUT_NAME)
+    
+    (sem_insts, next_time, prop) = generator.next()
+    
+    # Test paramters
+    language_system_P.params['Control']['task']['start_produce'] = 400
+    language_system_P.params['Control']['task']['time_pressure'] = 200
+    language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
+    
+    set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
+    max_time = 900
+    
+    for t in range(set_up_time, max_time):
+        if next_time != None and t>next_time:
+            (sem_insts, next_time, prop) = generator.next()
+            language_system_P.set_input(sem_insts)
+        language_system_P.update()
+    
+    language_system_P.save_sim(FOLDER, 'test_language_output.json')
+    
+    return language_system_P
     
     
 if __name__=='__main__':

@@ -1365,10 +1365,13 @@ class SCHEMA_SYSTEM(object):
         
         return sys_params
     
-    def save_sim(self, file_name = 'output.json'):
+    def save_sim(self, file_path = './', file_name = 'output.json'):
         """
         """
-        with open(file_name, 'wb') as f:
+        my_file = file_path + file_name
+        if not(os.path.exists(file_path)):
+            os.mkdir(file_path)
+        with open(my_file, 'wb') as f:
             json.dump(self.sim_data, f, sort_keys=True, indent=4, separators=(',', ': '))
     
     #######################
@@ -1456,6 +1459,9 @@ def save(schema_system, path='./tmp/'):
     Saves a schema system using pickle.
     """
     file_name = path + schema_system.name
+    if not(os.path.exists(path)):
+            os.mkdir(path)
+            
     with open(file_name, 'w') as f:
         pickle.dump(schema_system, f)
 

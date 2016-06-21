@@ -387,7 +387,9 @@ class CONCEPT_LTM(LTM):
         rel = cpt_knowledge.find_meaning('RELATION')
         for concept in cpt_knowledge.concepts():
             new_schema = None
-            if cpt_knowledge.match(concept, entity, match_type="is_a"):
+            if concept.name == 'CONCEPT':
+                pass
+            elif cpt_knowledge.match(concept, entity, match_type="is_a"):
                 new_schema = CPT_ENTITY_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])
             elif cpt_knowledge.match(concept, action, match_type="is_a"):
                 new_schema = CPT_ACTION_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])

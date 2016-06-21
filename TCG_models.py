@@ -9,6 +9,7 @@ import language_schemas as ls
 import perceptual_schemas as ps
 from loader import TCG_LOADER
     
+    
 def TCG_production_system(name='language_system_P', 
                           grammar_name='TCG_grammar_VB', 
                           semantics_name = 'TCG_semantics',
@@ -661,6 +662,17 @@ def TCG_SemWM(name='Semantic_WM',
     conceptLTM.initialize(my_conceptual_knowledge)
     
     return language_system_sem
+
+def create_model(model_name):
+    """
+    """
+    possibles = globals().copy()
+    function = possibles.get(model_name)
+    if not function:
+        raise NotImplementedError("model %s not implemented" % model_name)
+    model = function()
+    return model
+        
 
 if __name__ == '__main__':
     production_system = TCG_production_system()

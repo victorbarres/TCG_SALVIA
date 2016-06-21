@@ -382,11 +382,13 @@ class TCG_LOADER(object):
         # Create conceptual knowledge object
         my_conceptual_knowledge = cpt.CONCEPTUAL_KNOWLEDGE()
         
-        top = 'CONCEPTUAL_KNOWELDGE'
+        top = 'CONCEPT'
         top_cpt = cpt.CONCEPT(name=top, meaning=top)
         my_conceptual_knowledge.add_ent(top_cpt)
         
         flag = TCG_LOADER.read_concept("is_a", top_cpt, my_conceptual_knowledge, cpt_data)
+
+           
         if not(flag):
             return None
     
@@ -404,7 +406,7 @@ class TCG_LOADER(object):
         # Create peceptual_knowledge object
         my_perceptual_knowledge = per.PERCEPTUAL_KNOWLEDGE()
         
-        top = 'PERCEPTUAL_KNOWELDGE'
+        top = 'PERCEPT'
         top_per = per.PERCEPT_CAT(name=top, meaning=top)
         my_perceptual_knowledge.add_ent(top_per)
         
