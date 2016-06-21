@@ -5,15 +5,6 @@ Created on Thu Jun 16 15:33:26 2016
 @author: victor
 """
 
-from test_TCG_production import test
-
-model = test()
-
-gram_WM = model.schemas['Grammatical_WM_P']
-
-data = gram_WM.save_state['assemblage_out']
-
-
 def tree_data(assemblage):
     """
     Given an cxn_assemblage(Tree), returns the number of inner_nodes and outter_nodes (leaves)
@@ -91,7 +82,7 @@ def utterance_intervals(data):
         
     return utter_intervals
 
-def utterance_length(data):
+def utterance_lengths(data):
     """
     Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
     Returns
@@ -100,36 +91,59 @@ def utterance_length(data):
     utter_length = [len(dat['phon_form']) for dat in data]
     
     return utter_length
-
-###############
-# ANALYSIS
-import pprint as pp
-
-
-section_title = lambda x: "\n###### %s ######\n" %(str(x))
-
-print section_title('CXN USAGE')
     
-cxn_usage = cxn_usage_frequency(data)
-pp.pprint(cxn_usage) 
-
-num_types = len(cxn_usage.keys())
-num_tokens = sum([cxn_usage.values()])
-print '\nnum_types = %i\n' %num_types
-print 'num_tokens = %i\n' %num_tokens
-
-print section_title('SYNTACTIC COMPLEXITY')
-
-syn_complexity = syntactic_complexity(data)
-pp.pprint(syn_complexity)
-
-print section_title('UTTERANCE INTERVALS')
-
-utter_intervals = utterance_intervals(data)
-pp.pprint(utter_intervals)
-
-print section_title('UTTERANCE LENGTHS')
-
-utter_length = utterance_length(data)
-pp.pprint(utter_length)
     
+def prod_analyses(data):
+    """
+    Carries out all the analyses and returns a single output
+    """
+    res = {}
+    res['syntactic_complexity']= syntactic_complexity(data)
+    res['cxn_usage_frequency'] = cxn_usage_frequency(data)
+    res['utterance_intervals'] = utterance_intervals(data)
+    res['utterance_lengths'] = utterance_lengths(data)
+    
+    return res
+    
+###############################################################################
+if __name__ == '__main__':
+    
+    from test_TCG_production import test
+    
+    model = test()
+
+    gram_WM = model.schemas['Grammatical_WM_P']
+
+    data = gram_WM.save_state['assemblage_out'] 
+    
+    ###############
+    # ANALYSIS
+    import pprint as pp
+    
+    
+    section_title = lambda x: "\n###### %s ######\n" %(str(x))
+    
+    print section_title('CXN USAGE')
+        
+    cxn_usage = cxn_usage_frequency(data)
+    pp.pprint(cxn_usage) 
+    
+    num_types = len(cxn_usage.keys())
+    num_tokens = sum([cxn_usage.values()])
+    print '\nnum_types = %i\n' %num_types
+    print 'num_tokens = %i\n' %num_tokens
+    
+    print section_title('SYNTACTIC COMPLEXITY')
+    
+    syn_complexity = syntactic_complexity(data)
+    pp.pprint(syn_complexity)
+    
+    print section_title('UTTERANCE INTERVALS')
+    
+    utter_intervals = utterance_intervals(data)
+    pp.pprint(utter_intervals)
+    
+    print section_title('UTTERANCE LENGTHS')
+    
+    utter_lengths = utterance_lengths(data)
+    pp.pprint(utter_lengths)

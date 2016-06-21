@@ -4,12 +4,12 @@
 Test cases for the language production schemas defined in language_schemas.py
 """
 import random
-import os
 
 import language_schemas as ls
 from loader import TCG_LOADER
 from TCG_models import TCG_production_system
 from viewer import TCG_VIEWER
+from test_prod_analysis import prod_analyses
     
 def test(seed=None):
     """
@@ -249,13 +249,8 @@ def test_time_pressure(seed=None):
 def run_model(seed=None):
     """
     """
-    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
-        random.seed(seed)
-        seed = random.randint(0,10**9)
-    random.seed(seed)
     SEM_INPUT = 'sem_inputs.json'
     INPUT_NAME = 'blue_woman_kick_man'
-    FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main', semantics_name='TCG_semantics_main')
     
@@ -283,9 +278,10 @@ def run_model(seed=None):
             language_system_P.set_input(sem_insts)
         language_system_P.update()
     
-    language_system_P.save_sim(FOLDER, 'test_language_output.json')
-    
-    return language_system_P
+    gram_WM = language_system_P.schemas['Grammatical_WM_P']
+    data = gram_WM.save_state['assemblage_out'] 
+    res = prod_analyses(data)
+    return res
     
     
 if __name__=='__main__':

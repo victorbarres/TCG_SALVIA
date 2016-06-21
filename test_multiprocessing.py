@@ -21,13 +21,19 @@ def multi_proc(num_tests=1, n_jobs=-1, verbose=1):
     """
     
     # Mapping data 
-    Parallel(n_jobs=n_jobs, verbose=verbose)(delayed(run_model)() for i in range(num_tests))
+    res = Parallel(n_jobs=n_jobs, verbose=verbose)(delayed(run_model)() for i in range(num_tests))
+    
+    return res
 
 
 if __name__=='__main__':
     import sys
+    import pprint as pp
+    
     num_tests = int(sys.argv[1])
     n_jobs = int(sys.argv[2])
     verbose = int(sys.argv[3])
     print "num_tests=%i; n_jobs=%i; verbose=%i" %(num_tests, n_jobs, verbose)
-    multi_proc(num_tests, n_jobs, verbose)
+    res = multi_proc(num_tests, n_jobs, verbose)
+    
+    pp.pprint(res)
