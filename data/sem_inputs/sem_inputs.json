@@ -3,7 +3,7 @@
 		"test": {
 			"sem_rate": 10,
 			 "propositions"  : {
-				"P1": ["WOMAN(w1)"],
+				"P1":["WOMAN(w1)"],
 				"P2":["MAN(m1)"],
 				"P3":["MAN(m2)"],
 				"P4":["KICK(a1)"],
@@ -17,6 +17,7 @@
 			  "timing":[],
 			  "comments": "Test semantic input. The ? is optional but indicates that this concept does not have a possible lexicalization. Needs to be updated before it can be expressed."
 			},
+			
 		"test_name": {
 			"sem_rate": 10,
 			 "propositions"  : {
@@ -26,6 +27,7 @@
 			  "timing":[],
 			  "comments": ""
 			},
+			
 		"woman_static":{
 			"sem_rate":10,
 			"propositions": {
@@ -35,6 +37,7 @@
 			"timing":[],
 			"comments":"test naming"
 			},
+			
 		"kick_static":{
 			"sem_rate":10,
 			"propositions": {
@@ -44,6 +47,7 @@
 			"timing":[],
 			"comments":"test transitive"
 			},
+			
 		"blue_woman": {
 			"sem_rate": 10,
 			 "propositions"  : {
@@ -55,6 +59,7 @@
 			  "timing":[],
 			  "comments": ""
 			},
+			
 		"blue_woman_kick_man":{
 			"sem_rate":10,
 			"propositions"  : {

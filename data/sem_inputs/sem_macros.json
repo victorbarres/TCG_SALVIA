@@ -1,0 +1,24 @@
+﻿{ 
+	"input_marcros" : {
+		"test" : {
+			"sem_input_frame": {
+				"sem_rates":10,
+				"prop_frames":{
+					"P1":["ENTITY1(e1, a1)"],
+					"P2":["ENTITY2(e2, a2)"],
+					"P3":["RELATION1(e2, e1, a3)"]
+				},
+				"sequence":["P1", "P2", "P3"],
+				"timing":[]
+			},	
+			"substitutions":{
+				"ENTITY1":["MAN", "WOMAN", "BOY"],
+				"ENTITY2":["BIG", "SMALL"],
+				"RELATION1":["MODIFY"],
+				"a1":[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+				"a2":[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+				"a3":[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9],
+			}
+		}
+	}
+}

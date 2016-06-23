@@ -2425,7 +2425,7 @@ class SEM_GENERATOR(object):
         for name, sem_input in self.sem_inputs.iteritems():
             print name
             if verbose:
-                self.show_input(name)   
+                self.show_input(name)
                 
     def show_input(self, input_name):
         """
@@ -2441,7 +2441,7 @@ class SEM_GENERATOR(object):
     def sem_generator(self, input_name, verbose=False):
         """
         Creates a generator based on a semantic_data loaded by TCG_LOADER.load_sem_input().
-        Eeach time next() function is called, returns a set of concept instances as well as the next time at which the generator should be called.
+        Each time next() function is called, returns a set of concept instances as well as the next time at which the generator should be called.
         
         Args:
             - input_name (STR): name of the sem_input to be loaded in the generator.
@@ -2519,17 +2519,18 @@ class SEM_GENERATOR(object):
 class UTTER_GENERATOR():
     """
     """
-    def __init__(self, ling_inputs):
+    def __init__(self, ling_inputs, speed_param=1):
         self.ling_inputs = ling_inputs
+        self.speed_param = speed_param
         self.preprocess_inputs()
     
     def preprocess_inputs(self):
         """
         """
         for name, ling_input in self.ling_inputs.iteritems():
-            utter_rate = ling_input['utter_rate']
+            utter_rate = ling_input['utter_rate']*self.speed_param
             utterance = ling_input['utterance']
-            timing = ling_input['timing']
+            timing = [t*self.speed_param for t in ling_input['timing']]
             if utter_rate and not(timing):
                 ling_input['timing'] = [i*utter_rate for i in range(len(utterance))]
             if not(timing) and not(utter_rate):
