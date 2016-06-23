@@ -278,6 +278,7 @@ def run_model(seed=None):
             language_system_P.set_input(sem_insts)
         language_system_P.update()
     
+    # Output analysis
     gram_WM = language_system_P.schemas['Grammatical_WM_P']
     data = gram_WM.save_state['assemblage_out'] 
     res = prod_analyses(data)

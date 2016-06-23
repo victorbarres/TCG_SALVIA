@@ -2,7 +2,9 @@
 """
 Created on Fri Jun 17 14:26:46 2016
 
-@author: victor
+@author: Victor Barres
+
+Test running models on mutliprocessing.
 """
 
 from joblib import Parallel, delayed
@@ -29,6 +31,9 @@ def multi_proc(num_tests=1, n_jobs=-1, verbose=1):
 if __name__=='__main__':
     import sys
     import pprint as pp
+    if len(sys.argv) == 0:
+        print "Missing arguments!"
+        print "run: python test_multiprocessing.py num_tests(INT) num_jobs(INT) verbose(INT)"
     
     num_tests = int(sys.argv[1])
     n_jobs = int(sys.argv[2])

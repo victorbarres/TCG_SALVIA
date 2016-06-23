@@ -2426,6 +2426,7 @@ class SEM_GENERATOR(object):
             print name
             if verbose:
                 self.show_input(name)   
+                
     def show_input(self, input_name):
         """
         """
