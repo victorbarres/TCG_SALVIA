@@ -17,6 +17,7 @@ TCG data loader module
     All other methods should be considered private and are subject to change.
 """
 import json
+import re
 
 import concept as cpt
 import percept as per
@@ -471,7 +472,7 @@ class TCG_LOADER(object):
     @staticmethod    
     def load_BU_saliency(file_name = '', file_path = './'):
         """
-        Loads and returns a the saliency data define in in file_path\file_name.mat Return None if error.
+        Loads and returns the saliency data defined in in file_path\file_name.mat Return None if error.
         """
         saliency_data = smat.SALIENCY_DATA()
         saliency_data.load(file_path + file_name) # This needs to eb better integrated with the scene data.
@@ -480,18 +481,65 @@ class TCG_LOADER(object):
     @staticmethod
     def load_sem_input(file_name = '', file_path = './'):
         """
-        Loads and returns a the semantic input data define in in file_path\file_name.
+        Loads and returns the semantic input data defined in in file_path\file_name.
         Return None if error.
         """
         # Open and read file
         json_data = TCG_LOADER.json_read(file_name, path = file_path)
         return json_data['inputs']
+    
+    @staticmethod
+    def load_sem_macro(macro_name, file_name = '', file_path = './'):
+        """
+        Proceses the semantic input macro macro_name (STR) defined in in file_path\file_name.
+        """
+        # Open and read file
+        json_data = TCG_LOADER.json_read(file_name, path = file_path)
+        sem_macro = json_data['input_macros'][macro_name]
+        substitutions = sem_macro['substitutions']
+        sem_input_frame = json.dumps(sem_macro['sem_input_frame'])
+        
+        
+        def substitute(my_input, a_substitution):
+            pattern = lambda word: r'\b%s\b' %word
+            new_input = my_input
+            for u,v in a_substitution.iteritems():
+                my_pattern = pattern(u)
+                new_input = re.sub(my_pattern, v, new_input)
+            
+            return new_input
+        
+        def build_substitution_set(substitutions):
+            a_substitution = {}
+            substitution_set =[a_substitution]
+            
+            for k,v in substitutions.iteritems():
+                new_substitution_set = []
+                while substitution_set:
+                    substitution = substitution_set.pop()
+                    for value in v:
+                        new_substitution = substitution.copy()
+                        new_substitution[k] = value
+                        new_substitution_set.append(new_substitution)
+                substitution_set = new_substitution_set[:]
+                
+            return substitution_set
+            
+        substitution_set = build_substitution_set(substitutions)
+        sem_inputs = [substitute(sem_input_frame, substitution) for substitution in substitution_set]
+        
+        return sem_inputs
+            
+        
+        
+        
+        
         
         
     @staticmethod
     def load_ling_input(file_name = '', file_path = './'):
         """
-        Loads and returns a the linguistic input data define in in file_path\file_name.
+        Loads and returns the linguistic input data defined in in file_path\file_name.
         Return None if error.
         """
         # Open and read file
