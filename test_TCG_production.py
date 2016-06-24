@@ -283,7 +283,68 @@ def run_model(seed=None):
     data = gram_WM.save_state['assemblage_out'] 
     res = prod_analyses(data)
     return res
+
+def set_model(sem_input_file, sem_name, sem_input_macro = True, semantics_name='TCG_semantics_main', 
+              grammar_name='TCG_grammar_VB_main', params = {}):
+    """
+    """
+    SEM_INPUT_PATH = './data/sem_inputs/'
     
+    language_system_P = TCG_production_system(grammar_name=grammar_name, semantics_name=semantics_name)
+    
+    # Set up semantic input generator    
+    conceptLTM = language_system_P.schemas['Concept_LTM']
+    if not(sem_input_macro):
+        sem_inputs = TCG_LOADER.load_sem_input(sem_input_file, SEM_INPUT_PATH)
+        sem_input = {sem_name:sem_inputs[sem_name]}
+        sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=1)
+    if sem_input_macro:
+        sem_inputs = TCG_LOADER.load_sem_macro(sem_name, sem_input_file, SEM_INPUT_PATH)
+        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=1)
+    
+    return (language_system_P, sem_gen)
+
+def run_model2(model, generator, seed=None):
+    """
+    Temporary new version of run_model. 
+    """
+    (sem_insts, next_time, prop) = generator.next()
+    
+    # Test paramters
+    model.params['Control']['task']['start_produce'] = 400
+    model.params['Control']['task']['time_pressure'] = 200
+    model.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
+    
+    set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
+    max_time = 900
+    
+    print 'RUN'
+    for t in range(set_up_time, max_time):
+        if next_time != None and t>next_time:
+            (sem_insts, next_time, prop) = generator.next()
+            model.set_input(sem_insts)
+        model.update()
+    
+    # Output analysis
+    gram_WM = model.schemas['Grammatical_WM_P']
+    data = gram_WM.save_state['assemblage_out']
+    res = prod_analyses(data)
+    
+    model.reset()
+    return res
+
+def test_sem_frame(seed=None):
+    """
+    """
+    (model, sem_gen) = set_model('sem_macros.json', 'test', sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
+    output = {}
+    for name in sem_gen.sem_inputs:
+        generator = sem_gen.sem_generator(name, verbose=True)
+        output[name] = run_model2(model, generator)
+    
+    return output
+        
+        
     
 if __name__=='__main__':
     test(seed=None)

@@ -507,7 +507,7 @@ class TCG_LOADER(object):
                 my_pattern = pattern(u)
                 new_input = re.sub(my_pattern, v, new_input)
             
-            return new_input
+            return json.loads(new_input)
         
         def build_substitution_set(substitutions):
             a_substitution = {}
@@ -526,15 +526,9 @@ class TCG_LOADER(object):
             return substitution_set
             
         substitution_set = build_substitution_set(substitutions)
-        sem_inputs = [substitute(sem_input_frame, substitution) for substitution in substitution_set]
+        sem_inputs = {str(substitution): substitute(sem_input_frame, substitution) for substitution in substitution_set}
         
         return sem_inputs
-            
-        
-        
-        
-        
-        
         
     @staticmethod
     def load_ling_input(file_name = '', file_path = './'):

@@ -2457,7 +2457,7 @@ class SEM_GENERATOR(object):
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
 #        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition (without activation)
         func_pattern_cpt2 = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation
-        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)"
+        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation does without activation
         
         sem_input = self.sem_inputs[input_name]
         propositions = sem_input['propositions']
@@ -2474,7 +2474,7 @@ class SEM_GENERATOR(object):
             prop_list = propositions[prop_name]
             if verbose:
                 print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(propositions[sequence[idx]]))
-            for prop in prop_list:
+            for prop in prop_list:  
                 # Case1:
                 match1 = re.search(func_pattern_cpt2, prop)
                 match2 = re.search(func_pattern_rel, prop)
@@ -2507,6 +2507,7 @@ class SEM_GENERATOR(object):
                         rel_inst.content['pTo'] = name_table[arg2]
                 else:
                     print "ERROR, unknown formula"
+                    print prop
             
             next_idx = idx + 1       
             if next_idx<len(timing):

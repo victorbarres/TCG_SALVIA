@@ -218,8 +218,10 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.dt = 1.0
     
     def reset(self):
-        self.inputs = {}
-        self.outputs = {}
+        for k in self.inputs:
+            self.inputs[k] = None
+        for k in self.outputs:
+            self.outputs[k] = None
         self.activity = 0
         self.t = 0
         self.dt = 1.0
@@ -619,8 +621,10 @@ class WM(PROCEDURAL_SCHEMA):
         self.comp_links = []
         self.params['dyn'] = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
-        self.save_state = {'insts':{}}
-    
+        self.save_state = {'insts':{}, 
+                           'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
+                                           'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
+        
     def reset(self):
         """
         Reset state of the schema
@@ -629,7 +633,8 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.save_state = {'insts':{}}
+        for k in self.save_state:
+            self.save_state[k] = {}
         
        
     def add_instance(self,schema_inst, act0=None):
@@ -807,8 +812,6 @@ class WM(PROCEDURAL_SCHEMA):
             transfer = abs((inst_from.activity - inst_to.activity)*link.weight)
             tot_comp += transfer
         
-        if not(self.save_state.has_key('WM_activity')):
-            self.save_state['WM_activity'] = {'t':[], 'act':[], 'comp':[], 'coop':[], 'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}
         self.save_state['WM_activity']['t'].append(self.t)
         self.save_state['WM_activity']['act'].append(self.activity)
         self.save_state['WM_activity']['comp'].append(tot_comp)

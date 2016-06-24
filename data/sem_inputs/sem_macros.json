@@ -2,11 +2,11 @@
 	"input_macros":{
 		"test":{
 			"sem_input_frame":{
-				"sem_rates":10,
-				"prop_frames":{
+				"sem_rate":10,
+				"propositions":{
 					"P1":["ENTITY1(e1, a1)"],
 					"P2":["ENTITY2(e2, a2)"],
-					"P3":["RELATION1(e2, e1, a3)"]
+					"P3":["RELATION1(r1)", "r1(e2, e1)"]
 				},
 				"sequence":["P1", "P2", "P3"],
 				"timing":[]
@@ -16,8 +16,7 @@
 				"ENTITY2":["BIG", "SMALL"],
 				"RELATION1":["MODIFY"],
 				"a1":["0.1", "0.2"],
-				"a2":["0.1", "0.2"],
-				"a3":["0.1", "0.2"]
+				"a2":["0.1", "0.2"]
 			}
 		}
 	}

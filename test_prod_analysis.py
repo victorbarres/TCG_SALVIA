@@ -73,6 +73,8 @@ def utterance_intervals(data):
         - a list of the time intervals between each utterance produced.
     """
     utter_intervals= []
+    if not data:
+        return None
     t = data[0]['t']
     for dat in data[1:]:
         next_t = dat['t']
