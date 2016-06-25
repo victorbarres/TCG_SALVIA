@@ -316,9 +316,8 @@ def run_model2(model, generator, seed=None):
     model.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 200
+    max_time = 900
     
-    print 'RUN'
     data = []
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
@@ -338,11 +337,18 @@ def run_model2(model, generator, seed=None):
 def test_sem_frame(seed=None):
     """
     """
+    import time
     (model, sem_gen) = set_model('sem_macros.json', 'test', sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
     output = {}
+    count = 1
+    num_sim = len(sem_gen.sem_inputs)
     for name in sem_gen.sem_inputs:
-        generator = sem_gen.sem_generator(name, verbose=True)
+        start = time.time()
+        generator = sem_gen.sem_generator(name, verbose=False)
         output[name] = run_model2(model, generator)
+        end = time.time()
+        print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end-start) 
+        count +=1
     
     return output
         
