@@ -435,6 +435,13 @@ class SEMANTIC_WM(WM):
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
+    def reset(self):
+        """
+        Reest schema state
+        """
+        super(SEMANTIC_WM, self).reset()
+        self.SemRep = nx.DiGraph()
+    
     def process(self):
         """
         """
@@ -661,10 +668,10 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_P')
+        self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
-        self.save_state['assemblage_out'] = []
         
     def process(self):
         """
@@ -775,6 +782,7 @@ class GRAMMATICAL_WM_P(WM):
         """        
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         assemblages = self.assemble()
+        to_output = []
         if assemblages:
             phon_WM_output = []
             sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
@@ -789,7 +797,7 @@ class GRAMMATICAL_WM_P(WM):
                 
                 # Save winner assembalge to state
                 data = {'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0]}
-                self.save_state['assemblage_out'].append(data)
+                to_output.append(data)
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -816,6 +824,8 @@ class GRAMMATICAL_WM_P(WM):
                 return {'phon_WM_output':phon_WM_output, 'sem_WM_output':sem_WM_output}
             else:
                 return None
+        self.outputs['to_output'] = to_output
+        
         return None
 
     def get_winner_assemblage(self, assemblages, sem_input, phon_input):
@@ -1527,6 +1537,13 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.cxn_instances = []
     
+    def reset(self):
+        """
+        Reset schema state
+        """
+        super(CXN_RETRIEVAL_P, self).reset()
+        self.cxn_instances = []
+    
     def process(self):
         """
         """
@@ -1632,6 +1649,14 @@ class PHON_WM_P(WM):
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
     
+    def reset(self):
+        """
+        Reset schema state
+        """
+        super(PHON_WM_P, self).reset()
+        self.phon_sequence = []
+        
+    
     def process(self):
         """
         """
@@ -1674,6 +1699,14 @@ class UTTER(PROCEDURAL_SCHEMA):
         self.params = {'speech_rate':10}
         self.utterance_stack = []
     
+    
+    def reset(self):
+        """
+        Reset schema state
+        """
+        super(UTTER, self).reset()
+        self.utterance_stack = []
+        
     def process(self):
         """
         """
@@ -2304,6 +2337,13 @@ class CONTROL(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.params['task'] = {'time_pressure':100, 'start_produce':1000}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0}
+        self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'produce': False}
+    
+    def reset(self):
+        """
+        Reset the schema's state
+        """
+        super(CONTROL, self).reset()
         self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'produce': False}
     
     def set_mode(self, mode):

@@ -65,7 +65,7 @@ def TCG_production_system(name='language_system_P',
     language_system_P.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
     language_system_P.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     language_system_P.set_input_ports([semanticWM.find_port('from_conceptualizer')])
-    language_system_P.set_output_ports([utter.find_port('to_output')])
+    language_system_P.set_output_ports([utter.find_port('to_output'), grammaticalWM_P.find_port('to_output')])
     
     # Parameters
     semanticWM.params['dyn']['tau'] = 1000.0

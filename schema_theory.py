@@ -218,6 +218,12 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.dt = 1.0
     
     def reset(self):
+        """
+        Reset procedural schema state.
+        
+        Note:
+            - For any extention of the class, if new instance state variables are introduced, the method should be overriden!
+        """
         for k in self.inputs:
             self.inputs[k] = None
         for k in self.outputs:
@@ -633,8 +639,9 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        for k in self.save_state:
-            self.save_state[k] = {}
+        self.save_state = self.save_state = {'insts':{}, 
+                           'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
+                                           'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
         
        
     def add_instance(self,schema_inst, act0=None):

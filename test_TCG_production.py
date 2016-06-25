@@ -316,20 +316,22 @@ def run_model2(model, generator, seed=None):
     model.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 900
+    max_time = 200
     
     print 'RUN'
+    data = []
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
             model.set_input(sem_insts)
         model.update()
-    
+        # Store output
+        output = model.get_output()
+        if output['Grammatical_WM_P']:
+            data.append(output['Grammatical_WM_P'])
+            
     # Output analysis
-    gram_WM = model.schemas['Grammatical_WM_P']
-    data = gram_WM.save_state['assemblage_out']
     res = prod_analyses(data)
-    
     model.reset()
     return res
 
@@ -347,9 +349,10 @@ def test_sem_frame(seed=None):
         
     
 if __name__=='__main__':
-    test(seed=None)
+#    test(seed=None)
 #    test_params_dyn(seed=1)
 #    test_time_pressure(seed=1)
+    test_sem_frame()
         
 
 
