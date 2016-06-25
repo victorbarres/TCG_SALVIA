@@ -442,6 +442,12 @@ class VISUAL_WM(WM):
         self.params['dyn'] = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SceneRep = nx.DiGraph()
+    
+    def reset(self):
+        """
+        """
+        super(VISUAL_WM, self).reset()
+        self.SceneRep = nx.Digraph
         
     def process(self):
         """
@@ -603,6 +609,18 @@ class SUBSCENE_RECOGNITION(PROCEDURAL_SCHEMA):
         self.next_saccade = False 
         self.eye_pos = (0,0)
         self.focus_area = None
+    
+    def reset(self):
+        """
+        """
+        super(SUBSCENE_RECOGNITION, self).reset()
+        self.subscene = None
+        self.uncertainty = 0
+        self.next_saccade = False 
+        # Initialize eye_pos to center of scene.
+        self.eye_pos = (self.scene_data.width/2, self.scene_data.height/2)
+        self.focus_area = None
+        
         
     def initialize(self, scene_input, per_schemas, BU_saliency_map=None):
         """
@@ -792,6 +810,12 @@ class SIMPLE_SALIENCY_MAP(PROCEDURAL_SCHEMA):
         self.add_port('OUT', 'to_visual_WM') 
         self.add_port('OUT', 'to_subscene_rec')
         self.BU_saliency_map = None
+        self.areas = []
+    
+    def reset(self):
+        """
+        """
+        super(SIMPLE_SALIENCY_MAP).reset()
         self.areas = []
     
     def process(self):

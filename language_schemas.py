@@ -437,7 +437,6 @@ class SEMANTIC_WM(WM):
     
     def reset(self):
         """
-        Reest schema state
         """
         super(SEMANTIC_WM, self).reset()
         self.SemRep = nx.DiGraph()
@@ -1539,7 +1538,6 @@ class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
     
     def reset(self):
         """
-        Reset schema state
         """
         super(CXN_RETRIEVAL_P, self).reset()
         self.cxn_instances = []
@@ -1651,7 +1649,6 @@ class PHON_WM_P(WM):
     
     def reset(self):
         """
-        Reset schema state
         """
         super(PHON_WM_P, self).reset()
         self.phon_sequence = []
@@ -1702,7 +1699,6 @@ class UTTER(PROCEDURAL_SCHEMA):
     
     def reset(self):
         """
-        Reset schema state
         """
         super(UTTER, self).reset()
         self.utterance_stack = []
@@ -2341,7 +2337,6 @@ class CONTROL(PROCEDURAL_SCHEMA):
     
     def reset(self):
         """
-        Reset the schema's state
         """
         super(CONTROL, self).reset()
         self.state = {'last_prod_time':0, 'unexpressed_sem':False, 'mode':'produce', 'produce': False}
