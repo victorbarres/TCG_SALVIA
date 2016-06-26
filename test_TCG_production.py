@@ -9,7 +9,7 @@ import language_schemas as ls
 from loader import TCG_LOADER
 from TCG_models import TCG_production_system
 from viewer import TCG_VIEWER
-from test_prod_analysis import prod_analyses
+from test_prod_analysis import prod_analyses, prod_statistics
     
 def test(seed=None):
     """
@@ -318,7 +318,7 @@ def run_model2(model, generator, seed=None):
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900
     
-    data = []
+    out_data = []
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
@@ -327,10 +327,10 @@ def run_model2(model, generator, seed=None):
         # Store output
         output = model.get_output()
         if output['Grammatical_WM_P']:
-            data.append(output['Grammatical_WM_P'])
+            out_data.append(output['Grammatical_WM_P'])
             
     # Output analysis
-    res = prod_analyses(data)
+    res = prod_analyses(out_data)
     model.reset()
     return res
 
@@ -338,7 +338,7 @@ def test_sem_frame(seed=None):
     """
     """
     import time
-    (model, sem_gen) = set_model('sem_macros.json', 'test', sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
+    (model, sem_gen) = set_model('sem_macros.json', 'transitive_action', sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
     output = {}
     count = 1
     num_sim = len(sem_gen.sem_inputs)
@@ -358,7 +358,11 @@ if __name__=='__main__':
 #    test(seed=None)
 #    test_params_dyn(seed=1)
 #    test_time_pressure(seed=1)
-    test_sem_frame()
+    output = test_sem_frame()
+    
+    res_list = output.values()
+    res_stats = prod_statistics(res_list)
+    print res_stats
         
 
 

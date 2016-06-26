@@ -47,7 +47,7 @@ def syntactic_complexity(data):
     return syn_complexity
 
             
-def cxn_usage_frequency(data):
+def cxn_usage_count(data):
     """
     Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
     Returns
@@ -100,12 +100,64 @@ def prod_analyses(data):
     Carries out all the analyses and returns a single output
     """
     res = {}
-    res['syntactic_complexity']= syntactic_complexity(data)
-    res['cxn_usage_frequency'] = cxn_usage_frequency(data)
+    res['syntactic_complexity'] = syntactic_complexity(data)
+    res['cxn_usage_count'] = cxn_usage_count(data)
     res['utterance_intervals'] = utterance_intervals(data)
     res['utterance_lengths'] = utterance_lengths(data)
     
     return res
+
+def prod_statistics(res_list):
+    """
+    Carries basic statistical analyses on a set of prod_analyses.
+    
+    Args:
+        -res_list (ARRAY): Array of objects returned by prod_analyses
+    
+    Notes:
+        - syntactic complexity only keeps inner_nodes proportion.
+    """
+    import numpy as np
+    
+    total_res = {'syntactic_complexity':[], 'cxn_usage_count':{}, 'utterance_intervals':[], 'utterance_lengths':[]}
+    
+    for res in res_list:
+        field_name = 'syntactic_complexity'
+        total_res[field_name].append(float(res[field_name]['inner_nodes'])/float(res[field_name]['nodes']))
+        
+        field_name = 'cxn_usage_count'
+        for k,v in res[field_name].iteritems():
+            if total_res[field_name].has_key(k):
+                total_res[field_name][k] += v
+            else:
+                total_res[field_name][k] = v
+        
+        field_name = 'utterance_intervals'
+        total_res[field_name].append(res[field_name])
+        
+        field_name = 'utterance_lengths'
+        total_res[field_name].append(res[field_name])
+        
+                
+    res_stats = {}
+    my_stats = lambda vals:{"mean":np.mean(vals), "std":np.std(vals), "median":np.median(vals), "max":np.max(vals), "min":np.min(vals)}
+    
+    for field_name in ['syntactic_complexity', 'utterance_intervals', 'utterance_legnths']:  
+        res_stats[field_name] = my_stats(total_res[field_name])
+    
+    res_stats['cxn_usage_count'] = {}
+    total_count = 0
+    for k,v in total_res['cxn_usage_count'].iteritems():
+        s = np.sum(v)
+        res_stats[k] = np.sum(v)
+        total_count += s
+    
+    res_stats['cxn_usage_count']['total_count'] = total_count
+    
+    return res_stats
+        
+            
+    
     
 ###############################################################################
 if __name__ == '__main__':
@@ -127,7 +179,7 @@ if __name__ == '__main__':
     
     print section_title('CXN USAGE')
         
-    cxn_usage = cxn_usage_frequency(data)
+    cxn_usage = cxn_usage_count(data)
     pp.pprint(cxn_usage) 
     
     num_types = len(cxn_usage.keys())
