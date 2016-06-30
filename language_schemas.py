@@ -692,7 +692,8 @@ class GRAMMATICAL_WM_P(WM):
             output = self.produce_form(sem_input, phon_input)
             if output:
                 self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
-                self.outputs['to_semantic_WM'] =  output['sem_WM_output']            
+                self.outputs['to_semantic_WM'] =  output['sem_WM_output']    
+                self.outputs['to_output'] = output['to_output']
     
     ############################
     ### state update methods ###
@@ -781,7 +782,6 @@ class GRAMMATICAL_WM_P(WM):
         """        
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         assemblages = self.assemble()
-        to_output = []
         if assemblages:
             phon_WM_output = []
             sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
@@ -796,7 +796,6 @@ class GRAMMATICAL_WM_P(WM):
                 
                 # Save winner assembalge to state
                 data = {'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0]}
-                to_output.append(data)
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -820,10 +819,9 @@ class GRAMMATICAL_WM_P(WM):
                     winner_assemblage = None
             
             if phon_WM_output and sem_WM_output:
-                return {'phon_WM_output':phon_WM_output, 'sem_WM_output':sem_WM_output}
+                return {'phon_WM_output':phon_WM_output, 'sem_WM_output':sem_WM_output, 'to_output':data}
             else:
                 return None
-        self.outputs['to_output'] = to_output
         
         return None
 

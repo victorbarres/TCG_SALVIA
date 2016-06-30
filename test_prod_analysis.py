@@ -74,7 +74,7 @@ def utterance_intervals(data):
     """
     utter_intervals= []
     if not data:
-        return None
+        return utter_intervals
     t = data[0]['t']
     for dat in data[1:]:
         next_t = dat['t']
@@ -123,7 +123,8 @@ def prod_statistics(res_list):
     
     for res in res_list:
         field_name = 'syntactic_complexity'
-        total_res[field_name].append(float(res[field_name]['inner_nodes'])/float(res[field_name]['nodes']))
+        for i in range(len(res[field_name]['inner_nodes'])):
+            total_res[field_name].append(float(res[field_name]['inner_nodes'][i])/float(res[field_name]['nodes'][i]))
         
         field_name = 'cxn_usage_count'
         for k,v in res[field_name].iteritems():
@@ -133,23 +134,27 @@ def prod_statistics(res_list):
                 total_res[field_name][k] = v
         
         field_name = 'utterance_intervals'
-        total_res[field_name].append(res[field_name])
+        for val in res[field_name]:
+            total_res[field_name].append(res[val])
         
         field_name = 'utterance_lengths'
-        total_res[field_name].append(res[field_name])
+        for val in res[field_name]:
+            total_res[field_name].append(val)
         
                 
     res_stats = {}
-    my_stats = lambda vals:{"mean":np.mean(vals), "std":np.std(vals), "median":np.median(vals), "max":np.max(vals), "min":np.min(vals)}
+    my_stats = lambda vals:{"mean":np.mean(vals), "std":np.std(vals), "median":np.median(vals), "max":np.max(vals), "min":np.min(vals)}  
     
-    for field_name in ['syntactic_complexity', 'utterance_intervals', 'utterance_legnths']:  
-        res_stats[field_name] = my_stats(total_res[field_name])
+    for field_name in ['syntactic_complexity', 'utterance_intervals', 'utterance_lengths']:  
+        if total_res[field_name]:
+            res_stats[field_name] = my_stats(total_res[field_name])
+        else: res_stats[field_name] = None
     
     res_stats['cxn_usage_count'] = {}
     total_count = 0
     for k,v in total_res['cxn_usage_count'].iteritems():
         s = np.sum(v)
-        res_stats[k] = np.sum(v)
+        res_stats['cxn_usage_count'][k] = np.sum(v)
         total_count += s
     
     res_stats['cxn_usage_count']['total_count'] = total_count

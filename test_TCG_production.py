@@ -250,7 +250,7 @@ def run_model(seed=None):
     """
     """
     SEM_INPUT = 'sem_inputs.json'
-    INPUT_NAME = 'blue_woman_kick_man'
+    INPUT_NAME = 'kick_static_focus_agent'
     
     language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main', semantics_name='TCG_semantics_main')
     
@@ -271,17 +271,21 @@ def run_model(seed=None):
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900
-    
+    out_data = []
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
             language_system_P.set_input(sem_insts)
         language_system_P.update()
+        # Store output
+        output = language_system_P.get_output()
+        if output['Grammatical_WM_P']:
+            out_data.append(output['Grammatical_WM_P'])
+        if output['Utter']:
+            print "t:%i, '%s'" %(t, output['Utter'])
     
     # Output analysis
-    gram_WM = language_system_P.schemas['Grammatical_WM_P']
-    data = gram_WM.save_state['assemblage_out'] 
-    res = prod_analyses(data)
+    res = prod_analyses(out_data)
     return res
 
 def set_model(sem_input_file, sem_name, sem_input_macro = True, semantics_name='TCG_semantics_main', 
@@ -338,7 +342,8 @@ def test_sem_frame(seed=None):
     """
     """
     import time
-    (model, sem_gen) = set_model('sem_macros.json', 'transitive_action', sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
+    input_name = 'transitive_action'
+    (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
     output = {}
     count = 1
     num_sim = len(sem_gen.sem_inputs)
@@ -363,6 +368,8 @@ if __name__=='__main__':
     res_list = output.values()
     res_stats = prod_statistics(res_list)
     print res_stats
+#    res = run_model(seed=None)
+#    print res
         
 
 
