@@ -346,15 +346,17 @@ def test_sem_frame(seed=None):
     (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
     output = {}
     count = 1
-    num_sim = len(sem_gen.sem_inputs)
+    num_restarts = 10
+    num_sim = len(sem_gen.sem_inputs)*num_restarts
     for name in sem_gen.sem_inputs:
-        start = time.time()
-        generator = sem_gen.sem_generator(name, verbose=False)
-        output[name] = run_model2(model, generator)
-        end = time.time()
-        print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end-start) 
-        count +=1
-    
+        for i in range(num_restarts):
+            start = time.time()
+            generator = sem_gen.sem_generator(name, verbose=False)
+            run_name = "%s_%i" %(name, i)
+            output[run_name] = run_model2(model, generator)
+            end = time.time()
+            print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end-start) 
+            count +=1
     return output
         
         
@@ -363,11 +365,12 @@ if __name__=='__main__':
 #    test(seed=None)
 #    test_params_dyn(seed=1)
 #    test_time_pressure(seed=1)
+
     output = test_sem_frame()
-    
     res_list = output.values()
     res_stats = prod_statistics(res_list)
     print res_stats
+    
 #    res = run_model(seed=None)
 #    print res
         
