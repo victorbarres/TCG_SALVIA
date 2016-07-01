@@ -342,21 +342,38 @@ def test_sem_frame(seed=None):
     """
     """
     import time
+    t0 = time.time()
     input_name = 'transitive_action'
-    (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro = True, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
-    output = {}
+    sem_input_macro = True
+    (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
+    output = []
     count = 1
-    num_restarts = 10
+    num_restarts = 30
     num_sim = len(sem_gen.sem_inputs)*num_restarts
     for name in sem_gen.sem_inputs:
+        param_dict = {'input_name':input_name, 'num_restarts': num_restarts}
+        if sem_input_macro:
+                param_vals = eval(name)
+                param_dict.update(param_vals)
+        run_output = []
         for i in range(num_restarts):
+#            run_output = []
             start = time.time()
             generator = sem_gen.sem_generator(name, verbose=False)
-            run_name = "%s_%i" %(name, i)
-            output[run_name] = run_model2(model, generator)
+            sim_output = run_model2(model, generator)
+            run_output.append(sim_output)
             end = time.time()
-            print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end-start) 
+            print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
+#            sim_stats = prod_statistics(run_output)
+#            run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
+#            output.append(run_outputs)
             count +=1
+        sim_stats = prod_statistics(run_output)
+        run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
+        output.append(run_outputs)
+    
+    tf = time.time()
+    print "TOTAL SIMULATION TIME: %.2f" %(tf-t0)
     return output
         
         
@@ -366,11 +383,41 @@ if __name__=='__main__':
 #    test_params_dyn(seed=1)
 #    test_time_pressure(seed=1)
 
+#    output = test_sem_frame()
+#    res_list = [v['sim_output'] for v in output]
+#    res_stats = prod_statistics(res_list)
+#    print res_stats
+
+
     output = test_sem_frame()
-    res_list = output.values()
-    res_stats = prod_statistics(res_list)
-    print res_stats
+    if output:
+        header = {'params':[], 'outputs':['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'active', 'passive', 'total_constructions']}
+        dat = []
+        for run_dat in output:
+            if not header['params']:
+                header['params'] += run_dat ['params'].keys()
+            new_row = []
+            params_vals = [run_dat['params'][param] for param in header['params']]
+            output_stats = run_dat['sim_stats']
+            syntactic_complexity_mean = output_stats['syntactic_complexity']['mean']
+            syntactic_complexity_std = output_stats['syntactic_complexity']['std']
+            utterance_length_mean = output_stats['utterance_lengths']['mean']
+            utterance_length_std = output_stats['utterance_lengths']['std']
+            active = output_stats['cxn_usage_count'].get('SVO', 0)
+            passive = output_stats['cxn_usage_count'].get('PAS_SVO', 0)
+            total_constructions = output_stats['cxn_usage_count']['total_count']
+            output_vals = [syntactic_complexity_mean, syntactic_complexity_std, utterance_length_mean, utterance_length_std, active, passive, total_constructions]
+            new_row += params_vals + output_vals
+            dat.append(new_row)
     
+    line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
+    with open('test_file.csv', 'w') as f:
+        header = line(header['params'] + header['outputs'])
+        f.write(header)
+        for d in dat:
+            new_line = line(d)
+            f.write(new_line)
+        
 #    res = run_model(seed=None)
 #    print res
         

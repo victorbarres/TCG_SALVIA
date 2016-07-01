@@ -118,6 +118,7 @@ def prod_statistics(res_list):
         - syntactic complexity only keeps inner_nodes proportion.
     """
     import numpy as np
+    import pandas as pd
     
     total_res = {'syntactic_complexity':[], 'cxn_usage_count':{}, 'utterance_intervals':[], 'utterance_lengths':[]}
     
@@ -160,8 +161,6 @@ def prod_statistics(res_list):
     res_stats['cxn_usage_count']['total_count'] = total_count
     
     return res_stats
-        
-            
     
     
 ###############################################################################
