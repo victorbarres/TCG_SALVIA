@@ -343,34 +343,34 @@ def test_sem_frame(seed=None):
     """
     import time
     t0 = time.time()
-    input_name = 'transitive_action'
+    input_name = 'transitive_action_dynamic_patient_first'
     sem_input_macro = True
     (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
     output = []
     count = 1
-    num_restarts = 30
+    num_restarts = 10
     num_sim = len(sem_gen.sem_inputs)*num_restarts
     for name in sem_gen.sem_inputs:
         param_dict = {'input_name':input_name, 'num_restarts': num_restarts}
         if sem_input_macro:
                 param_vals = eval(name)
                 param_dict.update(param_vals)
-        run_output = []
+#        run_output = []
         for i in range(num_restarts):
-#            run_output = []
+            run_output = []
             start = time.time()
             generator = sem_gen.sem_generator(name, verbose=False)
             sim_output = run_model2(model, generator)
             run_output.append(sim_output)
             end = time.time()
             print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
-#            sim_stats = prod_statistics(run_output)
-#            run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
-#            output.append(run_outputs)
+            sim_stats = prod_statistics(run_output)
+            run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
+            output.append(run_outputs)
             count +=1
-        sim_stats = prod_statistics(run_output)
-        run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
-        output.append(run_outputs)
+#        sim_stats = prod_statistics(run_output)
+#        run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
+#        output.append(run_outputs)
     
     tf = time.time()
     print "TOTAL SIMULATION TIME: %.2f" %(tf-t0)
@@ -411,7 +411,7 @@ if __name__=='__main__':
             dat.append(new_row)
     
     line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
-    with open('test_file.csv', 'w') as f:
+    with open('sim.csv', 'w') as f:
         header = line(header['params'] + header['outputs'])
         f.write(header)
         for d in dat:

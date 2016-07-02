@@ -2444,7 +2444,7 @@ class SEM_GENERATOR(object):
         """
         """
         for name, sem_input in self.sem_inputs.iteritems():
-            sem_rate = sem_input['sem_rate']*self.speed_param
+            sem_rate = float(sem_input['sem_rate'])*self.speed_param
             sequence = sem_input['sequence']
             timing = [t*self.speed_param for t in sem_input['timing']]
             if sem_rate and not(timing):

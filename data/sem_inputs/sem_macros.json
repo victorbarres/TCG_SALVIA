@@ -19,11 +19,11 @@
 				"a2":["0.1", "0.2"]
 			}
 		},
-		"transitive_action":{
+		"transitive_action_static":{
 			"sem_input_frame":{
 				"sem_rate":10,
 				"propositions":{
-					"P1":["BOY(w1, x1)", "MAN(m1, x2)", "KICK(a1, x3)", "AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, w1)", "r2(a1, m1)"]
+					"P1":["BOY(b1, x1)", "MAN(m1, x2)", "KICK(a1, x3)", "AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, b1)", "r2(a1, m1)"]
 				},
 				"sequence":["P1"],
 				"timing":[]
@@ -36,18 +36,43 @@
 				"x5":["1.0"]
 			}
 		},
-		"transitive_action2":{
+		"transitive_action_dynamic_patient_first":{
 			"sem_input_frame":{
-				"sem_rate":10,
-				"propositions":{
-					"P1":["BOY(w1, x1)", "MAN(m1, x2)", "KICK(a1, x3)", "AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, w1)", "r2(a1, m1)"]
+				"sem_rate":"x0",
+				"propositions": {
+					"P1":["MAN(m1, x2)"],
+					"P2":["KICK(a1, x3)"],
+					"P3":["BOY(b1, x1)"],
+					"P4":["AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, b1)", "r2(a1, m1)"]
 				},
-				"sequence":["P1"],
+				"sequence":["P1", "P2", "P3", "P4"],
 				"timing":[]
 			},
 			"substitutions":{
-				"x1":["0.8"],
-				"x2":["1.0"],
+				"x0":["10", "30", "50", "70"],
+				"x1":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+				"x2":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+				"x3":["1.0"],
+				"x4":["1.0"],
+				"x5":["1.0"]
+			}
+		},
+		"transitive_action_dynamic_agent_first":{
+			"sem_input_frame":{
+				"sem_rate":"x0",
+				"propositions": {
+					"P1":["BOY(b1, x1)"],
+					"P2":["KICK(a1, x3)"],
+					"P3":["MAN(m1, x2)"],
+					"P4":["AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, b1)", "r2(a1, m1)"]
+				},
+				"sequence":["P1", "P2", "P3", "P4"],
+				"timing":[]
+			},
+			"substitutions":{
+				"x0":["10", "30", "50", "70"],
+				"x1":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+				"x2":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
 				"x3":["1.0"],
 				"x4":["1.0"],
 				"x5":["1.0"]
