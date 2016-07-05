@@ -1261,9 +1261,9 @@ class SCHEMA_SYSTEM(object):
         """
         self.input = sys_input
     
-    def update_param(self, schema_name, param_path, param_value):
+    def update_schema_param(self, schema_name, param_path, param_value):
         """
-        Update the parameter valuein schema_name defined by the param_path to param_value.
+        Update the parameter valu ein schema_name defined by the param_path to param_value.
         
          Args:
             - schema_name (str): name of the target schema
@@ -1272,6 +1272,22 @@ class SCHEMA_SYSTEM(object):
         """
         schema = self.schemas[schema_name]
         schema.update_param(param_path, param_value)
+    
+    def update_params(self, params):
+        """
+        Update the parameter value for all schema_name defined
+        as keys in param_set with the values param_path to param_value.
+        
+         Args:
+            - params (DICT): {"schema_name.param_path":"param_value"}
+        """
+        for key, param_value in params.iteritems():
+            path_list = key.split('.')
+            path_list.reverse()
+            schema_name = path_list.pop()
+            path_list.reverse()
+            param_path = '.'.join(path_list)
+            self.update_schema_param(schema_name, param_path, param_value)
         
     def get_output(self):
         """

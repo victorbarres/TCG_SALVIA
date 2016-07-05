@@ -77,6 +77,70 @@
 				"x4":["1.0"],
 				"x5":["1.0"]
 			}
+		},
+		"transitive_action_dynamic_patient_first2":{
+			"sem_input_frame":{
+				"sem_rate":"x0",
+				"propositions": {
+					"P1":["MAN(m1, x2)"],
+					"P2":["KICK(a1, x3)"],
+					"P3":["ENTITY(e1, x1)"],
+					"P4":["AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, e1)", "r2(a1, m1)"],
+					"P5":["SPECIFY(r3)", "BOY(b1, x1)", "r3(b1, e1)"]
+				},
+				"sequence":["P1", "P2", "P3", "P4", "P5"],
+				"timing":[]
+			},
+			"substitutions":{
+				"x0":["10", "30", "50", "70"],
+				"x1":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+				"x2":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+				"x3":["1.0"],
+				"x4":["1.0"],
+				"x5":["1.0"]
+			}
+		},
+		"transitive_action_dynamic_agent_first2":{
+			"sem_input_frame":{
+				"sem_rate":"x0",
+				"propositions": {
+					"P1":["BOY(b1, x1)"],
+					"P2":["KICK(a1, x3)"],
+					"P3":["ENTITY(e1, x2)"],
+					"P4":["AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, b1)", "r2(a1, e1)"],
+					"P5":["SPECIFY(r3)", "MAN(m1, x2)", "r3(m1, e1)"]
+				},
+				"sequence":["P1", "P2", "P3", "P4", "P5"],
+				"timing":[]
+			},
+			"substitutions":{
+				"x0":["10", "30", "50", "70"],
+				"x1":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+				"x2":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
+				"x3":["1.0"],
+				"x4":["1.0"],
+				"x5":["1.0"]
+			}
+		},
+		"blue_woman_kick_man":{
+			"sem_input_frame":{
+				"sem_rate":"x0",
+				"propositions"  : {
+					"P1":["WOMAN(w1)"],
+					"P2":["MAN(m1)"],
+					"P3":["KICK(a1)"],
+					"P4":["AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
+					"P5":["WEAR(a2)"],
+					"P6":["AGENT(r3)", "r3(a2, w1)"],
+					"P7":["PATIENT(r4)", "DRESS(d1)", "r4(a2, d1)"],
+					"P8":["BLUE(q1)", "MODIFY(r5)", "r5(q1,d1)"]
+				  },
+				"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+				"timing":[]
+			},
+			"substitutions":{
+				"x0":["10", "30", "50", "70"]
+			}
 		}
 	}
 }

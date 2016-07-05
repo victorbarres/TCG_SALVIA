@@ -186,7 +186,7 @@ def test_time_pressure(seed=None):
     input_name = 'blue_woman_kick_man'
     
     # Set up parameter space
-    start_produce_samples =np.linspace(1,500,20)
+    start_produce_samples = np.linspace(1,500,20)
     
     params_samples = []
     for start_produce in start_produce_samples:
@@ -314,11 +314,6 @@ def run_model2(model, generator, seed=None):
     """
     (sem_insts, next_time, prop) = generator.next()
     
-    # Test paramters
-    model.params['Control']['task']['start_produce'] = 400
-    model.params['Control']['task']['time_pressure'] = 200
-    model.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
-    
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
     max_time = 900
     
@@ -338,24 +333,26 @@ def run_model2(model, generator, seed=None):
     model.reset()
     return res
 
-def test_sem_frame(seed=None):
+def test_sem_frame(seed=None, input_name=''):
     """
     """
     import time
     t0 = time.time()
-    input_name = 'transitive_action_dynamic_patient_first'
     sem_input_macro = True
+    
     (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
+    
     output = []
     count = 1
-    num_restarts = 10
+    num_restarts = 2
+    
     num_sim = len(sem_gen.sem_inputs)*num_restarts
+    
     for name in sem_gen.sem_inputs:
         param_dict = {'input_name':input_name, 'num_restarts': num_restarts}
         if sem_input_macro:
-                param_vals = eval(name)
-                param_dict.update(param_vals)
-#        run_output = []
+            param_vals = eval(name)
+            param_dict.update(param_vals)
         for i in range(num_restarts):
             run_output = []
             start = time.time()
@@ -368,58 +365,106 @@ def test_sem_frame(seed=None):
             run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
             output.append(run_outputs)
             count +=1
-#        sim_stats = prod_statistics(run_output)
-#        run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
-#        output.append(run_outputs)
     
     tf = time.time()
     print "TOTAL SIMULATION TIME: %.2f" %(tf-t0)
     return output
-        
-        
+
+def grid_search(input_name, model_params_set=[],seed=None):
+    """
+    """
+    import time
+    t0 = time.time()
+    sem_input_macro = True
+    
+    (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', params = {})
+    
+    output = []
+    count = 1
+    num_restarts = 10
+    
+    num_sim = len(sem_gen.sem_inputs)*num_restarts*len(model_params_set)
+    
+    for model_params in model_params_set:
+        model.update_params(model_params)
+        for name in sem_gen.sem_inputs:
+            param_dict = {'input_name':input_name, 'num_restarts': num_restarts}
+            param_dict.update(model_params)
+            if sem_input_macro:
+                param_vals = eval(name)
+                param_dict.update(param_vals)
+            for i in range(num_restarts):
+                run_output = []
+                start = time.time()
+                generator = sem_gen.sem_generator(name, verbose=False)
+                sim_output = run_model2(model, generator)
+                run_output.append(sim_output)
+                end = time.time()
+                print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
+                sim_stats = prod_statistics(run_output)
+                run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
+                output.append(run_outputs)
+                count +=1
+    
+    tf = time.time()
+    print "TOTAL SIMULATION TIME: %.2f" %(tf-t0)
+    return output
+    
     
 if __name__=='__main__':
-#    test(seed=None)
-#    test_params_dyn(seed=1)
-#    test_time_pressure(seed=1)
-
-#    output = test_sem_frame()
-#    res_list = [v['sim_output'] for v in output]
-#    res_stats = prod_statistics(res_list)
-#    print res_stats
-
-
-    output = test_sem_frame()
-    if output:
-        header = {'params':[], 'outputs':['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'active', 'passive', 'total_constructions']}
-        dat = []
-        for run_dat in output:
-            if not header['params']:
-                header['params'] += run_dat ['params'].keys()
-            new_row = []
-            params_vals = [run_dat['params'][param] for param in header['params']]
-            output_stats = run_dat['sim_stats']
-            syntactic_complexity_mean = output_stats['syntactic_complexity']['mean']
-            syntactic_complexity_std = output_stats['syntactic_complexity']['std']
-            utterance_length_mean = output_stats['utterance_lengths']['mean']
-            utterance_length_std = output_stats['utterance_lengths']['std']
-            active = output_stats['cxn_usage_count'].get('SVO', 0)
-            passive = output_stats['cxn_usage_count'].get('PAS_SVO', 0)
-            total_constructions = output_stats['cxn_usage_count']['total_count']
-            output_vals = [syntactic_complexity_mean, syntactic_complexity_std, utterance_length_mean, utterance_length_std, active, passive, total_constructions]
-            new_row += params_vals + output_vals
-            dat.append(new_row)
+    import numpy as np
     
-    line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
-    with open('sim.csv', 'w') as f:
-        header = line(header['params'] + header['outputs'])
-        f.write(header)
-        for d in dat:
-            new_line = line(d)
-            f.write(new_line)
+    model_params_set = []
+    start_produce_samples = np.linspace(1,500,10)
+    conf_samples = np.linspace(0.3,0.3, 1)
+    for start_param in start_produce_samples:
+        for conf_param in conf_samples:
+            params = {'Control.task.start_produce':start_param, 
+                      'Grammatical_WM_P.C2.confidence_threshold':conf_param}
+            model_params_set.append(params)
+
+    for name in ["blue_woman_kick_man"]:
+        input_name = name
+        output = grid_search(input_name=input_name, model_params_set=model_params_set)
+        if output:
+            header = {'params':[], 'outputs':['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'active', 'passive', 'total_constructions', 'produced']}
+            dat = []
+            for run_dat in output:
+                if not header['params']:
+                    header['params'] += run_dat ['params'].keys()
+                new_row = []
+                params_vals = [run_dat['params'][param] for param in header['params']]
+                output_stats = run_dat['sim_stats']
+                if not output_stats['utterance_lengths']:
+                    produced = False
+                    syntactic_complexity_mean = np.NaN
+                    syntactic_complexity_std = np.NaN
+                    utterance_length_mean = np.NaN
+                    utterance_length_std = np.NaN
+                    active = np.NaN
+                    passive = np.NaN
+                    total_constructions = np.NaN
+                else:
+                    produced = True
+                    syntactic_complexity_mean = output_stats['syntactic_complexity']['mean']
+                    syntactic_complexity_std = output_stats['syntactic_complexity']['std']
+                    utterance_length_mean = output_stats['utterance_lengths']['mean']
+                    utterance_length_std = output_stats['utterance_lengths']['std']
+                    active = output_stats['cxn_usage_count'].get('SVO', 0)
+                    passive = output_stats['cxn_usage_count'].get('PAS_SVO', 0)
+                    total_constructions = output_stats['cxn_usage_count']['total_count']
+                output_vals = [syntactic_complexity_mean, syntactic_complexity_std, utterance_length_mean, utterance_length_std, active, passive, total_constructions, produced]
+                new_row += params_vals + output_vals
+                dat.append(new_row)
         
-#    res = run_model(seed=None)
-#    print res
+        line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
+        file_name = './simulation_analyses/%s.csv' % input_name
+        with open(file_name, 'w') as f:
+            header = line(header['params'] + header['outputs'])
+            f.write(header)
+            for d in dat:
+                new_line = line(d)
+                f.write(new_line)
         
 
 
