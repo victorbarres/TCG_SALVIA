@@ -59,7 +59,7 @@ def active_passive_static(file_path="./my_sim/", file_name="sim.csv", output_fol
     plt.xlabel('(Agt_saliency - Pat_saliency)*10', fontsize=14)
     plt.ylabel('Mean active-passive cxn', fontsize=14)
     plt.ylim(-1.5, 1.5)
-    save_to = "%spassive.%s" % (output_path, save_format)
+    save_to = "%sactive-passive.%s" % (output_path, save_format)
     plt.savefig(save_to, facecolor='w', edgecolor='w', format=save_format)
     
 def active_passive_dynamic(file_path="./my_sim/", file_name="sim.csv", output_folder="plots/"):
@@ -87,19 +87,89 @@ def active_passive_dynamic(file_path="./my_sim/", file_name="sim.csv", output_fo
         new_df = df[df['x0'] == r]
         df_stats = new_df.groupby(['saliency_diff'])['active', 'passive', 'act-pas'].agg([np.mean, np.std])
         plt.errorbar(df_stats.index, df_stats['act-pas']['mean'], yerr = df_stats['act-pas']['std'], marker='o', label= r)
-        title = 'Active - passive cxn as a function of agent-patient saliency'  
-        plt.title(title)
-        plt.xlabel('(Agt_saliency - Pat_saliency)*10', fontsize=14)
-        plt.ylabel('Mean active-passive cxn', fontsize=14)
-        plt.ylim(-1.5, 1.5)
+    title = 'Active - passive cxn as a function of agent-patient saliency'  
+    plt.title(title)
+    plt.xlabel('(Agt_saliency - Pat_saliency)*10', fontsize=14)
+    plt.ylabel('Mean active-passive cxn', fontsize=14)
+    plt.ylim(-1.5, 1.5)
     plt.legend()
     plt.show()
     save_to = "%sactive-passive-err.%s" % (output_path, save_format)
     plt.savefig(save_to, facecolor='w', edgecolor='w', format=save_format)
+    
+def time_pressure_dynamic(file_path="./my_sim/", file_name="sim.csv", output_folder="plots/"):
+    """
+    """
+    import os
+    output_path = file_path + output_folder
+    
+    if not(os.path.exists(output_path)):
+        os.mkdir(output_path)
+        
+    df = pd.read_csv(file_path + file_name)
+    # Renaming for simplicity
+    df = df.rename(columns = {"Grammatical_WM_P.C2.confidence_threshold": "threshold", "Control.task.start_produce": "start_produce"})
+    
+    df = df[df['produced'] == True]
+    
+    df_stats= df.groupby(['start_produce'])['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'total_constructions'].agg([np.mean, np.std])
+    save_format = 'pdf'
+    plt.figure()
+    plt.errorbar(df_stats.index, df_stats['syntactic_complexity_mean']['mean'], yerr=df_stats['syntactic_complexity_mean']['std'], linestyle='None', marker='o')
+    plt.title('Effet of time pressure on syntactic complexity')
+    plt.xlabel('Start produce time', fontsize=14)
+    plt.ylabel('Mean syntactic complexity', fontsize=14)
+    save_to = "%ssyntactic_complexity.%s" % (output_path, save_format)
+    plt.savefig(save_to, facecolor='w', edgecolor='w', format=save_format)    
+    
+    
+    plt.figure()
+    plt.errorbar(df_stats.index, df_stats['utterance_length_mean']['mean'], yerr=df_stats['utterance_length_mean']['std'], linestyle='None', marker='o')
+    plt.title('Effet of time pressure on utterance length')
+    plt.xlabel('Start produce time', fontsize=14)
+    plt.ylabel('Mean utterance length', fontsize=14)
+    save_to = "%sutterance_length.%s" % (output_path, save_format)
+    plt.savefig(save_to, facecolor='w', edgecolor='w', format=save_format)
+    
+    rates = rates = df['x0'].unique()
+    rates.sort()
+    df_stats= df.groupby(['x0','start_produce'])['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'total_constructions'].agg([np.mean, np.std])
+    
+    plt.figure()    
+    for r in rates:
+        new_df_stats = df_stats.ix[r]
+        plt.errorbar(new_df_stats.index, new_df_stats['syntactic_complexity_mean']['mean'], yerr=new_df_stats['syntactic_complexity_mean']['std'], marker='o', label = r)
+    plt.title('Effet of time pressure on syntactic complexity')
+    plt.xlabel('Start produce time', fontsize=14)
+    plt.ylabel('Mean syntactic complexity', fontsize=14)
+    plt.legend()
+    plt.show()
+    save_to = "%ssyntactic_complexity_rate.%s" % (output_path, save_format)
+    plt.savefig(save_to, facecolor='w', edgecolor='w', format=save_format)    
+    
+    
+    plt.figure()    
+    for r in rates:
+        new_df_stats = df_stats.ix[r]
+        plt.errorbar(new_df_stats.index, new_df_stats['utterance_length_mean']['mean'], yerr=new_df_stats['utterance_length_mean']['std'], marker='o', label = r)
+    plt.title('Effet of time pressure on utterance length')
+    plt.xlabel('Start produce time', fontsize=14)
+    plt.ylabel('Mean utterance length', fontsize=14)
+    plt.legend()
+    plt.show()
+    save_to = "%sutterance_length_rate.%s" % (output_path, save_format)
+    plt.savefig(save_to, facecolor='w', edgecolor='w', format=save_format)    
+        
+        
+        
+        
+    
+    
 
 if __name__ == "__main__":
-    file_name = 'transitive_action_dynamic_agent_first2'
+    file_name = 'blue_woman_kick_man'
     file_path = "./analyses/%s/" % file_name
-    active_passive_static(file_path=file_path, file_name=file_name+'.csv')
-    active_passive_dynamic(file_path=file_path, file_name=file_name+'.csv')
+#    active_passive_static(file_path=file_path, file_name=file_name+'.csv')
+#    active_passive_dynamic(file_path=file_path, file_name=file_name+'.csv')
+    time_pressure_dynamic(file_path=file_path, file_name=file_name+'.csv')
 
