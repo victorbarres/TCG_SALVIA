@@ -2,7 +2,7 @@
 """
 Created on Thu Jun 30 14:34:02 2016
 
-@author: victor
+@author: victor barres
 
 Preliminary test for simulation analyses!
 """
