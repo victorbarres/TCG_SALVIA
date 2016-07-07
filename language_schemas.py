@@ -669,7 +669,7 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('OUT', 'to_phonological_WM_P')
         self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
-        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         
     def process(self):
@@ -682,7 +682,7 @@ class GRAMMATICAL_WM_P(WM):
         if new_cxn_insts:
             self.add_new_insts(new_cxn_insts)            
                 
-        self.convey_sem_activations(sem_input)
+        self.convey_sem_activations(sem_input, weight=1)
         self.update_activations()
         self.prune()
         
@@ -711,10 +711,11 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def convey_sem_activations(self, sem_input):
+    def convey_sem_activations(self, sem_input, weight = 1.0):
         """
         Args:
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
+            - weight = weight to apply to the sem_activation value.
         
         Notes:
             For now, a construction receives activations from semantic working memory if :
@@ -751,7 +752,7 @@ class GRAMMATICAL_WM_P(WM):
             
             # Normalization
             act = act/(len(cover_nodes.keys()) + len(cover_edges.keys()))
-            inst.activation.E += act
+            inst.activation.E += act*weight
     
 #    def apply_pressure(self, pressure):
 #        """

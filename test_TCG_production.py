@@ -22,7 +22,7 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs.json'
-    INPUT_NAME = 'blue_woman_kick_man'
+    INPUT_NAME = 'woman_in_blue'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main', semantics_name='TCG_semantics_main')
@@ -38,13 +38,13 @@ def test(seed=None):
     (sem_insts, next_time, prop) = generator.next()
     
     # Test paramters
-    language_system_P.params['Control']['task']['start_produce'] = 400
+    language_system_P.params['Control']['task']['start_produce'] = 900
     language_system_P.params['Control']['task']['time_pressure'] = 200
     language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 900
-    save_states = [50, 100, 450, 550, 650]
+    max_time = 1000
+    save_states = [30, 800]
     
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
@@ -414,7 +414,7 @@ def grid_search(input_name, model_params_set=[],seed=None):
     return output
     
     
-if __name__=='__main__':
+def main():
     import numpy as np
     
     model_params_set = []
@@ -470,7 +470,7 @@ if __name__=='__main__':
             for d in dat:
                 new_line = line(d)
                 f.write(new_line)
-        
-
-
-
+    
+    
+if __name__=='__main__':
+    test()

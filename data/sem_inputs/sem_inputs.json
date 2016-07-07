@@ -59,6 +59,16 @@
 			  "timing":[],
 			  "comments": ""
 			},
+		
+		"woman_in_blue":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["WOMAN(w1)", "WEAR(a1)", "DRESS(d1)", "BLUE(b1)", "AGENT(r1)", "PATIENT(r2)", "MODIFY(r3)", "r1(a1, w1)", "r2(a1,d1)", "r3(b1, d1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test for the IN_COLOR construction"
+		},
 			
 		"blue_woman_kick_man":{
 			"sem_rate":10,
@@ -73,6 +83,16 @@
 				"P8":["BLUE(q1)", "MODIFY(r5)", "r5(q1,d1)"]
 			  },
 			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+			"timing":[],
+			"comments":""
+			}, 
+		
+		"blue_woman_kick_man_static":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["WOMAN(w1)", "MAN(m1)", "KICK(a1)" ,"AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)", "WEAR(a2)", "AGENT(r3)", "r3(a2, w1)", "PATIENT(r4)", "DRESS(d1)", "r4(a2, d1)", "BLUE(q1)", "MODIFY(r5)", "r5(q1,d1)"]
+			},
+			"sequence" :["P1"],
 			"timing":[],
 			"comments":""
 			}, 
