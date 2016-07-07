@@ -107,6 +107,7 @@ def time_pressure_dynamic(file_path="./my_sim/", file_name="sim.csv", output_fol
         os.mkdir(output_path)
         
     df = pd.read_csv(file_path + file_name)
+    
     # Renaming for simplicity
     df = df.rename(columns = {"Grammatical_WM_P.C2.confidence_threshold": "threshold", "Control.task.start_produce": "start_produce"})
     

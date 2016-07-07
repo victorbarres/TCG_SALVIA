@@ -141,6 +141,19 @@
 			"substitutions":{
 				"x0":["10", "30", "50", "70"]
 			}
+		},
+		"blue_woman_kick_man_static":{
+			"sem_input_frame":{
+				"sem_rate":"x0",
+				"propositions"  : {
+					"P1":["WOMAN(w1)", "MAN(m1)", "KICK(a1)" ,"AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)", "WEAR(a2)", "AGENT(r3)", "r3(a2, w1)", "PATIENT(r4)", "DRESS(d1)", "r4(a2, d1)", "BLUE(q1)", "MODIFY(r5)", "r5(q1,d1)"]
+				  },
+				"sequence" :["P1"],
+				"timing":[]
+			},
+			"substitutions":{
+				"x0":["10"]
+			}
 		}
 	}
 }

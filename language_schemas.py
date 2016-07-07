@@ -781,6 +781,7 @@ class GRAMMATICAL_WM_P(WM):
             Make sure to revisit all the different options below.
         """        
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
+        self.end_competitions() # When production is triggered, a decision is forced for all the competitions.       
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -811,6 +812,7 @@ class GRAMMATICAL_WM_P(WM):
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
+                
                 if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblage then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED!
                     for assemblage in assemblages:
                         assemblage.update_activation()
@@ -978,7 +980,7 @@ class GRAMMATICAL_WM_P(WM):
         self.set_winners(winner_assemblage)
         self.deactivate_coop_weigts()
 #        self.deactivate_coop_weigts2(winner_assemblage)
-        self.end_competitions()
+#        self.end_competitions()
         
     def set_subthreshold(self, insts):
         """

@@ -90,7 +90,7 @@ def TCG_production_system(name='language_system_P',
     grammaticalWM_P.params['C2']['confidence_threshold'] = 0.3 #0.7
     grammaticalWM_P.params['C2']['prune_threshold'] = 0.01 # Manipulations can yield "broca's aphasia" (0.3)
     grammaticalWM_P.params['C2']['coop_weight'] = 1.0
-    grammaticalWM_P.params['C2']['comp_weight'] = -4.0 # Needs to compensate for the dominance of cooperation link.
+    grammaticalWM_P.params['C2']['comp_weight'] = -1.0 #-4.0 # Needs to compensate for the dominance of cooperation link.
     grammaticalWM_P.params['C2']['sub_threshold_r'] = 0.8
     grammaticalWM_P.params['C2']['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
     
@@ -111,10 +111,10 @@ def TCG_production_system(name='language_system_P',
     control.set_mode('produce')
     control.params['task']['time_pressure'] = 200.0
     control.params['task']['start_produce'] = 400.0
-    control.params['style']['activation'] = 0.7
-    control.params['style']['sem_length'] = 0.3
-    control.params['style']['form_length'] = 0
-    control.params['style']['continuity'] = 0
+    control.params['style']['activation'] = 0.3 #0.7
+    control.params['style']['sem_length'] = 0.7 #0.5
+    control.params['style']['form_length'] = 0.0 #0.0
+    control.params['style']['continuity'] = 0.0  #0.0
     
     conceptLTM.init_act = 1.0
     grammaticalLTM.init_act = 0.3

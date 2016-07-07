@@ -318,6 +318,7 @@ def run_model2(model, generator, seed=None):
     max_time = 900
     
     out_data = []
+    out_utterance = []
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
@@ -327,11 +328,13 @@ def run_model2(model, generator, seed=None):
         output = model.get_output()
         if output['Grammatical_WM_P']:
             out_data.append(output['Grammatical_WM_P'])
+        if output['Utter']:
+            out_utterance.append(output['Utter'])
             
     # Output analysis
     res = prod_analyses(out_data)
     model.reset()
-    return res
+    return (res, ' '.join(out_utterance))
 
 def test_sem_frame(seed=None, input_name=''):
     """
@@ -344,7 +347,7 @@ def test_sem_frame(seed=None, input_name=''):
     
     output = []
     count = 1
-    num_restarts = 2
+    num_restarts = 10
     
     num_sim = len(sem_gen.sem_inputs)*num_restarts
     
@@ -357,12 +360,12 @@ def test_sem_frame(seed=None, input_name=''):
             run_output = []
             start = time.time()
             generator = sem_gen.sem_generator(name, verbose=False)
-            sim_output = run_model2(model, generator)
+            (sim_output, utterance) = run_model2(model, generator)
             run_output.append(sim_output)
             end = time.time()
             print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
             sim_stats = prod_statistics(run_output)
-            run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
+            run_outputs = { 'params': param_dict, 'sim_stats':sim_stats, 'utterance':utterance}
             output.append(run_outputs)
             count +=1
     
@@ -381,7 +384,7 @@ def grid_search(input_name, model_params_set=[],seed=None):
     
     output = []
     count = 1
-    num_restarts = 10
+    num_restarts = 30
     
     num_sim = len(sem_gen.sem_inputs)*num_restarts*len(model_params_set)
     
@@ -397,12 +400,12 @@ def grid_search(input_name, model_params_set=[],seed=None):
                 run_output = []
                 start = time.time()
                 generator = sem_gen.sem_generator(name, verbose=False)
-                sim_output = run_model2(model, generator)
+                (sim_output, utterance) = run_model2(model, generator)
                 run_output.append(sim_output)
                 end = time.time()
                 print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
                 sim_stats = prod_statistics(run_output)
-                run_outputs = { 'params': param_dict, 'sim_stats':sim_stats}
+                run_outputs = { 'params': param_dict, 'sim_stats':sim_stats, 'utterance':utterance}
                 output.append(run_outputs)
                 count +=1
     
@@ -415,7 +418,7 @@ if __name__=='__main__':
     import numpy as np
     
     model_params_set = []
-    start_produce_samples = np.linspace(1,500,10)
+    start_produce_samples = [800] #np.linspace(1,500,10)
     conf_samples = np.linspace(0.3,0.3, 1)
     for start_param in start_produce_samples:
         for conf_param in conf_samples:
@@ -423,11 +426,11 @@ if __name__=='__main__':
                       'Grammatical_WM_P.C2.confidence_threshold':conf_param}
             model_params_set.append(params)
 
-    for name in ["blue_woman_kick_man"]:
+    for name in ["blue_woman_kick_man_static"]:
         input_name = name
         output = grid_search(input_name=input_name, model_params_set=model_params_set)
         if output:
-            header = {'params':[], 'outputs':['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'active', 'passive', 'total_constructions', 'produced']}
+            header = {'params':[], 'outputs':['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'active', 'passive', 'total_constructions', 'produced', 'utterance']}
             dat = []
             for run_dat in output:
                 if not header['params']:
@@ -444,6 +447,7 @@ if __name__=='__main__':
                     active = np.NaN
                     passive = np.NaN
                     total_constructions = np.NaN
+                    utterance = ''
                 else:
                     produced = True
                     syntactic_complexity_mean = output_stats['syntactic_complexity']['mean']
@@ -453,7 +457,8 @@ if __name__=='__main__':
                     active = output_stats['cxn_usage_count'].get('SVO', 0)
                     passive = output_stats['cxn_usage_count'].get('PAS_SVO', 0)
                     total_constructions = output_stats['cxn_usage_count']['total_count']
-                output_vals = [syntactic_complexity_mean, syntactic_complexity_std, utterance_length_mean, utterance_length_std, active, passive, total_constructions, produced]
+                    utterance = run_dat['utterance']
+                output_vals = [syntactic_complexity_mean, syntactic_complexity_std, utterance_length_mean, utterance_length_std, active, passive, total_constructions, produced, utterance]
                 new_row += params_vals + output_vals
                 dat.append(new_row)
         
