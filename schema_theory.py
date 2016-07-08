@@ -538,7 +538,7 @@ class INST_ACTIVATION(object):
         """
         """
         noise =  random.normalvariate(self.noise_mean, self.noise_std)
-        d_act = self.dt/(self.tau)*(-self.act + self.logistic(self.E + I + noise)) + self.act_inf
+        d_act = self.dt/(self.tau)*(-self.act + self.logistic(self.E + I + noise + 0*self.act)) + self.act_inf
         self.t += self.dt
         self.act += d_act
         self.save_vals["t"].append(self.t)

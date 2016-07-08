@@ -90,7 +90,7 @@ def TCG_production_system(name='language_system_P',
     grammaticalWM_P.params['C2']['confidence_threshold'] = 0.3 #0.7
     grammaticalWM_P.params['C2']['prune_threshold'] = 0.1 #0.01 # Manipulations can yield "broca's aphasia" (0.3)
     grammaticalWM_P.params['C2']['coop_weight'] = 1.0
-    grammaticalWM_P.params['C2']['comp_weight'] = -0.3 #-4.0 # Needs to compensate for the dominance of cooperation link.
+    grammaticalWM_P.params['C2']['comp_weight'] = -1.0 #-4.0 # Needs to compensate for the dominance of cooperation link.
     grammaticalWM_P.params['C2']['sub_threshold_r'] = 0.8
     grammaticalWM_P.params['C2']['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
     

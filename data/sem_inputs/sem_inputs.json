@@ -25,7 +25,17 @@
 			  },
 			  "sequence" :["P1"],
 			  "timing":[],
-			  "comments": ""
+			  "comments": "Test name without lexical competition"
+			},
+			
+		"test_name2": {
+			"sem_rate": 10,
+			 "propositions"  : {
+				"P1": ["MAN(w1)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": "test naming without lexical competition"
 			},
 			
 		"woman_static":{

@@ -89,7 +89,7 @@
 	{
 		"name" : "PAS_SVO",
 		"class" : "S",
-		"preference" : 0.7,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -111,7 +111,7 @@
 	{
 		"name" : "DOUBLE_OBJ",
 		"class" : "S",
-		"preference" : 0.8,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -133,7 +133,7 @@
 	{
 		"name" : "OBLIQUE_DATIVE",
 		"class" : "S",
-		"preference" : 0.9,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -207,7 +207,7 @@
 	{
 		"name" : "SUBJ_REL_SVO_WHO",
 		"class" : "N",
-		"preference" : 0.6,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -227,7 +227,7 @@
 	{
 		"name" : "SUBJ_REL_SVO_WHICH",
 		"class" : "N",
-		"preference" : 0.6,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -247,7 +247,7 @@
 	{
 		"name" : "SUBJ_REL_SV_WHO",
 		"class" : "N",
-		"preference" : 0.6,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -264,7 +264,7 @@
 	{
 		"name" : "SUBJ_REL_SV_WHICH",
 		"class" : "N",
-		"preference" : 0.6,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -281,7 +281,7 @@
 	{
 		"name" : "SUBJ_REL_PAS_SVO_WHO",
 		"class" : "N",
-		"preference" : 0.4,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -304,7 +304,7 @@
 	{
 		"name" : "SUBJ_REL_PAS_SVO_WHICH",
 		"class" : "N",
-		"preference" : 0.4,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -327,7 +327,7 @@
 	{
 		"name" : "OBJ_REL_SVO_WHO",
 		"class" : "N",
-		"preference" : 0.6,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -347,7 +347,7 @@
 	{
 		"name" : "OBJ_REL_SVO_WHICH",
 		"class" : "N",
-		"preference" : 0.6,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -367,7 +367,7 @@
 	{
 		"name" : "OBJ_REL_PAS_SVO_WHO",
 		"class" : "N",
-		"preference" : 0.4,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -390,7 +390,7 @@
 	{
 		"name" : "OBJ_REL_PAS_SVO_WHICH",
 		"class" : "N",
-		"preference" : 0.4,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -413,7 +413,7 @@
 	{
 		"name" : "REL_SPA_WHO",
 		"class" : "N",
-		"preference" : 0.5,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -431,7 +431,7 @@
 	{
 		"name" : "REL_SPA_WHICH",
 		"class" : "N",
-		"preference" : 0.5,
+		"preference" : 1,
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "ITEM", "focus" : false, "head" : true},
@@ -1086,5 +1086,5 @@
 	}
 ],
 
-"comments": "Full grammar. Does not contain semantically empty constructions (e.g. det_a etc...). There are no construction of class 'NP'. Does contain the specify_cxn. Preferences are roughly set up to allow the system to use preferentially classic arg struct constructions."
+"comments": "Full grammar. Does not contain semantically empty constructions (e.g. det_a etc...). There are no construction of class 'NP'. Does contain the specify_cxn. Preferences are all set to 1."
 }

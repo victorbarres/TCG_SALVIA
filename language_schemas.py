@@ -711,7 +711,7 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def convey_sem_activations(self, sem_input, weight = 1.0):
+    def convey_sem_activations(self, sem_input, weight = 0.0):
         """
         Args:
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.

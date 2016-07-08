@@ -22,10 +22,10 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs.json'
-    INPUT_NAME = 'woman_in_blue'
+    INPUT_NAME = 'blue_woman_kick_man_static'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
-    language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main', semantics_name='TCG_semantics_main')
+    language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main_pref1', semantics_name='TCG_semantics_main')
     
     # Set up semantic input generator    
     conceptLTM = language_system_P.schemas['Concept_LTM']
@@ -38,14 +38,15 @@ def test(seed=None):
     (sem_insts, next_time, prop) = generator.next()
     
     # Test paramters
-    language_system_P.params['Control']['task']['start_produce'] = 900
+    language_system_P.params['Control']['task']['start_produce'] = 2100
     language_system_P.params['Control']['task']['time_pressure'] = 200
     language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 1000
-    save_states = [30, 800]
+    max_time = 2000
+    save_states = [30, 700, 2000]
     
+    flag = False
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
@@ -53,6 +54,11 @@ def test(seed=None):
             language_system_P.set_input(sem_insts)
         language_system_P.update()
         output = language_system_P.get_output()
+        if not(language_system_P.schemas['Grammatical_WM_P'].comp_links) and t>10 and not(flag):
+            print "t:%i, Competition done" % t
+            flag = True
+            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
+            language_system_P.params['Control']['task']['start_produce'] = t + 10
         if output['Utter']:
             print "t:%i, '%s'" %(t, output['Utter'])
         if t - set_up_time in save_states:
