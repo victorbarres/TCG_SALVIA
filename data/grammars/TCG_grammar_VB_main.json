@@ -384,7 +384,7 @@
 					{"name" : "S5", "type" : "SLOT", "classes" : ["VP", "V"]},
 					{"name" : "S6", "type" : "PHON", "phon" : "-ed"},
 					{"name" : "S7", "type" : "PHON", "phon" : "by"}],
-		"SymLinks" : {"OBJ" : "S1", "SUBJ" : "S3", "ACTION" : "S5"}		
+		"SymLinks" : {"OBJ" : "S3", "SUBJ" : "S1", "ACTION" : "S5"}		
 	},
 	
 	{
@@ -407,7 +407,7 @@
 					{"name" : "S5", "type" : "SLOT", "classes" : ["VP", "V"]},
 					{"name" : "S6", "type" : "PHON", "phon" : "-ed"},
 					{"name" : "S7", "type" : "PHON", "phon" : "by"}],
-		"SymLinks" : {"OBJ" : "S1", "SUBJ" : "S3", "ACTION" : "S5"}		
+		"SymLinks" : {"OBJ" : "S3", "SUBJ" : "S1", "ACTION" : "S5"}		
 	},
 
 	{
