@@ -702,6 +702,9 @@ class WM(PROCEDURAL_SCHEMA):
         self.coop_links.append(new_link)
         
         # Update the assemblages
+        """
+        I think this should be recursive. until no more merges are possible. (is that right?)
+        """
         assemblages_from = []
         assemblages_to = []
         assemblages_both = []
@@ -770,8 +773,14 @@ class WM(PROCEDURAL_SCHEMA):
         self.comp_links.append(new_link)   
         
         # Update the assemblages
-        
+        """
+        Find all the assemblages that have either inst_from or inst_to or both.
+        If they have both: split in two.
+        Go through inst_from and inst_to
     
+        
+        
+        """
     def find_comp_links(self,inst_from='any', inst_to='any'):
         """
         Returns a list of comp_links that match the criteria.
@@ -833,6 +842,67 @@ class WM(PROCEDURAL_SCHEMA):
             if asmb_2 in comp_set:
                 comp_set.remove(asmb_2)
                 comp_set.add(asmb)
+     
+    def _asmb_update_add_inst(self, schema_inst):
+        """
+        Create an assemblage containing this instance.
+        """
+        new_assemblage = ASSEMBLAGE() 
+        new_assemblage.add_instance(schema_inst)
+        self.assemblages.append(new_assemblage)
+        
+    def _asmb_update_remove_inst(self, schema_inst):
+        """
+        Remove all the assemblages containing this instance.
+        """
+        for assemblage in self.assemblages[:]:
+            if assemblage.has_inst(schema_inst):
+                self.assemblages.remove(assemblage)
+                self.remove_assemblage(assemblage)
+    
+    def _asmb_update_add_coop(self, coop_link): 
+        """
+        Update the assemblages
+        
+        I think this should be recursive. until no more merges are possible. (is that right?)
+        """
+        inst_from = coop_link.inst_from
+        inst_to = coop_link.inst_to
+        assemblages_from = []
+        assemblages_to = []
+        assemblages_both = []
+        for assemblage in self.assemblages:
+            flag_from = assemblage.has_inst(inst_from)
+            flag_to = assemblage.has_inst(inst_to)
+            if flag_from and flag_to:
+                assemblages_both.append(assemblage)
+            elif flag_from:
+                assemblages_from.append(assemblage)
+            elif flag_to:
+                assemblages_to.append(assemblage)
+        
+        for assemblage in assemblages_both: # for those assemblage, a new coop_link is simply added to the existing assemblage
+            assemblage.add_link(coop_link)
+        
+        for asmb_from in assemblages_from:
+            for asmb_to in assemblages_to:
+                compete = set([asmb_from, asmb_to]) in self.assemblages_comp
+                if not compete: # If the two assemblages do not compete, they should be merged.
+                    self.merge_assemblages(asmb_to, asmb_from, [coop_link])
+    def _asmb_update_remove_coop(self, coop_link):
+        """
+        """
+        return
+        
+    def _asmb_update_add_comp(self, comp_link):
+        """
+        """
+        return
+    
+    def _asmb_update_remove_comp(self, comp_link):
+        """
+        """
+        return
                             
     def update_activations(self):
         """
@@ -1246,7 +1316,10 @@ class ASSEMBLAGE(object):
         new_assemblage.schema_insts = self.schema_insts[:] # neither deep nor shallow copy.
         new_assemblage.coop_links = self.coop_links[:] 
         return new_assemblage
-        
+    
+    ######################
+    ### STATIC METHODS ###
+    ######################
     @staticmethod
     def merge(asmb_1, asmb_2):
         """
