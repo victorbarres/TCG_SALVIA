@@ -614,6 +614,8 @@ class WM(PROCEDURAL_SCHEMA):
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
+        - assemblages ([ASSEMBLAGE]):
+        - assemblages_comp ([set([ASSEMBLAGE, ASSEMBLAGE])):
         - params (DICT): {'dyn': {'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
                           'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT, 'coop_asymmetry':FLOAT, 'comp_asymmetry':FLOAT, 'P_comp':FLOAT, 'P_coop':FLOAT}}
             Note:
@@ -628,6 +630,8 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
+        self.assemblages = []
+        self.assemblages_comp = []
         self.params['dyn'] = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':8.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}, 
@@ -642,7 +646,9 @@ class WM(PROCEDURAL_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.save_state = self.save_state = {'insts':{}, 
+        self.assemblages = []
+        self.assemblages_comp = []
+        self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
                                            'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
         
@@ -659,12 +665,24 @@ class WM(PROCEDURAL_SCHEMA):
                       'noise_mean':self.params['dyn']['noise_mean'], 'noise_std':self.params['dyn']['noise_std']}
         schema_inst.params['act'] = act_params
         schema_inst.initialize_activation()
+        
+        # Create an assemblage containing this instance.
+        new_assemblage = ASSEMBLAGE() 
+        new_assemblage.add_instance(schema_inst)
+        self.assemblages.append(new_assemblage)
+        
         self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
         return True
     
     def remove_instance(self, schema_inst):
         self.schema_insts.remove(schema_inst)
-    
+        
+        # remove all the assemblages containing this instance.
+        for assemblage in self.assemblages[:]:
+            if assemblage.has_inst(schema_inst):
+                self.assemblages.remove(assemblage)
+                self.remove_assemblage(assemblage)
+                
     def find_instance(self, schema_inst_name):
         """
         Returns the schema instance with name schema_inst_name if it exists.
@@ -675,11 +693,36 @@ class WM(PROCEDURAL_SCHEMA):
         return schema_inst
         
     def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None):
+        """
+        """
         if weight == None:
             weight=self.params['C2']['coop_weight']
         new_link = COOP_LINK(inst_from, inst_to, weight*qual, self.params['C2']['coop_asymmetry'])
         new_link.set_connect(port_from, port_to)
         self.coop_links.append(new_link)
+        
+        # Update the assemblages
+        assemblages_from = []
+        assemblages_to = []
+        assemblages_both = []
+        for assemblage in self.assemblages:
+            flag_from = assemblage.has_inst(inst_from)
+            flag_to = assemblage.has_inst(inst_to)
+            if flag_from and flag_to:
+                assemblages_both.append(assemblage)
+            elif flag_from:
+                assemblages_from.append(assemblage)
+            elif flag_to:
+                assemblages_to.append(assemblage)
+        
+        for assemblage in assemblages_both: # for those assemblage, a new coop_link is simply added to the existing assemblage
+            assemblage.add_link(new_link)
+        
+        for asmb_from in assemblages_from:
+            for asmb_to in assemblages_to:
+                compete = set([asmb_from, asmb_to]) in self.assemblages_comp
+                if not compete: # If the two assemblages do not compete, they should be merged.
+                    self.merge_assemblages(asmb_to, asmb_from, [new_link])       
 
     def find_coop_links(self,inst_from='any', inst_to='any', port_from='any', port_to='any'):
         """
@@ -710,12 +753,24 @@ class WM(PROCEDURAL_SCHEMA):
         f_links = self.find_coop_links(inst_from=inst_from, inst_to=inst_to, port_from=port_from, port_to=port_to)
         for f_link in f_links:
             self.coop_links.remove(f_link)
+            
+        
+        # Update the assemblages
+        for assemblage in self.assemblages[:]:
+            for f_link in f_links:
+                if f_link in assemblage.coop_links:
+                    self.remove_assemblage(assemblage)
         
     def add_comp_link(self, inst_from, inst_to, weight=None):
+        """
+        """
         if weight == None:
             weight=self.params['C2']['comp_weight']
         new_link = COMP_LINK(inst_from, inst_to, weight, self.params['C2']['comp_asymmetry'])
-        self.comp_links.append(new_link)
+        self.comp_links.append(new_link)   
+        
+        # Update the assemblages
+        
     
     def find_comp_links(self,inst_from='any', inst_to='any'):
         """
@@ -740,7 +795,45 @@ class WM(PROCEDURAL_SCHEMA):
         f_links = self.find_comp_links(inst_from=inst_from, inst_to=inst_to)
         for f_link in f_links:
             self.comp_links.remove(f_link)
-           
+    
+    def remove_assemblage(self, assemblage):
+        """
+        Removes the assemblage from the state of WM.
+        """
+        self.assemblages.remove(assemblage)
+        for comp in self.assemblages_comp[:]: # update the assemblage competition state
+            if assemblage in comp:
+                self.assemblage_comp.remove(comp)
+        
+    def merge_assemblages(self, asmb_1, asmb_2, links=[]):
+        """
+        Merges two assembalges asmb_1 and asmb_2 into a new one and update the state of the WM.
+        Adds the links to the new assemblage
+        In the assemblage competitions, replace asmb_1 and asmb_2 everywhere by the new assemblage
+        """
+        if set([asmb_1, asmb_2]) in self.assemblages_comp:
+            print "Error: Trying to merge competining assemblages"
+            return False
+            
+        # create new merged assemblage
+        asmb = ASSEMBLAGE.merge(asmb_1, asmb_2)
+        for link in links:
+            asmb.add_link(link)
+        
+        # update the list of assemblages
+        self.assemblages.remove(asmb_1)
+        self.assemblages.remove(asmb_2)
+        self.assemblages.append(asmb)
+        
+        # update the assemblages competitions.
+        for comp_set in self.assemblages_comp: # replace asmb_1 or asmb_2 by asmb in all the competition they were involved
+            if asmb_1 in comp_set:
+                comp_set.remove(asmb_1)
+                comp_set.add(asmb)
+            if asmb_2 in comp_set:
+                comp_set.remove(asmb_2)
+                comp_set.add(asmb)
+                            
     def update_activations(self):
         """
         Update all the activations of instances in working memory based on cooperation and competition f-links.
@@ -1022,15 +1115,15 @@ class COOP_LINK(F_LINK):
         - inst_from (SCHEMA_INST)
         - inst_to (SCHEMA_INST)
         - connect (CONNECT)
-        - self.fixed_weight (BOOL)
+        - fixed_weight (BOOL)
 
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0):
+    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0, fixed_weight=False):
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
         self.connect = CONNECT()
-        self.fixed_weight = False
+        self.fixed_weight = fixed_weight
     
     def set_connect(self, port_from, port_to, weight=0.0, delay=0.0):
         self.connect.port_from = port_from
@@ -1077,11 +1170,11 @@ class COMP_LINK(F_LINK):
         - weight (FLOAT)
         - rate (FLAOT): rate at which the weight increase.
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=-1.0, asymmetry_coef=0.0): #Symmetric links
+    def __init__(self, inst_from=None, inst_to=None, weight=-1.0, asymmetry_coef=0.0, rate=1.0): #Symmetric links
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
-        self.rate = 1.005
+        self.rate = rate
     
     def update(self):
         """
@@ -1120,6 +1213,7 @@ class ASSEMBLAGE(object):
         """
         for l in self.coop_links:
             if (l.connect.port_from == link.connect.port_from) or (l.connect.port_to == link.connect.port_to):
+                print "ERROR: assemblage already contains the coop_link"
                 return False  
         self.coop_links.append(link)
         return True
@@ -1132,7 +1226,17 @@ class ASSEMBLAGE(object):
         """
         self.activation = sum([inst.activity for inst in self.schema_insts])/len(self.schema_insts) # Average
 #        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum (favors larger assemblage)
-    
+        
+    def has_instance(self, inst):
+        """
+        Returns True if the assemblage contains the instance inst
+        
+        Args:
+            - inst (SCHEMA_INST)
+        """
+        val = schema_inst in self.schema_insts  
+        return val
+        
     def copy(self):
         """
         Returns a copy of itself.
@@ -1142,7 +1246,36 @@ class ASSEMBLAGE(object):
         new_assemblage.schema_insts = self.schema_insts[:] # neither deep nor shallow copy.
         new_assemblage.coop_links = self.coop_links[:] 
         return new_assemblage
-    
+        
+    @staticmethod
+    def merge(asmb_1, asmb_2):
+        """
+        Merges two assemblages asmb_1 and asmb_2 by taking the union of their instance sets and of their coop-links sets.
+        Returns a new assemblage that correspond to the result of merge.
+        
+        Args:
+            asmb_1, asmb_2 (ASSEMBLAGES)
+        """
+        asmb = ASSEMBLAGE()
+        
+        # getting schema_inst union
+        insts_1 = set(asmb_1.schema_insts)
+        insts_2 = set(asmb_2.schema_insts)
+        insts = list(insts_1.union(insts_2))
+        asmb.schema_insts = insts
+        
+        # getting coop_links union
+        clinks_1 = set(asmb_1.coop_links)
+        clinks_2 = set(asmb_2.coop_links)
+        clinks = list(clinks_1.union(clinks_2))
+        asmb.coop_links = clinks
+        
+        asmb.update_activation()
+        
+        return asmb
+        
+        
+        
     ####################
     ### JSON METHODS ###
     ####################

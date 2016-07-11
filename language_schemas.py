@@ -1741,6 +1741,8 @@ class UTTER(PROCEDURAL_SCHEMA):
             
 #####################
 ### COMPREHENSION ###
+### EVERYTHING BELOW IS OUTDATED AND NEEDS TO BE UPDATED!            
+            
 class PHON_WM_C(WM):
     """
     Receives input one word at a time.
