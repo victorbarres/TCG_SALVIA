@@ -107,6 +107,17 @@
 			"comments":""
 			}, 
 			
+		"woman_kick_man_wear_dress_dynamic1":{
+			"sem_rate":10,
+			"propositions":{
+				"P1":["WOMAN(w1)", "MAN(m1)", "KICK(a1)" ,"AGENT(r1)", "r1(a1, w1)", "PATIENT(r2)", "r2(a1, m1)"],
+				"P2":["WEAR(a2)", "AGENT(r3)", "r3(a2, w1)", "PATIENT(r4)", "DRESS(d1)", "r4(a2, d1)"]
+			},
+			"sequence" :["P1", "P2"],
+			"timing":[],
+			"comments":""
+			}, 
+			
 		"kick_static_focus_agent":{
 			"sem_rate":10,
 			"propositions": {

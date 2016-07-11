@@ -68,7 +68,7 @@ def TCG_production_system(name='language_system_P',
     language_system_P.set_output_ports([utter.find_port('to_output'), grammaticalWM_P.find_port('to_output')])
     
     # Parameters
-    semanticWM.params['dyn']['tau'] = 1000.0
+    semanticWM.params['dyn']['tau'] = 5000.0
     semanticWM.params['dyn']['act_inf'] = 0.0
     semanticWM.params['dyn']['L'] = 1.0
     semanticWM.params['dyn']['k'] = 10.0
@@ -80,7 +80,7 @@ def TCG_production_system(name='language_system_P',
     semanticWM.params['C2']['coop_weight'] = 0.0
     semanticWM.params['C2']['comp_weight'] = 0.0
     
-    grammaticalWM_P.params['dyn']['tau'] = 30 # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    grammaticalWM_P.params['dyn']['tau'] = 100 # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
     grammaticalWM_P.params['dyn']['act_inf'] = 0.0
     grammaticalWM_P.params['dyn']['L'] = 1.0
     grammaticalWM_P.params['dyn']['k'] = 10.0 # Need to analyze the impact of that factor.
@@ -88,9 +88,9 @@ def TCG_production_system(name='language_system_P',
     grammaticalWM_P.params['dyn']['noise_mean'] = 0.0
     grammaticalWM_P.params['dyn']['noise_std'] = 0.2
     grammaticalWM_P.params['C2']['confidence_threshold'] = 0.3 #0.7
-    grammaticalWM_P.params['C2']['prune_threshold'] = 0.1 #0.01 # Manipulations can yield "broca's aphasia" (0.3)
-    grammaticalWM_P.params['C2']['coop_weight'] = 1.0
-    grammaticalWM_P.params['C2']['comp_weight'] = -1.0 #-4.0 # Needs to compensate for the dominance of cooperation link.
+    grammaticalWM_P.params['C2']['prune_threshold'] = 0.01 #0.01 # Manipulations can yield "broca's aphasia" (0.3)
+    grammaticalWM_P.params['C2']['coop_weight'] = 0.0
+    grammaticalWM_P.params['C2']['comp_weight'] = -0.1 #-4.0 # Needs to compensate for the dominance of cooperation link.
     grammaticalWM_P.params['C2']['sub_threshold_r'] = 0.8
     grammaticalWM_P.params['C2']['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
     

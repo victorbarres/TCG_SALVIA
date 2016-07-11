@@ -487,6 +487,8 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
             I+= v
         self.act_port_in.value = [];
         
+#        print "%s, %.2f, %.2f, %.2f" %(self.name, self.activity, self.activation.E, I)
+        
         self.activation.update(I)
         self.activity = self.activation.act
         self.act_port_out.value = self.activity
@@ -544,6 +546,7 @@ class INST_ACTIVATION(object):
         self.save_vals["t"].append(self.t)
         self.save_vals["act"].append(self.act)
         self.E = 0.0
+    
     
     def logistic(self, x):
         return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
@@ -761,6 +764,7 @@ class WM(PROCEDURAL_SCHEMA):
         for inst in self.schema_insts:
             inst.update_activation()
             if inst.activity<self.params['C2']['prune_threshold']:
+                print "prune: %s" % inst.name
                 inst.alive = False
         
         self.update_activity()
@@ -1018,20 +1022,31 @@ class COOP_LINK(F_LINK):
         - inst_from (SCHEMA_INST)
         - inst_to (SCHEMA_INST)
         - connect (CONNECT)
-        
-    NOTE: I need to experiment with the possibility to have 
+        - self.fixed_weight (BOOL)
+
     """
     def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0):
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
         self.connect = CONNECT()
+        self.fixed_weight = False
     
     def set_connect(self, port_from, port_to, weight=0.0, delay=0.0):
         self.connect.port_from = port_from
         self.connect.port_to = port_to
         self.connect.weight = float(weight)
         self.connect.delay = float(delay)
+    
+    def update(self):
+        """
+        """
+        super(COOP_LINK, self).update()
+        if self.fixed_weight:
+            return
+        else:
+            new_weight = self.inst_from.activity+self.inst_to.activity
+        self.update_weight(new_weight)
     
     def update_weight(self, new_weight):
         self.weight = float(new_weight)
@@ -1059,12 +1074,21 @@ class COMP_LINK(F_LINK):
     Data:
         - inst_from (SCHEMA_INST)
         - inst_to (SCHEMA_INST)
-        - weight (float)
+        - weight (FLOAT)
+        - rate (FLAOT): rate at which the weight increase.
     """
     def __init__(self, inst_from=None, inst_to=None, weight=-1.0, asymmetry_coef=0.0): #Symmetric links
         """
         """
         F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef)
+        self.rate = 1.005
+    
+    def update(self):
+        """
+        """
+        super(COMP_LINK, self).update()
+        new_weight = self.weight*self.rate
+        self.update_weight(new_weight)
 
 class ASSEMBLAGE(object):
     """

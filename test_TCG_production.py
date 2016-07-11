@@ -22,7 +22,7 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     SEM_INPUT = 'sem_inputs.json'
-    INPUT_NAME = 'blue_woman_kick_man_static'
+    INPUT_NAME = 'kick_static'
     FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed))
     
     language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main_pref1', semantics_name='TCG_semantics_main')
@@ -38,12 +38,12 @@ def test(seed=None):
     (sem_insts, next_time, prop) = generator.next()
     
     # Test paramters
-    language_system_P.params['Control']['task']['start_produce'] = 1000
+    language_system_P.params['Control']['task']['start_produce'] = 3100
     language_system_P.params['Control']['task']['time_pressure'] = 200
     language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 2000
+    max_time = 3000
     save_states = [30, 700, 2000]
     
     flag = False
@@ -65,7 +65,7 @@ def test(seed=None):
             TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
     
     language_system_P.schemas['Semantic_WM'].show_SemRep()
-    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=True,  c2_network=False)
     language_system_P.save_sim(FOLDER, 'test_language_output.json')
     
     return language_system_P

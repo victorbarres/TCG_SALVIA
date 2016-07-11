@@ -432,7 +432,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_visual_WM')
         self.params['dyn'] = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
-        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':0.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
     def reset(self):
@@ -669,7 +669,7 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('OUT', 'to_phonological_WM_P')
         self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
-        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':0.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         
     def process(self):
@@ -682,7 +682,7 @@ class GRAMMATICAL_WM_P(WM):
         if new_cxn_insts:
             self.add_new_insts(new_cxn_insts)            
                 
-        self.convey_sem_activations(sem_input, weight=1)
+        self.convey_sem_activations(sem_input, weight=1.0)
         self.update_activations()
         self.prune()
         
@@ -711,17 +711,18 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def convey_sem_activations(self, sem_input, weight = 0.0):
+    def convey_sem_activations(self, sem_input, weight = 0.0, normalization=True):
         """
         Args:
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
-            - weight = weight to apply to the sem_activation value.
+            - weight (FLOAT) = weight to apply to the sem_activation value.'
+            - normalization (BOOL) = If True, the propagation of the activation is normalized by the number of nodes and edges covered.
         
         Notes:
             For now, a construction receives activations from semantic working memory if :
                 - 1. It's semframe covers at least one semrep node that has not yet been 
             expressed. 
-                - 2. The SemFrame node that covers is linked to a TP_PHON.
+                - 2. The SemFrame node that covers is linked to a TP_PHON or does not have an attached symlinked (implicitely formalized)
                 - 3. It's semframe covers a semrep relations that has not yet been expressed.
             The overarching principles is that a cxn_inst receives activation from an unexpressed semantic schema that it formalizes.
             In the case of nodes, formalization means lexicalizations. Relations are necessarily formalized in the current framework.
@@ -736,22 +737,27 @@ class GRAMMATICAL_WM_P(WM):
             cover_edges = inst.covers['edges']
             
             act = 0
+            count = 0
             # Propagate semantic node activation
             for node in sem_input['nodes']:
                 inst_node = next((k for k,v in cover_nodes.items() if v==node), None) # Instances covers the node through sf_node
                 if inst_node:
                     inst_form = inst.content.node2form(inst_node)
-                    if isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form. (Lexicalization)
+                    if inst_form == None or isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form or does not have a symlink.. (formalization)                      
                         act += sem_input['nodes'][node]
+                        count += 1
             
             # Propagate semantic relation activation
             for edge in sem_input['edges']:
                 inst_edge = next((k for k,v in cover_edges.items() if v==edge), None)
                 if inst_edge:
                     act += sem_input['edges'][edge] # Edge always propagate their activation since they are obligatory formalized in a TCG cxn.
+                    count +=1
             
             # Normalization
-            act = act/(len(cover_nodes.keys()) + len(cover_edges.keys()))
+            if normalization and act!= 0:
+#                act = act/(len(cover_nodes.keys()) + len(cover_edges.keys())) # normalizing remove favoring constructions that cover more content.
+                act = act/count
             inst.activation.E += act*weight
     
 #    def apply_pressure(self, pressure):
@@ -1193,13 +1199,21 @@ class GRAMMATICAL_WM_P(WM):
                     return {"match_cat":match_cat, "links":links}
         
         #Check cooperation
+        flag1 = False
+        flag2 = False
         for n in overlap["nodes"]:
             link = GRAMMATICAL_WM_P.coop_link(inst1, inst2, n)
             if link:
+                flag1 = True
                 links.append(link)
             link = GRAMMATICAL_WM_P.coop_link(inst2, inst1, n)
             if link:
+                flag2 = True
                 links.append(link)
+        
+        if flag1 and flag2:
+            print "LOOP %s %s" %(inst1.name, inst2.name) # Warns that there are direct loops.
+            
         if links:
             match_cat = 1
         else:
