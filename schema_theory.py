@@ -889,19 +889,76 @@ class WM(PROCEDURAL_SCHEMA):
                 compete = set([asmb_from, asmb_to]) in self.assemblages_comp
                 if not compete: # If the two assemblages do not compete, they should be merged.
                     self.merge_assemblages(asmb_to, asmb_from, [coop_link])
+                    
     def _asmb_update_remove_coop(self, coop_link):
         """
         """
-        return
+        for assemblage in self.assemblages[:]:
+                if coop_link in assemblage.coop_links:
+                    self.remove_assemblage(assemblage)
         
     def _asmb_update_add_comp(self, comp_link):
         """
         """
+        inst_from = comp_link.inst_from
+        inst_to = comp_link.inst_to
+        assemblages_from = []
+        assemblages_to = []
+        assemblages_both = []
+        for assemblage in self.assemblages:
+            flag_from = assemblage.has_inst(inst_from)
+            flag_to = assemblage.has_inst(inst_to)
+            if flag_from and flag_to:
+                assemblages_both.append(assemblage)
+            elif flag_from:
+                assemblages_from.append(assemblage)
+            elif flag_to:
+                assemblages_to.append(assemblage)
+                
+        # Assemblages that contain both competing instance are split in two.
+        for asmb in assemblages_both:
+            asmb_new = assemblage.copy()
+            asmb.schema_insts.remove_instance(inst_from)
+            asmb_new.schema_insts.remove_instance(inst_to)
+            self.assemblages.append(asmb_new)
+            """
+            THIS IS WRONG! I need to know why the competition was there in the first place.
+            So the competition set should also come with the insts that triggered the competition.!
+            """
+            for comp in self.assemblages_comp[:]: 
+                if asmb in comp:
+                    comp_new = comp.copy()
+                    comp_new.remove(asmb)
+                    comp_new.add(asmb_new)
+                    self.assemblages_comp.append(comp_new) #WRONG!!!
+        
+        # For the other assemblages, update assemblage competitions.
+        """
+        This is where I can keep track of the list of competing elements between two assemblages.
+        """
+        
         return
     
     def _asmb_update_remove_comp(self, comp_link):
         """
         """
+        inst_from = comp_link.inst_from
+        inst_to = comp_link.inst_to
+        assemblages_from = []
+        assemblages_to = []
+        for assemblage in self.assemblages:
+            flag_from = assemblage.has_inst(inst_from)
+            flag_to = assemblage.has_inst(inst_to)
+            if flag_from:
+                assemblages_from.append(assemblage)
+            elif flag_to:
+                assemblages_to.append(assemblage)
+        
+        """
+        If the comp link was the only reason the two assemblages were in competition, remove competition.
+        Else remove the comp-link as a cause for competition.
+        """
+        
         return
                             
     def update_activations(self):
@@ -1266,13 +1323,34 @@ class ASSEMBLAGE(object):
     def add_instance(self, new_inst):
         """
         Add an instance new_inst (SCHEMA_INST) to the assemblage.
-        An instance can only be added if it is not already presen in the assemblage
+        An instance can only be added if it is not already presen in the assemblage.
+        Updates activation
         Returns True if the link was sucessfully added, False otherwise.
         """
         for inst in self.schema_insts:
             if inst == new_inst:
                 return False
         self.schema_insts.append(new_inst)
+        self.update_activation()
+        return True
+    
+    def remove_instance(self, inst):
+        """
+        Remove an instance from the assemblage.
+        Also removes any links that contains this instance.
+        Updates activation.
+        """
+        if not self.has_instance(inst):
+            print "Error: instance is not in the assemblage"
+            return False
+        
+        self.schema_insts.remove(inst)
+        links_from = self.find_links(inst_from=[inst], inst_to='any')
+        links_to = self.find_links(inst_from = 'any', inst_to=[inst])
+        for link in links_from + links_to:
+            self.remove_link(link)
+        
+        self.update_activation()
         return True
         
     def add_link(self, link):
@@ -1287,6 +1365,37 @@ class ASSEMBLAGE(object):
                 return False  
         self.coop_links.append(link)
         return True
+    
+    def remove_link(self, link):
+        """
+        Remove the link from the assemblage
+        """
+        if link not in self.coop_links:
+            print "Error: Cannot remove link from assemblage, link does not exist"
+            return False
+        
+        self.coop_links.remove(link)
+        return True
+            
+    
+    def find_links(self, inst_from='any', inst_to='any'):
+        """
+        Returns a list of coop_links that match the criteria.
+        By default, it returns al the coop_links (no criteria specified)
+        """
+        results = []
+        for flink in self.coop_links:
+            match = True
+            if inst_from!='any' and not(flink.inst_from in inst_from):
+                match = False
+            if inst_to!='any' and not(flink.inst_to in inst_to):
+                match = False
+            
+            if match:
+                results.append(flink)
+        results = list(set(results))
+        return results
+        
 
     def update_activation(self):
         """
@@ -1304,7 +1413,7 @@ class ASSEMBLAGE(object):
         Args:
             - inst (SCHEMA_INST)
         """
-        val = schema_inst in self.schema_insts  
+        val = inst in self.schema_insts  
         return val
         
     def copy(self):
@@ -1346,8 +1455,6 @@ class ASSEMBLAGE(object):
         asmb.update_activation()
         
         return asmb
-        
-        
         
     ####################
     ### JSON METHODS ###
