@@ -7,7 +7,7 @@ Dependencies:
     - Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
     - Uses Numpy for vectorial operations.
     - Uses pyttsx for the text to speech implementation (optional!)
-    - Uses re for regular expression parsing of sem inputs (optional)
+    - Uses re for regular expression parsing of sem inputs
     
     - Uses schema_theory
     - Uses construction
@@ -24,12 +24,13 @@ from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM,
 import construction
 import TCG_graph
 
-##################################
-### Language knowledge schemas ###
-##################################
+#######################################
+##### LANGUAGE KNOWLEDGE SCHEMAS ######
+#######################################
 
-################################
-# GRAMMATICAL KNOWLEDGE SCHEMA #
+####################################
+### GRAMMATICAL KNOWLEDGE SCHEMA ###
+####################################
 class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Construction schema
@@ -158,8 +159,10 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
             self.has_predicted = False
         else:
             self.form_state = None
-#############################
-# CONCEPT KNOWLEDGE SCHEMAS #
+#################################
+### CONCEPT KNOWLEDGE SCHEMAS ###
+#################################
+            
 class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Concept schema
@@ -237,8 +240,9 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
         """
         return self.content['concept'].similarity(cpt_inst.content['concept'])
 
-#########################
-# PHON KNOWLEDGE SCHEMA #
+#############################
+### PHON KNOWLEDGE SCHEMA ###
+#############################
 class PHON_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Phonological form schemas.
@@ -284,12 +288,13 @@ class PHON_SCHEMA_INST(SCHEMA_INST):
         content_copy = phon_schema.content.copy()
         self.content = content_copy
 
-###################################
-### LANGUAGE PROCEDURAL SCHEMAS ###
-###################################
+#######################################
+##### LANGUAGE PROCEDURAL SCHEMAS #####
+#######################################
 
 #################
 ### SEMANTICS ###
+#################
 class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
     """
     """
@@ -611,6 +616,7 @@ class SEMANTIC_WM(WM):
 
 ###################
 ### GRAMMAR LTM ###
+###################
 class GRAMMATICAL_LTM(LTM):
     """
     """
@@ -652,7 +658,8 @@ class GRAMMATICAL_LTM(LTM):
         return data
         
 ##################
-### PRODUCTION ###  
+### PRODUCTION ###
+##################
 class GRAMMATICAL_WM_P(WM):
     """
     TO DO!!
@@ -1741,7 +1748,8 @@ class UTTER(PROCEDURAL_SCHEMA):
             
 #####################
 ### COMPREHENSION ###
-### EVERYTHING BELOW IS OUTDATED AND NEEDS TO BE UPDATED!            
+#####################
+### EVERYTHING BELOW IS OUTDATED AND NEEDS TO BE UPDATED! ###          
             
 class PHON_WM_C(WM):
     """
@@ -2336,7 +2344,8 @@ class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
         return data
         
 ####################
-### TASK CONTROL ###      
+### TASK CONTROL ###
+####################
 class CONTROL(PROCEDURAL_SCHEMA):
     """
     This needs to be reformatted to better handle comprehension.
@@ -2423,8 +2432,9 @@ class CONTROL(PROCEDURAL_SCHEMA):
         data['state'] = self.state
         return data
         
-#####################
-### EXTRA CLASSES ###         
+#########################
+##### EXTRA CLASSES #####
+#########################         
 class TEXT2SPEECH(object):
     """
     """
@@ -2636,10 +2646,4 @@ class UTTER_GENERATOR():
             
 ###############################################################################
 if __name__=='__main__':
-    from test_TCG_production import test2 as test_production
-    from test_TCG_comprehension import test as test_comprehension
-    from test_TCG_dyad import test as test_dyad
-    
-    test_production(seed=1)
-#    test_comprehension(seed=None)
-#    test_dyad(seed=0)
+    print "No test case implemented"

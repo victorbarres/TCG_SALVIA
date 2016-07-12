@@ -156,8 +156,9 @@ class CONNECT(SCHEMA):
         """
         data = {"id":self.id, "name":self.name, "port_from":self.port_from.name, "port_to":self.port_to.name, "weight":self.weight, "delay":self.delay}
         return data
-        
+#######################################        
 ### KNOWLDGE AND PROCEDURAL SCHEMAS ###
+#######################################
 class KNOWLEDGE_SCHEMA(SCHEMA):
     """
     Knowledge schema base class (Declarative schema)
@@ -550,8 +551,10 @@ class INST_ACTIVATION(object):
     
     def logistic(self, x):
         return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
-        
+
+########################        
 ### LONG TERM MEMORY ###
+########################
 class LTM(PROCEDURAL_SCHEMA):
     """
     Long term memory. 
@@ -596,8 +599,10 @@ class LTM(PROCEDURAL_SCHEMA):
             else:
                 print "%s: Ambiguous schema name" %name
                 return None
-        
+                
+######################        
 ### WORKING MEMORY ###
+######################
 class WM(PROCEDURAL_SCHEMA):
     """
     Working memory
@@ -796,6 +801,68 @@ class WM(PROCEDURAL_SCHEMA):
                 
             if match:
                 results.append(flink)
+    
+    def update_activations(self):
+        """
+        Update all the activations of instances in working memory based on cooperation and competition f-links.
+        Passes activations through coop links with probabiliy P_coop, and through competition liks with probability P_comp
+        Then updates all instance activation.
+        Saves states.
+        """
+        # Propagating cooperation
+        for flink in self.coop_links:
+            r = random.random()
+            if(r<self.params['C2']['P_coop']):
+                flink.update()  
+        
+        # Propagating competition
+        for flink in self.comp_links:
+            r = random.random()
+            if(r<self.params['C2']['P_comp']):
+                flink.update()
+       
+        # Update all instances activation and sets alive=False for instances that fall below threshold.
+        for inst in self.schema_insts:
+            inst.update_activation()
+            if inst.activity<self.params['C2']['prune_threshold']:
+                print "prune: %s" % inst.name
+                inst.alive = False
+        
+        self.update_activity()
+    
+    def prune(self):
+        """
+        Removes from WM all the dead instances
+        """
+        for inst in self.schema_insts[:]:
+            if not inst.alive:
+                self.schema_insts.remove(inst)
+                for flink in self.coop_links[:]:
+                    if (flink.inst_from == inst) or (flink.inst_to == inst):
+                        self.coop_links.remove(flink)
+                for flink in self.comp_links[:]:
+                    if (flink.inst_from == inst) or (flink.inst_to == inst):
+                        self.comp_links.remove(flink)  
+    
+    def end_competitions(self):
+        """
+        Picks a winner for each ongoing competitions. 
+        Winner is the instance with the max activatity at the time when the method is called.
+            Loser is set to dead (alive=False). All the dead instances are then pruned.
+        """
+        for link in self.comp_links:
+            inst_from = link.inst_from
+            inst_to = link.inst_to
+            if inst_from.activity <= inst_to.activity:
+                inst_from.alive = False
+            else:
+                inst_to.alive = False
+        self.comp_links = []
+        self.prune()
+                
+    ##########################
+    ### ASSEMBLAGE METHODS ###
+    ##########################
                 
     def remove_comp_links(self,inst_from, inst_to):
         """
@@ -960,64 +1027,10 @@ class WM(PROCEDURAL_SCHEMA):
         """
         
         return
-                            
-    def update_activations(self):
-        """
-        Update all the activations of instances in working memory based on cooperation and competition f-links.
-        Passes activations through coop links with probabiliy P_coop, and through competition liks with probability P_comp
-        Then updates all instance activation.
-        Saves states.
-        """
-        # Propagating cooperation
-        for flink in self.coop_links:
-            r = random.random()
-            if(r<self.params['C2']['P_coop']):
-                flink.update()  
         
-        # Propagating competition
-        for flink in self.comp_links:
-            r = random.random()
-            if(r<self.params['C2']['P_comp']):
-                flink.update()
-       
-        # Update all instances activation and sets alive=False for instances that fall below threshold.
-        for inst in self.schema_insts:
-            inst.update_activation()
-            if inst.activity<self.params['C2']['prune_threshold']:
-                print "prune: %s" % inst.name
-                inst.alive = False
-        
-        self.update_activity()
-    
-    def prune(self):
-        """
-        Removes from WM all the dead instances
-        """
-        for inst in self.schema_insts[:]:
-            if not inst.alive:
-                self.schema_insts.remove(inst)
-                for flink in self.coop_links[:]:
-                    if (flink.inst_from == inst) or (flink.inst_to == inst):
-                        self.coop_links.remove(flink)
-                for flink in self.comp_links[:]:
-                    if (flink.inst_from == inst) or (flink.inst_to == inst):
-                        self.comp_links.remove(flink)  
-    
-    def end_competitions(self):
-        """
-        Picks a winner for each ongoing competitions. 
-        Winner is the instance with the max activatity at the time when the method is called.
-            Loser is set to dead (alive=False). All the dead instances are then pruned.
-        """
-        for link in self.comp_links:
-            inst_from = link.inst_from
-            inst_to = link.inst_to
-            if inst_from.activity <= inst_to.activity:
-                inst_from.alive = False
-            else:
-                inst_to.alive = False
-        self.comp_links = []
-        self.prune()
+    ############################
+    ### STATE SAVING METHODS ###
+    ############################
 
     def update_activity(self):
         """
