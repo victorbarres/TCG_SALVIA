@@ -7,3 +7,4 @@ data/scenes/*.mat
 to_fix/
 TOADD.txt
 data_analysis/
+simulation_analyses/analyses/
