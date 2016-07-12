@@ -399,7 +399,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         """
         data = {"name":self.name, "t":self.t, "activity":self.activity}
         return data
-         
+        
 #################################
 ### PROCEDURAL SCHEMA CLASSES ###
 #################################        
