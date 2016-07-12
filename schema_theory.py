@@ -27,9 +27,9 @@ import pprint
 import networkx as nx
 import json
 
-##################################
-### SCHEMAS (Functional units) ###
-##################################
+###################
+##### SCHEMAS #####
+###################
 class SCHEMA(object):
     """
     Schema (base class)
@@ -156,9 +156,9 @@ class CONNECT(SCHEMA):
         """
         data = {"id":self.id, "name":self.name, "port_from":self.port_from.name, "port_to":self.port_to.name, "weight":self.weight, "delay":self.delay}
         return data
-#######################################        
-### KNOWLDGE AND PROCEDURAL SCHEMAS ###
-#######################################
+############################################      
+##### KNOWLEDGE AND PROCEDURAL SCHEMAS #####
+############################################
 class KNOWLEDGE_SCHEMA(SCHEMA):
     """
     Knowledge schema base class (Declarative schema)
@@ -214,8 +214,8 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.params = {}
         self.inputs = {}
         self.outputs = {}
-        self.activity = 0
-        self.t = 0
+        self.activity = 0.0
+        self.t = 0.0
         self.dt = 1.0
     
     def reset(self):
@@ -399,11 +399,56 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         """
         data = {"name":self.name, "t":self.t, "activity":self.activity}
         return data
+
+class MODULE_SCHEMA(PROCEDURAL_SCHEMA):
+    """
+    Brain anchored procedural schema. Defines the schema system as nodes in the fixed system's topology.
+    
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
+        - inputs (DICT): At each time steps stores the inputs
+        - outputs (DICT): At each time steps stores the ouputs
+        - params (DICT)
+        - activity (float):
+    
+    Data:
+        - brain_regions(LIST): List of brain regions associated with the module schema.
+    """
+    def __init__(self, name=""):
+        PROCEDURAL_SCHEMA.__init__(self,name="")
+        brain_mapping = BRAIN_MAPPING()
+
+class FUNCTION_SCHEMA(PROCEDURAL_SCHEMA):
+    """
+    Functional schemas, not anchored to a specific brain regions but participating in the processes ocurring within a given
+    Module schema.
+    
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
+        - inputs (DICT): At each time steps stores the inputs
+        - outputs (DICT): At each time steps stores the ouputs
+        - params (DICT)
+        - activity (float):
+    """
+    def __init__(self, name=""):
+        PROCEDURAL_SCHEMA.__init__(self,name="")
         
-#################################
-### PROCEDURAL SCHEMA CLASSES ###
-#################################        
-class SCHEMA_INST(PROCEDURAL_SCHEMA):
+#####################################
+##### PROCEDURAL SCHEMA CLASSES #####
+#####################################  
+        
+
+###############################
+### FUNCTION SCHEMA CLASSES ###
+###############################       
+        
+class SCHEMA_INST(FUNCTION_SCHEMA):
     """
     Schema instance
     
@@ -427,7 +472,7 @@ class SCHEMA_INST(PROCEDURAL_SCHEMA):
         - act_port_out (PORT): Sends as output the activation of the instance.
     """    
     def __init__(self,schema=None, trace=None):
-        PROCEDURAL_SCHEMA.__init__(self,name="")
+        FUNCTION_SCHEMA.__init__(self,name="")
         self.content = None      
         self.alive = False
         self.trace = None
@@ -551,11 +596,15 @@ class INST_ACTIVATION(object):
     
     def logistic(self, x):
         return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
+        
+#############################
+### MODULE SCHEMA CLASSES ###
+#############################  
 
 ########################        
 ### LONG TERM MEMORY ###
 ########################
-class LTM(PROCEDURAL_SCHEMA):
+class LTM(MODULE_SCHEMA):
     """
     Long term memory. 
     Stores the set of schemas associated with this memory.
@@ -574,7 +623,7 @@ class LTM(PROCEDURAL_SCHEMA):
         - connections ([{from:schema1, to:schema2, weight:w}]): List of weighted connections between schemas (for future use if LTM needs to be defined as schema network)
     """
     def __init__(self, name=''):
-        PROCEDURAL_SCHEMA.__init__(self,name)
+        MODULE_SCHEMA.__init__(self,name)
         self.schemas = []
         self.connections = []
 
@@ -603,7 +652,7 @@ class LTM(PROCEDURAL_SCHEMA):
 ######################        
 ### WORKING MEMORY ###
 ######################
-class WM(PROCEDURAL_SCHEMA):
+class WM(MODULE_SCHEMA):
     """
     Working memory
     Stores the currently active schema instances and the functional links through which they enter in cooperative computation.
@@ -630,7 +679,7 @@ class WM(PROCEDURAL_SCHEMA):
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
     """
     def __init__(self, name=''):
-        PROCEDURAL_SCHEMA.__init__(self,name)
+        MODULE_SCHEMA.__init__(self,name)
         self.name = name
         self.schema_insts = []
         self.coop_links = []
@@ -1323,11 +1372,27 @@ class COMP_LINK(F_LINK):
         new_weight = self.weight*self.rate
         self.update_weight(new_weight)
 
-class ASSEMBLAGE(object):
+class ASSEMBLAGE(FUNCTION_SCHEMA):
     """
     Defines a schema instance assemblage.
+    
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+        - in_ports ([PORT]):
+        - out_ports ([PORT]):
+        - inputs (DICT): At each time steps stores the inputs
+        - outputs (DICT): At each time steps stores the ouputs
+        - params (DICT)
+        - activity (FLOAT):
+    
+    Data:
+        - schema_inst ([SCHEMA_INSTS])
+        - coop_links ([COOP_LINKS])
+        - score (FLOAT)
     """
-    def __init__(self):
+    def __init__(self, name=""):
+        FUNCTION_SCHEMA.__init__(self, name)
         self.schema_insts = []
         self.coop_links = []
         self.activation = 0.0
@@ -1419,6 +1484,8 @@ class ASSEMBLAGE(object):
         self.activation = sum([inst.activity for inst in self.schema_insts])/len(self.schema_insts) # Average
 #        self.activation = sum([inst.activity for inst in self.schema_insts]) # Sum (favors larger assemblage)
         
+        self.activity = self.activation
+        
     def has_instance(self, inst):
         """
         Returns True if the assemblage contains the instance inst
@@ -1481,12 +1548,12 @@ class ASSEMBLAGE(object):
         data['activation'] = self.activation
         return data
 
-#############################
-### BRAIN MAPPING CLASSES ###
-#############################
+#################################
+##### BRAIN MAPPING CLASSES #####
+#################################
 class BRAIN_MAPPING(object):
     """
-    Defines the mappings between procedural schemas and brain regions and between schema connections and brain connections.
+    Defines the mappings between module schemas and brain regions and between schema connections and brain connections.
     
     Data:
         -schema_mapping {schema_name1:[brain_region1, brain_region2,...], schema_name2:[brain_region3, brain_region4,...],...}
@@ -1510,15 +1577,15 @@ class BRAIN_MAPPING(object):
         return data
     
 
-############################
-### SCHEMA SYSTEM CLASSES###
-############################
+#################################
+##### SCHEMA SYSTEM CLASSES #####
+#################################
 class SCHEMA_SYSTEM(object):
     """
-    Defines a model as a system of procedural schemas.
+    Defines a model as a system of module schemas.
     Data:
         - name (str):
-        - schemas({schema_name:PROCEDURAL_SCHEMAS}):
+        - schemas({schema_name:MODULE_SCHEMAS}):
         - params (DICT): offers direct access to all the parameters in the model.
         - default_params (DICT): can store default parameter values.
         - connections ([CONNECT]):
@@ -1567,7 +1634,7 @@ class SCHEMA_SYSTEM(object):
     
     def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
         """
-        Adds connection (CONNECT) between from_schema:from_port (PROCEDURAL_SCHEMA:PORT) to to_schema:to_port (PROCEDURAL_SCHEMA:PORT).
+        Adds connection (CONNECT) between from_schema:from_port (MODULE_SCHEMA:PORT) to to_schema:to_port (MODULE_SCHEMA:PORT).
         Returns True if successful, False otherwise.
         """
         port_from = from_schema.find_port(from_port)
@@ -1582,7 +1649,7 @@ class SCHEMA_SYSTEM(object):
     
     def add_schemas(self, schemas):
         """
-        Add all the procedural schemas in "schemas" ([PROCEDURAL_SCHEMAS]) to the system.
+        Add all the module schemas in "schemas" ([MODULE_SCHEMAS]) to the system.
         """
         for schema in schemas:
             schema.dt = self.dt
@@ -1717,9 +1784,9 @@ class SCHEMA_SYSTEM(object):
         data['output_ports']= [p.name for p in self.output_ports]
         data['brain_mapping'] = self.brain_mapping.get_info()
         
-        data['procedural_schemas'] = {}
+        data['module_schemas'] = {}
         for schema_name, schema in self.schemas.iteritems():
-            data['procedural_schemas'][schema_name] = schema.get_info()
+            data['module_schemas'][schema_name] = schema.get_info()
         
         return data
     
@@ -1733,7 +1800,7 @@ class SCHEMA_SYSTEM(object):
     
     def get_params(self):
         """
-        Returns a dictionary containing pointers to the parameters for each procedural schema in the model.
+        Returns a dictionary containing pointers to the parameters for each module schema in the model.
         """
         sys_params = {}
         for schema_name, schema in self.schemas.iteritems():
@@ -1827,9 +1894,9 @@ class SCHEMA_SYSTEM(object):
         print "MODEL PARAMETERS"
         pprint.pprint(self.params, indent=1, width=1)
             
-########################
-### MODULE FUNCTIONS ###
-########################
+############################
+##### MODULE FUNCTIONS #####
+############################
 def save(schema_system, path='./tmp/'):
     """
     Saves a schema system using pickle.

@@ -18,7 +18,7 @@ def TCG_production_system(name='language_system_P',
     """
     Creates and returns the TCG production schema system.
     """
-    # Instantiating all the necessary procedural schemas
+    # Instantiating all the necessary modules schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
     grammaticalWM_P = ls.GRAMMATICAL_WM_P()
@@ -142,7 +142,7 @@ def TCG_comprehension_system(name='language_system_C',
     """
     Creates and returns the TCG comprehension schema system.
     """
-    # Instantiating all the necessary procedural schemas
+    # Instantiating all the necessary modules schemas
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
     phonWM_C = ls.PHON_WM_C()
@@ -252,7 +252,7 @@ def TCG_language_system(name='language_system',
     """
     Creates and returns the TCG language schema system, including both production and comprehension.
     """
-    # Instantiating all the necessary procedural schemas
+    # Instantiating all the necessary modules schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
@@ -417,7 +417,7 @@ def TCG_description_system(name='description_system',
     """
     Creates and returns the TCG production schema system.
     """
-    # Instantiating all the necessary procedural schemas
+    # Instantiating all the necessary modules schemas
     subscene_rec = ps.SUBSCENE_RECOGNITION()
     perceptLTM = ps.PERCEPT_LTM()
     visualWM = ps.VISUAL_WM()
@@ -449,7 +449,7 @@ def TCG_description_system(name='description_system',
                         'Concept_LTM':['']}
                         
     schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
-    # Creating schema system and adding procedural schemas
+    # Creating schema system and adding modules schemas
     description_system = st.SCHEMA_SYSTEM(name)
     description_system.add_schemas(schemas)
     
@@ -600,13 +600,13 @@ def TCG_description_system_saliency(name='description_system_saliency'):
     """
     description_system = TCG_description_system(name)
     
-    # Instantiating all the necessary procedural schemas
+    # Instantiating all the necessary modules schemas
     simpleSM = ps.SIMPLE_SALIENCY_MAP()
     
     # Defining schema to brain mappings.
     description_system.brain_mapping['Saliency_map'] = ['Dorsal_stream', 'IPS']
     
-    # Adding procedural schemas
+    # Adding modules schemas
     schemas = [simpleSM] 
     description_system.add_schemas(schemas)
     
@@ -631,7 +631,7 @@ def TCG_SemWM(name='Semantic_WM',
     Note that Control is required to send the "produce" signal.
     """
     
-    # Instantiating all the necessary procedural schemas
+    # Instantiating all the necessary modules schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
     control = ls.CONTROL()

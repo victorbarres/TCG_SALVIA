@@ -20,7 +20,7 @@ import networkx as nx
 import pyttsx
 
 
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, PROCEDURAL_SCHEMA, LTM, WM, ASSEMBLAGE
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, MODULE_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
 import TCG_graph
 
@@ -288,18 +288,18 @@ class PHON_SCHEMA_INST(SCHEMA_INST):
         content_copy = phon_schema.content.copy()
         self.content = content_copy
 
-#######################################
-##### LANGUAGE PROCEDURAL SCHEMAS #####
-#######################################
+###################################
+##### LANGUAGE MODULE SCHEMAS #####
+###################################
 
 #################
 ### SEMANTICS ###
 #################
-class CONCEPTUALIZER(PROCEDURAL_SCHEMA):
+class CONCEPTUALIZER(MODULE_SCHEMA):
     """
     """
     def __init__(self, name='Conceptualizer'):
-        PROCEDURAL_SCHEMA.__init__(self, name)
+        MODULE_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_visual_WM')
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('OUT', 'to_semantic_WM')
@@ -906,7 +906,7 @@ class GRAMMATICAL_WM_P(WM):
         
         max_score = None
         for i in range(len(assemblages)):
-            score = w1*assemblages[i].activation + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i]
+            score = w1*assemblages[i].activity + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i]
             assemblages[i].score = score
             if not(max_score):
                 max_score = score
@@ -1342,7 +1342,7 @@ class GRAMMATICAL_WM_P(WM):
             new_assemblage = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
             coop_links = new_assemblage.coop_links
         eq_inst = new_assemblage.schema_insts[0]
-        eq_inst.activity = new_assemblage.activation
+        eq_inst.activity = new_assemblage.activity
         return eq_inst
       
     @staticmethod      
@@ -1361,7 +1361,7 @@ class GRAMMATICAL_WM_P(WM):
         (new_cxn_inst, port_corr) = GRAMMATICAL_WM_P.combine_schemas(inst_p, inst_c, connect)
         
         new_assemblage = ASSEMBLAGE()
-        new_assemblage.activation = assemblage.activation
+        new_assemblage.activity = assemblage.activity
         
         for inst in assemblage.schema_insts:
             if inst != inst_p and inst != inst_c:
@@ -1548,11 +1548,11 @@ class GRAMMATICAL_WM_P(WM):
         GRAMMATICAL_WM_P.draw_instance_network(graph, title)
                   
 
-class CXN_RETRIEVAL_P(PROCEDURAL_SCHEMA):
+class CXN_RETRIEVAL_P(MODULE_SCHEMA):
     """
     """
     def __init__(self, name="Cxn_retrieval_P"):
-        PROCEDURAL_SCHEMA.__init__(self,name)
+        MODULE_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('OUT', 'to_grammatical_WM_P')
@@ -1708,11 +1708,11 @@ class PHON_WM_P(WM):
         data['phon_sequence'] = [phon_inst.content['word_form'] for phon_inst in self.phon_sequence]
         return data
 
-class UTTER(PROCEDURAL_SCHEMA):
+class UTTER(MODULE_SCHEMA):
     """
     """
     def __init__(self, name='Utter'):
-        PROCEDURAL_SCHEMA.__init__(self,name)
+        MODULE_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_output')
         self.params = {'speech_rate':10}
@@ -2290,12 +2290,12 @@ class GRAMMATICAL_WM_C(WM):
             GRAMMATICAL_WM_P.draw_assemblage(assemblage, title)
             i += 1
         
-class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
+class CXN_RETRIEVAL_C(MODULE_SCHEMA):
     """
     THIS NEEDS TO ALLOW FOR THE IMPLEMENTATIN OF A FORM OF CHART PARSING.
     """
     def __init__(self, name="Cxn_retrieval_C"):
-        PROCEDURAL_SCHEMA.__init__(self,name)
+        MODULE_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('IN', 'from_phonological_WM_C')
         self.add_port('IN', 'from_grammatical_WM_C')
@@ -2346,12 +2346,12 @@ class CXN_RETRIEVAL_C(PROCEDURAL_SCHEMA):
 ####################
 ### TASK CONTROL ###
 ####################
-class CONTROL(PROCEDURAL_SCHEMA):
+class CONTROL(MODULE_SCHEMA):
     """
     This needs to be reformatted to better handle comprehension.
     """
     def __init__(self, name="Control"):
-        PROCEDURAL_SCHEMA.__init__(self, name)
+        MODULE_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_semantic_WM')
