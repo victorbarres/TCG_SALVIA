@@ -906,7 +906,7 @@ class GRAMMATICAL_WM_P(WM):
         
         max_score = None
         for i in range(len(assemblages)):
-            score = w1*assemblages[i].activity + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i]
+            score = w1*assemblages[i].activation + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i]
             assemblages[i].score = score
             if not(max_score):
                 max_score = score
@@ -1342,7 +1342,7 @@ class GRAMMATICAL_WM_P(WM):
             new_assemblage = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
             coop_links = new_assemblage.coop_links
         eq_inst = new_assemblage.schema_insts[0]
-        eq_inst.activity = new_assemblage.activity
+        eq_inst.activity = new_assemblage.activation
         return eq_inst
       
     @staticmethod      
@@ -1361,7 +1361,7 @@ class GRAMMATICAL_WM_P(WM):
         (new_cxn_inst, port_corr) = GRAMMATICAL_WM_P.combine_schemas(inst_p, inst_c, connect)
         
         new_assemblage = ASSEMBLAGE()
-        new_assemblage.activity = assemblage.activity
+        new_assemblage.activation = assemblage.activation
         
         for inst in assemblage.schema_insts:
             if inst != inst_p and inst != inst_c:

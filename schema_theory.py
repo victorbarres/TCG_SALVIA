@@ -435,9 +435,13 @@ class FUNCTION_SCHEMA(PROCEDURAL_SCHEMA):
         - outputs (DICT): At each time steps stores the ouputs
         - params (DICT)
         - activity (float):
+    
+    Data:
+        - module (MODULE_SCHEMA): the module schema within which the function schema operates.
     """
     def __init__(self, name=""):
         PROCEDURAL_SCHEMA.__init__(self,name="")
+        self.module = None
         
 #####################################
 ##### PROCEDURAL SCHEMA CLASSES #####
@@ -461,6 +465,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         - outputs (DICT): At each time steps stores the ouputs
         - params (DICT)
         - activity (float):
+        - module (MODULE_SCHEMA): the module schema within which the function schema operates.
     Data:
         - content (KNOWLEDGE_SCHEMA)
         - alive (bool): status flag
@@ -512,12 +517,13 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         """
         return
     
-    def instantiate(self, schema, trace):
+    def instantiate(self, schema, trace, module=None):
         """
         Sets up the state of the schema instance at t0 of instantiation with tau characteristic time for activation dynamics.
         """
         self.content = schema.content
         self.name = "%s_%i" %(schema.name, self.id)
+        self.module = module
         self.alive = True
         self.trace = trace
         self.set_ports()
@@ -705,13 +711,17 @@ class WM(MODULE_SCHEMA):
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
                                            'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
+    
+    ########################
+    ### INSTANCE METHODS ###
+    ########################
         
        
-    def add_instance(self,schema_inst, act0=None):
+    def add_instance(self, schema_inst, act0=None):
         if schema_inst in self.schema_insts:
             return False
             
-        self.schema_insts.append(schema_inst)
+        self.schema_insts.append(schema_inst, module=self)
         if not(act0):
             act0 = schema_inst.activity # Uses the init_activation defined by the associated schema.
         act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 'act_inf':self.params['dyn']['act_inf'],
@@ -721,9 +731,7 @@ class WM(MODULE_SCHEMA):
         schema_inst.initialize_activation()
         
         # Create an assemblage containing this instance.
-        new_assemblage = ASSEMBLAGE() 
-        new_assemblage.add_instance(schema_inst)
-        self.assemblages.append(new_assemblage)
+        self.create_assemblage(insts=[schema_inst])
         
         self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
         return True
@@ -850,6 +858,18 @@ class WM(MODULE_SCHEMA):
                 
             if match:
                 results.append(flink)
+        
+        results = list(set(results))
+        return results
+        
+                
+    def remove_comp_links(self,inst_from, inst_to):
+        """
+        Remove the comp_links from working memory that satisfy the criteria.
+        """
+        f_links = self.find_comp_links(inst_from=inst_from, inst_to=inst_to)
+        for f_link in f_links:
+            self.comp_links.remove(f_link)
     
     def update_activations(self):
         """
@@ -908,27 +928,82 @@ class WM(MODULE_SCHEMA):
                 inst_to.alive = False
         self.comp_links = []
         self.prune()
-                
+    
     ##########################
     ### ASSEMBLAGE METHODS ###
     ##########################
-                
-    def remove_comp_links(self,inst_from, inst_to):
+    def create_assemblage(self, insts=[], coop_links=[]):
         """
-        Remove the comp_links from working memory that satisfy the criteria.
+        Creates and adds an assemblage containing the schema instances "insts" and the coop-links "coop_links".
+        
+        Args:
+            - insts ([SCHEMA_INST])
+            - coop_links ([COOP_LINK])
         """
-        f_links = self.find_comp_links(inst_from=inst_from, inst_to=inst_to)
-        for f_link in f_links:
-            self.comp_links.remove(f_link)
+        new_assemblage = ASSEMBLAGE()
+        for inst in insts:
+            new_assemblage.add_instance(inst)
+        for coop_link in coop_links:
+            new_assemblage.add_link(coop_link)
+        self.add_assemblage(new_assemblage)
     
+    def add_assemblage(self, assemblage):
+        """
+        Adds the assemblage to the current assemblage state.
+
+        Args:
+            - assemblage (ASSEMBLAGE)
+        """
+        if assemblage in self.assemblages:
+            print "ERROR: trying to add an assemblage that is already in the state."
+            return
+        self.assemblages.append(assemblage)
+        
     def remove_assemblage(self, assemblage):
         """
         Removes the assemblage from the state of WM.
         """
         self.assemblages.remove(assemblage)
         for comp in self.assemblages_comp[:]: # update the assemblage competition state
-            if assemblage in comp:
-                self.assemblage_comp.remove(comp)
+            if comp.has_assemblage(assemblage):
+                self.remove_assemblage_comp(comp)
+            
+    def add_assemblage_comp(self, asmb_1, asmb_2, comp_links=[]):
+        """
+        Add a competition between asmb_1 and asmb_2 based on comp_links between instances "comp_links".
+        If comp already exists, appends the comp_links to the already existing competition set.
+        """
+        results = self.find_assemblage_comp(asmb_1, asmb_2)
+        if results:
+            for comp in results:
+                comp.add_comp_links(comp_links)
+        else:
+            asmb_comp = ASSEMBLAGE_COMP(assemblages=[asmb_1, asmb_2], comp_links=comp_links)
+            self.assemblages_comp.append(asmb_comp)
+        
+    def find_assemblage_comp(self, asmb_1, asmb_2='any'):
+        """
+        Returns a list of assemblage_comp that match the criteria.
+        (Symmetric in asmb_1 and asmb_2)
+        """
+        results = []
+        for comp in self.assemblage_comp:
+            match = True
+            if not comp.has_assemblage(asmb_1):
+                match =False
+            elif asmb_2!='any' and (not comp.has_assemblage(asmb_2)):
+                match = False
+                
+            if match:
+                results.append(comp)
+        
+        return results
+        
+    def remove_assemblage_comp(self, comp):
+        """
+        Removes the competition comp.
+        """
+        self.assemblage_comp.remove(comp)
         
     def merge_assemblages(self, asmb_1, asmb_2, links=[]):
         """
@@ -936,7 +1011,8 @@ class WM(MODULE_SCHEMA):
         Adds the links to the new assemblage
         In the assemblage competitions, replace asmb_1 and asmb_2 everywhere by the new assemblage
         """
-        if set([asmb_1, asmb_2]) in self.assemblages_comp:
+        results = self.find_assemblage_comp(asmb_1, asmb_2)
+        if results:
             print "Error: Trying to merge competining assemblages"
             return False
             
@@ -946,26 +1022,22 @@ class WM(MODULE_SCHEMA):
             asmb.add_link(link)
         
         # update the list of assemblages
-        self.assemblages.remove(asmb_1)
-        self.assemblages.remove(asmb_2)
-        self.assemblages.append(asmb)
+        self.remove_assemblage(asmb_1)
+        self.remove_assemblage(asmb_2)
+        self.add_assemblage(asmb)
         
         # update the assemblages competitions.
-        for comp_set in self.assemblages_comp: # replace asmb_1 or asmb_2 by asmb in all the competition they were involved
-            if asmb_1 in comp_set:
-                comp_set.remove(asmb_1)
-                comp_set.add(asmb)
-            if asmb_2 in comp_set:
-                comp_set.remove(asmb_2)
-                comp_set.add(asmb)
+        results = self.find_assemblage_comp(asmb_1)# replace asmb_1 by asmb in all the competition they were involved
+        for comp in results:
+            comp.replace_asemablage(asmb_1, asmb)
+        
+        results = self.find_assemblage_comp(asmb_2)# replace asmb_2 by asmb in all the competition they were involved
      
     def _asmb_update_add_inst(self, schema_inst):
         """
         Create an assemblage containing this instance.
         """
-        new_assemblage = ASSEMBLAGE() 
-        new_assemblage.add_instance(schema_inst)
-        self.assemblages.append(new_assemblage)
+        self.create_assemblage(insts=[schema_inst])
         
     def _asmb_update_remove_inst(self, schema_inst):
         """
@@ -1002,16 +1074,17 @@ class WM(MODULE_SCHEMA):
         
         for asmb_from in assemblages_from:
             for asmb_to in assemblages_to:
-                compete = set([asmb_from, asmb_to]) in self.assemblages_comp
-                if not compete: # If the two assemblages do not compete, they should be merged.
+                results = self.find_assemblage_comp(asmb_from, asmb_to)
+                if not results: # If the two assemblages do not compete, they should be merged.
                     self.merge_assemblages(asmb_to, asmb_from, [coop_link])
                     
     def _asmb_update_remove_coop(self, coop_link):
         """
+        Removes all the assemblages that contain the coop_link
         """
         for assemblage in self.assemblages[:]:
-                if coop_link in assemblage.coop_links:
-                    self.remove_assemblage(assemblage)
+            if assemblage.has_coop_link(coop_link):
+                self.remove_assemblage(assemblage)
         
     def _asmb_update_add_comp(self, comp_link):
         """
@@ -1033,20 +1106,28 @@ class WM(MODULE_SCHEMA):
                 
         # Assemblages that contain both competing instance are split in two.
         for asmb in assemblages_both:
-            asmb_new = assemblage.copy()
-            asmb.schema_insts.remove_instance(inst_from)
-            asmb_new.schema_insts.remove_instance(inst_to)
-            self.assemblages.append(asmb_new)
+            asmb_to = assemblage.copy()
+            asmb_from = assemblage.copy()
+            asmb_to.remove_instance(inst_from)
+            asmb_from.remove_instance(inst_to)
+            self.remove_assemblage(asmb)
+            self.add_assemblage(asmb_to)
+            self.add_assemblage(asmb_from)
             """
             THIS IS WRONG! I need to know why the competition was there in the first place.
             So the competition set should also come with the insts that triggered the competition.!
             """
-            for comp in self.assemblages_comp[:]: 
-                if asmb in comp:
-                    comp_new = comp.copy()
-                    comp_new.remove(asmb)
-                    comp_new.add(asmb_new)
-                    self.assemblages_comp.append(comp_new) #WRONG!!!
+            results = self.find_assemblage_comp(asmb)
+            for comp in results:
+                flag = comp.involves_inst(inst_from)
+                if flag:
+                    comp.replace_assemblage(asmb, asmb_from)
+                
+                flag = comp.involves_inst(inst_to)
+                for link in results:
+                    if flag:
+                        comp.replace_assemblage(asmb, asmb_to)
+
         
         # For the other assemblages, update assemblage competitions.
         """
@@ -1389,7 +1470,11 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
     Data:
         - schema_inst ([SCHEMA_INSTS])
         - coop_links ([COOP_LINKS])
+        - activation (FLOAT)
         - score (FLOAT)
+    
+    Note:
+        - For now, the FUNCTION_SCHEMA data is unused by the assemblage.
     """
     def __init__(self, name=""):
         FUNCTION_SCHEMA.__init__(self, name)
@@ -1407,6 +1492,7 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         """
         for inst in self.schema_insts:
             if inst == new_inst:
+                print "ERROR: Instance is already in the assemblage"
                 return False
         self.schema_insts.append(new_inst)
         self.update_activation()
@@ -1495,10 +1581,22 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         """
         val = inst in self.schema_insts  
         return val
+    
+    def has_coop_link(self, coop_link):
+        """
+        Returns True if the assemblage contains the coop_link
+        
+        Args:
+            - coop_link (COOP_LINK)
+        """
+        val = coop_link in self.coop_link
+        return val
         
     def copy(self):
         """
         Returns a copy of itself.
+        Note:
+            - Only copies the assemblage specific data not the general function schema data.
         """
         new_assemblage = ASSEMBLAGE()
         new_assemblage.activation = self.activation
@@ -1547,6 +1645,75 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         data['coop_links'] = [l.get_info() for l in self.coop_links]
         data['activation'] = self.activation
         return data
+    
+class ASSEMBLAGE_COMP(object):
+    """
+    Defines an assemblage level competition
+    
+    Data:
+        - competing_assemblages ([ASSEMBLAGE, ASSEMBLAGE]): Competing assemblages.
+        - comp_links ([COMP_LINKS]): the instance competition links that trigger the assemblage competition.
+    """
+    
+    def __init__(self, assemblages=[], comp_links=[]):
+        self.competing_assemblages = set(assemblages)
+        self.comp_links = set(comp_links)
+    
+    def has_assemblage(self, assemblage):
+        """
+        Returns True if "assemblage" is in competing_assemblages
+        """
+        return assemblage in self.competing_assemblages
+    
+    def add_comp_links(self, comp_links=[]):
+        """
+        Adds comp_links list to the comp_links set.
+        """
+        self.comp_links.update(set(comp_links))
+    
+    def has_comp_link(self, comp_link):
+        """
+        Returns true if comp_link is in comp_links
+        """
+        return comp_link in self.comp_links
+    
+    def remove_comp_link(self, comp_link):
+        if not self.has_comp_link(comp_link):
+            print "ERROR: trying to remove a comp_link that is not in the assemblage competition."
+            return
+        self.comp_links.remove(comp_link)
+    
+    def involves_inst(self, inst):
+        """
+        Returns the list of comp_links that involve inst.
+        """
+        results = []
+        for comp_link in self.comp_links:
+            if comp_link.inst_from == inst or comp_link.inst_to == inst:
+                results.append(comp_link)
+        
+        return results
+    
+    def is_dead(self):
+        """
+        Returns True is comp_links is empty
+        """
+        return not(self.comp_links)
+        
+    def replace_assemblage(self, old_asmb, new_asmb):
+        """
+        Replaces old_asmb by new_asmb in competing_assmblages
+        """
+        if not self.has_assemblage(old_asmb):
+            print "ERROR: trying to replace an assemblage that is not part of the competition."
+            return
+        elif self.has_assemblage(new_asmb):
+            print "ERROR: competition with itself is not allowed for assemblages."
+            return
+        else:
+            self.competing_assemblages.remove(old_asmb)
+            self.competing_assemblages.add(new_asmb)
+            
 
 #################################
 ##### BRAIN MAPPING CLASSES #####
