@@ -281,22 +281,23 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         
         if port_type == PORT.TYPE_IN:
             if self.inputs.has_key(new_port.name):
-                print "ERROR: Already exising input port name %s. Cannot add the port to schema %s." %(new_port.name, self.name)              
-                return None
+                error_msg = "Already exising input port name %s. Cannot add the port to schema %s." %(new_port.name, self.name)
+                raise ValueError(error_msg)
             else:
                 self.in_ports.append(new_port)
                 self.inputs[new_port.name] = None
             return new_port.id
         elif port_type == PORT.TYPE_OUT:
             if self.outputs.has_key(new_port.name):
-                print "ERROR: Already existing output port name %s. Cannot add the port to schema %s." %(new_port.name, self.name)
+                error_msg = "Already existing output port name %s. Cannot add the port to schema %s." %(new_port.name, self.name)
+                raise ValueError(error_msg)
             else:
                 self.out_ports.append(new_port)
                 self.outputs[new_port.name] = None
             return new_port.id
         else:
-            print "ERROR: Unknown port type."
-            return None
+            error_msg = "Unknown port type: %s" %port_type
+            raise ValueError(error_msg)
     
     def remove_ports(self):
         """
@@ -346,11 +347,11 @@ class PROCEDURAL_SCHEMA(SCHEMA):
                 port.value = None # Reset port value
                 return val
         elif port and (port.type == PORT.TYPE_OUT):
-            print("ERROR: port %s refers to an output port" % port_name)
-            return None
+            error_msg = "Port %s refers to an output port" % port_name
+            raise ValueError(error_msg)
         else:
-            print("ERROR: port %s does not exist or could refer to multiple ports" % port_name)
-            return None
+            error_msg = "port %s does not exist or could refer to multiple ports" % port_name
+            raise ValueError(error_msg)
     
     def post_output(self, port_name, val):
         """
@@ -362,8 +363,8 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             port.value = val
             return True
         elif port and (port.type == PORT.TYPE_IN):
-            print("ERROR: port %s refers to an output port" % port_name)
-            return False
+            error_msg = "Port %s refers to an output port" % port_name
+            raise ValueError(error_msg)
         else:
             return False
     
@@ -378,8 +379,9 @@ class PROCEDURAL_SCHEMA(SCHEMA):
                 found.append(port)
         
         if len(found)!= 1:
-            print("ERROR: port %s does not exist or could refer to multiple ports" % port_name)
-            return None
+            error_msg = "Port %s does not exist or could refer to multiple ports" % port_name
+            raise ValueError(error_msg)
+            
         return found[0]
     
     ####################
@@ -699,10 +701,10 @@ class WM(MODULE_SCHEMA):
         self.assemblages = []
         self.assemblages_comp = []
         self.params['dyn'] = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
-        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':8.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
-                                           'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
+                                           'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[], 'num_asmbs':[]}}}
         
     def reset(self):
         """
@@ -716,7 +718,7 @@ class WM(MODULE_SCHEMA):
         self.assemblages_comp = []
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
-                                           'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
+                                           'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[], 'num_asmbs':[]}}}
     
     ########################
     ### INSTANCE METHODS ###
@@ -725,7 +727,8 @@ class WM(MODULE_SCHEMA):
         if schema_inst in self.schema_insts:
             return False
             
-        self.schema_insts.append(schema_inst, module=self)
+        self.schema_insts.append(schema_inst)
+        schema_inst.module = self
         if not(act0):
             act0 = schema_inst.activity # Uses the init_activation defined by the associated schema.
         act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 'act_inf':self.params['dyn']['act_inf'],
@@ -734,10 +737,12 @@ class WM(MODULE_SCHEMA):
         schema_inst.params['act'] = act_params
         schema_inst.initialize_activation()
         
+        # Save inst activation values.
+        self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy()
+        
         # Update assemblage state.
         self._asmb_update_add_inst(schema_inst)
         
-        self.save_state['insts'][schema_inst.name] = schema_inst.activation.save_vals.copy();
         return True
     
     def remove_instance(self, schema_inst):
@@ -757,7 +762,18 @@ class WM(MODULE_SCHEMA):
         
     def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None):
         """
+        Add a cooperation link between two instances.
+        A cooperation link can only be added if the two instances are not already in competition.
         """
+        if (inst_from not in self.schema_insts) or (inst_to not in self.schema_insts):
+            raise ValueError("Cannot add cooperation link. Either %s or %s are not in WM." %(inst_from.name, inst_to.name))            
+            
+        result_1 = self.find_comp_links(inst_from=inst_from, inst_to=inst_to)
+        result_2 = self.find_comp_links(inst_from=inst_to, inst_to=inst_from) # Directionality does not matter.
+        
+        if result_1 or result_2:
+            raise ValueError("Cannot add cooperation link. %s and %s are already in competition!" %(inst_from.name, inst_to.name))
+            
         if weight == None:
             weight=self.params['C2']['coop_weight']
         new_link = COOP_LINK(inst_from, inst_to, weight*qual, self.params['C2']['coop_asymmetry'])
@@ -767,25 +783,23 @@ class WM(MODULE_SCHEMA):
         # Update assemblage state.
         self._asmb_update_add_coop(new_link)
 
-    def find_coop_links(self,inst_from='any', inst_to='any', port_from='any', port_to='any'):
+    def find_coop_links(self, inst_from='any', inst_to='any', port_from='any', port_to='any'):
         """
         Returns a list of coop_links that match the criteria.
         By default, it returns al the coop_links (no criteria specified)
-        """
+        """        
         results = []
         for flink in self.coop_links:
-            match = True
-            if inst_from!='any' and not(flink.inst_from in inst_from):
-                match = False
-            if inst_to!='any' and not(flink.inst_to in inst_to):
-                match = False
-            if port_from!='any' and not(flink.connect.port_from in port_from):
-                match = False
-            if port_to !='any' and not(flink.connect.port_to in port_to):
-                match = False
+            if inst_from!='any' and (flink.inst_from != inst_from):
+                continue
+            if inst_to!='any' and (flink.inst_to != inst_to):
+                continue
+            if port_from !='any' and (flink.connect.port_from != port_from):
+                continue
+            if port_to !='any' and (flink.connect.port_to != port_to):
+                continue
             
-            if match:
-                results.append(flink)
+            results.append(flink)
         results = list(set(results))
         return results
                    
@@ -801,7 +815,19 @@ class WM(MODULE_SCHEMA):
         
     def add_comp_link(self, inst_from, inst_to, weight=None):
         """
+        Add a competition link between two instances.
+        A competition link can only be added if the two instances are not already in cooperation.
+        
         """
+        if (inst_from not in self.schema_insts) or (inst_to not in self.schema_insts):
+            raise ValueError("Cannot add competition link. Either %s or %s are not in WM." %(inst_from.name, inst_to.name))
+            
+        result_1 = self.find_coop_links(inst_from=inst_from, inst_to=inst_to)
+        result_2 = self.find_coop_links(inst_from=inst_to, inst_to=inst_from) # Directionality does not matter.
+        
+        if result_1 or result_2:
+            raise ValueError("Cannot add competition link. %s and %s are already in cooperation!" %(inst_from.name, inst_to.name))        
+        
         if weight == None:
             weight=self.params['C2']['comp_weight']
         new_link = COMP_LINK(inst_from, inst_to, weight, self.params['C2']['comp_asymmetry'])
@@ -810,21 +836,19 @@ class WM(MODULE_SCHEMA):
         # Update assemblage state.
         self._asmb_update_add_comp(new_link)
         
-    def find_comp_links(self,inst_from='any', inst_to='any'):
+    def find_comp_links(self, inst_from='any', inst_to='any'):
         """
         Returns a list of comp_links that match the criteria.
         By default, it returns al the comp_links (no criteria specified)
         """
         results = []
         for flink in self.comp_links:
-            match = True
             if inst_from!='any' and (flink.inst_from != inst_from):
-                match = False
+                continue
             if inst_to!='any' and (flink.inst_to != inst_to):
-                match = False
+                continue
                 
-            if match:
-                results.append(flink)
+            results.append(flink)
         
         results = list(set(results))
         return results
@@ -839,6 +863,16 @@ class WM(MODULE_SCHEMA):
             self.comp_links.remove(f_link)
             # Update assemblage state.
             self._asmb_update_remove_comp(f_link)
+    
+    def update_activity(self):
+        """
+        Computes the overall activity of the working memory.
+        The WM activity at time t is defined as the sum of all the instances activities.
+        """
+        tot_act = 0
+        for inst in self.schema_insts:
+            tot_act += inst.activity
+        self.activity = tot_act
     
     def update_activations(self):
         """
@@ -870,10 +904,12 @@ class WM(MODULE_SCHEMA):
                 inst.alive = False
         
         self.update_activity()
+        
+        self.update_save_state()
     
     def prune(self):
         """
-        Removes from WM all the dead instances
+        Removes from WM all the dead instances.
         """
         for inst in self.schema_insts[:]:
             if not inst.alive:
@@ -933,8 +969,8 @@ class WM(MODULE_SCHEMA):
             - assemblage (ASSEMBLAGE)
         """
         if assemblage in self.assemblages:
-            print "ERROR: trying to add an assemblage that is already in the state."
-            return
+            raise ValueError("trying to add an assemblage that is already in the state.")
+
         self.assemblages.append(assemblage)
         
     def remove_assemblage(self, assemblage):
@@ -965,7 +1001,7 @@ class WM(MODULE_SCHEMA):
         (Symmetric in asmb_1 and asmb_2)
         """
         results = []
-        for comp in self.assemblage_comp:
+        for comp in self.assemblages_comp:
             match = True
             if not comp.has_assemblage(asmb_1):
                 match =False
@@ -985,7 +1021,7 @@ class WM(MODULE_SCHEMA):
         """
         Removes the competition comp.
         """
-        self.assemblage_comp.remove(comp)
+        self.assemblages_comp.remove(comp)
         
     def merge_assemblages(self, asmb_1, asmb_2, links=[]):
         """
@@ -995,8 +1031,7 @@ class WM(MODULE_SCHEMA):
         """
         results = self.find_assemblage_comp(asmb_1, asmb_2)
         if results:
-            print "Error: Trying to merge competining assemblages"
-            return False
+            raise ValueError("Trying to merge competing assemblages")
             
         # create new merged assemblage
         asmb = ASSEMBLAGE.merge(asmb_1, asmb_2)
@@ -1028,8 +1063,8 @@ class WM(MODULE_SCHEMA):
         For now I use the TD variable of the instance (no real cooperation links).
         """
         for asmb in self.assemblages:
-            for inst in asmb.schema_inst:
-                inst.activity.TD += asmb.score
+            for inst in asmb.schema_insts:
+                inst.activation.TD += asmb.score
 
     def _asmb_update_add_inst(self, schema_inst):
         """
@@ -1042,8 +1077,7 @@ class WM(MODULE_SCHEMA):
         Remove all the assemblages containing this instance.
         """
         for assemblage in self.assemblages[:]:
-            if assemblage.has_inst(schema_inst):
-                self.assemblages.remove(assemblage)
+            if assemblage.has_instance(schema_inst):
                 self.remove_assemblage(assemblage)
     
     def _asmb_update_add_coop(self, coop_link): 
@@ -1058,15 +1092,15 @@ class WM(MODULE_SCHEMA):
         assemblages_to = []
         assemblages_both = []
         for assemblage in self.assemblages:
-            flag_from = assemblage.has_inst(inst_from)
-            flag_to = assemblage.has_inst(inst_to)
+            flag_from = assemblage.has_instance(inst_from)
+            flag_to = assemblage.has_instance(inst_to)
             if flag_from and flag_to:
                 assemblages_both.append(assemblage)
             elif flag_from:
                 assemblages_from.append(assemblage)
             elif flag_to:
                 assemblages_to.append(assemblage)
-        
+
         for assemblage in assemblages_both: # for those assemblage, a new coop_link is simply added to the existing assemblage
             assemblage.add_link(coop_link)
         
@@ -1078,15 +1112,28 @@ class WM(MODULE_SCHEMA):
                     
     def _asmb_update_remove_coop(self, coop_link):
         """
-        Removes all the assemblages that contain the coop_link
+        WRONG!!!!!!!!!!!!!!!!!!!!!
+        Remove coop_link from all the assemblages that contain it.
+        NOTE: THIS MIGHT LEAD TO NEW ASSEMBLAGES TO ADD!
+        
         """
+        raise ValueError("Assemblage update following coop_link removal is not yet implemented!")
+        
         for assemblage in self.assemblages[:]:
             if assemblage.has_coop_link(coop_link):
-                self.remove_assemblage(assemblage)
+                """
+                Remove coop_link from assemblage
+                Check if it is still an assemblage (ie still is a connected graph)
+                If not, returns the list of assemblages form from the est of connceted graphs.
+                Remove the assemblage and replace with with the new set of assemblages.
+                Update assemblage competitions on this basis.
+                """
+        return
         
     def _asmb_update_add_comp(self, comp_link):
         """
         Updates the assemblages state given that comp_link is added.
+        THIS IS WRONG!!!
         """
         inst_from = comp_link.inst_from
         inst_to = comp_link.inst_to
@@ -1094,8 +1141,8 @@ class WM(MODULE_SCHEMA):
         assemblages_to = []
         assemblages_both = []
         for assemblage in self.assemblages:
-            flag_from = assemblage.has_inst(inst_from)
-            flag_to = assemblage.has_inst(inst_to)
+            flag_from = assemblage.has_instance(inst_from)
+            flag_to = assemblage.has_instance(inst_to)
             if flag_from and flag_to:
                 assemblages_both.append(assemblage)
             elif flag_from:
@@ -1104,6 +1151,7 @@ class WM(MODULE_SCHEMA):
                 assemblages_to.append(assemblage)
                 
         # Assemblages that contain both competing instance are split in two.
+        # THIS IS WRONG!!! By removing an instance from an assemblage, it might not be an assemblage anymore!
         for asmb in assemblages_both:
             asmb_to = assemblage.copy()
             asmb_from = assemblage.copy()
@@ -1129,10 +1177,10 @@ class WM(MODULE_SCHEMA):
         # For the other assemblages, update assemblage competitions.
         for asmb_1 in assemblages_from:
             for asmb_2 in assemblages_to:
-                results = self.find_assemblages_comp(asmb_1, asmb_2) # Check if there is an existing competition between the two assemblages
+                results = self.find_assemblage_comp(asmb_1, asmb_2) # Check if there is an existing competition between the two assemblages
                 if results:
                     comp = results[0] # there should only be one competition between two defined assemblages.
-                    comp.add_comp_link(comp_link) # Update competition.
+                    comp.add_comp_links([comp_link]) # Update competition.
                 else:
                     self.add_assemblage_comp(asmb_1, asmb_2, [comp_link]) # Create new competition
                     
@@ -1150,17 +1198,42 @@ class WM(MODULE_SCHEMA):
     ############################
     ### STATE SAVING METHODS ###
     ############################
-
-    def update_activity(self):
-        """
-        Computes the overall activity of the working memory.
-        The activity reflects the amount of cooperation and competition going on.
-        """
-        tot_act = 0
-        for inst in self.schema_insts:
-            tot_act += inst.activity
-        self.activity = tot_act
         
+    def update_save_state(self):
+        """
+        Add the current state values to save_state.
+        """
+        # Saving global WM state values.
+        self.save_state['WM_activity']['t'].append(self.t)
+        self.save_state['WM_activity']['act'].append(self.activity)
+        
+        
+        # Saving new instances activations.
+        for inst in self.schema_insts:
+            if inst.name not in self.save_state['insts']:
+                # Save inst activation values.
+                self.save_state['insts'][inst.name] = inst.activation.save_vals.copy()
+        
+        # Saving C2 values.
+        (tot_coop, tot_comp) = self.compute_C2_transfers()
+        self.save_state['WM_activity']['comp'].append(tot_comp)
+        self.save_state['WM_activity']['coop'].append(tot_coop)
+        
+        self.save_state['WM_activity']['c2_network']['num_insts'].append(len(self.schema_insts))
+        self.save_state['WM_activity']['c2_network']['num_coop_links'].append(len(self.coop_links))
+        self.save_state['WM_activity']['c2_network']['num_comp_links'].append(len(self.comp_links))
+        
+        # Saving assemblage values.
+        self.save_state['WM_activity']['c2_network']['num_asmbs'].append(len(self.assemblages))
+
+    def compute_C2_transfers(self):
+        """
+        Compute the amount of instantaneous cooperation and competition in the network.
+        
+        Returns (tot_coop, tot_comp) with:
+            - tot_coop [FLOAT]: Total amount of current cooperation value transfer.
+            - tot_comp [FLOAT]: Total amount of current competition value transfer.
+        """
         tot_coop = 0
         tot_comp = 0
         for link in self.coop_links:
@@ -1174,14 +1247,8 @@ class WM(MODULE_SCHEMA):
             inst_to = link.inst_to
             transfer = abs((inst_from.activity - inst_to.activity)*link.weight)
             tot_comp += transfer
-        
-        self.save_state['WM_activity']['t'].append(self.t)
-        self.save_state['WM_activity']['act'].append(self.activity)
-        self.save_state['WM_activity']['comp'].append(tot_comp)
-        self.save_state['WM_activity']['coop'].append(tot_coop)
-        self.save_state['WM_activity']['c2_network']['num_insts'].append(len(self.schema_insts))
-        self.save_state['WM_activity']['c2_network']['num_coop_links'].append(len(self.coop_links))
-        self.save_state['WM_activity']['c2_network']['num_comp_links'].append(len(self.comp_links))
+            
+        return (tot_coop, tot_comp)
         
     ####################
     ### JSON METHODS ###
@@ -1232,7 +1299,6 @@ class WM(MODULE_SCHEMA):
             plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
             plt.show()
         
-        
         # Plot global activity values.
         num_plots =  len([val for val in [WM_act, c2_levels] if val==True])
         
@@ -1248,6 +1314,7 @@ class WM(MODULE_SCHEMA):
                 plt.ylabel('activity', fontsize=14)
                 plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['act'], linewidth=2, color='k', label='act')
                 plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+                plt.margins(0.1, 0.1)
                 
             # Plot c2 levels
             if c2_levels:
@@ -1256,11 +1323,12 @@ class WM(MODULE_SCHEMA):
                 plt.title('C2 levels')
                 plt.xlabel('time', fontsize=14)
                 plt.ylabel('activation transfer', fontsize=14)
-                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['comp'],  linewidth=2, color='r', label='competition')
-                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['coop'],  linewidth=2, color='g', label='cooperation')
+                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['comp'], linewidth=2, color='r', label='competition')
+                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['coop'], linewidth=2, color='g', label='cooperation')
                 tot_c2 = [v1 + v2 for (v1, v2) in zip(self.save_state['WM_activity']['comp'], self.save_state['WM_activity']['coop'])]
                 plt.plot(self.save_state['WM_activity']['t'], tot_c2, '--',  linewidth=2, color='k', label='total')
                 plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+                plt.margins(0.1, 0.1)
             
             plt.show()
         
@@ -1268,13 +1336,15 @@ class WM(MODULE_SCHEMA):
         if c2_network:
             plt.figure(facecolor='white')    
             plt.subplot(2,1,1)
-            plt.title('C2 instances and links')
+            plt.title('C2 instances, links and assemblages')
             plt.xlabel('time', fontsize=14)
             plt.ylabel('number', fontsize=14)
-            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_insts'],  linewidth=2, color='k', label='num insts')
+            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_insts'],  linewidth=2, color='b', label='num insts')
             plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_coop_links'],  linewidth=2, color='g', label='num coop links')
             plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_comp_links'],  linewidth=2, color='r', label='num comp links')
+            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_asmbs'], linewidth=2, color='k', label='num assemblages')
             plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+            plt.margins(0.1, 0.1)
             
             plt.subplot(2,1,2)
             plt.title('C2 network density')
@@ -1285,6 +1355,7 @@ class WM(MODULE_SCHEMA):
             plt.plot(self.save_state['WM_activity']['t'], coop_density,  linewidth=2, color='g', label='coop density')
             plt.plot(self.save_state['WM_activity']['t'], comp_density,  linewidth=2, color='r', label='comp density')
             plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+            plt.margins(0.1, 0.1)
             plt.show()
             
         
@@ -1404,6 +1475,9 @@ class COOP_LINK(F_LINK):
         self.weight = float(new_weight)
         self.connect.weight = float(new_weight)
     
+    def has_ports(self):
+        return self.connect.port_from and self.connect.port_to
+    
     def copy(self):
         new_flink = COOP_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
         new_flink.connect = self.connect.copy()
@@ -1481,8 +1555,9 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         """
         for inst in self.schema_insts:
             if inst == new_inst:
-                print "ERROR: Instance is already in the assemblage"
-                return False
+                error_msg = "Instance %s is already in the assemblage" %new_inst.name
+                raise ValueError(error_msg)
+
         self.schema_insts.append(new_inst)
         self.update_activation()
         return True
@@ -1494,8 +1569,8 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         Updates activation.
         """
         if not self.has_instance(inst):
-            print "Error: instance is not in the assemblage"
-            return False
+            error_msg = "Instance %s is not in the assemblage" %inst.name
+            raise ValueError(error_msg)
         
         self.schema_insts.remove(inst)
         links_from = self.find_links(inst_from=[inst], inst_to='any')
@@ -1513,9 +1588,9 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         Returns True if the link was sucessfully added, False otherwise.
         """
         for l in self.coop_links:
-            if (l.connect.port_from == link.connect.port_from) or (l.connect.port_to == link.connect.port_to):
-                print "ERROR: assemblage already contains the coop_link"
-                return False  
+            if l.has_ports() and ((l.connect.port_from == link.connect.port_from) or (l.connect.port_to == link.connect.port_to)):
+                raise ValueError("assemblage already contains a coop_link that link to a similar port.")
+                 
         self.coop_links.append(link)
         return True
     
@@ -1524,8 +1599,7 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         Remove the link from the assemblage
         """
         if link not in self.coop_links:
-            print "Error: Cannot remove link from assemblage, link does not exist"
-            return False
+            raise ValueError("Cannot remove link from assemblage, link does not exist")
         
         self.coop_links.remove(link)
         return True
@@ -1585,7 +1659,7 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         Args:
             - coop_link (COOP_LINK)
         """
-        val = coop_link in self.coop_link
+        val = coop_link in self.coop_links
         return val
         
     def copy(self):
@@ -1675,8 +1749,8 @@ class ASSEMBLAGE_COMP(object):
     
     def remove_comp_link(self, comp_link):
         if not self.has_comp_link(comp_link):
-            print "ERROR: trying to remove a comp_link that is not in the assemblage competition."
-            return
+            raise ValueError("Trying to remove a comp_link that is not in the assemblage competition.")
+
         self.comp_links.remove(comp_link)
     
     def involves_inst(self, inst):
@@ -1701,11 +1775,9 @@ class ASSEMBLAGE_COMP(object):
         Replaces old_asmb by new_asmb in competing_assmblages
         """
         if not self.has_assemblage(old_asmb):
-            print "ERROR: trying to replace an assemblage that is not part of the competition."
-            return
+            raise ValueError("Trying to replace an assemblage that is not part of the competition.")
         elif self.has_assemblage(new_asmb):
-            print "ERROR: competition with itself is not allowed for assemblages."
-            return
+            raise ValueError("Competition with itself is not allowed for assemblages.")
         else:
             self.competing_assemblages.remove(old_asmb)
             self.competing_assemblages.add(new_asmb)
@@ -1818,7 +1890,8 @@ class SCHEMA_SYSTEM(object):
             schema.dt = self.dt
             schema.t = self.t
             if schema.name in self.schemas:
-                print "ERROR: There is already a schema named %s" % schema.name
+                error_msg = "There is already a schema named %s" % schema.name
+                raise ValueError(error_msg)
             else:
                 self.schemas[schema.name] = schema
                 schema.schema_system = self
@@ -2086,35 +2159,79 @@ if __name__=="__main__":
     ###############
     ### Test WM ###
     ###############
-    num_schemas=10
-    schemas = [KNOWLEDGE_SCHEMA(name="act:"+str(i*1.0/num_schemas), LTM=None, content=None, init_act=i*1.0/num_schemas) for i in range(1,num_schemas+1)]
-    insts = [SCHEMA_INST(schema=s, trace=s) for s in schemas]
+    schema_names = [1,2,3,4,5]
+    act_noise = (0.5, 0.1) # (mean, std)
+    coop = [(1,2), (4,5)]
+    comp = [(3,2), (3,5)]
+    E = 1.0
+    insts = {}
     wm = WM()
-    for inst in insts:
-            wm.add_instance(inst, inst.trace.init_act)
-    
-    for i in range(len(insts)):
-        for j in range(len(insts)):
-            if i != j:               
-                r = random.random()
-                if r <0.1:
-                    wm.add_comp_link(inst_from=insts[i], inst_to=insts[j], weight=-1)
-                    print "comp: %s and %s" %(insts[i].name, insts[j].name)
-                
-    for i in range(len(insts)):
-        for j in range(len(insts)):
-            if i != j:    
-                r = random.random()
-                if r <0.1:
-                    wm.add_coop_link(inst_from=insts[i], port_from=None, inst_to=insts[j], port_to=None, weight=1)
-                    print "coop: %s and %s" %(insts[i].name, insts[j].name)
+    wm.update_param('C2.prune_threshold', 0.2)
+    for schema_name in schema_names:
+        act = np.random.normal(act_noise[0], act_noise[1])
+        name = "%i(%.2f)" %(schema_name, act)
+        k_schema = KNOWLEDGE_SCHEMA(name=name , LTM=None, content=None, init_act=act)
+        inst = SCHEMA_INST(schema=k_schema, trace=k_schema)
+        wm.add_instance(inst, inst.trace.init_act)
+        insts[schema_name] = inst
     
     
-    max_step = 1000
-    for step in range(max_step):
-        wm.t = step
-        wm.update_activations()
+    for (name_from, name_to) in comp:
+        wm.add_comp_link(inst_from=insts[name_from], inst_to=insts[name_to], weight=-1)
+        print "comp: %s and %s" %(insts[name_from].name, insts[name_to].name)
         
+    for (name_from, name_to) in coop:
+        wm.add_coop_link(inst_from=insts[name_from], port_from=None, inst_to=insts[name_to], port_to=None, weight=1)
+        print "coop: %s and %s" %(insts[name_from].name, insts[name_to].name)
+    
+    wm.show_state()
+    max_step = 20
+    for step in range(max_step):
+        print "#####################"
+        print "t = %i" %step
+        wm.t = step
+        for inst in wm.schema_insts:
+            inst.activation.E = E
+        wm.update_activations()
+        wm.prune()
+      
+    # add new schemas
+      
+    schema_names = [6,7]
+    coop = [(6,7), (6,2)]
+    comp = [(2,7)]
+        
+    for schema_name in schema_names:
+        act = np.random.normal(act_noise[0], act_noise[1])
+        name = "%i(%.2f)" %(schema_name, act)
+        k_schema = KNOWLEDGE_SCHEMA(name=name , LTM=None, content=None, init_act=act)
+        inst = SCHEMA_INST(schema=k_schema, trace=k_schema)
+        wm.add_instance(inst, inst.trace.init_act)
+        insts[schema_name] = inst
+    
+    
+    for (name_from, name_to) in comp:
+        wm.add_comp_link(inst_from=insts[name_from], inst_to=insts[name_to], weight=-1)
+        print "comp: %s and %s" %(insts[name_from].name, insts[name_to].name)
+        
+    for (name_from, name_to) in coop:
+        wm.add_coop_link(inst_from=insts[name_from], port_from=None, inst_to=insts[name_to], port_to=None, weight=1)
+        print "coop: %s and %s" %(insts[name_from].name, insts[name_to].name)
+    
+    wm.show_state()
+    max_step = 20
+    for step in range(20, 20+max_step):
+        print "#####################"
+        print "t = %i" %step
+        wm.t = step
+        for inst in wm.schema_insts:
+            inst.activation.E = E
+        wm.update_activations()
+        wm.prune()
+    
     wm.show_dynamics()
+    wm.show_state()
+            
+            
     
     
