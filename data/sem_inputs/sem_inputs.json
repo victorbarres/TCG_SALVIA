@@ -179,6 +179,19 @@
 			"sequence": ["P1"],
 			"timing":[],
 			"comments":"test double object and oblique dative argument structure constructions"
+		},
+		
+		"young_woman_punch_man":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["MAN(man1, 0.9)"],
+				"P2":["PUNCH(punch1, 0.8)", "HUMAN(human1, 0.7)", "AGENT(agt1, 1.0)", "PATIENT(pt1, 1.0)", "pt1(punch1, man1)", "agt1(punch1, woman1)"],
+				"P3":["WOMAN(woman1, 0.7)", "SPECIFY(spec1, 1.0)", "spec1(woman1, human1)"],
+				"P4":["YOUNG(young1, 0.9)", "MODIFY(mod1, 1.0)", "mod1(young1, woman1)"]
+			},
+			"sequence":["P1", "P2", "P3", "P4"],
+			"timing":[],
+			"comments":"Example used in papers."
 		}
 	}
 }

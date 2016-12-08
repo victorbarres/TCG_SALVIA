@@ -420,7 +420,7 @@ class MODULE_SCHEMA(PROCEDURAL_SCHEMA):
         - brain_regions(LIST): List of brain regions associated with the module schema.
     """
     def __init__(self, name=""):
-        PROCEDURAL_SCHEMA.__init__(self,name="")
+        PROCEDURAL_SCHEMA.__init__(self,name)
         brain_mapping = BRAIN_MAPPING()
 
 class FUNCTION_SCHEMA(PROCEDURAL_SCHEMA):
@@ -694,7 +694,7 @@ class WM(MODULE_SCHEMA):
     """
     def __init__(self, name=''):
         MODULE_SCHEMA.__init__(self,name)
-        self.name = name
+#        self.name = name
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
