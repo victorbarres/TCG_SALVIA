@@ -121,11 +121,9 @@
 			"SPECIFY" : {},
 			"THEMATIC" :
 			{
-				"AGENT" : {
-					"AGT_PT" : {}
-				},
-				"PATIENT" : {
-					"AGT_PT" : {}
+				"AGT_PT":{
+					"AGENT": {},
+					"PATIENT": {}
 				},
 				"THEME" : {},
 				"RECIPIENT" : {}
