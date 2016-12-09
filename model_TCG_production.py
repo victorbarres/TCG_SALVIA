@@ -2,7 +2,7 @@
 """
 @author: Victor Barres
 Functions required to run the TCG production system defined in TCG_model as "TCG_production_system".
- - Set the model and the input generator using set_model()
+ - Set the model and the input generator using set_model() and set_input()
  - If the model is to be run only on one input and one set of parameter use run_model()
  - If the model is to be run as part of grid search over a parameter space use "grid_search"
  - Use main() to run grid_search + run on multiple inputs.
@@ -75,44 +75,60 @@ def test_run(seed=None):
     
     return language_system_P
 
-def set_model(sem_input_file, sem_name, sem_input_macro = True, semantics_name='TCG_semantics_main', 
-              grammar_name='TCG_grammar_VB_main', model_params = {}):
+def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}):
     """
     Sets up a TCG production model.
     
     Args:
-        - sem_input_file (STR): Semantic input file name
-        - sem_name (STR): Semantic input name
-        - sem_input_macro (BOOL): True is the input is an ISRF macro
         - semantics_name (STR): Name of the semantic file containing the perceptual, world, and conceptualization knowledge.
         - grammar_name (STR): Name of the grammar file to use.
         - model_prams (dict): Dictionary defining the model parameters (if different than default)
     
-    Returns: (model, semantic input genereator)    
-    
+    Returns: production model
     """
-    SEM_INPUT_PATH = './data/sem_inputs/'
     
     model = TCG_production_system(grammar_name=grammar_name, semantics_name=semantics_name)
     if model_params:
         model.update_params(model_params)
     
-    # Set up semantic input generator    
+    return model
+    
+def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_macro = False, speed_param=1):
+    """
+    Sets up a TCG ISRF inputs generator for TCG production model.
+    
+    Args:
+        - sem_name (STR): Semantic input name.
+        - sem_input_file (STR): Semantic input file name. For non-macro input, set to 'ALL' to load all inputs from file.
+        - sem_input_macro (BOOL): True is the input is an ISRF macro.
+        - speed_param (INT): multiplier of the rate defined in the ISRF input.
+    
+    Returns input SEM_GENERATOR object.
+    """
+    SEM_INPUT_PATH = './data/sem_inputs/'
+    
     conceptLTM = model.schemas['Concept_LTM']
     if not(sem_input_macro):
         sem_inputs = TCG_LOADER.load_sem_input(sem_input_file, SEM_INPUT_PATH)
-        sem_input = {sem_name:sem_inputs[sem_name]}
-        sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=1)
+        if input_name == 'ALL':
+            sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param)
+        else:
+            sem_input = {input_name:sem_inputs[input_name]}
+            sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=speed_param)
     if sem_input_macro:
-        sem_inputs = TCG_LOADER.load_sem_macro(sem_name, sem_input_file, SEM_INPUT_PATH)
-        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=1)
+        sem_inputs = TCG_LOADER.load_sem_macro(input_name, sem_input_file, SEM_INPUT_PATH)
+        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param)
     
-    return (model, sem_gen)
+    return sem_gen
+    
+    
 
-def run_model(model, generator, seed=None):
+def run_model(model, sem_gen, input_name, seed=None, verbose=0):
     """
-    Temporary new version of run_model. 
+    Run the model "model" for an semantic gerator "sem_gent" using the input "input_name"
+    Verbose modes: 0 -> no output printed. 1 -> only final utterance printed, 2 -> input and utterances printed as they are received and produced.
     """
+    generator = sem_gen.sem_generator(input_name, verbose = (verbose>1))
     (sem_insts, next_time, prop) = generator.next()
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
@@ -123,6 +139,8 @@ def run_model(model, generator, seed=None):
     for t in range(set_up_time, max_time):
         if next_time != None and t>next_time:
             (sem_insts, next_time, prop) = generator.next()
+#            if verbose>1:
+#                print "t:%i, sem: %s (prop: %s)" %(t, ', '.join([inst.name for inst in sem_insts]), prop)
             model.set_input(sem_insts)
         model.update()
         # Store output
@@ -130,20 +148,26 @@ def run_model(model, generator, seed=None):
         if output['Grammatical_WM_P']:
             out_data.append(output['Grammatical_WM_P'])
         if output['Utter']:
+            if verbose > 1:
+                 print "t:%i, '%s'" %(t, output['Utter'])
             out_utterance.append(output['Utter'])
             
     # Output analysis
     res = prod_analyses(out_data)
     model.reset()
+    
+    # Prints utterance in verbose mode.
+    if verbose == 1:
+        print ' '.join(out_utterance)
     return (res, ' '.join(out_utterance))
 
 def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
     """
     Runs model for input "input_name" over the search space defined by "model_params_set".
-    For each poitn of the search space, model is ran "num_restarts" times.
+    For each point of the search space, model is ran "num_restarts" times.
     
     Args:
-        - input_name (STR): Name of the semantic input.
+        - input_name (STR): Name of the semantic input (needs to be in sem_macros.json)
         - model_params_set (ARRAY): Array of model paramters dict.
         - num_restarts (INT): Number of restarts for each model run.
         
@@ -153,9 +177,21 @@ def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
     """
     import time
     t0 = time.time()
-    sem_input_macro = True
     
-    (model, sem_gen) = set_model('sem_macros.json', input_name, sem_input_macro, semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main')
+    # Defining inputs.
+    sem_input_file = 'sem_macros.json'
+    sem_input_macro = True # For now it only uses macros
+    
+    
+    semantics_name = 'TCG_semantics_main'
+    grammar_name = 'TCG_grammar_VB_main'
+    
+    
+    #Setting up model
+    model  = set_model(semantics_name, grammar_name)
+    
+    #Setting up input
+    sem_gen = set_inputs(model, sem_input_file, input_name, sem_input_macro)
     
     output = []
     count = 1
@@ -173,8 +209,8 @@ def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
             for i in range(num_restarts):
                 run_output = []
                 start = time.time()
-                generator = sem_gen.sem_generator(name, verbose=False)
-                (sim_output, utterance) = run_model(model, generator)
+#                generator = sem_gen.sem_generator(name, verbose=False)
+                (sim_output, utterance) = run_model(model, sem_gen, name, verbose=0)
                 run_output.append(sim_output)
                 end = time.time()
                 print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
@@ -258,5 +294,6 @@ def main():
                 f.write(new_line)
     
     
+    
 if __name__=='__main__':
-    test_run()
+    print "nothing here!"

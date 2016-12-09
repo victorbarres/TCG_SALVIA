@@ -38,7 +38,12 @@ class TCG_LOADER(object):
             print "Cannot open %s. %s" %(file_name, e.strerror)
             return False
         
-        json_data = json.load(f)
+        try:
+           json_data = json.load(f)
+        except ValueError as e:
+            print "Invalid json file %s. %s" %(file_name, e)
+            return False
+        
         f.close()
         
         return json_data

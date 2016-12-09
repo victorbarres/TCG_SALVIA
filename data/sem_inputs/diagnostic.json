@@ -8,7 +8,7 @@
 			  "sequence" :["P1"],
 			  "timing":[],
 			  "comments": "test naming without lexical competition."
-			},
+		},
 			
 		"test_naming_ambiguous": {
 			"sem_rate": 10,
@@ -18,7 +18,7 @@
 			  "sequence" :["P1"],
 			  "timing":[],
 			  "comments": "Test naming with lexical competition."
-			},
+		},
 			
 		"test_naming_2": {
 			"sem_rate": 10,
@@ -38,7 +38,7 @@
 			"sequence":["P1"],
 			"timing":[],
 			"comments":"test naming with lexical competition, a0 given"
-			},
+		},
 			
 		"young_woman_static": {
 			"sem_rate": 10,
@@ -48,7 +48,7 @@
 			  "sequence" :["P1"],
 			  "timing":[],
 			  "comments": "test property-modifier static."
-			},
+		},
 			
 		"young_woman_dyn": {
 			"sem_rate": 10,
@@ -60,7 +60,7 @@
 			  "sequence" :["P1", "P2", "P3"],
 			  "timing":[],
 			  "comments": "test property-modifier dynamic."
-			},
+		},
 		
 		"woman_kick_man_static":{
 			"sem_rate":10,
@@ -70,7 +70,7 @@
 			"sequence":["P1"],
 			"timing":[],
 			"comments":"test transitive static."
-			},
+		},
 		
 		"woman_kick_man_dyn":{
 			"sem_rate":10,
@@ -83,7 +83,7 @@
 			"sequence" :["P1", "P2", "P3", "P4"],
 			"timing":[],
 			"comments":"test transitive dynamic."
-			},
+		},
 		
 		"young_woman_punch_man_static":{
 			"sem_rate":10,
@@ -111,7 +111,7 @@
 			"sem_rate":10,
 			"propositions": {
 				"P1":["MAN(man1)", "PUNCH(punch1)", "WOMAN(woman1)",  "AGENT(agt1)", "PATIENT(pt1)", "pt1(punch1, man1)", "agt1(punch1, woman1)",
-				"KICK(kick1)", "WATERING_CAN(can1)", AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
+				"KICK(kick1)", "WATERING_CAN(can1)", "AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
 			},
 			"sequence":["P1"],
 			"timing":[],
@@ -122,7 +122,7 @@
 			"sem_rate":10,
 			"propositions": {
 				"P1":["MAN(man1)", "PUNCH(punch1)", "WOMAN(woman1)",  "AGENT(agt1)", "PATIENT(pt1)", "pt1(punch1, man1)", "agt1(punch1, woman1)"],
-				"P2":["KICK(kick1)", "WATERING_CAN(can1)", AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
+				"P2":["KICK(kick1)", "WATERING_CAN(can1)", "AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
 			},
 			"sequence":["P1", "P2"],
 			"timing":[],
