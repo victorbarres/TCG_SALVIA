@@ -1551,7 +1551,7 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
     def add_instance(self, new_inst):
         """
         Add an instance new_inst (SCHEMA_INST) to the assemblage.
-        An instance can only be added if it is not already presen in the assemblage.
+        An instance can only be added if it is not already present in the assemblage.
         Updates activation
         Returns True if the link was sucessfully added, False otherwise.
         """

@@ -296,4 +296,7 @@ def main():
     
     
 if __name__=='__main__':
-    print "nothing here!"
+    model = set_model()
+    my_inputs = set_inputs(model, 'ALL')
+    run_model(model, my_inputs, 'young_woman_static', verbose=2)
+    
