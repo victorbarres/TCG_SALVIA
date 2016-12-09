@@ -97,6 +97,19 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "pretty"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
+	
+	{
+		"name" : "YOUNG",
+		"class" : "A",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "YOUNG", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "young"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
 
 	{
 		"name" : "WOMAN",

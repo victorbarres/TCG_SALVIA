@@ -32,19 +32,6 @@
 	},
 	
 	{
-		"name" : "A_DET_NOUN",
-		"class" : "NP",
-		"SemFrame" : 
-		{
-			"nodes" : [{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : true}],
-			"edges" : []
-		},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "a"},
-					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
-		"SymLinks" : {"OBJ" : "S2"}		
-	},
-	
-	{
 		"name" : "HIT",
 		"class" : "V",
 		"SemFrame" : {
@@ -68,7 +55,7 @@
 
 	{
 		"name" : "MAN",
-		"class" : "N",
+		"class" : "NP",
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "MAN", "focus" : false, "head" : true}],
 					"edges" : []
@@ -79,7 +66,7 @@
 	
 	{
 		"name" : "BOY",
-		"class" : "N",
+		"class" : "NP",
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "BOY", "focus" : false, "head" : true}],
 					"edges" : []
@@ -90,7 +77,7 @@
 	
 	{
 		"name" : "GIRL",
-		"class" : "N",
+		"class" : "NP",
 		"SemFrame" : {
 					"nodes" : [{"name" : "N1", "concept" : "GIRL", "focus" : false, "head" : true}],
 					"edges" : []

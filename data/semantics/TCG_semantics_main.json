@@ -111,7 +111,8 @@
 			"APPEARANCE" :
 			{
 				"PRETTY" : {},
-				"HANDSOME" : {}
+				"HANDSOME" : {},
+				"YOUNG" : {}
 			}
 		},
 		
@@ -211,6 +212,12 @@
 			[
 				"Q4_SMALL",
 				"Q5_BIG"
+			],
+			"APPEARANCE":
+			[
+				"Q8_YOUNG",
+				"Q9_PRETTY",
+				"Q10_HANDSOME"
 			]
 		},
 		
@@ -320,6 +327,10 @@
 		"WHITE" : ["Q7_WHITE"],
 		"BIG" : ["Q5_BIG"],
 		"SMALL" : ["Q4_SMALL"],
+		"YOUNG" : ["Q8_YOUNG"],
+		"PRETTY": ["Q9_PRETTY"],
+		"HANDSOME" : ["Q10_HANDSOME"],
+				
 		
 		"SPECIFY" : ["R1_SPECIFY"],
 		"MODIFY" : ["R9_HAS_PARAM"],
