@@ -296,7 +296,15 @@ def main():
     
     
 if __name__=='__main__':
-    model = set_model()
-    my_inputs = set_inputs(model, 'ALL')
-    run_model(model, my_inputs, 'young_woman_static', verbose=2)
+    diagnostic_list = ['test_naming', 'test_naming_ambiguous', 'test_naming_2', 'young_woman_static', 'young_woman_dyn', 'woman_kick_man_static', 'woman_kick_man_dyn', 
+    'young_woman_punch_man_static', 'young_woman_punch_man_dyn', 'woman_punch_man_kick_can_static',
+    'woman_punch_man_kick_can_dyn', 'woman_in_blue_static']
+    
+    for input_name in diagnostic_list[6:]:
+        print input_name
+        model = set_model()
+        my_inputs = set_inputs(model, 'ALL')
+        run_model(model, my_inputs, input_name, verbose=2)
+        raw_input("Press Enter to continue...")
+    
     

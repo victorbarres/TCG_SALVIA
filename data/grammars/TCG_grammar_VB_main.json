@@ -509,6 +509,19 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "kick"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
+	
+	{
+		"name" : "PUNCH",
+		"class" : "V",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "PUNCH", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "punch"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
 
 	{
 		"name" : "WEAR",

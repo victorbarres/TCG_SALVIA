@@ -79,7 +79,8 @@
 				"KICK" : {},
 				"WEAR" : {},
 				"SPLASH" : {},
-				"MEET" : {}
+				"MEET" : {},
+				"PUNCH" : {}
 			},
 			"INTRANSITIVE" :
 			{
@@ -194,7 +195,8 @@
 			"A6_LAUGH",
 			"A7_WATCH",
 			"A8_SPLASH",
-			"A9_MEET"
+			"A9_MEET",
+			"A10_PUNCH"
 		],
 		
 		"QUALITY":
@@ -250,7 +252,9 @@
 				"R18_GIVEN",
 				"R19_SENDER",
 				"R20_SENDEE",
-				"R21_SENT"
+				"R21_SENT",
+				"R22_PUNCHER",
+				"R23_PUNCHEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -317,6 +321,7 @@
 		"WATCH" : ["A7_WATCH"],
 		"SPLASH" : ["A8_SPLASH"],
 		"MEET" : ["A9_MEET"],
+		"PUNCH" : ["A10_PUNCH"],
 		
 		"COLOR" : ["Q?_COLOR"],
 		
@@ -340,8 +345,8 @@
 		"SUCCESSIVE" : ["R12_SUCCESSIVE"],
 		"CONCURRENT" : ["R11_CONCURRENT"],
 
-		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER", "R14_SPLASHER", "R16_GIVER", "R19_SENDER"],
-		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE", "R15_SPLASHEE"],
+		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER", "R14_SPLASHER", "R16_GIVER", "R19_SENDER", "R22_PUNCHER"],
+		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE", "R15_SPLASHEE", "R23_PUNCHEE"],
 		"THEME": ["R18_GIVEN", "R21_SENT"],
 		"RECIPIENT" : ["R17_GIVEE", "R20_SENDEE"]
 	}

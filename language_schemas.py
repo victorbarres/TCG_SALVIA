@@ -2599,13 +2599,15 @@ class UTTER_GENERATOR():
             if not(timing) and not(utter_rate):
                 print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
     
-    def show_options(self, verbose = False):
+    def show_options(self, verbose = False, get_list = False):
         """
+        Print the input names.
+        If verbose, show the content of each input.
         """
         for name, ling_input in self.ling_inputs.iteritems():
             print name
             if verbose:
-                self.show_input(name) 
+                self.show_input(name)
                 
     def show_input(self, input_name):
         """
