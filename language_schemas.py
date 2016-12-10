@@ -437,7 +437,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_visual_WM')
         self.params['dyn'] = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
-        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':0.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
     def reset(self):

@@ -573,14 +573,13 @@ class INST_ACTIVATION(object):
     """
     Note: Having dt and Tau is redundant... dt should be defined at the system level.
     I have added E to gather external inputs (not carried through ports. Useful for activations across WMs.)
-    I have added TD to gather TD inputs from ASSEMBLAGES (not carried through ports. SHould be replaced by actual cooperation links!)
     """
     def __init__(self, t0=0.0, act0=1.0, dt=0.1, tau=1.0, act_inf=0.0, L=1.0, k=10.0, x0=0.5, noise_mean=0.0, noise_std=0.0):
         self.t0 = float(t0)
         self.act0 = float(act0)
         self.tau = float(tau)
         self.act_inf = float(act_inf)
-        self.W = {'W_I':1.0, 'W_E':1.0, 'W_TD':0.0, 'W_self':0.0, 'W_noise':1.0}
+        self.W = {'W_I':1.0, 'W_E':1.0, 'W_self':0.0, 'W_noise':1.0}
         self.L = float(L)
         self.k = float(k)
         self.x0 = float(x0)
@@ -591,21 +590,19 @@ class INST_ACTIVATION(object):
         self.noise_std = float(noise_std)
         self.save_vals = {"t":[], "act":[]}
         self.E = 0.0
-        self.TD = 0.0
         
     def update(self, I):
         """
         """
         noise =  random.normalvariate(self.noise_mean, self.noise_std)
         V_act = np.array([I, self.E, self.TD, self.act, noise])
-        W = np.array([self.W[val] for val in ['W_I', 'W_E', 'W_TD', 'W_self', 'W_noise']])
+        W = np.array([self.W[val] for val in ['W_I', 'W_E', 'W_self', 'W_noise']])
         d_act = self.dt/(self.tau)*(-self.act + self.logistic(np.dot(W, V_act))) + self.act_inf
         self.t += self.dt
         self.act += d_act
         self.save_vals["t"].append(self.t)
         self.save_vals["act"].append(self.act)
         self.E = 0.0
-        self.TD = 0.0
     
     
     def logistic(self, x):
@@ -1179,16 +1176,6 @@ class COOP_LINK(F_LINK):
         self.connect.port_to = port_to
         self.connect.weight = float(weight)
         self.connect.delay = float(delay)
-    
-    def update(self):
-        """
-        """
-        super(COOP_LINK, self).update()
-        if self.fixed_weight:
-            return
-        else:
-            new_weight = self.inst_from.activity+self.inst_to.activity
-        self.update_weight(new_weight)
     
     def update_weight(self, new_weight):
         self.weight = float(new_weight)
