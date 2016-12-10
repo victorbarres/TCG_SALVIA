@@ -795,7 +795,7 @@ class GRAMMATICAL_WM_P(WM):
             Make sure to revisit all the different options below.
         """        
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
-        self.end_competitions() # When production is triggered, a decision is forced for all the competitions.       
+        self.end_competitions() # When production is triggered, a decision is forced for all the competitions.
         assemblages = self.assemble()
         if assemblages:
             phon_WM_output = []
@@ -1317,7 +1317,7 @@ class GRAMMATICAL_WM_P(WM):
                     for child in children:
                         flag =  child in assemblage.schema_insts
                         if not(flag):
-                            link = self.find_coop_links(inst_from=[child], inst_to=[node], port_from=[child.find_port("output")], port_to=[port])
+                            link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child.find_port("output"), port_to=port)
                             for f in new_frontiers:
                                 updated_frontiers.append(f[:] + [(child, link[0])])
                     new_frontiers = updated_frontiers # Wrong indentation. Not handling frontiers properly.
@@ -2156,7 +2156,7 @@ class GRAMMATICAL_WM_C(WM):
                 for child in children:
                     flag =  child in assemblage.schema_insts
                     if not(flag):
-                        link = self.find_coop_links(inst_from=[child], inst_to=[node], port_from=[child.find_port("output")], port_to=[port])
+                        link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child.find_port("output"), port_to=port)
                         for f in new_frontiers:
                             updated_frontiers.append(f[:] + [(child, link[0])])
                 new_frontiers = updated_frontiers

@@ -595,7 +595,7 @@ class INST_ACTIVATION(object):
         """
         """
         noise =  random.normalvariate(self.noise_mean, self.noise_std)
-        V_act = np.array([I, self.E, self.TD, self.act, noise])
+        V_act = np.array([I, self.E, self.act, noise])
         W = np.array([self.W[val] for val in ['W_I', 'W_E', 'W_self', 'W_noise']])
         d_act = self.dt/(self.tau)*(-self.act + self.logistic(np.dot(W, V_act))) + self.act_inf
         self.t += self.dt
@@ -657,8 +657,8 @@ class LTM(MODULE_SCHEMA):
             if len(res)==1:
                 return res[0]
             else:
-                print "%s: Ambiguous schema name" %name
-                return None
+                error_msg = "%s: Ambiguous schema name" %name
+                raise ValueError(error_msg)
                 
 ######################        
 ### WORKING MEMORY ###
@@ -773,6 +773,12 @@ class WM(MODULE_SCHEMA):
         """
         Returns a list of coop_links that match the criteria.
         By default, it returns al the coop_links (no criteria specified)
+        
+        Args:
+            - inst_from (SCHEMA_INST or 'any')
+            - inst_to (SCHEMA_INST or 'any')
+            - port_from (PORT or 'any')
+            - port_to (PORT or 'any')
         """        
         results = []
         for flink in self.coop_links:
@@ -789,7 +795,7 @@ class WM(MODULE_SCHEMA):
         results = list(set(results))
         return results
                    
-    def remove_coop_links(self,inst_from, inst_to, port_from='any', port_to='any'):
+    def remove_coop_links(self, inst_from, inst_to, port_from='any', port_to='any'):
         """
         Remove the coop_links from working memory that satisfy the criteria.
         """
@@ -821,6 +827,10 @@ class WM(MODULE_SCHEMA):
         """
         Returns a list of comp_links that match the criteria.
         By default, it returns al the comp_links (no criteria specified)
+        
+        Args:
+            - inst_from (SCHEMA_INST or 'any')
+            - inst_to (SCHEMA_INST or 'any')
         """
         results = []
         for flink in self.comp_links:
@@ -1158,6 +1168,8 @@ class COOP_LINK(F_LINK):
     Cooperation functional links between schema instances in working memory
         
     Data inherited:
+        - inst_from (SCHEMA_INST)
+        - inst_to (SCHEMA_INST)
         - weight (FLOAT)
         - asymmetry_coef (FLOAT): 0 <= asymmetry_coef <= 1
         - weight_func (Lambda function): Function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
@@ -1272,8 +1284,8 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
             raise ValueError(error_msg)
         
         self.schema_insts.remove(inst)
-        links_from = self.find_links(inst_from=[inst], inst_to='any')
-        links_to = self.find_links(inst_from = 'any', inst_to=[inst])
+        links_from = self.find_links(inst_from=inst, inst_to='any')
+        links_to = self.find_links(inst_from = 'any', inst_to=inst)
         for link in links_from + links_to:
             self.remove_link(link)
         
@@ -1308,17 +1320,19 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         """
         Returns a list of coop_links that match the criteria.
         By default, it returns al the coop_links (no criteria specified)
+        
+        Args:
+            - inst_from (SCHEMA_INST or 'any')
+            - inst_to (SCHEMA_INST or 'any')
         """
         results = []
         for flink in self.coop_links:
-            match = True
-            if inst_from!='any' and not(flink.inst_from in inst_from):
-                match = False
-            if inst_to!='any' and not(flink.inst_to in inst_to):
-                match = False
+            if inst_from!='any' and not(flink.inst_from != inst_from):
+                continue
+            if inst_to!='any' and not(flink.inst_to != inst_to):
+                continue
+            results.append(flink)
             
-            if match:
-                results.append(flink)
         results = list(set(results))
         return results
         
