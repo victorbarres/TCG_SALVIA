@@ -436,7 +436,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_visual_WM')
-        self.params['dyn'] = {'tau':1000.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['dyn'] = {'tau':1000.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
@@ -675,21 +675,21 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_P')
         self.add_port('OUT', 'to_output')
-        self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
+        self.params['dyn'] = {'tau':30.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         
     def process(self):
         """
         """
-        sem_input = self.inputs['from_semantic_WM'] # I need to tie the activity of the cxn_instances to that of the SemRep.
+        sem_input = self.inputs['from_semantic_WM'] # I need to tie the activity of the cxn_instances to that of the SemRep. (Would be nicer to have coop-links across WMs.)
         new_cxn_insts= self.inputs['from_cxn_retrieval_P']
         ctrl_input = self.inputs['from_control']
         phon_input = self.inputs['from_phonological_WM_P']
         if new_cxn_insts:
             self.add_new_insts(new_cxn_insts)            
                 
-        self.convey_sem_activations(sem_input, weight=1.0)
+        self.convey_sem_activations(sem_input, weight=1.0) # THE WEIGHT SHOULD BE DEFINED IN PARAMS
         self.update_activations()
         self.prune()
         
@@ -718,7 +718,7 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def convey_sem_activations(self, sem_input, weight = 0.0, normalization=True):
+    def convey_sem_activations(self, sem_input, weight=0.0, normalization=True):
         """
         Args:
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
@@ -743,7 +743,7 @@ class GRAMMATICAL_WM_P(WM):
             cover_nodes = inst.covers['nodes']
             cover_edges = inst.covers['edges']
             
-            act = 0
+            act = 0.0
             count = 0
             # Propagate semantic node activation
             for node in sem_input['nodes']:
@@ -762,7 +762,7 @@ class GRAMMATICAL_WM_P(WM):
                     count +=1
             
             # Normalization
-            if normalization and act!= 0:
+            if normalization and count>0:
 #                act = act/(len(cover_nodes.keys()) + len(cover_edges.keys())) # normalizing remove favoring constructions that cover more content.
                 act = act/count
             inst.activation.E += act*weight
@@ -1665,7 +1665,7 @@ class PHON_WM_P(WM):
         self.add_port('OUT', 'to_utter')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_control')
-        self.params['dyn'] = {'tau':2, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['dyn'] = {'tau':2, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
     
@@ -1761,7 +1761,7 @@ class PHON_WM_C(WM):
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_control')
-        self.params['dyn'] = {'tau':2.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['dyn'] = {'tau':2.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
 
@@ -1795,7 +1795,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('IN', 'from_cxn_retrieval_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
-        self.params['dyn'] = {'tau':30.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.3}
+        self.params['dyn'] = {'tau':30.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':0, 'comp_asymmetry':0,'P_comp':1.0, 'P_coop':1.0,  'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
         self.params['pred'] = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
@@ -2481,8 +2481,10 @@ class SEM_GENERATOR(object):
             if not(timing) and not(sem_rate):
                 print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
                 
-    def show_options(self, verbose = False):
+    def show_options(self, verbose=False):
         """
+        Print the input names.
+        If verbose, show the content of each input.
         """
         for name, sem_input in self.sem_inputs.iteritems():
             print name
@@ -2491,6 +2493,7 @@ class SEM_GENERATOR(object):
                 
     def show_input(self, input_name):
         """
+        Show the content of input "input_name".
         """
         sem_input = self.sem_inputs.get(input_name, None)
         if sem_input:
@@ -2599,7 +2602,7 @@ class UTTER_GENERATOR():
             if not(timing) and not(utter_rate):
                 print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
     
-    def show_options(self, verbose = False, get_list = False):
+    def show_options(self, verbose = False):
         """
         Print the input names.
         If verbose, show the content of each input.
@@ -2611,6 +2614,7 @@ class UTTER_GENERATOR():
                 
     def show_input(self, input_name):
         """
+        Show the content of input "input_name".
         """
         ling_input = self.ling_inputs.get(input_name, None)
         if ling_input:

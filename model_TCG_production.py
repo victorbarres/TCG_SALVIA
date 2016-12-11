@@ -300,7 +300,7 @@ if __name__=='__main__':
     'young_woman_punch_man_static', 'young_woman_punch_man_dyn', 'woman_punch_man_kick_can_static',
     'woman_punch_man_kick_can_dyn', 'woman_in_blue_static']
     
-    for input_name in diagnostic_list[6:]:
+    for input_name in diagnostic_list[2:6]:
         print input_name
         model = set_model()
         my_inputs = set_inputs(model, 'ALL')

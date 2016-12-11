@@ -69,10 +69,8 @@ def TCG_production_system(name='language_system_P',
     
     # Parameters
     semanticWM.params['dyn']['tau'] = 5000.0
-    semanticWM.params['dyn']['act_inf'] = 0.0
-    semanticWM.params['dyn']['L'] = 1.0
+    semanticWM.params['dyn']['act_rest'] = 0.001
     semanticWM.params['dyn']['k'] = 10.0
-    semanticWM.params['dyn']['x0'] = 0.5
     semanticWM.params['dyn']['noise_mean'] = 0.0
     semanticWM.params['dyn']['noise_std'] = 0.2
     semanticWM.params['C2']['confidence_threshold'] = 0.0
@@ -81,10 +79,8 @@ def TCG_production_system(name='language_system_P',
     semanticWM.params['C2']['comp_weight'] = 0.0
     
     grammaticalWM_P.params['dyn']['tau'] = 100 # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
-    grammaticalWM_P.params['dyn']['act_inf'] = 0.0
-    grammaticalWM_P.params['dyn']['L'] = 1.0
+    grammaticalWM_P.params['dyn']['act_rest'] = 0.001
     grammaticalWM_P.params['dyn']['k'] = 10.0 # Need to analyze the impact of that factor.
-    grammaticalWM_P.params['dyn']['x0'] = 0.5
     grammaticalWM_P.params['dyn']['noise_mean'] = 0.0
     grammaticalWM_P.params['dyn']['noise_std'] = 0.2
     grammaticalWM_P.params['C2']['confidence_threshold'] = 0.3 #0.7
@@ -95,10 +91,8 @@ def TCG_production_system(name='language_system_P',
     grammaticalWM_P.params['C2']['deact_weight'] = 0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
     
     phonWM_P.params['dyn']['tau'] = 100.0
-    phonWM_P.params['dyn']['act_inf'] = 0.0
-    phonWM_P.params['dyn']['L'] = 1.0
+    phonWM_P.params['dyn']['act_rest'] = 0.001
     phonWM_P.params['dyn']['k'] = 10.0
-    phonWM_P.params['dyn']['x0'] = 0.5
     phonWM_P.params['dyn']['noise_mean'] = 0.0
     phonWM_P.params['dyn']['noise_std'] = 0.2
     phonWM_P.params['C2']['confidence_threshold'] = 0.0
@@ -186,10 +180,8 @@ def TCG_comprehension_system(name='language_system_C',
     
     # Parameters
     phonWM_C.params['dyn']['tau'] = 100.0
-    phonWM_C.params['dyn']['act_inf'] = 0.0
-    phonWM_C.params['dyn']['L'] = 1.0
+    phonWM_C.params['dyn']['act_rest'] = 0.001
     phonWM_C.params['dyn']['k'] = 10.0
-    phonWM_C.params['dyn']['x0'] = 0.5
     phonWM_C.params['dyn']['noise_mean'] = 0.0
     phonWM_C.params['dyn']['noise_std'] = 0.2
     phonWM_C.params['C2']['confidence_threshold'] = 0.0
@@ -198,10 +190,8 @@ def TCG_comprehension_system(name='language_system_C',
     phonWM_C.params['C2']['comp_weight'] = 0.0
     
     grammaticalWM_C.params['dyn']['tau'] = 100.0
-    grammaticalWM_C.params['dyn']['act_inf'] = 0.0
-    grammaticalWM_C.params['dyn']['L'] = 1.0
+    grammaticalWM_C.params['dyn']['act_rest'] = 0.001
     grammaticalWM_C.params['dyn']['k'] = 10.0
-    grammaticalWM_C.params['dyn']['x0'] = 0.5
     grammaticalWM_C.params['dyn']['noise_mean'] = 0.0
     grammaticalWM_C.params['dyn']['noise_std'] = 0.2
     grammaticalWM_C.params['C2']['confidence_threshold'] = 0.5
@@ -214,10 +204,8 @@ def TCG_comprehension_system(name='language_system_C',
     grammaticalLTM.init_act = grammaticalWM_C.params['C2']['confidence_threshold']*0.5
     
     semanticWM.params['dyn']['tau'] = 300.0
-    semanticWM.params['dyn']['act_inf'] = 0.0
-    semanticWM.params['dyn']['L'] = 1.0
+    semanticWM.params['dyn']['act_rest'] = 0.001
     semanticWM.params['dyn']['k'] = 10.0
-    semanticWM.params['dyn']['x0'] = 0.5
     semanticWM.params['dyn']['noise_mean'] = 0.0
     semanticWM.params['dyn']['noise_std'] = 0.2
     semanticWM.params['C2']['confidence_threshold'] = 0.0
@@ -316,10 +304,8 @@ def TCG_language_system(name='language_system',
     
     # Parameters
     semanticWM.params['dyn']['tau'] = 1000.0
-    semanticWM.params['dyn']['act_inf'] = 0.0
-    semanticWM.params['dyn']['L'] = 1.0
+    semanticWM.params['dyn']['act_rest'] = 0.001
     semanticWM.params['dyn']['k'] = 10.0
-    semanticWM.params['dyn']['x0'] = 0.5
     semanticWM.params['dyn']['noise_mean'] = 0.0
     semanticWM.params['dyn']['noise_std'] = 0.2
     semanticWM.params['C2']['confidence_threshold'] = 0.0
@@ -328,10 +314,8 @@ def TCG_language_system(name='language_system',
     semanticWM.params['C2']['comp_weight'] = 0.0
     
     grammaticalWM_P.params['dyn']['tau'] = 30.0
-    grammaticalWM_P.params['dyn']['act_inf'] = 0.0
-    grammaticalWM_P.params['dyn']['L'] = 1.0
+    grammaticalWM_P.params['dyn']['act_rest'] = 0.001
     grammaticalWM_P.params['dyn']['k'] = 10.0
-    grammaticalWM_P.params['dyn']['x0'] = 0.5
     grammaticalWM_P.params['dyn']['noise_mean'] = 0.0
     grammaticalWM_P.params['dyn']['noise_std'] = 0.2
     grammaticalWM_P.params['C2']['confidence_threshold'] = 0.7
@@ -342,10 +326,8 @@ def TCG_language_system(name='language_system',
     grammaticalWM_P.params['C2']['deact_weight'] = 0.0
     
     phonWM_P.params['dyn']['tau'] = 100.0
-    phonWM_P.params['dyn']['act_inf'] = 0.0
-    phonWM_P.params['dyn']['L'] = 1.0
+    phonWM_P.params['dyn']['act_rest'] = 0.001
     phonWM_P.params['dyn']['k'] = 10.0
-    phonWM_P.params['dyn']['x0'] = 0.5
     phonWM_P.params['dyn']['noise_mean'] = 0
     phonWM_P.params['dyn']['noise_std'] = 0.2
     phonWM_P.params['C2']['confidence_threshold'] = 0
@@ -367,10 +349,8 @@ def TCG_language_system(name='language_system',
     control.params['style']['continuity'] = 0.1
     
     phonWM_C.params['dyn']['tau'] = 100.0
-    phonWM_C.params['dyn']['act_inf'] = 0.0
-    phonWM_C.params['dyn']['L'] = 1.0
+    phonWM_C.params['dyn']['act_rest'] = 0.001
     phonWM_C.params['dyn']['k'] = 10.0
-    phonWM_C.params['dyn']['x0'] = 0.5
     phonWM_C.params['dyn']['noise_mean'] = 0.0
     phonWM_C.params['dyn']['noise_std'] = 0.2
     phonWM_C.params['C2']['confidence_threshold'] = 0.0
@@ -379,10 +359,8 @@ def TCG_language_system(name='language_system',
     phonWM_C.params['C2']['comp_weight'] = 0.0
     
     grammaticalWM_C.params['dyn']['tau'] = 100.0
-    grammaticalWM_C.params['dyn']['act_inf'] = 0.0
-    grammaticalWM_C.params['dyn']['L'] = 1.0
+    grammaticalWM_C.params['dyn']['act_rest'] = 0.001
     grammaticalWM_C.params['dyn']['k'] = 10.0
-    grammaticalWM_C.params['dyn']['x0'] = 0.5
     grammaticalWM_C.params['dyn']['noise_mean'] = 0.0
     grammaticalWM_C.params['dyn']['noise_std'] = 0.2
     grammaticalWM_C.params['C2']['confidence_threshold'] = 0.5
@@ -488,10 +466,8 @@ def TCG_description_system(name='description_system',
     subscene_rec.params['recognition_time'] = 50
     
     visualWM.params['dyn']['tau'] = 300.0
-    visualWM.params['dyn']['act_inf'] = 0.0
-    visualWM.params['dyn']['L'] = 1.0
+    visualWM.params['dyn']['act_rest'] = 0.001
     visualWM.params['dyn']['k'] = 10.0
-    visualWM.params['dyn']['x0'] = 0.5
     visualWM.params['dyn']['noise_mean'] = 0.0
     visualWM.params['dyn']['noise_std'] = 1.0
     visualWM.params['C2']['confidence_threshold'] = 0.0
@@ -502,10 +478,8 @@ def TCG_description_system(name='description_system',
     perceptLTM.init_act = 1.0
     
     semanticWM.params['dyn']['tau'] = 300.0
-    semanticWM.params['dyn']['act_inf'] = 0.0
-    semanticWM.params['dyn']['L'] = 1.0
+    semanticWM.params['dyn']['act_rest'] = 0.001
     semanticWM.params['dyn']['k'] = 10.0
-    semanticWM.params['dyn']['x0'] = 0.5
     semanticWM.params['dyn']['noise_mean'] = 0.0
     semanticWM.params['dyn']['noise_std'] = 0.2
     semanticWM.params['C2']['confidence_threshold'] = 0.0
@@ -516,10 +490,8 @@ def TCG_description_system(name='description_system',
     conceptLTM.init_act = 1.0
     
     grammaticalWM_P.params['dyn']['tau'] = 30 # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
-    grammaticalWM_P.params['dyn']['act_inf'] = 0.0
-    grammaticalWM_P.params['dyn']['L'] = 1.0
+    grammaticalWM_P.params['dyn']['act_rest'] = 0.001
     grammaticalWM_P.params['dyn']['k'] = 10.0 # Need to analyze the impact of that factor.
-    grammaticalWM_P.params['dyn']['x0'] = 0.5
     grammaticalWM_P.params['dyn']['noise_mean'] = 0.0
     grammaticalWM_P.params['dyn']['noise_std'] = 0.2
     grammaticalWM_P.params['C2']['confidence_threshold'] = 0.7
@@ -532,10 +504,8 @@ def TCG_description_system(name='description_system',
     grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']
     
     phonWM_P.params['dyn']['tau'] = 100.0
-    phonWM_P.params['dyn']['act_inf'] = 0.0
-    phonWM_P.params['dyn']['L'] = 1.0
+    phonWM_P.params['dyn']['act_rest'] = 0.001
     phonWM_P.params['dyn']['k'] = 10.0
-    phonWM_P.params['dyn']['x0'] = 0.5
     phonWM_P.params['dyn']['noise_mean'] = 0
     phonWM_P.params['dyn']['noise_std'] = 0.2
     phonWM_P.params['C2']['confidence_threshold'] = 0

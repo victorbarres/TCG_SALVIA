@@ -473,7 +473,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation.
         - activity (FLOAT): activity value for schema instance
-        - params: {'act':{t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT act_inf:FLOAT, L:FLOAT, k:FLOAT, x0:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}}
+        - params: {'act':{t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT act_rest:FLOAT, k:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}}
         - activation (INST_ACTIVATION): Activation object of schema instance
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
@@ -484,7 +484,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         self.alive = False
         self.trace = None
         self.activity = 0
-        self.params['act'] = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['act'] = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_out", port_value=0);
@@ -495,7 +495,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         Set activation parameters
         """
         self.activation = INST_ACTIVATION(t0=self.params['act']['t0'], act0=self.params['act']['act0'], dt=self.params['act']['dt'], tau=self.params['act']['tau'],
-                                          act_inf=self.params['act']['act_inf'], L=self.params['act']['L'], k=self.params['act']['k'], x0=self.params['act']['x0'],
+                                          act_rest=self.params['act']['act_rest'], k=self.params['act']['k'],
                                           noise_mean=self.params['act']['noise_mean'], noise_std=self.params['act']['noise_std'])
         
         self.activation.save_vals["t"].append(self.params['act']['t0'])
@@ -574,15 +574,13 @@ class INST_ACTIVATION(object):
     Note: Having dt and Tau is redundant... dt should be defined at the system level.
     I have added E to gather external inputs (not carried through ports. Useful for activations across WMs.)
     """
-    def __init__(self, t0=0.0, act0=1.0, dt=0.1, tau=1.0, act_inf=0.0, L=1.0, k=10.0, x0=0.5, noise_mean=0.0, noise_std=0.0):
+    def __init__(self, t0=0.0, act0=1.0, dt=0.1, tau=1.0, act_rest=0.001, k=10.0, noise_mean=0.0, noise_std=0.0):
         self.t0 = float(t0)
         self.act0 = float(act0)
         self.tau = float(tau)
-        self.act_inf = float(act_inf)
-        self.W = {'W_I':1.0, 'W_E':1.0, 'W_self':0.0, 'W_noise':1.0}
-        self.L = float(L)
+        self.act_rest = float(act_rest)
+        self.W = {'W_I':1.0, 'W_E':1.0}
         self.k = float(k)
-        self.x0 = float(x0)
         self.dt = float(dt) 
         self.t = self.t0
         self.act = self.act0
@@ -591,22 +589,33 @@ class INST_ACTIVATION(object):
         self.save_vals = {"t":[], "act":[]}
         self.E = 0.0
         
-    def update(self, I):
+    def update(self, Int):
         """
         """
-        noise =  random.normalvariate(self.noise_mean, self.noise_std)
-        V_act = np.array([I, self.E, self.act, noise])
-        W = np.array([self.W[val] for val in ['W_I', 'W_E', 'W_self', 'W_noise']])
-        d_act = self.dt/(self.tau)*(-self.act + self.logistic(np.dot(W, V_act))) + self.act_inf
+        alpha = (1.0 - 1.0/self.tau) # Time constant (leak rate)
+        noise =  random.normalvariate(self.noise_mean, self.noise_std) # noise value
+        V_act = np.array([Int, self.E]) # Inputs vector
+        W = np.array([self.W[val] for val in ['W_I', 'W_E']]) # Weights vector
+        Input = np.dot(W, V_act) # Total input
+        new_act = alpha*self.act + (1.0 - alpha)*self.logistic(Input + noise) # Updated activation
+        self.act = new_act
         self.t += self.dt
-        self.act += d_act
         self.save_vals["t"].append(self.t)
         self.save_vals["act"].append(self.act)
         self.E = 0.0
     
     
     def logistic(self, x):
-        return self.L/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
+        """
+        Activation function.
+        """
+        if self.act_rest == 0.0:
+            err_msg = "logistic function undefined for sigma(0) = act_rest = 0"
+            raise ValueError(err_msg)
+            
+        x0 = np.log(1.0/self.act_rest - 1)/self.k     # Compute x0 so that sigma(0) = act_rest    
+        output = 1.0/(1.0 + np.exp(-1.0*self.k*(x-x0)))
+        return output
         
 #############################
 ### MODULE SCHEMA CLASSES ###
@@ -680,7 +689,7 @@ class WM(MODULE_SCHEMA):
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
-        - params (DICT): {'dyn': {'tau':FLOAT, 'act_inf':FLOAT, 'L':FLOAT, 'k':FLOAT, 'x0':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
+        - params (DICT): {'dyn': {'tau':FLOAT, 'act_rest':FLOAT,'k':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
                           'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT, 'coop_asymmetry':FLOAT, 'comp_asymmetry':FLOAT, 'P_comp':FLOAT, 'P_coop':FLOAT}}
             Note:
             - coop_weight (FLOAT): weight of cooperation f-links
@@ -693,7 +702,7 @@ class WM(MODULE_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.params['dyn'] = {'tau':10.0, 'act_inf':0.0, 'L':1.0, 'k':10.0, 'x0':0.5, 'noise_mean':0.0, 'noise_std':0.1}
+        self.params['dyn'] = {'tau':10.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.1}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
@@ -723,9 +732,8 @@ class WM(MODULE_SCHEMA):
         
         if not(act0):
             act0 = schema_inst.activity # Uses the init_activation defined by the associated schema.
-        act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 'act_inf':self.params['dyn']['act_inf'],
-                      'L':self.params['dyn']['L'], 'k':self.params['dyn']['k'], 'x0':self.params['dyn']['x0'],
-                      'noise_mean':self.params['dyn']['noise_mean'], 'noise_std':self.params['dyn']['noise_std']}
+        act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 'act_rest':self.params['dyn']['act_rest'],
+                      'k':self.params['dyn']['k'], 'noise_mean':self.params['dyn']['noise_mean'], 'noise_std':self.params['dyn']['noise_std']}
         schema_inst.params['act'] = act_params
         schema_inst.initialize_activation()
         
@@ -1004,9 +1012,9 @@ class WM(MODULE_SCHEMA):
         # Plot instance activations
         if inst_act:
             plt.figure(facecolor='white')
-            title = '%s dynamics \n dyn: [tau:%g, act_inf:%g, L:%g, k:%g, x0:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(
+            title = '%s dynamics \n dyn: [tau:%g, act_rest:%g, k:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(
                                 self.name,
-                                self.params['dyn']['tau'], self.params['dyn']['act_inf'], self.params['dyn']['L'], self.params['dyn']['k'], self.params['dyn']['x0'],
+                                self.params['dyn']['tau'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
                                 self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
                                   self.params['C2']['coop_weight'], self.params['C2']['comp_weight'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
             plt.title(title)
