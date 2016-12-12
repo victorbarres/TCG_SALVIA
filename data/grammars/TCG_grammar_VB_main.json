@@ -15,30 +15,47 @@
 	
 	{
 		"name" : "CNJ_AND",
-		"class" : "S",
+		"class" : "D",
 		"preference" : 1,
 		"group": 3,
 		"SemFrame" :
 		{
-			"nodes" : [	{"name" : "EVT1", "concept" : "ACTION", "focus" : true, "head" : true}, 
-						{"name" : "EVT2", "concept" : "ACTION", "focus" : false, "head" : true}],
-			"edges" : [	{"name" : "EVT1_EVT2", "concept" : "SUCCESSIVE", "from" : "EVT1", "to" : "EVT2"}]
+			"nodes" : [	{"name" : "EVT1", "concept" : "ACTION", "focus" : true, "head" : false}, 
+						{"name" : "EVT2", "concept" : "ACTION", "focus" : false, "head" : false}],
+			"edges" : [	]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},
 					{"name" : "S2", "type" : "PHON", "phon" : "and"},
 					{"name" : "S3", "type" : "SLOT", "classes" :["S"]}],
 		"SymLinks" : {"EVT1" : "S1", "EVT2" : "S3"}
 	},
-
+	
 	{
-		"name" : "CNJ_WHILE",
-		"class" : "S",
+		"name" : "CNJ_THEN",
+		"class" : "D",
 		"preference" : 1,
 		"group": 3,
 		"SemFrame" :
 		{
-			"nodes" : [	{"name" : "EVT1", "concept" : "ACTION", "focus" : true, "head" : true}, 
-						{"name" : "EVT2", "concept" : "ACTION", "focus" : false, "head" : true}],
+			"nodes" : [	{"name" : "EVT1", "concept" : "ACTION", "focus" : false, "head" : false}, 
+						{"name" : "EVT2", "concept" : "ACTION", "focus" : false, "head" : false}],
+			"edges" : [	{"name" : "EVT1_EVT2", "concept" : "SUCCESSIVE", "from" : "EVT1", "to" : "EVT2"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},
+					{"name" : "S2", "type" : "PHON", "phon" : "then"},
+					{"name" : "S3", "type" : "SLOT", "classes" :["S"]}],
+		"SymLinks" : {"EVT1" : "S1", "EVT2" : "S3"}
+	},
+
+	{
+		"name" : "CNJ_WHILE",
+		"class" : "D",
+		"preference" : 1,
+		"group": 3,
+		"SemFrame" :
+		{
+			"nodes" : [	{"name" : "EVT1", "concept" : "ACTION", "focus" : true, "head" : false}, 
+						{"name" : "EVT2", "concept" : "ACTION", "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "EVT1_EVT2", "concept" : "CONCURRENT", "from" : "EVT1", "to" : "EVT2"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},
@@ -56,8 +73,8 @@
 			"nodes" : [	{"name" : "ACTOR_1", "concept" : "ENTITY", "focus" : true, "head" : false},
 						{"name" : "ACTOR_2", "concept" : "ENTITY", "focus" : false, "head" : false},
 						{"name" : "ACT", "concept" : "ACTION", "focus" : false, "head" : true}],
-			"edges" : [	{"name" : "AGT_PT_1", "concept" : "AGT_PT", "from" : "ACT", "to" : "ACTOR_1"},
-						{"name" : "AGT_PT_2", "concept" : "AGT_PT", "from" : "ACT", "to" : "ACTOR_2"}]
+			"edges" : [	{"name" : "AGT_PT_1", "concept" : "AGT+PT", "from" : "ACT", "to" : "ACTOR_1"},
+						{"name" : "AGT_PT_2", "concept" : "AGT+PT", "from" : "ACT", "to" : "ACTOR_2"}]
 		},
 		
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["NP", "N"]},
@@ -639,6 +656,32 @@
 					"edges" : []
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "meet"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "KISS",
+		"class" : "V",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "KISS", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "kiss"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "SHAKE_HANDS",
+		"class" : "V",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "N1", "concept" : "SHAKE_HANDS", "focus" : false, "head" : true}],
+					"edges" : []
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "shake hands"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
 

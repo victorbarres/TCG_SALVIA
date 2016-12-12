@@ -797,6 +797,7 @@ class GRAMMATICAL_WM_P(WM):
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         self.end_competitions() # When production is triggered, a decision is forced for all the competitions.
         assemblages = self.assemble()
+        data = []
         if assemblages:
             phon_WM_output = []
             sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
@@ -809,8 +810,8 @@ class GRAMMATICAL_WM_P(WM):
                 sem_WM_output['missing_info'] = missing_info
                 assemblages.remove(winner_assemblage)
                 
-                # Save winner assembalge to state
-                data = {'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0]}
+                # Save winner assemblage to state
+                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0]})
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)

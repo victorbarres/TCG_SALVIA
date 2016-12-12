@@ -79,14 +79,22 @@
 				"KICK" : {},
 				"WEAR" : {},
 				"SPLASH" : {},
-				"MEET" : {},
-				"PUNCH" : {}
+				"PUNCH" : {},
+				"KISS" : {}
 			},
+			
+			"SYMMETRIC":
+			{
+				"MEET" : {},
+				"SHAKE_HANDS" : {}
+			},
+			
 			"INTRANSITIVE" :
 			{
 				"LAUGH" : {},
 				"WATCH" : {}
 			},
+			
 			"DITRANSITIVE" :
 			{
 				"GIVE": {},
@@ -124,8 +132,12 @@
 			"THEMATIC" :
 			{
 				"AGT_PT":{
-					"AGENT": {},
-					"PATIENT": {}
+					"AGENT": {
+						"AGT+PT" : {}
+						},
+					"PATIENT": {
+						"AGT+PT" : {}
+						}
 				},
 				"THEME" : {},
 				"RECIPIENT" : {}
@@ -196,7 +208,9 @@
 			"A7_WATCH",
 			"A8_SPLASH",
 			"A9_MEET",
-			"A10_PUNCH"
+			"A10_PUNCH",
+			"A11_KISS",
+			"A12_SHAKE_HANDS"
 		],
 		
 		"QUALITY":
@@ -254,7 +268,11 @@
 				"R20_SENDEE",
 				"R21_SENT",
 				"R22_PUNCHER",
-				"R23_PUNCHEE"
+				"R23_PUNCHEE",
+				"R24_MEET",
+				"R25_SHAKE_HANDS",
+				"R26_KISSER",
+				"R27_KISSEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -283,7 +301,6 @@
 		"BOY" : ["O2_BOY"],
 		"WOMAN" : ["O3_WOMAN"],
 		"GIRL" : ["O4_GIRL"],
-		"PEOPLE" : ["O1_MAN"],
 		"HUMAN" : ["O5_HUMAN"],
 		"ANIMAL" : ["O6_ANIMAL"],
 		"MOUSE" : ["O7_MOUSE"],
@@ -322,6 +339,8 @@
 		"SPLASH" : ["A8_SPLASH"],
 		"MEET" : ["A9_MEET"],
 		"PUNCH" : ["A10_PUNCH"],
+		"KISS" : ["A11_KISS"],
+		"SHAKE_HANDS" : ["A12_SHAKE_HANDS"],
 		
 		"COLOR" : ["Q?_COLOR"],
 		
@@ -345,8 +364,9 @@
 		"SUCCESSIVE" : ["R12_SUCCESSIVE"],
 		"CONCURRENT" : ["R11_CONCURRENT"],
 
-		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER", "R14_SPLASHER", "R16_GIVER", "R19_SENDER", "R22_PUNCHER"],
-		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE", "R15_SPLASHEE", "R23_PUNCHEE"],
+		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER", "R14_SPLASHER", "R16_GIVER", "R19_SENDER", "R22_PUNCHER", "R26_KISSER"],
+		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE", "R15_SPLASHEE", "R23_PUNCHEE", "R27_KISSEE"],
+		"AGT+PT" :["R24_MEET", "R25_SHAKE_HANDS"],
 		"THEME": ["R18_GIVEN", "R21_SENT"],
 		"RECIPIENT" : ["R17_GIVEE", "R20_SENDEE"]
 	}

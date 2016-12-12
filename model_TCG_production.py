@@ -13,7 +13,7 @@ import language_schemas as ls
 from loader import TCG_LOADER
 from TCG_models import TCG_production_system
 from viewer import TCG_VIEWER
-from test_prod_analysis import prod_analyses, prod_statistics
+from prod_analysis import prod_analyses, prod_statistics
     
 def test_run(seed=None):
     """
@@ -128,6 +128,8 @@ def run_model(model, sem_gen, input_name, seed=None, verbose=0):
     Run the model "model" for an semantic gerator "sem_gent" using the input "input_name"
     Verbose modes: 0 -> no output printed. 1 -> only final utterance printed, 2 -> input and utterances printed as they are received and produced.
     """
+    random.seed(seed)    
+    
     generator = sem_gen.sem_generator(input_name, verbose = (verbose>1))
     (sem_insts, next_time, prop) = generator.next()
     
@@ -146,7 +148,7 @@ def run_model(model, sem_gen, input_name, seed=None, verbose=0):
         # Store output
         output = model.get_output()
         if output['Grammatical_WM_P']:
-            out_data.append(output['Grammatical_WM_P'])
+            out_data.extend(output['Grammatical_WM_P'])
         if output['Utter']:
             if verbose > 1:
                  print "t:%i, '%s'" %(t, output['Utter'])
@@ -209,8 +211,7 @@ def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
             for i in range(num_restarts):
                 run_output = []
                 start = time.time()
-#                generator = sem_gen.sem_generator(name, verbose=False)
-                (sim_output, utterance) = run_model(model, sem_gen, name, verbose=0)
+                (sim_output, utterance) = run_model(model, sem_gen, name, seed=seed, verbose=0)
                 run_output.append(sim_output)
                 end = time.time()
                 print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
@@ -241,7 +242,10 @@ def main():
             model_params_set.append(params)
     
     # Define the set of inputs on which the model will be run.
-    inputs = ["blue_woman_kick_man_static"]
+    inputs = ["test_naming"]
+    
+    # If seed != None, then all the restart will yield the same results.
+    seed=None    
     
     # Define the number of restarts
     num_restarts = 10
@@ -249,7 +253,7 @@ def main():
     # Run the grid search for inputs X parameters X num_restarts
     for name in inputs:
         input_name = name
-        output = grid_search(input_name=input_name, model_params_set=model_params_set, num_restarts=num_restarts)
+        output = grid_search(input_name=input_name, model_params_set=model_params_set, num_restarts=num_restarts, seed=seed)
         if output:
             header = {'params':[], 'outputs':['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'active', 'passive', 'total_constructions', 'produced', 'utterance']}
             dat = []
@@ -292,19 +296,45 @@ def main():
             for d in dat:
                 new_line = line(d)
                 f.write(new_line)
+
+
+def run_prod_diagnostics():
+    """
+    Allows to run a set of production diagnostics.
+    """
+    print "\n\nDiagnostic cases\n\n"
+    
+    DIAGNOSTIC_FILE = 'diagnostic.json'
+    
+    diagnostic_list = {1:'test_naming', 2:'test_naming_ambiguous', 3:'test_naming_2', 4:'young_woman_static', 
+                       5:'young_woman_dyn', 6:'woman_kick_man_static', 7:'woman_kick_man_dyn', 
+                       8:'young_woman_punch_man_static', 9:'young_woman_punch_man_dyn', 10:'woman_punch_man_kick_can_static',
+                       11:'woman_punch_man_kick_can_dyn', 12:'woman_in_blue_static'}
+    
+    for num, name in diagnostic_list.iteritems():
+       print "%i -> %s" %(num, name)
+     
+    input_vals = raw_input("\nInput case numbers as (e.g 1, 2, 6, 7). For all input use ALL:\n->")   
+    if input_vals == 'ALL':
+        input_vals = diagnostic_list.keys()
+        input_vals.sort()
+    else:
+        input_vals = [int(s.strip()) for s in input_vals.split(',')]
+    
+    diagnostic_cases = [diagnostic_list[value] for value in input_vals]
+    
+    for input_name in diagnostic_cases:
+        print "\nINPUT NAME: %s\n" %input_name
+        model = set_model()
+        my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro = False)
+        print "\nSIMULATION RUN:\n"
+        res = run_model(model, my_inputs, input_name, verbose=2)
+        print "\nRESULTS:\n"
+        print res
+        raw_input("\nPress Enter to continue...\n")
     
     
     
 if __name__=='__main__':
-    diagnostic_list = ['test_naming', 'test_naming_ambiguous', 'test_naming_2', 'young_woman_static', 'young_woman_dyn', 'woman_kick_man_static', 'woman_kick_man_dyn', 
-    'young_woman_punch_man_static', 'young_woman_punch_man_dyn', 'woman_punch_man_kick_can_static',
-    'woman_punch_man_kick_can_dyn', 'woman_in_blue_static']
-    
-    for input_name in diagnostic_list[2:6]:
-        print input_name
-        model = set_model()
-        my_inputs = set_inputs(model, 'ALL')
-        run_model(model, my_inputs, input_name, verbose=2)
-        raw_input("Press Enter to continue...")
-    
+    run_prod_diagnostics()
     
