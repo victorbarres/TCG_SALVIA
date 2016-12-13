@@ -137,6 +137,80 @@
 			"sequence":["P1"],
 			"timing":[],
 			"comments":"test for the IN_COLOR construction."
+		},
+		
+		"woman_kick_H_man_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 1.0)", "MAN(m1, 1.0)", "KICK(a1, 1.0, H)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive static."
+		},
+		
+		"woman_H_kick_man_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 1.0, H)", "MAN(m1, 1.0)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive static."
+		},
+		
+		"woman_kick_man_H_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["WOMAN(w1, 1.0)", "MAN(m1, 1.0, H)", "KICK(a1, 1.0)", "AGENT(r1, 1.0)", "PATIENT(r2, 1.0)", "r1(a1, w1)", "r2(a1, m1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive static."
+		},
+		
+		"woman_punch_H_man_kick_can_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["MAN(man1)", "PUNCH(punch1, H)", "WOMAN(woman1)",  "AGENT(agt1)", "PATIENT(pt1)", "pt1(punch1, man1)", "agt1(punch1, woman1)",
+				"KICK(kick1)", "WATERING_CAN(can1)", "AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
+		},
+		
+		"woman_H_punch_man_kick_can_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["MAN(man1)", "PUNCH(punch1)", "WOMAN(woman1, H)",  "AGENT(agt1)", "PATIENT(pt1)", "pt1(punch1, man1)", "agt1(punch1, woman1)",
+				"KICK(kick1)", "WATERING_CAN(can1)", "AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
+		},
+		
+		"woman_punch_man_H_kick_can_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["MAN(man1, H)", "PUNCH(punch1)", "WOMAN(woman1)",  "AGENT(agt1)", "PATIENT(pt1)", "pt1(punch1, man1)", "agt1(punch1, woman1)",
+				"KICK(kick1)", "WATERING_CAN(can1)", "AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
+		},
+		
+		"woman_punch_man_kick_can_H_static":{
+			"sem_rate":10,
+			"propositions": {
+				"P1":["MAN(man1)", "PUNCH(punch1)", "WOMAN(woman1)",  "AGENT(agt1)", "PATIENT(pt1)", "pt1(punch1, man1)", "agt1(punch1, woman1)",
+				"KICK(kick1)", "WATERING_CAN(can1, H)", "AGENT(agt2)", "PATIENT(pt2)", "pt2(kick1, can1)", "agt2(kick1, man1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
 		}
 	}
 }

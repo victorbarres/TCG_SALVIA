@@ -222,6 +222,7 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
         SCHEMA_INST.__init__(self, schema=cpt_schema, trace=trace)
         content_copy = cpt_schema.content.copy()
         self.content = content_copy
+        self.head = False
         self.unbound = False
         
     def match(self, cpt_inst, match_type = "is_a"):
@@ -533,7 +534,7 @@ class SEMANTIC_WM(WM):
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
-                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], new=True, expressed=False)
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], head=inst.head, new=True, expressed=False)
             
             # Then add the relations
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
@@ -1603,12 +1604,13 @@ class CXN_RETRIEVAL_P(MODULE_SCHEMA):
         IMPORTANT ALGORITHM
         Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
         """
-        SemFrame_graph = cxn_schema.content.SemFrame.graph 
+        SemFrame_graph = cxn_schema.content.SemFrame.graph
             
         node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-#        print cxn_schema.name
+        node_head_match = lambda sem_rep_head, sem_frame_head: (not(sem_rep_head) or sem_frame_head) # It only matters that sem_frame_head match sem_rep_head when sem_rep_head is True.
+        
         edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "is" for strict matching
-        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+        nm = TCG_graph.node_iso_match(["concept", "head"], ["", False], [node_concept_match, node_head_match])
         em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
         
         def subgraph_filter(subgraph):
@@ -1623,7 +1625,7 @@ class CXN_RETRIEVAL_P(MODULE_SCHEMA):
                     return True
             return False
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)
+        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)     
         return sub_iso
     
     def SemMatch_qual(self, SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
@@ -1635,7 +1637,7 @@ class CXN_RETRIEVAL_P(MODULE_SCHEMA):
             - In the current version of focus, it only looks at the focus node for the quality of match. 
                 But focus should be defined as contrasts within consructions (and between constructions.)
                 Move from focus as boolean value to focus as value attached to each node.
-            - Still need to incorporate light sem. For this, need to switch to vector space representaiton of concept. 
+            - Still need to incorporate light sem. For this, need to switch to vector space representatiton of concept. 
             This could be added on top of the is-a ontology.
         """
         # Compute match qual value based on focus values.
@@ -1643,8 +1645,8 @@ class CXN_RETRIEVAL_P(MODULE_SCHEMA):
         for cxn_node, sem_node_name in a_sub_iso['nodes'].iteritems():
             sem_node_act = SemRep.node[sem_node_name]['cpt_inst'].activity
             if cxn_node.focus:
-                focus = 1
-                focus_match -= focus - sem_node_act # This is much too simple. But placeholder for now.            
+                max_val = 1
+                focus_match -= max_val - sem_node_act # This is much too simple. But placeholder for now.            
         return focus_match
     
     ####################
@@ -2522,7 +2524,8 @@ class SEM_GENERATOR(object):
         
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
 #        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition (without activation)
-        func_pattern_cpt2 = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation
+#        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation
+        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?((\s*,\s*)(?P<head>H))?\s*\)" # Concept definition with activation and head
         func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation does without activation
         
         sem_input = self.sem_inputs[input_name]
@@ -2542,7 +2545,7 @@ class SEM_GENERATOR(object):
                 print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(propositions[sequence[idx]]))
             for prop in prop_list:  
                 # Case1:
-                match1 = re.search(func_pattern_cpt2, prop)
+                match1 = re.search(func_pattern_cpt, prop)
                 match2 = re.search(func_pattern_rel, prop)
                 if match1:
                     dat = match1.groupdict()
@@ -2551,12 +2554,15 @@ class SEM_GENERATOR(object):
                     var = dat['var']                        
                     cpt_schema = self.conceptLTM.find_schema(name=concept)
                     cpt_act = dat.get('act', None)
+                    cpt_head = dat.get('head', None)
                         
                     cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
                     if cpt_act:
                         cpt_inst.set_activation(float(cpt_act))
                     if cpt_var:
                         cpt_inst.unbound = True
+                    if cpt_head:
+                        cpt_inst.head = True
                     name_table[var] = cpt_inst
                     instances.append(cpt_inst)
                 

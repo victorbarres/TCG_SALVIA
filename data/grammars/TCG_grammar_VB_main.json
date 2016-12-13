@@ -230,7 +230,7 @@
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
 						{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
-						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
+						{"name" : "ACTION", "concept" : "ACTION", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
 		},
@@ -250,7 +250,7 @@
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ITEM", "focus" : false, "head" : true},
 						{"name" : "OBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
-						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
+						{"name" : "ACTION", "concept" : "ACTION", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
 		},
@@ -269,7 +269,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
-						{"name" : "ACTION", "concept" : "INTRANSITIVE", "focus" : false, "head" : false}],
+						{"name" : "ACTION", "concept" : "INTRANSITIVE", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
@@ -286,7 +286,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ITEM", "focus" : false, "head" : true},
-						{"name" : "ACTION", "concept" : "INTRANSITIVE", "focus" : false, "head" : false}],
+						{"name" : "ACTION", "concept" : "INTRANSITIVE", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
@@ -304,7 +304,7 @@
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
 						{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
-						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
+						{"name" : "ACTION", "concept" : "ACTION", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
 		},
@@ -327,7 +327,7 @@
 		{
 			"nodes" : [{"name" : "SUBJ", "concept" : "ITEM", "focus" : false, "head" : false},
 						{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
-						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
+						{"name" : "ACTION", "concept" : "ACTION", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
 		},
@@ -349,7 +349,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
-						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : true, "head" : false},
 						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
@@ -369,7 +369,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
-						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
+						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : true, "head" : false},
 						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
@@ -388,8 +388,8 @@
 		"group": 2,
 		"SemFrame" : 
 		{
-			"nodes" : [{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
-						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
+			"nodes" : [{"name" : "OBJ", "concept" : "HUMAN", "focus" : true, "head" : false},
+						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : true},
 						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
@@ -411,20 +411,20 @@
 		"group": 2,
 		"SemFrame" : 
 		{
-			"nodes" : [{"name" : "OBJ", "concept" : "ITEM", "focus" : false, "head" : true},
-						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : false},
+			"nodes" : [{"name" : "OBJ", "concept" : "ITEM", "focus" : true, "head" : false},
+						{"name" : "SUBJ", "concept" : "ENTITY", "focus" : false, "head" : true},
 						{"name" : "ACTION", "concept" : "ACTION", "focus" : false, "head" : false}],
 			"edges" : [{"name" : "ACTION_SUBJ", "concept" : "AGENT", "from" : "ACTION", "to" : "SUBJ"},
 						{"name" : "ACTION_OBJ", "concept" : "PATIENT", "from" : "ACTION", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
-					{"name" : "S2", "type" : "PHON", "phon" : "which"},
-					{"name" : "S3", "type" : "SLOT", "classes" : ["NP", "N"]},
-					{"name" : "S4", "type" : "PHON", "phon" : "is"},
-					{"name" : "S5", "type" : "SLOT", "classes" : ["VP", "V"]},
-					{"name" : "S6", "type" : "PHON", "phon" : "-ed"},
-					{"name" : "S7", "type" : "PHON", "phon" : "by"}],
-		"SymLinks" : {"OBJ" : "S3", "SUBJ" : "S1", "ACTION" : "S5"}		
+					{"name" : "S2", "type" : "PHON", "phon" : "by"},
+					{"name" : "S3", "type" : "PHON", "phon" : "which"},
+					{"name" : "S4", "type" : "SLOT", "classes" : ["NP", "N"]},
+					{"name" : "S5", "type" : "PHON", "phon" : "is"},
+					{"name" : "S6", "type" : "SLOT", "classes" : ["VP", "V"]},
+					{"name" : "S7", "type" : "PHON", "phon" : "-ed"}],
+		"SymLinks" : {"OBJ" : "S4", "SUBJ" : "S1", "ACTION" : "S6"}		
 	},
 
 	{
@@ -435,7 +435,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "HUMAN", "focus" : false, "head" : true},
-						{"name" : "ATTR", "concept" : "PROPERTY", "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "PROPERTY", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
@@ -452,7 +452,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "OBJ", "concept" : "ITEM", "focus" : false, "head" : true},
-						{"name" : "ATTR", "concept" : "PROPERTY", "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "PROPERTY", "focus" : true, "head" : false}],
 			"edges" : [{"name" : "ATTR_OBJ", "concept" : "MODIFY", "from" : "ATTR", "to" : "OBJ"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},

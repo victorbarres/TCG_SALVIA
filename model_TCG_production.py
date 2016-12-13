@@ -309,7 +309,10 @@ def run_prod_diagnostics():
     diagnostic_list = {1:'test_naming', 2:'test_naming_ambiguous', 3:'test_naming_2', 4:'young_woman_static', 
                        5:'young_woman_dyn', 6:'woman_kick_man_static', 7:'woman_kick_man_dyn', 
                        8:'young_woman_punch_man_static', 9:'young_woman_punch_man_dyn', 10:'woman_punch_man_kick_can_static',
-                       11:'woman_punch_man_kick_can_dyn', 12:'woman_in_blue_static'}
+                       11:'woman_punch_man_kick_can_dyn', 12:'woman_in_blue_static', 13:'woman_kick_H_man_static',
+                       14:'woman_H_kick_man_static', 15:'woman_kick_man_H_static',
+                       16:"woman_punch_H_man_kick_can_static", 17:"woman_H_punch_man_kick_can_static",
+                       18:"woman_punch_man_H_kick_can_static", 19:"woman_punch_man_kick_can_H_static"}
     
     for num, name in diagnostic_list.iteritems():
        print "%i -> %s" %(num, name)
