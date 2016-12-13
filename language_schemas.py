@@ -179,7 +179,6 @@ class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
         Args:
             - name (STR):
             - concept (CONCEPT):
-            - init_act (FLOAT):
         """
         KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
         self.set_content({'concept':concept})
@@ -205,6 +204,13 @@ class CPT_PROPERTY_SCHEMA(CPT_SCHEMA):
     def __init__(self, name, concept, init_act):
         CPT_SCHEMA.__init__(self ,name, concept, init_act)
 
+class CPT_EVENT_SCHEMA(CPT_SCHEMA):
+    """
+    Conceptual event schema
+    """
+    def __init__(self, name, concept, init_act):
+        CPT_SCHEMA.__init__(self ,name, concept, init_act)
+
 class CPT_RELATION_SCHEMA(CPT_SCHEMA):
     """
     Conceptual relation schema
@@ -223,6 +229,7 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
         content_copy = cpt_schema.content.copy()
         self.content = content_copy
         self.unbound = False
+        self.frame = False
         
     def match(self, cpt_inst, match_type = "is_a"):
         """
@@ -386,14 +393,24 @@ class CONCEPT_LTM(LTM):
         """
         self.cpt_knowledge = cpt_knowledge
         
-        entity = cpt_knowledge.find_meaning('ENTITY')
-        action = cpt_knowledge.find_meaning('ACTION')
-        prop = cpt_knowledge.find_meaning('PROPERTY')
-        rel = cpt_knowledge.find_meaning('RELATION')
+        entity_name = 'ENTITY'
+        action_name = 'ACTION'
+        property_name = 'PROPERTY'
+        relation_name = 'RELATION'  
+        event_name = 'EVENT'
+        
+        entity = cpt_knowledge.find_meaning(entity_name)
+        action = cpt_knowledge.find_meaning(action_name)
+        prop = cpt_knowledge.find_meaning(property_name)
+        rel = cpt_knowledge.find_meaning(relation_name)
+        event = cpt_knowledge.find_meaning(event_name)
+
         for concept in cpt_knowledge.concepts():
             new_schema = None
             if concept.name == 'CONCEPT':
                 pass
+            elif cpt_knowledge.match(concept, event, match_type="is_a"):
+                new_schema = CPT_EVENT_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])
             elif cpt_knowledge.match(concept, entity, match_type="is_a"):
                 new_schema = CPT_ENTITY_SCHEMA(name=concept.name, concept=concept, init_act=self.params['init_act'])
             elif cpt_knowledge.match(concept, action, match_type="is_a"):
@@ -533,13 +550,13 @@ class SEMANTIC_WM(WM):
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
-                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], new=True, expressed=False)
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, expressed=False)
             
             # Then add the relations
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
-                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'],  new=True, expressed=False)
+                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
             
     def gram_WM_P_ouput(self):
         """

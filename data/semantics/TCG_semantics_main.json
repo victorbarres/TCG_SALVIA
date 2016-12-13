@@ -1,6 +1,8 @@
 {
 	"CONCEPTUAL_KNOWLEDGE" : 
 	{
+		"EVENT":{},
+		
 		"ENTITY" : 
 		{
 			"OBJECT" : 
@@ -80,7 +82,8 @@
 				"WEAR" : {},
 				"SPLASH" : {},
 				"PUNCH" : {},
-				"KISS" : {}
+				"KISS" : {},
+				"WATCH" : {}
 			},
 			
 			"SYMMETRIC":
@@ -91,8 +94,7 @@
 			
 			"INTRANSITIVE" :
 			{
-				"LAUGH" : {},
-				"WATCH" : {}
+				"LAUGH" : {}
 			},
 			
 			"DITRANSITIVE" :
@@ -126,11 +128,17 @@
 		},
 		
 		"RELATION" : 
-		{
-			"MODIFY" : {},
+			
 			"SPECIFY" : {},
-			"THEMATIC" :
+			
+			"OBJECT_FRAME":{
+				"MODIFY" : {},
+				"ATTR" : {}
+			},
+				
+			"ACTION_FRAME" :
 			{
+				"ATTR" : {},
 				"AGT_PT":{
 					"AGENT": {
 						"AGT+PT" : {}
@@ -140,16 +148,21 @@
 						}
 				},
 				"THEME" : {},
-				"RECIPIENT" : {}
+				"RECIPIENT" : {},
+				"MODIFY" : {}
 			},
-			"TEMPORAL" :
+			
+			"EVENT_FRAME":
 			{
+				"SPATIAL" : 
+				{ 
+					"IN" : {} 
+				},
+				"TEMPORAL" :
+				{
 				"SUCCESSIVE" : {},
 				"CONCURRENT" : {}
-			},
-			"SPATIAL" : 
-			{ 
-				"IN" : {} 
+				}
 			}
 		}
 	},
