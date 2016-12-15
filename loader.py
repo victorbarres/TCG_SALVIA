@@ -133,6 +133,8 @@ class TCG_LOADER(object):
         new_node.head = aNode['head']
         if 'focus' in aNode:
             new_node.focus = aNode['focus']
+        if 'frame' in aNode:
+            new_node.frame = aNode['frame']
         
         # Update construction and name_table    
         new_cxn.add_sem_elem(new_node)

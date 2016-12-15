@@ -493,7 +493,7 @@ class SEMANTIC_WM(WM):
         if self.inputs['from_grammatical_WM_P']:
             # Note nodes and edges as expressed
             for name in self.inputs['from_grammatical_WM_P']['nodes']:
-                self.SemRep.node[name]['expressed'] = True # NEED TO EXTENT TO RELATIONS.
+                self.SemRep.node[name]['expressed'] = True
             for name in self.inputs['from_grammatical_WM_P']['edges']:
                 d = self.SemRep.get_edge_data(name[0], name[1])
                 d['expressed'] = True
@@ -544,7 +544,7 @@ class SEMANTIC_WM(WM):
         
         NOTE:
             - Does not handle the case of concept instance updating.
-            - SemRep carreies the instance and the concept. The concept field is redundant, but is useful in order to be able to define
+            - SemRep carries the instance and the concept. The concept field is redundant, but is useful in order to be able to define
             SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
         """
         if cpt_insts:
@@ -557,6 +557,19 @@ class SEMANTIC_WM(WM):
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
                 self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
+            
+#            # Update concept frames
+#            self.update_cpt_frames()
+    
+#    def update_cpt_frames(self):
+#        """
+#        For all the concept frames instances. If they have an 'IS' relation, propagate is_concept to frame.
+#        """
+#        cpt_rel_name = 'IS'
+#        for u,v,d in [edge for edge in self.SemRep.edges(data=True)]:
+#            if d['concept'].name == cpt_rel_name:
+#                self.SemRep.node[u]['cpt_inst'].content = self.SemRep.node[v]['cpt_inst'].content.copy()
+#                self.SemRep.node[u]['concept'] = self.SemRep.node[v]['concept']
             
     def gram_WM_P_ouput(self):
         """
@@ -1604,30 +1617,7 @@ class CXN_RETRIEVAL_P(MODULE_SCHEMA):
         """
         if not cxn_schemas:
             return
-        for cxn_schema in cxn_schemas:        
-            sub_iso = self.SemMatch_cat(SemRep, cxn_schema)
-            for a_sub_iso in sub_iso:
-                match_qual = self.SemMatch_qual(SemRep, cxn_schema, a_sub_iso)
-                trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}
-                node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
-                edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
-                mapping = {'nodes':node_mapping, 'edges':edge_mapping}                
-                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
-                self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
-                    
-    def SemMatch_cat(self, SemRep, cxn_schema):
-        """
-        IMPORTANT ALGORITHM
-        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
-        """
-        SemFrame_graph = cxn_schema.content.SemFrame.graph 
             
-        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-#        print cxn_schema.name
-        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "is" for strict matching
-        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
-        
         def subgraph_filter(subgraph):
             """
             Returns True only if at least one node or edge is tagged as new.
@@ -1639,8 +1629,36 @@ class CXN_RETRIEVAL_P(MODULE_SCHEMA):
                 if d['new']:
                     return True
             return False
+        
+        # Build SemRep subgraphs
+        SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='vertex', subgraph_filter=subgraph_filter)
+        
+        for cxn_schema in cxn_schemas:
+            sub_iso = self.SemMatch_cat(SemRep_subgraphs, cxn_schema)
+            for a_sub_iso in sub_iso:
+                match_qual = self.SemMatch_qual(SemRep, cxn_schema, a_sub_iso)
+                trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}
+                node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
+                edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
+                mapping = {'nodes':node_mapping, 'edges':edge_mapping}                
+                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
+                self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
+                    
+    def SemMatch_cat(self, SemRep_subgraphs, cxn_schema):
+        """
+        IMPORTANT ALGORITHM
+        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
+        """
+        SemFrame_graph = cxn_schema.content.SemFrame.graph 
+            
+        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+       
+        nm = TCG_graph.node_iso_match(["concept", "frame"], ["", False], [node_concept_match, node_frame_match])
+        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
 
-        sub_iso = TCG_graph.find_sub_iso(SemRep, SemFrame_graph, node_match=nm, edge_match=em, subgraph_filter=subgraph_filter)
+        sub_iso = TCG_graph.find_sub_iso(SemRep_subgraphs, SemFrame_graph, node_match=nm, edge_match=em)
         return sub_iso
     
     def SemMatch_qual(self, SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
@@ -2531,15 +2549,14 @@ class SEM_GENERATOR(object):
             - verbose (BOOL): Flag
         """
         # For reference.
-    #        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
-    #        cpt_pattern = r"[A-Z0-9_]+"
-    #        var_pattern = r"[a-z0-9]+"
-    #        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
-    #        cpt_var_pattern = r"\?[A-Z0-9_]+"
+#        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
+#        cpt_pattern = r"[A-Z0-9_]+"
+#        var_pattern = r"[a-z0-9]+"
+#        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
+#        cpt_var_pattern = r"\?[A-Z0-9_]+"
         
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
-#        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)\s*\)" # Concept definition (without activation)
-        func_pattern_cpt2 = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation
+        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
         func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation does without activation
         
         sem_input = self.sem_inputs[input_name]
@@ -2559,7 +2576,7 @@ class SEM_GENERATOR(object):
                 print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(propositions[sequence[idx]]))
             for prop in prop_list:  
                 # Case1:
-                match1 = re.search(func_pattern_cpt2, prop)
+                match1 = re.search(func_pattern_cpt, prop)
                 match2 = re.search(func_pattern_rel, prop)
                 if match1:
                     dat = match1.groupdict()
@@ -2567,9 +2584,12 @@ class SEM_GENERATOR(object):
                     concept = dat['operator']
                     var = dat['var']                        
                     cpt_schema = self.conceptLTM.find_schema(name=concept)
+                    cpt_frame = dat.get('frame', None)
                     cpt_act = dat.get('act', None)
                         
                     cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
+                    if cpt_frame:
+                        cpt_inst.frame = True
                     if cpt_act:
                         cpt_inst.set_activation(float(cpt_act))
                     if cpt_var:

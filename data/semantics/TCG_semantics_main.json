@@ -1,7 +1,10 @@
 {
 	"CONCEPTUAL_KNOWLEDGE" : 
 	{
-		"EVENT":{},
+		"EVENT":
+		{
+		
+		},
 		
 		"ENTITY" : 
 		{
@@ -127,9 +130,9 @@
 			}
 		},
 		
-		"RELATION" : 
+		"RELATION" : {
 			
-			"SPECIFY" : {},
+			"IS":{},
 			
 			"OBJECT_FRAME":{
 				"MODIFY" : {},

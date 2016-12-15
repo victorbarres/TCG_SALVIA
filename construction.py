@@ -49,11 +49,13 @@ class TP_NODE(TP_SEM_ELEM):
     Data:
         - head (BOOL): 
         - focus (BOOL):
+        - frame (BOOL):
     """
     def __init__(self):
         TP_SEM_ELEM.__init__(self)
         self.head = False
         self.focus = False
+        self.frame = False
     
     def copy(self):
         new_node = TP_NODE()
@@ -62,6 +64,7 @@ class TP_NODE(TP_SEM_ELEM):
         new_node.concept = self.concept
         new_node.head = self.head
         new_node.focus = self.focus
+        new_node.frame = self.frame
         return (new_node, name_corr)
 
 class TP_REL(TP_SEM_ELEM):
@@ -186,7 +189,7 @@ class TP_SEMFRAME(TP_ELEM):
     def _create_NX_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
-            graph.add_node(node, concept=node.concept)
+            graph.add_node(node, concept=node.concept, frame=node.frame)
         for edge in self.edges:
             graph.add_edge(edge.pFrom, edge.pTo, concept=edge.concept)
         

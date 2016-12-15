@@ -123,12 +123,13 @@ def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_m
     
     
 
-def run_model(model, sem_gen, input_name, seed=None, verbose=0):
+def run_model(model, sem_gen, input_name, seed=None, verbose=0, prob_times=[]):
     """
     Run the model "model" for an semantic gerator "sem_gent" using the input "input_name"
     Verbose modes: 0 -> no output printed. 1 -> only final utterance printed, 2 -> input and utterances printed as they are received and produced.
+    prob_times ([INT]): For time in list, saves a view of LinguisticWM concise in tmp folder.
     """
-    random.seed(seed)    
+    random.seed(seed)
     
     generator = sem_gen.sem_generator(input_name, verbose = (verbose>1))
     (sem_insts, next_time, prop) = generator.next()
@@ -153,6 +154,13 @@ def run_model(model, sem_gen, input_name, seed=None, verbose=0):
             if verbose > 1:
                  print "t:%i, '%s'" %(t, output['Utter'])
             out_utterance.append(output['Utter'])
+        if t in prob_times:
+            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True)
+            
+    
+    if verbose>2:
+        model.schemas['Semantic_WM'].show_SemRep()
+        model.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=True,  c2_network=False)
             
     # Output analysis
     res = prod_analyses(out_data)
@@ -298,7 +306,7 @@ def main():
                 f.write(new_line)
 
 
-def run_prod_diagnostics():
+def run_prod_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of production diagnostics.
     """
@@ -308,8 +316,9 @@ def run_prod_diagnostics():
     
     diagnostic_list = {1:'test_naming', 2:'test_naming_ambiguous', 3:'test_naming_2', 4:'young_woman_static', 
                        5:'young_woman_dyn', 6:'woman_kick_man_static', 7:'woman_kick_man_dyn', 
-                       8:'young_woman_punch_man_static', 9:'young_woman_punch_man_dyn', 10:'woman_punch_man_kick_can_static',
-                       11:'woman_punch_man_kick_can_dyn', 12:'woman_in_blue_static'}
+                       8:'young_woman_punch_man_static', 9:'young_woman_punch_man_dyn', 10: 'man_who_kick_can_static', 
+                       11:'woman_punch_man_kick_can_static', 12:'woman_punch_man_kick_can_dyn',
+                       13:'woman_in_blue_static'}
     
     for num, name in diagnostic_list.iteritems():
        print "%i -> %s" %(num, name)
@@ -328,7 +337,7 @@ def run_prod_diagnostics():
         model = set_model()
         my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro = False)
         print "\nSIMULATION RUN:\n"
-        res = run_model(model, my_inputs, input_name, verbose=2)
+        res = run_model(model, my_inputs, input_name, verbose=verbose, prob_times=prob_times)
         print "\nRESULTS:\n"
         print res
         raw_input("\nPress Enter to continue...\n")
@@ -336,5 +345,5 @@ def run_prod_diagnostics():
     
     
 if __name__=='__main__':
-    run_prod_diagnostics()
+    run_prod_diagnostics(verbose=3, prob_times=[100])
     
