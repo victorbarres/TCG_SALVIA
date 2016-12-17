@@ -93,7 +93,7 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
     return model
     
-def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_macro = False, speed_param=1):
+def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_macro = False, speed_param=5):
     """
     Sets up a TCG ISRF inputs generator for TCG production model.
     

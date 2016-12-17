@@ -68,7 +68,7 @@ def TCG_production_system(name='language_system_P',
     language_system_P.set_output_ports([utter.find_port('to_output'), grammaticalWM_P.find_port('to_output')])
     
     # Parameters
-    semanticWM.params['dyn']['tau'] = 5000.0
+    semanticWM.params['dyn']['tau'] = 1000.0
     semanticWM.params['dyn']['int_weight'] = 1.0
     semanticWM.params['dyn']['ext_weight'] = 1.0
     semanticWM.params['dyn']['act_rest'] = 0.001
