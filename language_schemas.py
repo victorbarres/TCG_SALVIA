@@ -453,7 +453,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_visual_WM')
-        self.params['dyn'] = {'tau':1000.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
     
@@ -705,7 +705,7 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_P')
         self.add_port('OUT', 'to_output')
-        self.params['dyn'] = {'tau':30.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
+        self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         
@@ -1701,7 +1701,7 @@ class PHON_WM_P(WM):
         self.add_port('OUT', 'to_utter')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_control')
-        self.params['dyn'] = {'tau':2, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['dyn'] = {'tau':2, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
     
@@ -1797,7 +1797,7 @@ class PHON_WM_C(WM):
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_control')
-        self.params['dyn'] = {'tau':2.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['dyn'] = {'tau':2.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
 
@@ -1831,7 +1831,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('IN', 'from_cxn_retrieval_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
-        self.params['dyn'] = {'tau':30.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
+        self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':0, 'comp_asymmetry':0,'P_comp':1.0, 'P_coop':1.0,  'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
         self.params['pred'] = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1

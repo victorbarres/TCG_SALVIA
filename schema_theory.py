@@ -473,7 +473,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         - alive (bool): status flag
         - trace (): Pointer to the element that triggered the instantiation.
         - activity (FLOAT): activity value for schema instance
-        - params: {'act':{t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT act_rest:FLOAT, k:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}}
+        - params: {'act':{t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT, int_weight:FLOAT, ext_weight:FLOAT, sact_rest:FLOAT, k:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}}
         - activation (INST_ACTIVATION): Activation object of schema instance
         - act_port_in (PORT): Stores the vector of all the input activations.
         - act_port_out (PORT): Sends as output the activation of the instance.
@@ -484,7 +484,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         self.alive = False
         self.trace = None
         self.activity = 0
-        self.params['act'] = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'tau':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['act'] = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'int_weight': 1.0, 'ext_weight': 1.0, 'tau':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.activation = None
         self.act_port_in = PORT("IN", port_schema=self, port_name="act_in", port_value=[]);
         self.act_port_out = PORT("OUT", port_schema=self, port_name="act_out", port_value=0);
@@ -495,6 +495,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         Set activation parameters
         """
         self.activation = INST_ACTIVATION(t0=self.params['act']['t0'], act0=self.params['act']['act0'], dt=self.params['act']['dt'], tau=self.params['act']['tau'],
+                                          int_weight=self.params['act']['int_weight'], ext_weight=self.params['act']['ext_weight'],
                                           act_rest=self.params['act']['act_rest'], k=self.params['act']['k'],
                                           noise_mean=self.params['act']['noise_mean'], noise_std=self.params['act']['noise_std'])
         
@@ -541,14 +542,12 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
             I+= v
         self.act_port_in.value = [];
         
-#        print "%s, %.2f, %.2f, %.2f" %(self.name, self.activity, self.activation.E, I)
-        
         self.activation.update(I)
         self.activity = self.activation.act
         self.act_port_out.value = self.activity
     
     @abc.abstractmethod
-    def update(self):
+    def process(self):
         """
         This function should be specified for every specific SCHEMA_INST class.
         When called, this function should read the value at the input ports and based on the state of the procedure, update the state of the instance and 
@@ -574,12 +573,12 @@ class INST_ACTIVATION(object):
     Note: Having dt and Tau is redundant... dt should be defined at the system level.
     I have added E to gather external inputs (not carried through ports. Useful for activations across WMs.)
     """
-    def __init__(self, t0=0.0, act0=1.0, dt=0.1, tau=1.0, act_rest=0.001, k=10.0, noise_mean=0.0, noise_std=0.0):
+    def __init__(self, t0=0.0, act0=1.0, dt=0.1, tau=1.0, int_weight=1.0, ext_weight=1.0, act_rest=0.001, k=10.0, noise_mean=0.0, noise_std=0.0):
         self.t0 = float(t0)
         self.act0 = float(act0)
         self.tau = float(tau)
         self.act_rest = float(act_rest)
-        self.W = {'W_I':1.0, 'W_E':1.0}
+        self.W = {'W_I':int_weight, 'W_E':ext_weight, 'W_self':0.0}
         self.k = float(k)
         self.dt = float(dt) 
         self.t = self.t0
@@ -591,12 +590,16 @@ class INST_ACTIVATION(object):
         
     def update(self, Int):
         """
+        Int: total internal input
         """
         alpha = (1.0 - 1.0/self.tau) # Time constant (leak rate)
         noise =  random.normalvariate(self.noise_mean, self.noise_std) # noise value
-        V_act = np.array([Int, self.E]) # Inputs vector
-        W = np.array([self.W[val] for val in ['W_I', 'W_E']]) # Weights vector
-        Input = np.dot(W, V_act) # Total input
+        act_int = self.W['W_I']*Int + self.W['W_self']*self.act # Weighted internal input
+        act_ext = self.W['W_E']*self.E #  Weighted external input
+        Input = act_int + act_ext # Total input before noise (linear summation option)
+#        Input = act_ext + act_int*act_ext # Total input before noise (modulation option 1)
+
+        
         new_act = alpha*self.act + (1.0 - alpha)*self.logistic(Input + noise) # Updated activation
         self.act = new_act
         self.t += self.dt
@@ -689,11 +692,13 @@ class WM(MODULE_SCHEMA):
         - schema_insts ([SCHEMA_INST]):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
-        - params (DICT): {'dyn': {'tau':FLOAT, 'act_rest':FLOAT,'k':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
+        - params (DICT): {'dyn': {'tau':FLOAT, 'int_weight':FLOAT, 'ext_weight':FLOAT,'act_rest':FLOAT,'k':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
                           'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT, 'coop_asymmetry':FLOAT, 'comp_asymmetry':FLOAT, 'P_comp':FLOAT, 'P_coop':FLOAT}}
             Note:
             - coop_weight (FLOAT): weight of cooperation f-links
             - comp_weight (FLOAT): weight of competition f-links
+            - int_weight (FLOAT): weight given to internal effects on C2
+            - ext_weight (FLOAT): weight given to external effects on C2
             - prune_threshold (FLOAT): Below this threshold the instances are considered inactive (Alive=False)
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
     """
@@ -702,7 +707,7 @@ class WM(MODULE_SCHEMA):
         self.schema_insts = []
         self.coop_links = []
         self.comp_links = []
-        self.params['dyn'] = {'tau':10.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.1}
+        self.params['dyn'] = {'tau':10.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.1}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
@@ -732,7 +737,8 @@ class WM(MODULE_SCHEMA):
         
         if not(act0):
             act0 = schema_inst.activity # Uses the init_activation defined by the associated schema.
-        act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 'act_rest':self.params['dyn']['act_rest'],
+        act_params = {'t0':self.t, 'act0': act0, 'dt':self.dt, 'tau':self.params['dyn']['tau'], 
+                      'int_weight':self.params['dyn']['int_weight'], 'ext_weight':self.params['dyn']['ext_weight'], 'act_rest':self.params['dyn']['act_rest'],
                       'k':self.params['dyn']['k'], 'noise_mean':self.params['dyn']['noise_mean'], 'noise_std':self.params['dyn']['noise_std']}
         schema_inst.params['act'] = act_params
         schema_inst.initialize_activation()
@@ -1012,11 +1018,11 @@ class WM(MODULE_SCHEMA):
         # Plot instance activations
         if inst_act:
             plt.figure(facecolor='white')
-            title = '%s dynamics \n dyn: [tau:%g, act_rest:%g, k:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g ,prune:%g, conf:%g]' %(
+            title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
                                 self.name,
-                                self.params['dyn']['tau'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
+                                self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
                                 self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
-                                  self.params['C2']['coop_weight'], self.params['C2']['comp_weight'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
+                                  self.params['C2']['coop_weight'], self.params['C2']['comp_weight'],  self.params['C2']['coop_asymmetry'], self.params['C2']['comp_asymmetry'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
             plt.title(title)
             plt.xlabel('time', fontsize=14)
             plt.ylabel('activity', fontsize=14)
@@ -1138,7 +1144,7 @@ class F_LINK(object):
         - asymmetry_coef (FLOAT): 0 <= asymmetry_coef <= 1
         - weight_func (Lambda function): Function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func=lambda w,x,y:w):
+    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:x):
         """
         """
         self.inst_from = inst_from
