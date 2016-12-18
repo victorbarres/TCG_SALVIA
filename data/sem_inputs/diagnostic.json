@@ -1,7 +1,7 @@
 { 
 	"inputs":{
 		"test_naming": {
-			"sem_rate": 10,
+			"sem_rate": 1,
 			 "propositions"  : {
 				"P1": ["ENTITY(e,F)", "MAN(man)", "IS(is)", "is(e, man)"]
 			  },
@@ -11,7 +11,7 @@
 		},
 			
 		"test_naming_ambiguous": {
-			"sem_rate": 10,
+			"sem_rate": 1,
 			 "propositions"  : {
 				"P1": ["ENTITY(e,F)", "WOMAN(woman)", "IS(is)", "is(e, woman)"]
 			  },
@@ -21,7 +21,7 @@
 		},
 			
 		"test_naming_2": {
-			"sem_rate": 10,
+			"sem_rate": 1,
 			 "propositions"  : {
 				"P1": ["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", "ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"]
 			  },
@@ -31,7 +31,7 @@
 			},
 			
 		"woman_static":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e,F,0.8)", "WOMAN(woman)", "IS(is)", "is(e, woman)"]
 			},
@@ -41,7 +41,7 @@
 		},
 			
 		"young_woman_static": {
-			"sem_rate": 10,
+			"sem_rate": 1,
 			 "propositions"  : {
 				"P1":["ENTITY(e,F,0.9)", "WOMAN(woman)", "IS(is)", "is(e, woman)", "YOUNG(young, 0.8)", "MODIFY(mod, 0.7)", "mod(e, young)"]
 			  },
@@ -51,7 +51,7 @@
 		},
 			
 		"young_woman_dyn": {
-			"sem_rate": 10,
+			"sem_rate": 1,
 			 "propositions"  : {
 				"P1":["ENTITY(e,F,0.9)"],
 				"P2":["WOMAN(woman)", "IS(is)", "is(e, woman)"],
@@ -63,7 +63,7 @@
 		},
 		
 		"woman_kick_man_static":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
 					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
@@ -77,7 +77,7 @@
 		},
 		
 		"woman_kick_man_dyn":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions"  : {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
 				"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
@@ -90,7 +90,7 @@
 		},
 		
 		"young_woman_punch_man_static":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
 					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)", "YOUNG(young)", "MODIFY(mod)", "mod(e2, young)",
@@ -104,7 +104,7 @@
 		},
 			
 		"young_woman_punch_man_dyn":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
 				"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
@@ -119,7 +119,7 @@
 		},
 		
 		"man_who_kick_can_static":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)",
 					"ENTITY(e2,F)", "WATERING_CAN(can)", "IS(is2)", "is2(e2, can)",
@@ -132,7 +132,7 @@
 		},
 		
 		"woman_punch_man_kick_can_static":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
 					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
@@ -147,7 +147,7 @@
 		},
 		
 		"woman_punch_man_kick_can_dyn":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
 					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
@@ -162,7 +162,7 @@
 		},
 			
 		"woman_in_blue_static":{
-			"sem_rate":10,
+			"sem_rate":1,
 			"propositions":{
 				"P1":["WOMAN(w1)", "WEAR(a1)", "DRESS(d1)", "BLUE(b1)", "AGENT(r1)", "PATIENT(r2)", "MODIFY(r3)", "r1(a1, w1)", "r2(a1,d1)", "r3(b1, d1)"]
 			},

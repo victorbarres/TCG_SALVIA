@@ -1491,11 +1491,13 @@ class SCHEMA_SYSTEM(object):
         - brain_mapping (BRAIN_MAPPING)
         - t (FLOAT): System global time.
         - dt (FLOAT): System time increment.
+        - set_up_time (INT): Number of time steps the system is ran so that all its sub-systems are in proper initial states.
         - verbose (BOOL): If True, print execution information.
         - sim_data (DICT): stores the simulation data.
     """
     T0 = 0.0
     TIME_STEP = 1.0
+    SET_UP_TIME = 10
     def __init__(self, name=''):
         self.name = name
         self.schemas = {}
@@ -1509,6 +1511,7 @@ class SCHEMA_SYSTEM(object):
         self.brain_mapping = None
         self.t = SCHEMA_SYSTEM.T0
         self.dt = SCHEMA_SYSTEM.TIME_STEP
+        self.set_up_time = SCHEMA_SYSTEM.SET_UP_TIME
         self.verbose = False
         self.sim_data = {'schema_system':{}, 'system_states':{}}
         
@@ -1610,6 +1613,26 @@ class SCHEMA_SYSTEM(object):
             return self.outputs[self.t]
         else:
             return None
+            
+    def initialize_states(self):
+        """
+        Run the model for self.set_up_time steps.
+        Does not read inputs or posts outputs.
+        self.t is not updated, simulation results not saved.
+        """
+        for t in range(self.set_up_time):
+             # Update all the schema states
+            for schema_name, schema in self.schemas.iteritems():
+                init_t = time.time()
+                schema.update()
+                end_t = time.time()
+                schema.t = self.t
+                if self.verbose:
+                    print 'Update %s, (%f s)' %(schema_name, end_t - init_t)
+            
+            # Propagate value through connections
+            for connection in self.connections:
+                connection.update()
         
     def update(self):
         """

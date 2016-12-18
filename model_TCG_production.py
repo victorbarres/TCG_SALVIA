@@ -93,7 +93,7 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
     return model
     
-def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_macro = False, speed_param=5):
+def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_macro = False, speed_param=10):
     """
     Sets up a TCG ISRF inputs generator for TCG production model.
     
@@ -101,7 +101,7 @@ def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_m
         - sem_name (STR): Semantic input name.
         - sem_input_file (STR): Semantic input file name. For non-macro input, set to 'ALL' to load all inputs from file.
         - sem_input_macro (BOOL): True is the input is an ISRF macro.
-        - speed_param (INT): multiplier of the rate defined in the ISRF input.
+        - speed_param (INT): multiplier of the rate defined in the ISRF input (by default the ISFR rate is 1.)
     
     Returns input SEM_GENERATOR object.
     """
@@ -119,8 +119,7 @@ def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_m
         sem_inputs = TCG_LOADER.load_sem_macro(input_name, sem_input_file, SEM_INPUT_PATH)
         sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param)
     
-    return sem_gen
-    
+    return sem_gen    
     
 
 def run_model(model, sem_gen, input_name, seed=None, verbose=0, prob_times=[]):
@@ -133,14 +132,13 @@ def run_model(model, sem_gen, input_name, seed=None, verbose=0, prob_times=[]):
     
     generator = sem_gen.sem_generator(input_name, verbose = (verbose>1))
     (sem_insts, next_time, prop) = generator.next()
-    
-    set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
+    model.initialize_states()
     max_time = 900
     
     out_data = []
     out_utterance = []
-    for t in range(set_up_time, max_time):
-        if next_time != None and t>next_time:
+    for t in range(max_time):
+        if  next_time != None and t>=next_time:
             (sem_insts, next_time, prop) = generator.next()
 #            if verbose>1:
 #                print "t:%i, sem: %s (prop: %s)" %(t, ', '.join([inst.name for inst in sem_insts]), prop)
@@ -306,19 +304,20 @@ def main():
                 f.write(new_line)
 
 
+DIAGNOSTIC_FILE = 'diagnostic.json'
+    
+diagnostic_list = {1:'test_naming', 2:'test_naming_ambiguous', 3:'test_naming_2', 4:'young_woman_static', 
+                   5:'young_woman_dyn', 6:'woman_kick_man_static', 7:'woman_kick_man_dyn', 
+                   8:'young_woman_punch_man_static', 9:'young_woman_punch_man_dyn', 10: 'man_who_kick_can_static', 
+                   11:'woman_punch_man_kick_can_static', 12:'woman_punch_man_kick_can_dyn',
+                   13:'woman_in_blue_static'}
+    
+
 def run_prod_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of production diagnostics.
     """
     print "\n\nDiagnostic cases\n\n"
-    
-    DIAGNOSTIC_FILE = 'diagnostic.json'
-    
-    diagnostic_list = {1:'test_naming', 2:'test_naming_ambiguous', 3:'test_naming_2', 4:'young_woman_static', 
-                       5:'young_woman_dyn', 6:'woman_kick_man_static', 7:'woman_kick_man_dyn', 
-                       8:'young_woman_punch_man_static', 9:'young_woman_punch_man_dyn', 10: 'man_who_kick_can_static', 
-                       11:'woman_punch_man_kick_can_static', 12:'woman_punch_man_kick_can_dyn',
-                       13:'woman_in_blue_static'}
     
     for num, name in diagnostic_list.iteritems():
        print "%i -> %s" %(num, name)
@@ -341,8 +340,6 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
         print "\nRESULTS:\n"
         print res
         raw_input("\nPress Enter to continue...\n")
-    
-    
     
 if __name__=='__main__':
     run_prod_diagnostics(verbose=3, prob_times=[100])
