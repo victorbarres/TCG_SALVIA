@@ -182,7 +182,7 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     """
     DIAGNOSTIC_FILE = 'diagnostic_kuchinksy.json'
     SPEED_PARAM = 50
-    MODEL_PARAMS = {}
+    MODEL_PARAMS = {'Control.task.start_produce':400}
     
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
@@ -211,12 +211,12 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     diagnostic_cases = [diagnostic_list[value] for value in input_vals]
     
     for input_name in diagnostic_cases:
-        raw_input("\nPress Enter to continue...\n")
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
         res = run_model(model, my_inputs, input_name, max_time, seed, verbose=verbose, prob_times=prob_times)
         print "\nRESULTS:\n"
         print res
+        raw_input("\nPress Enter to continue...\n")
 
 def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
     """
@@ -353,5 +353,5 @@ def run_grid_search():
                 f.write(new_line)
     
 if __name__=='__main__':
-    run_prod_diagnostics(verbose=3, prob_times=[100])
+    run_prod_diagnostics(verbose=3, prob_times=[])
     
