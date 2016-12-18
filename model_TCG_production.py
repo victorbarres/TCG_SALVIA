@@ -14,6 +14,8 @@ from loader import TCG_LOADER
 from TCG_models import TCG_production_system
 from viewer import TCG_VIEWER
 from prod_analysis import prod_analyses, prod_statistics
+
+TMP_FOLDER = './tmp'
     
 def test_run(seed=None):
     """
@@ -93,7 +95,7 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
     return model
     
-def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_macro = False, speed_param=10):
+def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_macro=False, speed_param=10):
     """
     Sets up a TCG ISRF inputs generator for TCG production model.
     
@@ -122,27 +124,31 @@ def set_inputs(model, input_name, sem_input_file= 'diagnostic.json', sem_input_m
     return sem_gen    
     
 
-def run_model(model, sem_gen, input_name, seed=None, verbose=0, prob_times=[]):
+def run_model(model, sem_gen, input_name, max_time=900, seed=None, verbose=0, prob_times=[]):
     """
     Run the model "model" for an semantic gerator "sem_gent" using the input "input_name"
     Verbose modes: 0 -> no output printed. 1 -> only final utterance printed, 2 -> input and utterances printed as they are received and produced.
     prob_times ([INT]): For time in list, saves a view of LinguisticWM concise in tmp folder.
     """
+    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
+        random.seed(seed)
+        seed = random.randint(0,10**9)
     random.seed(seed)
+    
+    FOLDER = '%s/TEST_%s_%s/' %(TMP_FOLDER, input_name, str(seed))
     
     generator = sem_gen.sem_generator(input_name, verbose = (verbose>1))
     (sem_insts, next_time, prop) = generator.next()
     model.initialize_states()
-    max_time = 900
     
     out_data = []
     out_utterance = []
     for t in range(max_time):
         if  next_time != None and t>=next_time:
             (sem_insts, next_time, prop) = generator.next()
-#            if verbose>1:
-#                print "t:%i, sem: %s (prop: %s)" %(t, ', '.join([inst.name for inst in sem_insts]), prop)
             model.set_input(sem_insts)
+            if verbose>2:
+                prob_times.append(t + 10) #Will save the state 10 step after introduction of new inputs.
         model.update()
         # Store output
         output = model.get_output()
@@ -153,7 +159,7 @@ def run_model(model, sem_gen, input_name, seed=None, verbose=0, prob_times=[]):
                  print "t:%i, '%s'" %(t, output['Utter'])
             out_utterance.append(output['Utter'])
         if t in prob_times:
-            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True)
+            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
             
     
     if verbose>2:
@@ -168,6 +174,49 @@ def run_model(model, sem_gen, input_name, seed=None, verbose=0, prob_times=[]):
     if verbose == 1:
         print ' '.join(out_utterance)
     return (res, ' '.join(out_utterance))
+    
+    
+def run_prod_diagnostics(verbose=2, prob_times=[]):
+    """
+    Allows to run a set of production diagnostics.
+    """
+    DIAGNOSTIC_FILE = 'diagnostic_kuchinksy.json'
+    SPEED_PARAM = 50
+    MODEL_PARAMS = {}
+    
+    ### GENERAL PARAMETERS
+    semantics_name = 'TCG_semantics_main'
+    grammar_name='TCG_grammar_VB_main'  
+    max_time =1000
+    seed=None
+    ###    
+    
+    model = set_model(semantics_name, grammar_name, model_params=MODEL_PARAMS)
+    my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro = False, speed_param=SPEED_PARAM)
+    
+    input_names = my_inputs.sem_inputs.keys()
+    diagnostic_list = dict(zip(range(len(input_names)), input_names))
+    
+    print "\n\nDiagnostic cases\n\n"
+    for num, name in diagnostic_list.iteritems():
+       print "%i -> %s" %(num, name)
+     
+    input_vals = raw_input("\nInput case numbers as (e.g 1, 2, 6, 7). For all input use ALL:\n->")   
+    if input_vals == 'ALL':
+        input_vals = diagnostic_list.keys()
+        input_vals.sort()
+    else:
+        input_vals = [int(s.strip()) for s in input_vals.split(',')]
+    
+    diagnostic_cases = [diagnostic_list[value] for value in input_vals]
+    
+    for input_name in diagnostic_cases:
+        raw_input("\nPress Enter to continue...\n")
+        print "\nINPUT NAME: %s\n" %input_name
+        print "\nSIMULATION RUN:\n"
+        res = run_model(model, my_inputs, input_name, max_time, seed, verbose=verbose, prob_times=prob_times)
+        print "\nRESULTS:\n"
+        print res
 
 def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
     """
@@ -231,7 +280,7 @@ def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
     return output
     
     
-def main():
+def run_grid_search():
     """
     Runs the production model using grid_search.
     """
@@ -302,44 +351,6 @@ def main():
             for d in dat:
                 new_line = line(d)
                 f.write(new_line)
-
-
-DIAGNOSTIC_FILE = 'diagnostic.json'
-    
-diagnostic_list = {1:'test_naming', 2:'test_naming_ambiguous', 3:'test_naming_2', 4:'young_woman_static', 
-                   5:'young_woman_dyn', 6:'woman_kick_man_static', 7:'woman_kick_man_dyn', 
-                   8:'young_woman_punch_man_static', 9:'young_woman_punch_man_dyn', 10: 'man_who_kick_can_static', 
-                   11:'woman_punch_man_kick_can_static', 12:'woman_punch_man_kick_can_dyn',
-                   13:'woman_in_blue_static'}
-    
-
-def run_prod_diagnostics(verbose=2, prob_times=[]):
-    """
-    Allows to run a set of production diagnostics.
-    """
-    print "\n\nDiagnostic cases\n\n"
-    
-    for num, name in diagnostic_list.iteritems():
-       print "%i -> %s" %(num, name)
-     
-    input_vals = raw_input("\nInput case numbers as (e.g 1, 2, 6, 7). For all input use ALL:\n->")   
-    if input_vals == 'ALL':
-        input_vals = diagnostic_list.keys()
-        input_vals.sort()
-    else:
-        input_vals = [int(s.strip()) for s in input_vals.split(',')]
-    
-    diagnostic_cases = [diagnostic_list[value] for value in input_vals]
-    
-    for input_name in diagnostic_cases:
-        print "\nINPUT NAME: %s\n" %input_name
-        model = set_model()
-        my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro = False)
-        print "\nSIMULATION RUN:\n"
-        res = run_model(model, my_inputs, input_name, verbose=verbose, prob_times=prob_times)
-        print "\nRESULTS:\n"
-        print res
-        raw_input("\nPress Enter to continue...\n")
     
 if __name__=='__main__':
     run_prod_diagnostics(verbose=3, prob_times=[100])

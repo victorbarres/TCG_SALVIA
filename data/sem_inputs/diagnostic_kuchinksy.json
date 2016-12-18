@@ -1,0 +1,62 @@
+{ 
+	"inputs":{
+		
+		"man_woman_kick_act":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P3":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+				"P4":["EVENT(evt1,F)", "IS(is3)", "is3(evt1,a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+			},
+			"sequence" :["P1", "P2", "P3", "P4"],
+			"timing":[],
+			"comments":"Easy objects, hard action"
+		},
+		
+		"act_kick_woman_man":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+				"P2":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"P3":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"]
+				
+			},
+			"sequence" :["P1", "P2", "P3", "P4"],
+			"timing":[],
+			"comments":"Easy action, hard objects"
+		},
+		
+		"act_kick_woman_man_young":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+				"P2":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"P3":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P5":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P5"],
+			"timing":[],
+			"comments":"Easy action, hard objects + modifier"
+		},
+
+		
+		"woman_punch_man_kick_can":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+				"P2":["PUNCH(punch)", "IS(is4)", "is4(a1, punch)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"P3":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P5":["ENTITY(e3,F)", "WATERING_CAN(can)", "IS(is5)", "is5(e3, can)"],
+				"P6":["EVENT(evt2,F)", "ACTION(a2,F)", "IS(is6)", "is6(evt2,a2)", "KICK(kick)", "IS(is7)", "is7(a2, kick)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a2, e3)",
+					"MODIFY(mod1)", "mod1(e1, evt2)"]
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6"],
+			"timing":[],
+			"comments":"Two actions, modifier"
+		}
+	}
+}
