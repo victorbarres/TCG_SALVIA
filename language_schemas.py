@@ -2620,7 +2620,7 @@ class SEM_GENERATOR(object):
             
             yield (instances, next_time, ' , '.join(prop_list))
 
-class UTTER_GENERATOR():
+class UTTER_GENERATOR(object):
     """
     """
     def __init__(self, ling_inputs, speed_param=1):
