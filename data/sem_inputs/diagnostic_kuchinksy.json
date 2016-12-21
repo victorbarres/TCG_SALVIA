@@ -57,6 +57,21 @@
 			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6"],
 			"timing":[],
 			"comments":"Two actions, modifier"
+		},
+		
+		"Jin_ex":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"P2":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P3":["KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+				"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P5":["EVENT(evt2, F)", "IS(is5)", "is5(evt2, e1)", "YOUNG(young)", "MODIFY(mod1)", "mod1(evt2, young)"]
+				
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P5"],
+			"timing":[],
+			"comments":"Example presented by Jin in his modeling paper. Different treatment of relative clause in my case."
 		}
 	}
 }

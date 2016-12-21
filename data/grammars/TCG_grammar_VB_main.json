@@ -377,14 +377,13 @@
 		"class" : "N",
 		"preference" : 1,
 		"group": 2,
-		"SemFrame" :
+		"SemFrame" : 
 		{
-			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ENT", "concept" : "EVENT", "frame" : true, "focus" : true, "head" : false},
+			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : true},
 						{"name" : "ATTR", "concept" : "PROPERTY", "frame" : false, "focus" : false, "head" : false}],
 			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ENT"},
-						{"name" : "EVT_ATTR", "concept" : "MODIFY", "from" : "EVT", "to" : "ATTR"},
-						{"name" : "ENT_EVT", "concept" : "MODIFY", "from" : "ENT", "to" : "EVT"}]
+						{"name" : "EVT_ATTR", "concept" : "MODIFY", "from" : "EVT", "to" : "ATTR"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
 					{"name" : "S2", "type" : "PHON", "phon" : "that"},

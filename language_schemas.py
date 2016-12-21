@@ -708,7 +708,7 @@ class GRAMMATICAL_WM_P(WM):
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
-        
+        self.limit_capacity_option = 4
     def process(self):
         """
         """
@@ -796,8 +796,7 @@ class GRAMMATICAL_WM_P(WM):
             
             # Normalization
             if normalization and count>0:
-#                act = act/(len(cover_nodes.keys()) + len(cover_edges.keys())) # normalizing remove favoring constructions that cover more content.
-                act = act/count
+                act = act/count # normalizing removes favoring constructions that cover more content.
             inst.activation.E += act*weight
     
     def apply_pressure(self, pressure, option=0):
@@ -1719,7 +1718,7 @@ class PHON_WM_P(WM):
         self.params['dyn'] = {'tau':2, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
-        self.needs_filler = True
+        self.needs_filler = False
         self.filler = '....'
     
     def reset(self):
@@ -1762,6 +1761,9 @@ class PHON_WM_P(WM):
             self.needs_filler = False
         elif phon_sequence == None:
             self.needs_filler = True
+        elif phon_sequence:
+            self.needs_filler = False
+            
             
 
     ####################

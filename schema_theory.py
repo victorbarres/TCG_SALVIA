@@ -712,6 +712,7 @@ class WM(MODULE_SCHEMA):
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
                                            'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
+        self.limit_capacity_option = 0 # NEed to refactor that if it turns out to be useful
         
     def reset(self):
         """
@@ -903,6 +904,8 @@ class WM(MODULE_SCHEMA):
         
         self.update_activity()
         
+        self.limit_capacity(option=self.limit_capacity_option) #To impact WM capacity.
+        
         self.update_save_state()
     
     def prune(self):
@@ -934,6 +937,36 @@ class WM(MODULE_SCHEMA):
                 inst_to.alive = False
         self.comp_links = []
         self.prune()
+        
+    ###########################
+    ### Degradation methods ###
+    ###########################
+    def limit_capacity(self, option=0):
+        """
+        Test various ways to induce WM capacity limitations.
+        """
+        if option==0: # Do nothing
+            return
+        elif option==1: # Set the cooperations weight to 0
+            self.params['C2']['coop_weight'] = 0.0
+        elif option==2: # Make the cooperation weight quickly decay (non maintenance of cooperation)
+            pass # Need to define in WM a parameter that provides the F_link functions. This would also require having a pruning for f_links.
+        elif option==3: # Randomly remove coop_links to limit structural capacity
+            threshold = 0.1
+            for link in self.coop_links[:]:
+                val =  random.random()
+                if val<threshold:
+                    self.coop_link.remove(link)
+        elif option==4: # same things but now links are remove in proportion to number of linkss
+                max_val = 0.001
+                max_capacity = 10.0
+                capacity_remaining = (max_capacity - len(self.coop_links))/max_capacity
+                threshold = min(max_val, (1 - capacity_remaining)*max_val) #linear
+                for link in self.coop_links[:]:
+                    val =  random.random()
+                    if val<threshold:
+                        print "t:%i DAMAGE! coop_removed (%s -> %s)" %(self.t, link.inst_from.name, link.inst_to.name)
+                        self.coop_links.remove(link)
         
     ############################
     ### STATE SAVING METHODS ###
