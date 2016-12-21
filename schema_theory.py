@@ -37,7 +37,7 @@ class SCHEMA(object):
     Data:
         - id (int): Unique id
         - name (str): schema name
-        - schema_system (SCHEMA_SYSTEM): Schema system to which the instance belongs.
+        - schema_system (SCHEMA_SYSTEM): Schema system to which the schema belongs.
     """
     ID_next = 1 # Global schema ID counter
     def __init__(self, name=""):
@@ -156,44 +156,13 @@ class CONNECT(SCHEMA):
         """
         data = {"id":self.id, "name":self.name, "port_from":self.port_from.name, "port_to":self.port_to.name, "weight":self.weight, "delay":self.delay}
         return data
-############################################      
-##### KNOWLEDGE AND PROCEDURAL SCHEMAS #####
-############################################
-class KNOWLEDGE_SCHEMA(SCHEMA):
-    """
-    Knowledge schema base class (Declarative schema)
-    Those schemas can be instantiated.
-    
-    Data (inherited):
-        - id (int): Unique id
-        - name (str): schema name
-    Data:
-        - LTM (LTM): Associated long term memory.
-        - content (): Procedural or semantic content of the schema.
-        - init_act (float): Initial activation value.
-    """    
-    def __init__(self, name="", LTM=None, content=None, init_act=0):
-        SCHEMA.__init__(self, name)
-        self.content = content
-        self.LTM = LTM
-        self.init_act = init_act
-    
-    def set_name(self, name):
-        self.name = name
-
-    def set_init(self, init_act):
-        self.init_act = init_act
-    
-    def set_content(self, content):
-        self.content = content
-    
-    def set_LTM(self, LTM):
-        self.LTM = LTM
-
+        
+##############################  
+##### PROCEDURAL SCHEMAS #####
+##############################
 class PROCEDURAL_SCHEMA(SCHEMA):
     """
     Procedural schema base class
-    Those schemas cannot be instantiated. They can be linked to brain data.
     Data (inherited):
         - id (int): Unique id
         - name (str): schema name
@@ -444,6 +413,41 @@ class FUNCTION_SCHEMA(PROCEDURAL_SCHEMA):
     def __init__(self, name=""):
         PROCEDURAL_SCHEMA.__init__(self,name)
         self.module = None
+ 
+################################
+### KNOWLEDGE SCHEMA CLASSES ###
+################################        
+
+class KNOWLEDGE_SCHEMA(SCHEMA):
+    """
+    Knowledge schema base class (Declarative schema)
+    Those schemas can be instantiated.
+    
+    Data (inherited):
+        - id (int): Unique id
+        - name (str): schema name
+    Data:
+        - LTM (LTM): Associated long term memory.
+        - content (): Procedural or semantic content of the schema.
+        - init_act (float): Initial activation value.
+    """    
+    def __init__(self, name="", LTM=None, content=None, init_act=0):
+        SCHEMA.__init__(self, name)
+        self.content = content
+        self.LTM = LTM
+        self.init_act = init_act
+    
+    def set_name(self, name):
+        self.name = name
+
+    def set_init(self, init_act):
+        self.init_act = init_act
+    
+    def set_content(self, content):
+        self.content = content
+    
+    def set_LTM(self, LTM):
+        self.LTM = LTM
         
 #####################################
 ##### PROCEDURAL SCHEMA CLASSES #####
@@ -712,8 +716,6 @@ class WM(MODULE_SCHEMA):
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
                                            'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
-        self.limit_capacity_option = 0 # NEed to refactor that if it turns out to be useful
-        
     def reset(self):
         """
         Reset state of the schema
@@ -904,7 +906,7 @@ class WM(MODULE_SCHEMA):
         
         self.update_activity()
         
-        self.limit_capacity(option=self.limit_capacity_option) #To impact WM capacity.
+        self.limit_capacity() #To impact WM capacity.
         
         self.update_save_state()
     
@@ -944,6 +946,7 @@ class WM(MODULE_SCHEMA):
     def limit_capacity(self, option=0):
         """
         Test various ways to induce WM capacity limitations.
+        In progress. For now no way to set up the degradations for each WM...
         """
         if option==0: # Do nothing
             return
@@ -957,7 +960,7 @@ class WM(MODULE_SCHEMA):
                 val =  random.random()
                 if val<threshold:
                     self.coop_link.remove(link)
-        elif option==4: # same things but now links are remove in proportion to number of linkss
+        elif option==4: # same things but now links are removed in proportion to number of linkss
                 max_val = 0.001
                 max_capacity = 10.0
                 capacity_remaining = (max_capacity - len(self.coop_links))/max_capacity
@@ -1170,6 +1173,7 @@ class F_LINK(object):
             to_inst -> from_inst: weight*(1-asymmetry_coef)
         
     Data:
+        - WM (WM): Working memory it is associated with.
         - inst_from (SCHEMA_INST)
         - inst_to (SCHEMA_INST)
         - weight (FLOAT)
