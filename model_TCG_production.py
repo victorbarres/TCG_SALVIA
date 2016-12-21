@@ -168,6 +168,7 @@ def run_model(model, sem_gen, input_name, max_time=900, seed=None, verbose=0, pr
             
     # Output analysis
     res = prod_analyses(out_data)
+    model.show_params()
     model.reset()
     
     # Prints utterance in verbose mode.
@@ -181,8 +182,8 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     Allows to run a set of production diagnostics.
     """
     DIAGNOSTIC_FILE = 'diagnostic_kuchinksy.json'
-    SPEED_PARAM = 50
-    MODEL_PARAMS = {'Control.task.start_produce':400}
+    SPEED_PARAM = 20
+    MODEL_PARAMS = {'Control.task.start_produce':0, 'Control.task.time_pressure':10, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.1, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.coop_asymmetry':0.0}
     
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'

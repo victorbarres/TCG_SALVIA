@@ -725,12 +725,15 @@ class GRAMMATICAL_WM_P(WM):
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']
-#            self.apply_pressure(ctrl_input['pressure'])
-            output = self.produce_form(sem_input, phon_input)
-            if output:
-                self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
-                self.outputs['to_semantic_WM'] =  output['sem_WM_output']    
-                self.outputs['to_output'] = output['to_output']
+            pressure = self.apply_pressure(ctrl_input['pressure'], option=1)
+            if pressure:
+                output = self.produce_form(sem_input, phon_input)
+                if output:
+                    self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
+                    self.outputs['to_semantic_WM'] =  output['sem_WM_output']    
+                    self.outputs['to_output'] = output['to_output']
+                else:
+                    self.outputs['to_phonological_WM_P'] = []
     
     ############################
     ### state update methods ###
@@ -797,14 +800,26 @@ class GRAMMATICAL_WM_P(WM):
                 act = act/count
             inst.activation.E += act*weight
     
-#    def apply_pressure(self, pressure):
-#        """
-#        Applies pressure by ramping up C2
-#        """
-#        for link in [l for l in self.coop_links if l.weight != 0]: # Make sure not to reactivate old weights.
-#            link.update_weight(self.params['C2']['coop_weight'] + self.params['C2']['coop_weight']*pressure)
-#        for link in self.comp_links:
-#            link.update_weight(self.params['C2']['comp_weight'] + self.params['C2']['comp_weight']*pressure)
+    def apply_pressure(self, pressure, option=0):
+        """
+        Tests various ways to apply time pressure.
+        """
+        if option==0: # Do nothing
+            try_produce = True
+        elif option == 1: # Simply trigger production when pressure reaches 1.
+            try_produce = pressure>=1
+        elif option == 2: #Applies pressure by ramping up C2
+            for link in [l for l in self.coop_links if l.weight != 0]: # Make sure not to reactivate old weights.
+                link.update_weight(self.params['C2']['coop_weight'] + self.params['C2']['coop_weight']*pressure)
+            for link in self.comp_links:
+                link.update_weight(self.params['C2']['comp_weight'] + self.params['C2']['comp_weight']*pressure)  
+            try_produce = True
+        else:
+            error_msg = 'Invalid apply pressure option'
+            raise ValueError(error_msg)
+        
+        return try_produce
+        
 
     def produce_form(self, sem_input, phon_input):
         """
@@ -1704,6 +1719,8 @@ class PHON_WM_P(WM):
         self.params['dyn'] = {'tau':2, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
+        self.needs_filler = True
+        self.filler = '....'
     
     def reset(self):
         """
@@ -1729,11 +1746,24 @@ class PHON_WM_P(WM):
         else:
             self.outputs['to_utter'] =  None
         
+        # Add pause fillers to outputs.
+        self.add_fillers(phon_sequence)
+        
         self.update_activations()
         self.prune()
         self.outputs['to_grammatical_WM_P'] =  [phon_inst.content['word_form'] for phon_inst in self.phon_sequence]
         
-    
+    def add_fillers(self, phon_sequence):
+        """
+        Simple method to have pause filler placed in utter outputs.
+        """
+        if phon_sequence == [] and self.needs_filler:
+            self.outputs['to_utter'] = [self.filler]
+            self.needs_filler = False
+        elif phon_sequence == None:
+            self.needs_filler = True
+            
+
     ####################
     ### JSON METHODS ###
     ####################
