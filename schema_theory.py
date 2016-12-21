@@ -938,7 +938,6 @@ class WM(MODULE_SCHEMA):
     ############################
     ### STATE SAVING METHODS ###
     ############################
-        
     def update_save_state(self):
         """
         Add the current state values to save_state.
@@ -1727,7 +1726,7 @@ class SCHEMA_SYSTEM(object):
         
         return sys_params
     
-    def save_sim(self, file_path = './', file_name = 'output.json'):
+    def save_sim(self, file_path = './tmp/', file_name = 'output.json'):
         """
         """
         my_file = file_path + file_name
