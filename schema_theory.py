@@ -413,7 +413,20 @@ class FUNCTION_SCHEMA(PROCEDURAL_SCHEMA):
     def __init__(self, name=""):
         PROCEDURAL_SCHEMA.__init__(self,name)
         self.system = None
- 
+
+class SYSTEM_OF_SYSTEMS(object):
+    """
+    Defines a system-of-systems (SoS) class
+    Data:
+        - name (str):
+        - schemas({schema_name:SYSTEM_SCHEMAS}):
+        - connections ([CONNECT]):
+    """
+    def __init__(self, name=""):
+        self.name = name
+        self.schemas = {}
+        self.connections = []
+    
 ################################
 ### KNOWLEDGE SCHEMA CLASSES ###
 ################################        
@@ -1511,15 +1524,17 @@ class BRAIN_MAPPING(object):
 #########################
 ##### MODEL CLASSES #####
 #########################
-class MODEL(object):
+class MODEL(SYSTEM_OF_SYSTEMS):
     """
-    Defines a model as a system of system schemas.
-    Data:
+    Defines a model as a system-of-systems.
+    
+    Data (inherited):
         - name (str):
         - schemas({schema_name:SYSTEM_SCHEMAS}):
-        - params (DICT): offers direct access to all the parameters in the model.
-        - default_params (DICT): can store default parameter values.
         - connections ([CONNECT]):
+    Data:
+        - params (DICT): offers direct access to all the parameters in the model.
+        - default_params (DICT): can store default parameter values.s
         - input_port ([PORT]): the list of ports that read the input
         - output_ports ([PORT]): The list of ports that defines the output value
         - input (): system's input.
@@ -1535,11 +1550,9 @@ class MODEL(object):
     TIME_STEP = 1.0
     SET_UP_TIME = 10
     def __init__(self, name=''):
-        self.name = name
-        self.schemas = {}
+        SYSTEM_OF_SYSTEMS.__init__(self, name)
         self.params = None
         self.default_params = None
-        self.connections = []
         self.input_ports = None
         self.output_ports = None
         self.input = None
