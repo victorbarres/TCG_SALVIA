@@ -184,6 +184,12 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     SPEED_PARAM = 20
     MODEL_PARAMS = {'Control.task.start_produce':200, 'Control.task.time_pressure':200, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.1, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.comp_weight':-10.0, 'Grammatical_WM_P.C2.coop_asymmetry':0.0}
     
+    # Attempt to model lesion
+#    MODEL_PARAMS['Grammatical_WM_P.C2.coop_weight']=0.1 # Reduce cooperation weights
+#    MODEL_PARAMS['Grammatical_WM_P.dyn.noise_std']=10.0 # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
+#    MODEL_PARAMS['Grammatical_WM_P.C2.prune_threshold']=0.2 # Change prune threshold (shoudl be done in relation to initial activation values.)
+#    MODEL_PARAMS['Grammatical_WM_P.dyn.k'] = 3.4 # Interesting effects, bifurcation at a given value.
+
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
@@ -216,7 +222,6 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
         res = run_model(model, my_inputs, input_name, max_time, seed, verbose=verbose, prob_times=prob_times)
         print "\nRESULTS:\n"
         print res
-        raw_input("\nPress Enter to continue...\n")
 
 def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
     """
