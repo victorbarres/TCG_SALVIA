@@ -9,11 +9,11 @@ import language_schemas as ls
 import perceptual_schemas as ps
 from loader import TCG_LOADER
 
-def parameters(module_names):
+def parameters(system_names):
     """
-    Returns a parameter dictionary containing the path and values for the parameters associated with each module whose name is given in module_names
+    Returns a parameter dictionary containing the path and values for the parameters associated with each system whose name is given in system_names
     Args:
-        - module_names ([STR])
+        - system_names ([STR])
     """
     params = {
     'Concept_LTM':{
@@ -138,12 +138,12 @@ def parameters(module_names):
         }
     }
     
-    module_params = {}
-    for module_name in module_names:
-        for k,v in params[module_name].iteritems():
-            path = '%s.%s' %(module_name, k)
-            module_params[path] = v
-    return module_params
+    system_params = {}
+    for system_name in system_names:
+        for k,v in params[system_name].iteritems():
+            path = '%s.%s' %(system_name, k)
+            system_params[path] = v
+    return system_params
     
 def TCG_production_system(name='language_system_P', 
                           grammar_name='TCG_grammar_VB_main', 
@@ -153,7 +153,7 @@ def TCG_production_system(name='language_system_P',
     """
     Creates and returns the TCG production schema system.
     """
-    # Instantiating all the necessary modules schemas
+    # Instantiating all the necessary sysem schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
     grammaticalWM_P = ls.GRAMMATICAL_WM_P()
@@ -204,8 +204,8 @@ def TCG_production_system(name='language_system_P',
     model.set_output_ports([utter.find_port('to_output'), grammaticalWM_P.find_port('to_output')])
     
     # Parameters
-    module_names = model.schemas.keys()
-    model_params = parameters(module_names)
+    system_names = model.schemas.keys()
+    model_params = parameters(system_names)
     model.update_params(model_params)
     
     # Loading data
@@ -231,7 +231,7 @@ def TCG_comprehension_system(name='language_system_C',
     """
     Creates and returns the TCG comprehension schema system.
     """
-    # Instantiating all the necessary modules schemas
+    # Instantiating all the necessary system schemas
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
     phonWM_C = ls.PHON_WM_C()
@@ -275,8 +275,8 @@ def TCG_comprehension_system(name='language_system_C',
     
     
     # Parameters
-    module_names = model.schemas.keys()
-    model_params = parameters(module_names)
+    system_names = model.schemas.keys()
+    model_params = parameters(system_names)
     model.update_params(model_params)
     
     
@@ -305,7 +305,7 @@ def TCG_language_system(name='language_system',
     """
     Creates and returns the TCG language schema system, including both production and comprehension.
     """
-    # Instantiating all the necessary modules schemas
+    # Instantiating all the necessary system schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
@@ -369,8 +369,8 @@ def TCG_language_system(name='language_system',
     model.set_output_ports([utter.find_port('to_output')])
     
     # Parameters
-    module_names = model.schemas.keys()
-    model_params = parameters(module_names)
+    system_names = model.schemas.keys()
+    model_params = parameters(system_names)
     model.update_params(model_params)
     
     grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']*0.5
@@ -398,7 +398,7 @@ def SALVIA_P(name='SALVIA_P',
     """
     Creates and returns the SALVIA production schema system.
     """
-    # Instantiating all the necessary modules schemas
+    # Instantiating all the necessary system schemas
     subscene_rec = ps.SUBSCENE_RECOGNITION()
     perceptLTM = ps.PERCEPT_LTM()
     visualWM = ps.VISUAL_WM()
@@ -430,7 +430,7 @@ def SALVIA_P(name='SALVIA_P',
                         'Concept_LTM':['']}
                         
     schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
-    # Creating schema system and adding modules schemas
+    # Creating schema system and adding system schemas
     model = st.SCHEMA_SYSTEM(name)
     model.add_schemas(schemas)
     
@@ -465,8 +465,8 @@ def SALVIA_P(name='SALVIA_P',
     model.brain_mapping = description_brain_mapping
     
     # Parameters
-    module_names = model.schemas.keys()
-    model_params = parameters(module_names)
+    system_names = model.schemas.keys()
+    model_params = parameters(system_names)
     model.update_params(model_params)
     
     grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']
@@ -519,13 +519,13 @@ def SALVIA_P_saliency(name='SALVIA_P_saliency'):
     """
     model = SALVIA_P(name)
     
-    # Instantiating all the necessary modules schemas
+    # Instantiating all the necessary system schemas
     simpleSM = ps.SIMPLE_SALIENCY_MAP()
     
     # Defining schema to brain mappings.
     model.brain_mapping['Saliency_map'] = ['Dorsal_stream', 'IPS']
     
-    # Adding modules schemas
+    # Adding system schemas
     schemas = [simpleSM] 
     model.add_schemas(schemas)
     
@@ -550,7 +550,7 @@ def TCG_SemWM(name='TCG_semantic_WM',
     Note that Control is required to send the "produce" signal.
     """
     
-    # Instantiating all the necessary modules schemas
+    # Instantiating all the necessary system schemas
     semanticWM = ls.SEMANTIC_WM()
     conceptLTM = ls.CONCEPT_LTM()
     control = ls.CONTROL()

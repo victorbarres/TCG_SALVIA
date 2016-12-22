@@ -20,7 +20,7 @@ import networkx as nx
 import pyttsx
 
 
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, MODULE_SCHEMA, LTM, WM, ASSEMBLAGE
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, SYSTEM_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
 import TCG_graph
 
@@ -296,17 +296,17 @@ class PHON_SCHEMA_INST(SCHEMA_INST):
         self.content = content_copy
 
 ###################################
-##### LANGUAGE MODULE SCHEMAS #####
+##### LANGUAGE SYSTEM SCHEMAS #####
 ###################################
 
 #################
 ### SEMANTICS ###
 #################
-class CONCEPTUALIZER(MODULE_SCHEMA):
+class CONCEPTUALIZER(SYSTEM_SCHEMA):
     """
     """
     def __init__(self, name='Conceptualizer'):
-        MODULE_SCHEMA.__init__(self, name)
+        SYSTEM_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_visual_WM')
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('OUT', 'to_semantic_WM')
@@ -1593,11 +1593,11 @@ class GRAMMATICAL_WM_P(WM):
         GRAMMATICAL_WM_P.draw_instance_network(graph, title)
                   
 
-class CXN_RETRIEVAL_P(MODULE_SCHEMA):
+class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
     """
     """
     def __init__(self, name="Cxn_retrieval_P"):
-        MODULE_SCHEMA.__init__(self,name)
+        SYSTEM_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('OUT', 'to_grammatical_WM_P')
@@ -1776,11 +1776,11 @@ class PHON_WM_P(WM):
         data['phon_sequence'] = [phon_inst.content['word_form'] for phon_inst in self.phon_sequence]
         return data
 
-class UTTER(MODULE_SCHEMA):
+class UTTER(SYSTEM_SCHEMA):
     """
     """
     def __init__(self, name='Utter'):
-        MODULE_SCHEMA.__init__(self,name)
+        SYSTEM_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_output')
         self.params = {'speech_rate':10}
@@ -2358,12 +2358,12 @@ class GRAMMATICAL_WM_C(WM):
             GRAMMATICAL_WM_P.draw_assemblage(assemblage, title)
             i += 1
         
-class CXN_RETRIEVAL_C(MODULE_SCHEMA):
+class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
     """
     THIS NEEDS TO ALLOW FOR THE IMPLEMENTATIN OF A FORM OF CHART PARSING.
     """
     def __init__(self, name="Cxn_retrieval_C"):
-        MODULE_SCHEMA.__init__(self,name)
+        SYSTEM_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('IN', 'from_phonological_WM_C')
         self.add_port('IN', 'from_grammatical_WM_C')
@@ -2414,12 +2414,12 @@ class CXN_RETRIEVAL_C(MODULE_SCHEMA):
 ####################
 ### TASK CONTROL ###
 ####################
-class CONTROL(MODULE_SCHEMA):
+class CONTROL(SYSTEM_SCHEMA):
     """
     This needs to be reformatted to better handle comprehension.
     """
     def __init__(self, name="Control"):
-        MODULE_SCHEMA.__init__(self, name)
+        SYSTEM_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('IN', 'from_phonological_WM_P')
         self.add_port('OUT', 'to_semantic_WM')
