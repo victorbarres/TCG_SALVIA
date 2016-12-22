@@ -12,7 +12,7 @@ Dependencies:
     - matplotlib.plt to visualize WM state dynamics
     - networkx to visualize WM state
     - json to save simulation data in json format.
-    - pickle to save schema_systems.
+    - pickle to save models.
     - pprint for printing data
 """
 import abc
@@ -37,14 +37,14 @@ class SCHEMA(object):
     Data:
         - id (int): Unique id
         - name (str): schema name
-        - schema_system (SCHEMA_SYSTEM): Schema system to which the schema belongs.
+        - model (MODEL): model to which the schema belongs.
     """
     ID_next = 1 # Global schema ID counter
     def __init__(self, name=""):
         self.id = SCHEMA.ID_next
         SCHEMA.ID_next += 1
         self.name = name
-        self.schema_system = None
+        self.model = None
 
 class PORT(object):
     """
@@ -373,7 +373,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
 
 class SYSTEM_SCHEMA(PROCEDURAL_SCHEMA):
     """
-    Brain anchored procedural schema. Defines the schema system as nodes in the fixed system's topology.
+    Brain anchored procedural schema. Defines the sytem schema as nodes in the fixed system's topology.
     
     Data (inherited):
         - id (int): Unique id
@@ -1508,10 +1508,10 @@ class BRAIN_MAPPING(object):
         return data
     
 
-#################################
-##### SCHEMA SYSTEM CLASSES #####
-#################################
-class SCHEMA_SYSTEM(object):
+#########################
+##### MODEL CLASSES #####
+#########################
+class MODEL(object):
     """
     Defines a model as a system of system schemas.
     Data:
@@ -1545,11 +1545,11 @@ class SCHEMA_SYSTEM(object):
         self.input = None
         self.outputs = {}
         self.brain_mapping = None
-        self.t = SCHEMA_SYSTEM.T0
-        self.dt = SCHEMA_SYSTEM.TIME_STEP
-        self.set_up_time = SCHEMA_SYSTEM.SET_UP_TIME
+        self.t = MODEL.T0
+        self.dt = MODEL.TIME_STEP
+        self.set_up_time = MODEL.SET_UP_TIME
         self.verbose = False
-        self.sim_data = {'schema_system':{}, 'system_states':{}}
+        self.sim_data = {'model':{}, 'system_states':{}}
         
     def reset(self):
         """
@@ -1557,8 +1557,8 @@ class SCHEMA_SYSTEM(object):
         """      
         self.input = None
         self.outputs = {}
-        self.t = SCHEMA_SYSTEM.T0
-        self.sim_data = {'schema_system':{}, 'system_states':{}}
+        self.t = MODEL.T0
+        self.sim_data = {'model':{}, 'system_states':{}}
         for schema_name in self.schemas:
             schema = self.schemas[schema_name]
             schema.t = self.t
@@ -1576,7 +1576,7 @@ class SCHEMA_SYSTEM(object):
         if port_from and port_to:
             new_connect = CONNECT(name=name, port_from=port_from, port_to=port_to, weight=weight, delay=delay)
             self.connections.append(new_connect)
-            new_connect.schema_system = self
+            new_connect.model = self
             return True
         else:
             return False
@@ -1593,7 +1593,7 @@ class SCHEMA_SYSTEM(object):
                 raise ValueError(error_msg)
             else:
                 self.schemas[schema.name] = schema
-                schema.schema_system = self
+                schema.model = self
         
         self.params = self.get_params() # update the params value to account for new parameters.
     
@@ -1706,8 +1706,8 @@ class SCHEMA_SYSTEM(object):
             port.value = None
         
         # Save simulation data
-        if not(self.sim_data['schema_system']):
-            self.sim_data['schema_system'] = self.get_info()
+        if not(self.sim_data['model']):
+            self.sim_data['model'] = self.get_info()
         self.sim_data[self.t] = self.get_state()    
     
     def set_default_params(self, params=None):
@@ -1733,7 +1733,7 @@ class SCHEMA_SYSTEM(object):
     def get_info(self):
         """
         """
-        data = {'name':self.name, 'T0':SCHEMA_SYSTEM.T0, 'TIME_STEP':SCHEMA_SYSTEM.TIME_STEP, 'dt':self.dt}
+        data = {'name':self.name, 'T0':MODEL.T0, 'TIME_STEP':MODEL.TIME_STEP, 'dt':self.dt}
         data['connections'] = [c.get_info() for c in self.connections]
         data['input_ports'] = [p.name for p in self.input_ports]
         data['output_ports']= [p.name for p in self.output_ports]
@@ -1844,7 +1844,7 @@ class SCHEMA_SYSTEM(object):
     
     def show_params(self):
         """
-        Display all the parameters of the schema system.
+        Display all the parameters of the model.
         """
         print "MODEL PARAMETERS"
         pprint.pprint(self.params, indent=1, width=1)
@@ -1852,25 +1852,25 @@ class SCHEMA_SYSTEM(object):
 ############################
 ##### MODULE FUNCTIONS #####
 ############################
-def save(schema_system, path='./tmp/'):
+def save(model, path='./tmp/'):
     """
-    Saves a schema system using pickle.
+    Saves a model using pickle.
     """
-    file_name = path + schema_system.name
+    file_name = path + model.name
     if not(os.path.exists(path)):
             os.mkdir(path)
             
     with open(file_name, 'w') as f:
-        pickle.dump(schema_system, f)
+        pickle.dump(model, f)
 
-def load(schema_system_name,path='./tmp/'):
+def load(model_name,path='./tmp/'):
     """
-    loads a schema system using pickle.
+    loads a model using pickle.
     """
-    file_name = path + schema_system_name
+    file_name = path + model_name
     with open(file_name, 'r') as f:
-        schema_system  = pickle.load(f)
-        return schema_system
+        model  = pickle.load(f)
+        return model
     return None
         
 ###############################################################################

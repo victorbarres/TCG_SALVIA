@@ -151,7 +151,7 @@ def TCG_production_system(name='language_system_P',
                           grammar_path = './data/grammars/',
                           semantics_path = './data/semantics/'):
     """
-    Creates and returns the TCG production schema system.
+    Creates and returns the TCG production model.
     """
     # Instantiating all the necessary sysem schemas
     semanticWM = ls.SEMANTIC_WM()
@@ -174,15 +174,15 @@ def TCG_production_system(name='language_system_P',
                         'Utter':['']
                         }
    
-    # Initializing schema system
-    model = st.SCHEMA_SYSTEM(name)
+    # Initializing model
+    model = st.MODEL(name)
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     model.brain_mapping = language_brain_mapping
     
-    # Setting up language schema system.
+    # Setting up language model.
     language_schemas = [conceptLTM, semanticWM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, control]
 
     model.add_schemas(language_schemas)
@@ -229,7 +229,7 @@ def TCG_comprehension_system(name='language_system_C',
                              grammar_path = './data/grammars/',
                              semantics_path = './data/semantics/'):
     """
-    Creates and returns the TCG comprehension schema system.
+    Creates and returns the TCG comprehension model.
     """
     # Instantiating all the necessary system schemas
     grammaticalLTM = ls.GRAMMATICAL_LTM()
@@ -249,15 +249,15 @@ def TCG_comprehension_system(name='language_system_C',
                     'Concept_LTM':[''],
                     'Control':['DLPFC']}
     
-    # Initializing schema system
-    model= st.SCHEMA_SYSTEM(name)
+    # Initializing model
+    model = st.MODEL(name)
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     model.brain_mapping = language_brain_mapping
     
-    # Setting up language schema system.
+    # Setting up language model.
     language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM, conceptLTM, control]
 
     model.add_schemas(language_schemas)
@@ -303,7 +303,7 @@ def TCG_language_system(name='language_system',
                         grammar_path = './data/grammars/',
                         semantics_path = './data/semantics/'):
     """
-    Creates and returns the TCG language schema system, including both production and comprehension.
+    Creates and returns the TCG language model, including both production and comprehension.
     """
     # Instantiating all the necessary system schemas
     semanticWM = ls.SEMANTIC_WM()
@@ -332,15 +332,15 @@ def TCG_language_system(name='language_system',
                     'Control':['DLPFC'],
                     'Concept_LTM':['']}
    
-    # Initializing schema system
-    model = st.SCHEMA_SYSTEM(name)
+    # Initializing model
+    model = st.MODEL(name)
     
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     model.brain_mapping = language_brain_mapping
     
-    # Setting up language schema system.
+    # Setting up language model.
     language_schemas = [semanticWM, conceptLTM, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, phonWM_C, grammaticalWM_C, cxn_retrieval_C, control]
 
     model.add_schemas(language_schemas)
@@ -396,7 +396,7 @@ def SALVIA_P(name='SALVIA_P',
            grammar_path = './data/grammars/',
            semantics_path = './data/semantics/'):
     """
-    Creates and returns the SALVIA production schema system.
+    Creates and returns the SALVIA production model.
     """
     # Instantiating all the necessary system schemas
     subscene_rec = ps.SUBSCENE_RECOGNITION()
@@ -430,8 +430,9 @@ def SALVIA_P(name='SALVIA_P',
                         'Concept_LTM':['']}
                         
     schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
-    # Creating schema system and adding system schemas
-    model = st.SCHEMA_SYSTEM(name)
+   
+   # Creating model and adding system schemas
+    model = st.MODEL(name)
     model.add_schemas(schemas)
     
     # Defining connections
@@ -501,7 +502,7 @@ def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
                            grammar_path = './data/grammars/',
                            semantics_path = './data/semantics/'):
     """
-    Creates and returns the SALVIA schema system with verbal guidance.
+    Creates and returns the SALVIA model with verbal guidance.
     """
     
     model = SALVIA_P(name, grammar_name, semantics_name, grammar_path, semantics_path)
@@ -515,7 +516,7 @@ def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
     
 def SALVIA_P_saliency(name='SALVIA_P_saliency'):
     """
-    Creates and returns the SALVIA production schema system that include a simple saliency map
+    Creates and returns the SALVIA production model that include a simple saliency map
     """
     model = SALVIA_P(name)
     
@@ -558,8 +559,8 @@ def TCG_SemWM(name='TCG_semantic_WM',
     # Defining schema to brain mappings.    
     mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus']}
     
-    # Initializing schema system
-    model = st.SCHEMA_SYSTEM('Semantic_WM')
+    # Initializing model
+    model = st.MODEL('Semantic_WM')
     language_schemas = [conceptLTM, semanticWM, control]
     model.add_schemas(language_schemas)
     
@@ -568,7 +569,7 @@ def TCG_SemWM(name='TCG_semantic_WM',
     brain_mapping.schema_mapping = mapping
     model.brain_mapping = brain_mapping
     
-    # Setting up language schema system.
+    # Setting up language model.
     model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     model.set_input_ports([semanticWM.find_port('from_conceptualizer')])
     model.set_output_ports([semanticWM.find_port('to_cxn_retrieval_P')])
