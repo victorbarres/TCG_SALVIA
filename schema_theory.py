@@ -83,6 +83,7 @@ class CONNECT(SCHEMA):
     Data (inherited):
         - id (int): Unique id
         - name (str): schema name
+        - model (MODEL): model to which the connect belongs.
     Data:
         - port_from (PORT)
         - port_to (PORT)
@@ -965,7 +966,7 @@ class WM(SYSTEM_SCHEMA):
             threshold = min(max_prob, memory_usage)
             val = np.random.rand()
             if val < threshold:
-                print "\nt:%i, Bumped! %s memory_usage:%f\n" %(self.t, inst['cxn_inst'].name, memory_usage)
+                print "\nt:%i, Blocked! %s memory_usage:%f\n" %(self.t, inst['cxn_inst'].name, memory_usage)
             else:
                 insts_kept.append(inst)
                 print "\nt:%i, Allowed! %s memory_usage:%f\n" %(self.t, inst['cxn_inst'].name, memory_usage)
