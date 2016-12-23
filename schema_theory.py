@@ -84,6 +84,7 @@ class CONNECT(object):
     Data:
         - id (int): Unique id
         - name (str): schema name
+        - model (MODEL): model to which the connect belongs.
         - port_from (PORT)
         - port_to (PORT)
         - weight (float)
@@ -96,6 +97,7 @@ class CONNECT(object):
         self.name = name
         self.id = CONNECT.ID_NEXT
         CONNECT.ID_NEXT += 1
+        self.model
         self.port_from = port_from
         self.port_to = port_to
         self.weight = weight
