@@ -81,9 +81,9 @@ def parameters(system_names):
         'task.mode':'produce',
         'task.time_pressure':200.0,
         'task.start_produce':400.0,
-        'style.activation':0.3, #0.7
-        'style.sem_length':0.3, #0.5
-        'style.form_length':0.3, #0.0
+        'style.activation':0.4, #0.7
+        'style.sem_length':0.6, #0.5
+        'style.form_length':0.0, #0.0
         'style.continuity':0.1  #0.0
         },
     

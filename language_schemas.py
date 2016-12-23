@@ -721,7 +721,7 @@ class GRAMMATICAL_WM_P(WM):
                 
         self.convey_sem_activations(sem_input, weight=1.0) # THE WEIGHT SHOULD BE DEFINED IN PARAMS
         self.update_activations()
-        self.limit_memory(max_capacity=10, max_prob=1.0, option=2)
+        self.limit_memory(max_capacity=10, max_prob=1.0, option=0)
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
