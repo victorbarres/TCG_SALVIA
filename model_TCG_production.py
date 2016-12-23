@@ -141,6 +141,9 @@ def run_model(model, sem_gen, input_name, max_time=900, seed=None, verbose=0, pr
     (sem_insts, next_time, prop) = generator.next()
     model.initialize_states()
     
+    if verbose>2:
+        prob_times.append(max_time-10)# Will save the state 10 steps before max_time
+    
     out_data = []
     out_utterance = []
     for t in range(max_time):
@@ -180,7 +183,7 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of production diagnostics.
     """
-    DIAGNOSTIC_FILE = 'diagnostic_kuchinksy.json'
+    DIAGNOSTIC_FILE = 'diagnostic.json'
     SPEED_PARAM = 20
     MODEL_PARAMS = {'Control.task.start_produce':200, 'Control.task.time_pressure':200, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.1, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.comp_weight':-10.0, 'Grammatical_WM_P.C2.coop_asymmetry':0.0}
     

@@ -721,6 +721,7 @@ class GRAMMATICAL_WM_P(WM):
                 
         self.convey_sem_activations(sem_input, weight=1.0) # THE WEIGHT SHOULD BE DEFINED IN PARAMS
         self.update_activations()
+        self.limit_memory(max_capacity=10, max_prob=1.0, option=2)
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
@@ -743,7 +744,6 @@ class GRAMMATICAL_WM_P(WM):
         Args:
             new_insts ([{"cxn_inst":CXN_SCHEMA_INST, "match_qual":FLOAT}]): List of construction instances to be added to grammatical working memory.
         """
-        new_insts = self.limit_memory(new_insts)
         for inst in new_insts:
             match_qual = inst["match_qual"]
             act = inst["cxn_inst"].activity

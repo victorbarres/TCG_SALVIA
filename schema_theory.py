@@ -97,7 +97,7 @@ class CONNECT(object):
         self.name = name
         self.id = CONNECT.ID_NEXT
         CONNECT.ID_NEXT += 1
-        self.model
+        self.model = None
         self.port_from = port_from
         self.port_to = port_to
         self.weight = weight
@@ -960,22 +960,42 @@ class WM(SYSTEM_SCHEMA):
     ###########################
     ### DEGRADATION METHODS ###
     ###########################
-    def limit_memory(self, insts,  max_prob = 1.0,  max_capacity = 5.0):
+    def limit_memory(self, max_capacity=None, max_prob=0.01, option=1):
         """
         """
-        insts_kept = []
-        np.random.shuffle(insts)
-        for inst in insts:
-            memory_usage = 1 - (max_capacity - len(self.schema_insts))/max_capacity
-            threshold = min(max_prob, memory_usage)
+        if option==1: # Limit on the instances
+            num_insts = len(self.schema_insts)
+            if max_capacity == None or num_insts == 0: # No limitation or no instances yet
+                return
+            
+            memory_usage = 1 - (max_capacity - num_insts)/float(max_capacity)
+    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
+            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
+            
             val = np.random.rand()
+            idx = np.random.randint(0,num_insts)
+            inst = self.schema_insts[idx]
             if val < threshold:
-                print "\nt:%i, Blocked! %s memory_usage:%f\n" %(self.t, inst['cxn_inst'].name, memory_usage)
-            else:
-                insts_kept.append(inst)
-                print "\nt:%i, Allowed! %s memory_usage:%f\n" %(self.t, inst['cxn_inst'].name, memory_usage)
-        
-        return insts_kept
+                inst.alive = False
+                print "\nt:%i, Killed! %s memory_usage:%g, threshold:%g\n" %(self.t, inst.name, memory_usage, threshold)
+            return
+        if option==2: # limit on the coop_links
+            num_links = len(self.coop_links)
+            if max_capacity == None or num_links == 0: # No limitation or no links yet
+                return
+            
+            memory_usage = 1 - (max_capacity - num_links)/float(max_capacity)
+    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
+            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
+            
+            val = np.random.rand()
+            idx = np.random.randint(0,num_links)
+            link = self.coop_links[idx]
+            if val < threshold:
+                self.coop_links.remove(link)
+                print "\nt:%i, Killed! %s -> %s, memory_usage:%g, threshold:%g\n" %(self.t, link.inst_from.name, link.inst_to.name, memory_usage, threshold)
+                print num_links
+            
 
         
     ############################
