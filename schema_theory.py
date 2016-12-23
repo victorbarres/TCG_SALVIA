@@ -734,6 +734,7 @@ class WM(SYSTEM_SCHEMA):
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
                                            'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
+                                          
     def reset(self):
         """
         Reset state of the schema
@@ -923,9 +924,7 @@ class WM(SYSTEM_SCHEMA):
                 inst.alive = False
         
         self.update_activity()
-        
-        self.limit_capacity() #To impact WM capacity.
-        
+
         self.update_save_state()
     
     def prune(self):
@@ -959,35 +958,45 @@ class WM(SYSTEM_SCHEMA):
         self.prune()
         
     ###########################
-    ### Degradation methods ###
+    ### DEGRADATION METHODS ###
     ###########################
-    def limit_capacity(self, option=0):
+    def limit_memory(self, max_capacity=None, max_prob=0.01, option=1):
         """
-        Test various ways to induce WM capacity limitations.
-        In progress. For now no way to set up the degradations for each WM...
         """
-        if option==0: # Do nothing
+        if option==1: # Limit on the instances
+            num_insts = len(self.schema_insts)
+            if max_capacity == None or num_insts == 0: # No limitation or no instances yet
+                return
+            
+            memory_usage = 1 - (max_capacity - num_insts)/float(max_capacity)
+    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
+            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
+            
+            val = np.random.rand()
+            idx = np.random.randint(0,num_insts)
+            inst = self.schema_insts[idx]
+            if val < threshold:
+                inst.alive = False
+                print "\nt:%i, Killed! %s memory_usage:%g, threshold:%g\n" %(self.t, inst.name, memory_usage, threshold)
             return
-        elif option==1: # Set the cooperations weight to 0
-            self.params['C2']['coop_weight'] = 0.0
-        elif option==2: # Make the cooperation weight quickly decay (non maintenance of cooperation)
-            pass # Need to define in WM a parameter that provides the F_link functions. This would also require having a pruning for f_links.
-        elif option==3: # Randomly remove coop_links to limit structural capacity
-            threshold = 0.1
-            for link in self.coop_links[:]:
-                val =  random.random()
-                if val<threshold:
-                    self.coop_link.remove(link)
-        elif option==4: # same things but now links are removed in proportion to number of linkss
-                max_val = 0.001
-                max_capacity = 10.0
-                capacity_remaining = (max_capacity - len(self.coop_links))/max_capacity
-                threshold = min(max_val, (1 - capacity_remaining)*max_val) #linear
-                for link in self.coop_links[:]:
-                    val =  random.random()
-                    if val<threshold:
-                        print "t:%i DAMAGE! coop_removed (%s -> %s)" %(self.t, link.inst_from.name, link.inst_to.name)
-                        self.coop_links.remove(link)
+        if option==2: # limit on the coop_links
+            num_links = len(self.coop_links)
+            if max_capacity == None or num_links == 0: # No limitation or no links yet
+                return
+            
+            memory_usage = 1 - (max_capacity - num_links)/float(max_capacity)
+    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
+            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
+            
+            val = np.random.rand()
+            idx = np.random.randint(0,num_links)
+            link = self.coop_links[idx]
+            if val < threshold:
+                self.coop_links.remove(link)
+                print "\nt:%i, Killed! %s -> %s, memory_usage:%g, threshold:%g\n" %(self.t, link.inst_from.name, link.inst_to.name, memory_usage, threshold)
+                print num_links
+            
+
         
     ############################
     ### STATE SAVING METHODS ###
@@ -1198,7 +1207,7 @@ class F_LINK(object):
         - asymmetry_coef (FLOAT): 0 <= asymmetry_coef <= 1
         - weight_func (Lambda function): Function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:x):
+    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:0.5*x):
         """
         """
         self.inst_from = inst_from
