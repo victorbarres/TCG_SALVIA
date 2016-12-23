@@ -29,7 +29,7 @@ random.seed(seed)
 
 class AREA(object):
     """
-    Simply defines an area in the visual input
+    Defines an area in the visual input
     """
     ID_next = 0 # Global area ID counter
     def __init__(self, x=0, y=0, w=0, h=0, saliency=0):
@@ -199,7 +199,7 @@ class PERCEPT_QUALITY(PERCEPT_SCHEMA):
 
 class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMAS BY DEFAULT AS FROM and To (A VARIABLE! (unbound), eg. something is red). Think about that....
     """
-    Defines relation perceptual schemas.
+    Defines relation between perceptual schemas.
     """
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
@@ -259,15 +259,14 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
     """
     Perceptual schema instance.
     
-    Data:
-        Inherited from SCHEMA_INST:
-            Note: 
-            - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
-            - covers ({'cpt_inst'=CPT_SCHEMA_INST}): Pointer to the concept instances associated through conceptualization.
+    Data (inherited)::
+        - trace (): Pointer to the element that triggered the instantiation. # Think about this replaces "cover" in construction instances for TCG1.0
+        - covers ({'cpt_inst'=CPT_SCHEMA_INST}): Pointer to the concept instances associated through conceptualization.
         
     Notes:
         For now, those schema instances are not used to form assemablages -> so no use for ports... 
-        Trace is left empty, one can think that in a more realistic preceptual model, perceptual schemas would be instantiated on the basis of other perceptual schemas (See VISION model)
+        Trace is left empty, one can think that in a more realistic preceptual model, 
+            perceptual schemas would be instantiated on the basis of other perceptual schemas (See VISION model)
     """
     def __init__(self, per_schema, trace):
         SCHEMA_INST.__init__(self, schema=per_schema, trace=trace)
@@ -476,7 +475,7 @@ class VISUAL_WM(WM):
         
         NOTE:
             - Does not handle the case of percept instance updating.
-            - SceneRep carreies the instance and the percept.
+            - SceneRep carries the instance and the percept.
         """
         if per_insts:
             # First process all the instances that are not relations.
@@ -490,8 +489,6 @@ class VISUAL_WM(WM):
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
                 self.SceneRep.add_edge(node_from, node_to, per_inst=rel_inst, percept=rel_inst.content['percept'],  new=True)
-        
-#            self.show_SceneRep()
     
     def show_SceneRep(self):
         node_labels = dict((n, '%s(%.1f)' %(n, d['per_inst'].activity)) for n,d in self.SceneRep.nodes(data=True))
@@ -520,7 +517,7 @@ class PERCEPT_LTM(LTM):
         Initilize the state of the PERCEPTUAL LTM with percetual_schema based on the content of percetual_knowledge
        
         Args:
-            - peceptual_knowledge (PERCEPTUAL_KNOWLEDGE): TCG percetpual knowledge data
+            - per_knowledge (PERCEPTUAL_KNOWLEDGE): TCG percetpual knowledge data
         """
         self.perceptual_knowledge = per_knowledge
         
@@ -579,7 +576,9 @@ class PERCEPT_LTM(LTM):
 
 class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
     """
-    Packages the selective attention processes assuming that for now the pre-attentive parallel perceptual processing phase as already taken place.
+    Packages the selective attention processes assuming that for now the pre-attentive
+        parallel perceptual processing phase has already taken place.
+        
     Data
         - params: {'recognition_time':FLOAT}: Defines the time it takes to perceive a schema of uncertainty 1.
         - data (DICT): Stores the schema's data.
@@ -721,6 +720,7 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
                 self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
                 self.subscene = None
         
+        # TD guidance
         percept_schema_inst = self.inputs['from_visual_WM']
         if percept_schema_inst:
             self.focus_area = percept_schema_inst.content['area']
@@ -737,15 +737,19 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         Sets the eye position to the center of the subscene area.
         """
         max_saliency = 0
+        new_ss = self.subscene
         in_focus_ss = self.in_focus()
+        
         for ss in in_focus_ss:
             if ss.saliency > max_saliency:
                 max_saliency = ss.saliency
-                self.subscene = ss
-                self.eye_pos = self.subscene.area.center()
-#                ############ Test of strategy of zoom-in first. #############
-#                if not(self.focus_area):
-#                    self.focus_area = self.subscene.area 
+                new_ss = ss
+                
+        self.subscene = new_ss
+        self.eye_pos = self.subscene.area.center()
+#        ############ Test of strategy of zoom-in first. #############
+#        if not(self.focus_area):
+#            self.focus_area = self.subscene.area 
     
     def in_focus(self):
         """

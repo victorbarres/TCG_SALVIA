@@ -168,6 +168,7 @@ def run_model(model, sem_gen, input_name, max_time=900, seed=None, verbose=0, pr
             
     # Output analysis
     res = prod_analyses(out_data)
+    model.save_sim(file_path = FOLDER, file_name = 'output.json')
     model.reset()
     
     # Prints utterance in verbose mode.
@@ -216,7 +217,6 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
         res = run_model(model, my_inputs, input_name, max_time, seed, verbose=verbose, prob_times=prob_times)
         print "\nRESULTS:\n"
         print res
-        raw_input("\nPress Enter to continue...\n")
 
 def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
     """

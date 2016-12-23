@@ -97,7 +97,7 @@ class CONNECT(object):
         self.name = name
         self.id = CONNECT.ID_NEXT
         CONNECT.ID_NEXT += 1
-        self.model
+        self.model = None
         self.port_from = port_from
         self.port_to = port_to
         self.weight = weight
