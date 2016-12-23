@@ -77,22 +77,25 @@ class PORT(object):
         self.port_data = None
         self.port_value = None
 
-class CONNECT(SCHEMA):
+class CONNECT(object):
     """
     Defines connections and message passing between ports (input_port -> output_port)
-    Data (inherited):
+    
+    Data:
         - id (int): Unique id
         - name (str): schema name
-    Data:
         - port_from (PORT)
         - port_to (PORT)
         - weight (float)
         - delay (float)
     """
+    ID_NEXT = 1
     def __init__(self, name="",  port_from=None, port_to=None, weight=0, delay=0):
         """
         """
-        SCHEMA.__init__(self, name)
+        self.name = name
+        self.id = CONNECT.ID_NEXT
+        CONNECT.ID_NEXT += 1
         self.port_from = port_from
         self.port_to = port_to
         self.weight = weight
