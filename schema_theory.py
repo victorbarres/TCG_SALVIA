@@ -979,6 +979,7 @@ class WM(SYSTEM_SCHEMA):
                 inst.alive = False
                 print "\nt:%i, Killed! %s memory_usage:%g, threshold:%g\n" %(self.t, inst.name, memory_usage, threshold)
             return
+            
         if option==2: # limit on the coop_links
             num_links = len(self.coop_links)
             if max_capacity == None or num_links == 0: # No limitation or no links yet
