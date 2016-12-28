@@ -186,9 +186,9 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     """
     DIAGNOSTIC_FILE = 'diagnostic.json'
     SPEED_PARAM = 20
-    MODEL_PARAMS = {'Control.task.start_produce':200, 'Control.task.time_pressure':200, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.1, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.comp_weight':-10.0, 'Grammatical_WM_P.C2.coop_asymmetry':0.0}
+    MODEL_PARAMS = {'Control.task.start_produce':700, 'Control.task.time_pressure':200, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.1, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.comp_weight':-10.0, 'Grammatical_WM_P.C2.coop_asymmetry':0.0}
     
-    # Attempt to model lesion
+    # Attempts to model lesion
 #    MODEL_PARAMS['Grammatical_WM_P.C2.coop_weight']=0.1 # Reduce cooperation weights
 #    MODEL_PARAMS['Grammatical_WM_P.dyn.noise_std']=10.0 # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
 #    MODEL_PARAMS['Grammatical_WM_P.C2.prune_threshold']=0.2 # Change prune threshold (shoudl be done in relation to initial activation values.)

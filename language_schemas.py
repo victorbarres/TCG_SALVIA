@@ -719,7 +719,7 @@ class GRAMMATICAL_WM_P(WM):
         if new_cxn_insts:
             self.add_new_insts(new_cxn_insts)            
                 
-        self.convey_sem_activations(sem_input, weight=1.0) # THE WEIGHT SHOULD BE DEFINED IN PARAMS
+        self.convey_sem_activations(sem_input)
         self.update_activations()
         self.limit_memory(max_capacity=10, max_prob=1.0, option=0)
         self.prune()
@@ -752,7 +752,7 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def convey_sem_activations(self, sem_input, weight=0.0, normalization=True):
+    def convey_sem_activations(self, sem_input, normalization=True):
         """
         Args:
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
@@ -763,14 +763,12 @@ class GRAMMATICAL_WM_P(WM):
             For now, a construction receives activations from semantic working memory if :
                 - 1. It's semframe covers at least one semrep node that has not yet been 
             expressed. 
-                - 2. The SemFrame node that covers is linked to a TP_PHON or does not have an attached symlinked (implicitely formalized)
+                - 2. The SemFrame node that covers is linked to a TP_PHON or does not have an attached SymLink (implicitely formalized)
                 - 3. It's semframe covers a semrep relations that has not yet been expressed.
             The overarching principles is that a cxn_inst receives activation from an unexpressed semantic schema that it formalizes.
             In the case of nodes, formalization means lexicalizations. Relations are necessarily formalized in the current framework.
             
-            This is more inclusive that only lexical items and should probably be replaced by:
-                - 1. Create a specific set of lexical construction
-                - 2. Define higher level construction which include lexical items as requiring to slot in the lexical construction.
+            This is more inclusive that only lexical items.
             
         """
         for inst in self.schema_insts:
@@ -797,8 +795,8 @@ class GRAMMATICAL_WM_P(WM):
             
             # Normalization
             if normalization and count>0:
-                act = act/count # normalizing removes favoring constructions that cover more content.
-            inst.activation.E += act*weight
+                act = act/count # normalizing removes advantage for constructions that cover more content.
+            inst.activation.E += act
     
     def apply_pressure(self, pressure, option=0):
         """
