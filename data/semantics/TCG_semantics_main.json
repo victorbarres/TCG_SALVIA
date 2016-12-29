@@ -172,84 +172,89 @@
 
 	"PERCEPTUAL_KNOWLEDGE" :
 	{
+	
+		"SCENE":
+		[
+			"EVENT_SCENE",
+			"ACTION_SCENE",
+			"ENTITY_SCENE"
+		],
+		
 		"OBJECT":
 		[
-			"O?_ENTITY",
-			"O?_OBJECT",
-			"O1_MAN",
-			"O2_BOY",
-			"O3_WOMAN",
-			"O4_GIRL",
-			"O5_HUMAN",
-			"O6_ANIMAL",
-			"O7_MOUSE",
-			"O8_TURTLE",
-			"O9_DRESS",
-			"O10_TSHIRT",
-			"O13_PEOPLE",
-			"O14_BALLERINA",
-			"O15_CELLIST",
-			"O16_FENCER", 
-			"O17_CELLO",
-			"O18_TREE",
-			"O19_BAG",
-			"O20_WATERING_CAN",
-			"O21_SHIRT",
-			"O22_SUIT",
-			"O23_ROBBER",
-			"O24_POLICEMAN",
-			"O25_HUNTER",
-			"O26_DOG",
-			"O27_HOOK",
-			"O28_BOOKSHELF",
-			"O29_WAGON"
+			
+			"MAN",
+			"BOY",
+			"WOMAN",
+			"GIRL",
+			"HUMAN",
+			"ANIMAL",
+			"MOUSE",
+			"TURTLE",
+			"DRESS",
+			"TSHIRT",
+			"PEOPLE",
+			"BALLERINA",
+			"CELLIST",
+			"FENCER", 
+			"CELLO",
+			"TREE",
+			"BAG",
+			"WATERING_CAN",
+			"SHIRT",
+			"SUIT",
+			"ROBBER",
+			"POLICEMAN",
+			"HUNTER",
+			"DOG",
+			"HOOK",
+			"BOOKSHELF",
+			"WAGON"
 		],
 		
 		"PLACE":
 		[
-			"P?_PLACE",
-			"O11_BOXINGRING",
-			"O12_PARK"
+			"BOXINGRING",
+			"PARK"
 		],
 		
 		"ACTION":
 		[
-			"A?_ACTION",
-			"A1_SQUIRT",
-			"A2_TALK",
-			"A3_HIT",
-			"A4_WEAR",
-			"A5_KICK",
-			"A6_LAUGH",
-			"A7_WATCH",
-			"A8_SPLASH",
-			"A9_MEET",
-			"A10_PUNCH",
-			"A11_KISS",
-			"A12_SHAKE_HANDS"
+			"SQUIRT",
+			"TALK",
+			"HIT",
+			"WEAR",
+			"KICK",
+			"LAUGH",
+			"WATCH",
+			"SPLASH",
+			"MEET",
+			"PUNCH",
+			"KISS",
+			"SHAKE_HANDS"
 		],
 		
 		"QUALITY":
 		{
 			"COLOR":
 			[
-				"Q?_COLOR",
-				"Q1_RED",
-				"Q2_BLUE",
-				"Q3_GREEN",
-				"Q6_BLACK",
-				"Q7_WHITE"
+				"RED",
+				"BLUE",
+				"GREEN",
+				"BLACK",
+				"WHITE"
 			],
 			"SIZE":
 			[
-				"Q4_SMALL",
-				"Q5_BIG"
+				"SMALL",
+				"BIG"
 			],
+			
 			"APPEARANCE":
 			[
-				"Q8_YOUNG",
-				"Q9_PRETTY",
-				"Q10_HANDSOME"
+				"YOUNG",
+				"PRETTY",
+				"HANDSOME"
 			]
 		},
 		
@@ -257,134 +262,129 @@
 		{
 			"SCENE_REL":
 			[
-				"R1_SPECIFY"
+				"IS"
 			],
 			
 			"ACTION_REL":
 			[
-				"R1_SQUIRTER",
-				"R2_TALKER",
-				"R3_HITER",
-				"R4_WEARER",
-				"R5_KICKER",
-				"R6_LAUGHER",
-				"R7_WATCHER",
-				"R8_SQUIRTEE",
-				"R9_HEARER",
-				"R10_HITEE",
-				"R11_WEAREE",
-				"R12_KICKEE",
-				"R13_WATCHEE",
-				"R14_SPLASHER",
-				"R15_SPLASHEE",
-				"R16_GIVER",
-				"R17_GIVEE",
-				"R18_GIVEN",
-				"R19_SENDER",
-				"R20_SENDEE",
-				"R21_SENT",
-				"R22_PUNCHER",
-				"R23_PUNCHEE",
-				"R24_MEET",
-				"R25_SHAKE_HANDS",
-				"R26_KISSER",
-				"R27_KISSEE"
+				"SQUIRTER",
+				"TALKER",
+				"HITER",
+				"WEARER",
+				"KICKER",
+				"LAUGHER",
+				"WATCHER",
+				"SQUIRTEE",
+				"HEARER",
+				"HITEE",
+				"WEAREE",
+				"KICKEE",
+				"WATCHEE",
+				"SPLASHER",
+				"SPLASHEE",
+				"GIVER",
+				"GIVEE",
+				"GIVEN",
+				"SENDER",
+				"SENDEE",
+				"SENT",
+				"PUNCHER",
+				"PUNCHEE",
+				"MEET_REL",
+				"SHAKE_HANDS_REL",
+				"KISSER",
+				"KISSEE"
 			],
 			"SPATIAL_REL":
 			[
-				"R8_CONTAIN" 
+				"CONTAIN" 
 			],
 			"QUALITY_REL":
 			[
-				"R9_HAS_PARAM"
+				"HAS_PARAM"
 			],
 			"TEMP_REL":
 			[
-				"R11_CONCURRENT",
-				"R12_SUCCESSIVE"
+				"CONCURRENT",
+				"SUCCESSIVE"
 			]
 		}
 	},
 	
 	"CONCEPTUALIZATION":
-	{
+	{	
+		"ENTITY": ["ENTITY_SCENE"],
+		"ACTION" : ["ACTION_SCENE"],
+		"EVENT" : ["EVENT_SCENE"],
 		
-		"ENTITY": ["O?_ENTITY"],
-		"OBJECT": ["O?_OBJECT"],
-		"PLACE": ["P?_PLACE"],
+		"MAN" : ["MAN"],
+		"BOY" : ["BOY"],
+		"WOMAN" : ["WOMAN"],
+		"GIRL" : ["GIRL"],
+		"HUMAN" : ["HUMAN"],
+		"ANIMAL" : ["ANIMAL"],
+		"MOUSE" : ["MOUSE"],
+		"TURTLE" : ["TURTLE"],
+		"DRESS" : ["DRESS"],
+		"TSHIRT" : ["TSHIRT"],
+		"BOXINGRING" : ["BOXINGRING"],
+		"PARK" : ["PARK"],
+		"PEOPLE" : ["PEOPLE"],
+		"BALLERINA" : ["BALLERINA"],
+		"CELLIST" : ["CELLIST"],
+		"FENCER" : ["FENCER"],
+		"CELLO" : ["CELLO"],
+		"TREE" : ["TREE"],
+		"BAG" : ["BAG"],
+		"WATERING_CAN" :["WATERING_CAN"],
+		"SHIRT" :["SHIRT"],
+		"SUIT" :["SUIT"],
+		"ROBBER" : ["ROBBER"],
+		"POLICEMAN" : ["POLICEMAN"],
+		"HUNTER" : ["HUNTER"],
+		"DOG" : ["DOG"],
+		"HOOK" : ["HOOK"],
+		"BOOKSHELF" : ["BOOKSHELF"],
+		"WAGON" : ["WAGON"],
 		
-		"MAN" : ["O1_MAN"],
-		"BOY" : ["O2_BOY"],
-		"WOMAN" : ["O3_WOMAN"],
-		"GIRL" : ["O4_GIRL"],
-		"HUMAN" : ["O5_HUMAN"],
-		"ANIMAL" : ["O6_ANIMAL"],
-		"MOUSE" : ["O7_MOUSE"],
-		"TURTLE" : ["O8_TURTLE"],
-		"DRESS" : ["O9_DRESS"],
-		"TSHIRT" : ["O10_TSHIRT"],
-		"BOXINGRING" : ["O11_BOXINGRING"],
-		"PARK" : ["O12_PARK"],
-		"PEOPLE" : ["O13_PEOPLE"],
-		"BALLERINA" : ["O14_BALLERINA"],
-		"CELLIST" : ["O15_CELLIST"],
-		"FENCER" : ["O16_FENCER"],
-		"CELLO" : ["O17_CELLO"],
-		"TREE" : ["O18_TREE"],
-		"BAG" : ["O19_BAG"],
-		"WATERING_CAN" :["O20_WATERING_CAN"],
-		"SHIRT" :["O21_SHIRT"],
-		"SUIT" :["O22_SUIT"],
-		"ROBBER" : ["O23_ROBBER"],
-		"POLICEMAN" : ["O24_POLICEMAN"],
-		"HUNTER" : ["O25_HUNTER"],
-		"DOG" : ["O26_DOG"],
-		"HOOK" : ["O27_HOOK"],
-		"BOOKSHELF" : ["O28_BOOKSHELF"],
-		"WAGON" : ["O29_WAGON"],
+		"SQUIRT" : ["SQUIRT"],
+		"TALK" : ["TALK"],
+		"HIT" : ["HIT"],
+		"WEAR" : ["WEAR"],
+		"KICK" : ["KICK"],
+		"LAUGH" : ["LAUGH"],
+		"WATCH" : ["WATCH"],
+		"SPLASH" : ["SPLASH"],
+		"MEET" : ["MEET"],
+		"PUNCH" : ["PUNCH"],
+		"KISS" : ["KISS"],
+		"SHAKE_HANDS" : ["SHAKE_HANDS"],
 		
-		"ACTION" : ["A?_ACTION"],
-		
-		"SQUIRT" : ["A1_SQUIRT"],
-		"TALK" : ["A2_TALK"],
-		"HIT" : ["A3_HIT"],
-		"WEAR" : ["A4_WEAR"],
-		"KICK" : ["A5_KICK"],
-		"LAUGH" : ["A6_LAUGH"],
-		"WATCH" : ["A7_WATCH"],
-		"SPLASH" : ["A8_SPLASH"],
-		"MEET" : ["A9_MEET"],
-		"PUNCH" : ["A10_PUNCH"],
-		"KISS" : ["A11_KISS"],
-		"SHAKE_HANDS" : ["A12_SHAKE_HANDS"],
-		
-		"COLOR" : ["Q?_COLOR"],
-		
-		"RED" : ["Q1_RED"],
-		"BLUE" : ["Q2_BLUE"],
-		"GREEN" : ["Q3_GREEN"],
-		"BLACK" : ["Q6_BLACK"],
-		"WHITE" : ["Q7_WHITE"],
-		"BIG" : ["Q5_BIG"],
-		"SMALL" : ["Q4_SMALL"],
-		"YOUNG" : ["Q8_YOUNG"],
-		"PRETTY": ["Q9_PRETTY"],
-		"HANDSOME" : ["Q10_HANDSOME"],
+		"RED" : ["RED"],
+		"BLUE" : ["BLUE"],
+		"GREEN" : ["GREEN"],
+		"BLACK" : ["BLACK"],
+		"WHITE" : ["WHITE"],
+		"BIG" : ["BIG"],
+		"SMALL" : ["SMALL"],
+		"YOUNG" : ["YOUNG"],
+		"PRETTY": ["PRETTY"],
+		"HANDSOME" : ["HANDSOME"],
 				
 		
-		"SPECIFY" : ["R1_SPECIFY"],
-		"MODIFY" : ["R9_HAS_PARAM"],
+		"IS" : ["IS"],
+		"MODIFY" : ["HAS_PARAM"],
 		
-		"IN" : ["R8_CONTAIN"],
+		"IN" : ["CONTAIN"],
 		
-		"SUCCESSIVE" : ["R12_SUCCESSIVE"],
-		"CONCURRENT" : ["R11_CONCURRENT"],
+		"SUCCESSIVE" : ["SUCCESSIVE"],
+		"CONCURRENT" : ["CONCURRENT"],
 
-		"AGENT" : ["R1_SQUIRTER", "R2_TALKER", "R3_HITER", "R4_WEARER", "R5_KICKER", "R6_LAUGHER", "R7_WATCHER", "R14_SPLASHER", "R16_GIVER", "R19_SENDER", "R22_PUNCHER", "R26_KISSER"],
-		"PATIENT" : ["R8_SQUIRTEE", "R9_HEARER", "R10_HITEE", "R11_WEAREE", "R12_KICKEE", "R13_WATCHEE", "R15_SPLASHEE", "R23_PUNCHEE", "R27_KISSEE"],
-		"AGT+PT" :["R24_MEET", "R25_SHAKE_HANDS"],
-		"THEME": ["R18_GIVEN", "R21_SENT"],
-		"RECIPIENT" : ["R17_GIVEE", "R20_SENDEE"]
+		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER"],
+		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE"],
+		"AGT+PT" :["MEET_REL", "SHAKE_HANDS_REL"],
+		"THEME": ["GIVEN", "SENT"],
+		"RECIPIENT" : ["GIVEE", "SENDEE"]
 	}
 }
 

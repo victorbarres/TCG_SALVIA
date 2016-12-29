@@ -148,6 +148,7 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     PLACE = 'PLACE'
     ACTION = 'ACTION'
     QUALITY = 'QUALITY'
+    SCENE = 'SCENE'
     SCENE_REL = 'SCENE_REL'
     SPATIAL_REL = 'SPATIAL_REL'
     ACTION_REL = 'ACTION_REL'
@@ -197,6 +198,14 @@ class PERCEPT_QUALITY(PERCEPT_SCHEMA):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.QUALITY
 
+class PERCEPT_SCENE(PERCEPT_SCHEMA):
+    """
+    Scene schema
+    """
+    def __init__(self, name, percept, init_act):
+        PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
+        self.type = PERCEPT_SCHEMA.SCENE
+
 class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMAS BY DEFAULT AS FROM and To (A VARIABLE! (unbound), eg. something is red). Think about that....
     """
     Defines relation between perceptual schemas.
@@ -217,7 +226,7 @@ class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMA
 
 class PERCEPT_SCENE_REL(PERCEPT_SCHEMA_REL):
     """
-    Scene relation schema. Define relation (edge) between two schemas (PERCEPT_OBJECT) pFrom and pTo.
+    Scene relation schema. Define relation (edge) between two schemas (PERCEPT_SCENE) pFrom and pTo.
     """
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
@@ -525,6 +534,7 @@ class PERCEPT_LTM(LTM):
         place = per_knowledge.find_meaning('PLACE')
         action = per_knowledge.find_meaning('ACTION')
         qual = per_knowledge.find_meaning('QUALITY')
+        scene = per_knowledge.find_meaning('SCENE')
         scene_rel = per_knowledge.find_meaning('SCENE_REL')
         action_rel = per_knowledge.find_meaning('ACTION_REL')
         spatial_rel = per_knowledge.find_meaning('SPATIAL_REL')
@@ -543,6 +553,8 @@ class PERCEPT_LTM(LTM):
                  new_schema = PERCEPT_ACTION(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, qual, match_type="is_a"):
                  new_schema = PERCEPT_QUALITY(name=percept.name, percept=percept, init_act=self.params['init_act'])
+            elif per_knowledge.match(per_cat, scene, match_type="is_a"):
+                 new_schema = PERCEPT_SCENE(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, action_rel, match_type="is_a"):
                  new_schema = PERCEPT_ACTION_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, spatial_rel, match_type="is_a"):
@@ -700,6 +712,7 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
+                self.eye_pos = self.subscene.area.center()
                 output['eye_pos'] = self.eye_pos
                 output['subscene'] = {'name':self.subscene.name, 'radius': self.subscene.area.radius()}
                 output['saliency'] = self.subscene.saliency
@@ -744,9 +757,8 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
             if ss.saliency > max_saliency:
                 max_saliency = ss.saliency
                 new_ss = ss
-                
+        
         self.subscene = new_ss
-        self.eye_pos = self.subscene.area.center()
 #        ############ Test of strategy of zoom-in first. #############
 #        if not(self.focus_area):
 #            self.focus_area = self.subscene.area 

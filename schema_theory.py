@@ -906,12 +906,15 @@ class WM(SYSTEM_SCHEMA):
             tot_act += inst.activity
         self.activity = tot_act
     
-    def update_activations(self):
+    def update_activations(self, threshold=None):
         """
         Update all the activations of instances in working memory based on cooperation and competition f-links.
         Passes activations through coop links with probabiliy P_coop, and through competition liks with probability P_comp
         Then updates all instance activation.
         Saves states.
+        
+        Args:
+            - threshold (FLOAT): the pruning threshould, if None, simply use the one defined in the WM parameters.
         """
         # Propagating cooperation
         for flink in self.coop_links:
@@ -924,11 +927,14 @@ class WM(SYSTEM_SCHEMA):
             r = random.random()
             if(r<self.params['C2']['P_comp']):
                 flink.update()
+        
+        if threshold==None:
+            threshold = self.params['C2']['prune_threshold']
        
         # Update all instances activation and sets alive=False for instances that fall below threshold.
         for inst in self.schema_insts:
             inst.update_activation()
-            if inst.activity<self.params['C2']['prune_threshold']:
+            if inst.activity<threshold:
                 inst.alive = False
         
         self.update_activity()

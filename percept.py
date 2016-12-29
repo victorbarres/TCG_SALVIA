@@ -165,7 +165,8 @@ class CONCEPTUALIZATION(object):
         if not(per in self.per2cpt):
             self.per2cpt[per] = cpt
         else:
-            print "Percept %s already associated with concept %s" %(per, self.per2cpt[per])
+            err_message = "Percept %s already associated with concept %s" %(per, self.per2cpt[per])
+            raise ValueError(err_message)
         
     
     def conceptualize(self, per):

@@ -978,10 +978,11 @@ class TCG_VIEWER:
         fig = plt.gcf()
         ax = fig.gca()
         
-        color_dict = {'OBJECT':'g', 'ACTION':'r' , 'QUALITY':'b'}
+        color_dict = {'OBJECT':'g', 'ACTION':'r' , 'QUALITY':'b', 'SCENE':'y'}
         
         # Display perceptual schemas and area
         for per_schema in scene.schemas:
+            print per_schema.name
             if not(isinstance(per_schema.trace, perceptual_schemas.PERCEPT_SCHEMA_REL)):
                 area = per_schema.content['area']
                 pos = (area.y, area.x)
@@ -997,6 +998,9 @@ class TCG_VIEWER:
                 head_size = 10
                 pos_start = (pos_from[1], pos_from[0])
                 d_pos = (pos_to[1] - pos_from[1], pos_to[0] - pos_from[0])
+                if d_pos == (0,0):
+                    err_message = "Cannot draw arrow between %s and %s for relation %s since they have the same area center" %(schema_from.name, schema_to.name, per_schema.name)
+                    raise ValueError(err_message)
                 plt.arrow(pos_start[0], pos_start[1], d_pos[0], d_pos[1], length_includes_head=True, head_width=head_size/2, head_length=head_size, fc='k', ec='k')
                 info = '%s (%.1f)' %(per_schema.name, per_schema.content['saliency'])
                 plt.text(pos_start[0] + d_pos[0]/2, pos_start[1] + d_pos[1]/2, info, fontsize=10)

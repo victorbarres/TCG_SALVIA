@@ -1,5 +1,49 @@
 { 
 	"inputs":{
+		"evt_act_static":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e2)", "pt1(a1, e1)"]
+			},
+			"sequence" :["P1"],
+			"timing":[],
+			"comments":"Only transitive action event frame, no content."
+		},
+		
+		"evt_act_woman":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+				"P2":["WOMAN(woman)", "IS(is2)", "is2(e1, woman)"]
+			},
+			"sequence" :["P1", "P2"],
+			"timing":[],
+			"comments":"Transitive action event frame. Then agent 'woman'"
+		},
+		
+		"evt_act_man_kick":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+				"P2":["MAN(man)", "IS(is2)", "is2(e1, man)"],
+				"P3":["KICK(kick)", "IS(is3)", "is3(a1, kick)"]
+			},
+			"sequence" :["P1", "P2", "P3"],
+			"timing":[],
+			"comments":"Transitive action event frame. Then agent 'man' (no lexical competition), then 'kick'."
+		},
+		
+		"evt_act_woman_kick":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+				"P2":["WOMAN(woman)", "IS(is2)", "is2(e1, woman)"],
+				"P3":["KICK(kick)", "IS(is3)", "is3(a1, kick)"]
+			},
+			"sequence" :["P1", "P2", "P3"],
+			"timing":[],
+			"comments":"Transitive action event frame. Then agent 'woman' (lexical competition), then 'kick'."
+		},
 		
 		"man_woman_kick_act":{
 			"sem_rate":1,

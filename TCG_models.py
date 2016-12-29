@@ -16,9 +16,14 @@ def parameters(system_names):
         - system_names ([STR])
     """
     params = {
+    'Percept_LTM':{
+        'init_act':1.0
+        },
+        
     'Concept_LTM':{
         'init_act':1.0
         },
+        
     'Grammatical_LTM':{
         'init_act':0.3
         },
@@ -298,8 +303,8 @@ def TCG_comprehension_system(name='language_system_C',
     return model
 
 def TCG_language_system(name='language_system',
-                        grammar_name='TCG_grammar_VB', 
-                        semantics_name = 'TCG_semantics',
+                        grammar_name='TCG_grammar_VB_main', 
+                        semantics_name = 'TCG_semantics_main',
                         grammar_path = './data/grammars/',
                         semantics_path = './data/semantics/'):
     """
@@ -391,8 +396,8 @@ def TCG_language_system(name='language_system',
     return 
     
 def SALVIA_P(name='SALVIA_P',
-           grammar_name='TCG_grammar_VB', 
-           semantics_name = 'TCG_semantics',
+           grammar_name='TCG_grammar_VB_main', 
+           semantics_name = 'TCG_semantics_main',
            grammar_path = './data/grammars/',
            semantics_path = './data/semantics/'):
     """
@@ -467,6 +472,7 @@ def SALVIA_P(name='SALVIA_P',
     
     # Parameters
     system_names = model.schemas.keys()
+    print system_names
     model_params = parameters(system_names)
     model.update_params(model_params)
     
@@ -497,8 +503,8 @@ def SALVIA_P(name='SALVIA_P',
     return model
     
 def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
-                           grammar_name='TCG_grammar_VB', 
-                           semantics_name = 'TCG_semantics',
+                           grammar_name='TCG_grammar_VB_main', 
+                           semantics_name = 'TCG_semantics_main',
                            grammar_path = './data/grammars/',
                            semantics_path = './data/semantics/'):
     """

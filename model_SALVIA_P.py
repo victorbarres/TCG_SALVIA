@@ -6,7 +6,7 @@ Test TCG description
 """
 import random
 
-from TCG_models import TCG_description_system, TCG_description_system_verbal_guidance
+from TCG_models import SALVIA_P, SALVIA_P_verbal_guidance
 from viewer import TCG_VIEWER
 from loader import TCG_LOADER
 
@@ -19,15 +19,15 @@ def test(seed=None):
         print "seed = %i" %seed
     random.seed(seed)
     
-    description_system = TCG_description_system_verbal_guidance()
+    description_system = SALVIA_P_verbal_guidance()
 
     # Generating schema system graph visualization
-    description_system.system2dot(image_type='png', disp=True)
+#    description_system.system2dot(image_type='png', disp=True)
 
     # Defining scene input
     FOLDER  = "./data/scenes/"
     SCENE_FILE = "TCG_scene.json"
-    SCENE_NAME = 'KC06_1_1_ActPt'
+    SCENE_NAME = 'test'
     SCENE_FOLDER = "%s%s/" %(FOLDER, SCENE_NAME)
     IMG_FILE = SCENE_FOLDER + 'scene.png'
     
@@ -37,10 +37,11 @@ def test(seed=None):
     description_system.set_input(my_scene)
     description_system.verbose = False
     
-    description_system.schemas['Control'].params['task']['start_produce'] = 20
+    description_system.schemas['Control'].params['task']['start_produce'] = 0
+    description_system.schemas['Control'].params['task']['time_pressure'] = 300
     
     set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 300
+    max_time = 1000
     save_states = [130]
     
     fixations = []
@@ -63,15 +64,15 @@ def test(seed=None):
                 vals = [(u,v) for u,v in output['Subscene_recognition'].iteritems() if v]
                 if vals:
                     print "t:%i, '%s'" %(t, vals)
-        if t - set_up_time in save_states:
-                TCG_VIEWER.display_WMs_state(description_system.schemas['Visual_WM'], description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
-                TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)
-                TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
+#        if t - set_up_time in save_states:
+#                TCG_VIEWER.display_WMs_state(description_system.schemas['Visual_WM'], description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
+#                TCG_VIEWER.display_gramWM_state(description_system.schemas['Grammatical_WM_P'], concise=True)
+#                TCG_VIEWER.display_lingWM_state(description_system.schemas['Semantic_WM'], description_system.schemas['Grammatical_WM_P'], concise=True)
     
     description_system.schemas['Visual_WM'].show_SceneRep()
-#    description_system.schemas['Visual_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+    description_system.schemas['Visual_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     description_system.schemas['Semantic_WM'].show_SemRep()
-#    description_system.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
+    description_system.schemas['Semantic_WM'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     description_system.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=False, c2_network=False)
     description_system.schemas['Grammatical_WM_P'].show_state()
     

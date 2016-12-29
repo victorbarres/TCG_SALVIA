@@ -1,0 +1,145 @@
+{
+ "scene": {
+  "resolution": [
+   1025,
+   768
+  ],
+  "schemas": {
+   "sc_0": {
+    "name": "HUMAN_LEFT",
+    "location": [
+     201,
+     159
+    ],
+    "size": [
+     184,
+     515
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O?_ENTITY"
+   },
+   "sc_1": {
+    "name": "HUMAN_RIGHT",
+    "location": [
+     162,
+     520
+    ],
+    "size": [
+     228,
+     474
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O?_ENTITY"
+   },
+   "sc_2": {
+    "name": "CELLIST",
+    "location": [
+     301,
+     169
+    ],
+    "size": [
+     129,
+     392
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O15_CELLIST"
+   },
+   "sc_4": {
+    "name": "SPLASH",
+    "location": [
+     304,
+     344
+    ],
+    "size": [
+     175,
+     117
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "A8_SPLASH"
+   },
+   "sc_5": {
+    "name": "SPLASHER",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R14_SPLASHER",
+    "from": "SPLASH",
+    "to": "HUMAN_RIGHT"
+   },
+   "sc_6": {
+    "name": "SPLASHEE",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R15_SPLASHEE",
+    "from": "SPLASH",
+    "to": "HUMAN_LEFT"
+   },
+   "sc_7": {
+    "name": "IS_CELLIST",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R1_SPECIFY",
+    "from": "CELLIST",
+    "to": "HUMAN_LEFT"
+   }
+  },
+  "subscenes": {
+   "ss_0": {
+    "name": "SPLASH_ACTION",
+    "schemas": [
+     "HUMAN_LEFT",
+     "HUMAN_RIGHT",
+     "SPLASH",
+     "SPLASHER",
+     "SPLASHEE"
+    ],
+    "saliency": "1.0",
+    "uncertainty": "1"
+   },
+   "ss_1": {
+    "name": "ZOOM_CELLIST",
+    "schemas": [
+     "HUMAN_LEFT",
+     "CELLIST",
+     "IS_CELLIST"
+    ],
+    "saliency": "0.9",
+    "uncertainty": "1"
+   }
+  }
+ }
+}

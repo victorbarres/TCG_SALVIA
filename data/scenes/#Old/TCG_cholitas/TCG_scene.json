@@ -1,0 +1,447 @@
+{
+ "scene": {
+  "resolution": [
+   1023,
+   679
+  ],
+  "schemas": {
+   "sc_0": {
+    "name": "WOMAN1",
+    "location": [
+     28,
+     202
+    ],
+    "size": [
+     462,
+     598
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O3_WOMAN"
+   },
+   "sc_2": {
+    "name": "WEAR1",
+    "location": [
+     38,
+     350
+    ],
+    "size": [
+     302,
+     567
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "A4_WEAR"
+   },
+   "sc_3": {
+    "name": "DRESS1",
+    "location": [
+     37,
+     350
+    ],
+    "size": [
+     307,
+     601
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O9_DRESS"
+   },
+   "sc_4": {
+    "name": "Schema_4",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R4_WEARER",
+    "from": "WEAR1",
+    "to": "WOMAN1"
+   },
+   "sc_5": {
+    "name": "Schema_5",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R11_WEAREE",
+    "from": "WEAR1",
+    "to": "DRESS1"
+   },
+   "sc_6": {
+    "name": "Schema_6",
+    "location": [
+     38,
+     351
+    ],
+    "size": [
+     311,
+     543
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "QUALITY",
+    "schema": "Q3_GREEN"
+   },
+   "sc_7": {
+    "name": "Schema_7",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R9_HAS_PARAM",
+    "from": "Schema_6",
+    "to": "DRESS1"
+   },
+   "sc_8": {
+    "name": "WOMAN2",
+    "location": [
+     40,
+     704
+    ],
+    "size": [
+     289,
+     424
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O3_WOMAN"
+   },
+   "sc_10": {
+    "name": "DRESS2",
+    "location": [
+     278,
+     674
+    ],
+    "size": [
+     321,
+     289
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O9_DRESS"
+   },
+   "sc_11": {
+    "name": "Schema_11",
+    "location": [
+     274,
+     677
+    ],
+    "size": [
+     287,
+     222
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "QUALITY",
+    "schema": "Q2_BLUE"
+   },
+   "sc_13": {
+    "name": "WEAR2",
+    "location": [
+     23,
+     679
+    ],
+    "size": [
+     312,
+     565
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "A4_WEAR"
+   },
+   "sc_14": {
+    "name": "Schema_14",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R4_WEARER",
+    "from": "WEAR2",
+    "to": "WOMAN2"
+   },
+   "sc_15": {
+    "name": "Schema_15",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R11_WEAREE",
+    "from": "WEAR2",
+    "to": "DRESS2"
+   },
+   "sc_16": {
+    "name": "Schema_16",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R9_HAS_PARAM",
+    "from": "Schema_11",
+    "to": "DRESS2"
+   },
+   "sc_17": {
+    "name": "KICK1",
+    "location": [
+     191,
+     343
+    ],
+    "size": [
+     552,
+     241
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "A5_KICK"
+   },
+   "sc_18": {
+    "name": "Schema_18",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R5_KICKER",
+    "from": "KICK1",
+    "to": "WOMAN1"
+   },
+   "sc_19": {
+    "name": "Schema_19",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R12_KICKEE",
+    "from": "KICK1",
+    "to": "WOMAN2"
+   },
+   "sc_20": {
+    "name": "BOXINGRING1",
+    "location": [
+     303,
+     2
+    ],
+    "size": [
+     214,
+     311
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O11_BOXINGRING"
+   },
+   "sc_21": {
+    "name": "PEOPLE",
+    "location": [
+     452,
+     0
+    ],
+    "size": [
+     273,
+     178
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "O13_PEOPLE"
+   },
+   "sc_23": {
+    "name": "Schema_23",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R8_CONTAIN",
+    "from": "KICK1",
+    "to": "BOXINGRING1"
+   },
+   "sc_24": {
+    "name": "WATCH1",
+    "location": [
+     417,
+     15
+    ],
+    "size": [
+     283,
+     171
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "A7_WATCH"
+   },
+   "sc_25": {
+    "name": "Schema_25",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R11_CONCURRENT",
+    "from": "KICK1",
+    "to": "WATCH1"
+   },
+   "sc_26": {
+    "name": "Schema_26",
+    "location": [
+     0,
+     0
+    ],
+    "size": [
+     0,
+     0
+    ],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "R7_WATCHER",
+    "from": "WATCH1",
+    "to": "PEOPLE"
+   }
+  },
+  "subscenes": {
+   "ss_0": {
+    "name": "Subscene_Left_Woman",
+    "schemas": [
+     "WOMAN1",
+     "WEAR1",
+     "DRESS1",
+     "Schema_4",
+     "Schema_5"
+    ]
+   },
+   "ss_1": {
+    "name": "Subscene_Right_Woman",
+    "schemas": [
+     "WOMAN2",
+     "DRESS2",
+     "WEAR2",
+     "Schema_14",
+     "Schema_15"
+    ]
+   },
+   "ss_2": {
+    "name": "Subscene_Left_Dress",
+    "schemas": [
+     "DRESS1",
+     "Schema_6",
+     "Schema_7"
+    ]
+   },
+   "ss_3": {
+    "name": "Subscene_Right_Dress",
+    "schemas": [
+     "DRESS2",
+     "Schema_11",
+     "Schema_16"
+    ]
+   },
+   "ss_4": {
+    "name": "Subscene_Kick",
+    "schemas": [
+     "WOMAN1",
+     "WOMAN2",
+     "KICK1",
+     "Schema_18",
+     "Schema_19"
+    ]
+   },
+   "ss_6": {
+    "name": "Subscene_Boxingring",
+    "schemas": [
+     "KICK1",
+     "BOXINGRING1",
+     "Schema_23"
+    ]
+   },
+   "ss_7": {
+    "name": "Subscene_People",
+    "schemas": [
+     "PEOPLE"
+    ]
+   },
+   "ss_8": {
+    "name": "Subscene_People_Focus",
+    "schemas": [
+     "WATCH1",
+     "Schema_26",
+	 "PEOPLE"
+    ]
+   }
+  }
+ }
+}

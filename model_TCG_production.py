@@ -184,13 +184,13 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of production diagnostics.
     """
-    DIAGNOSTIC_FILE = 'diagnostic.json'
-    SPEED_PARAM = 20
-    MODEL_PARAMS = {'Control.task.start_produce':200, 'Control.task.time_pressure':200, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.1, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.comp_weight':-10.0, 'Grammatical_WM_P.C2.coop_asymmetry':1.0}
+    DIAGNOSTIC_FILE = 'diagnostic_kuchinksy.json'
+    SPEED_PARAM = 600
+    MODEL_PARAMS = {'Control.task.start_produce':0.0, 'Control.task.time_pressure':1000, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.01, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.comp_weight':-10.0, 'Grammatical_WM_P.C2.coop_asymmetry':1.0}
     
     # Attempts to model lesion
 #    MODEL_PARAMS['Grammatical_WM_P.C2.coop_weight']=0.1 # Reduce cooperation weights
-#    MODEL_PARAMS['Grammatical_WM_P.dyn.noise_std']=10.0 # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
+#    MODEL_PARAMS['Grammatical_WM_P.dyn.noise_std']=2.0 # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
 #    MODEL_PARAMS['Grammatical_WM_P.C2.prune_threshold']=0.2 # Change prune threshold (shoudl be done in relation to initial activation values.)
 #    MODEL_PARAMS['Grammatical_WM_P.dyn.k'] = 3.4 # Interesting effects, bifurcation at a given value.
 #    MODEL_PARAMS['Grammatical_WM_P.dyn.act_rest'] = 0.001 # Act rest does not take into account the noise.
@@ -198,7 +198,7 @@ def run_prod_diagnostics(verbose=2, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time =1000
+    max_time =3000
     seed=None
     ###    
     

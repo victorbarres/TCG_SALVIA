@@ -346,6 +346,8 @@ class CONCEPTUALIZER(SYSTEM_SCHEMA):
         Notes:
             - For now the conceptualization scheme is trivial: many-to-one mapping.
         """
+        FRAMES  = ['ENTITY_SCENE', 'ACTION_SCENE', 'EVENT_SCENE']
+        
         cpt_insts  = []
         for n,d in SceneRep.nodes(data=True): # First process the nodes.
             if d['new']:
@@ -354,6 +356,7 @@ class CONCEPTUALIZER(SYSTEM_SCHEMA):
                 cpt_name = self.conceptualization.conceptualize(per_name)
                 cpt_schema = [schema for schema in cpt_schemas if schema.name == cpt_name][0]
                 cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':per_inst, 'cpt_schema':cpt_schema})
+                cpt_inst.frame = per_name in FRAMES
                 cpt_inst.set_activation(per_inst.activity) # THIS MIGHT NEED TO BE PARAMETRIZED!!
                 per_inst.covers['cpt_inst'] = cpt_inst
                 cpt_insts.append(cpt_inst)
@@ -721,17 +724,17 @@ class GRAMMATICAL_WM_P(WM):
                 
         self.convey_sem_activations(sem_input)
         self.update_activations()
-        self.limit_memory(max_capacity=None, max_prob=1.0, option=1)
+        self.limit_memory(max_capacity=None, max_prob=1.0, option=0)
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']
-            pressure = self.apply_pressure(ctrl_input['pressure'], option=1)
-            if pressure:
+            try_produce = self.apply_pressure(ctrl_input['pressure'], option=1)
+            if try_produce:
                 output = self.produce_form(sem_input, phon_input)
                 if output:
                     self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
-                    self.outputs['to_semantic_WM'] =  output['sem_WM_output']    
+                    self.outputs['to_semantic_WM'] =  output['sem_WM_output']
                     self.outputs['to_output'] = output['to_output']
                 else:
                     self.outputs['to_phonological_WM_P'] = []
@@ -804,7 +807,7 @@ class GRAMMATICAL_WM_P(WM):
             # Propagate activation
             if use_groups:
                 W_1 = 1.0 # Weight of activation propagation to in groups
-                W_2 = 0.1 # Weight of activation propagation to out groups
+                W_2 = 1.0 # Weight of activation propagation to out groups
                 if inst.content.group in use_groups:
                     node_weight = 1.0
                     edge_weight = 1.0
@@ -850,7 +853,7 @@ class GRAMMATICAL_WM_P(WM):
                 link.update_weight(self.params['C2']['coop_weight'] + self.params['C2']['coop_weight']*pressure)
             for link in self.comp_links:
                 link.update_weight(self.params['C2']['comp_weight'] + self.params['C2']['comp_weight']*pressure)  
-            try_produce = True
+            try_produce = True     
         else:
             error_msg = 'Invalid apply pressure option'
             raise ValueError(error_msg)
@@ -880,11 +883,13 @@ class GRAMMATICAL_WM_P(WM):
         self.end_competitions() # When production is triggered, a decision is forced for all the competitions.
         assemblages = self.assemble()
         data = []
+        winner_found = False
         if assemblages:
             phon_WM_output = []
             sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
             winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             while winner_assemblage and winner_assemblage.score >= score_threshold:
+                winner_found = True
                 (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
                 phon_WM_output.extend(phon_form)
                 sem_WM_output['nodes'].extend(expressed['nodes'])
@@ -917,7 +922,7 @@ class GRAMMATICAL_WM_P(WM):
                 else:
                     winner_assemblage = None
             
-            if phon_WM_output and sem_WM_output:
+            if winner_found:
                 return {'phon_WM_output':phon_WM_output, 'sem_WM_output':sem_WM_output, 'to_output':data}
             else:
                 return None
@@ -1570,7 +1575,7 @@ class GRAMMATICAL_WM_P(WM):
             - expressed = the semrep that the assemblage expresses (nodes and relations) as defined in the instance trace.
         """
         eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
-        expressed = eq_inst.trace['semrep']
+        expressed = {'nodes':eq_inst.trace['semrep']['nodes'][:], 'edges':eq_inst.trace['semrep']['edges'][:]} # Deep copy
         phon_form = []
         missing_info = None
         for form in eq_inst.content.SynForm.form:
@@ -1581,7 +1586,7 @@ class GRAMMATICAL_WM_P(WM):
                 SemRep_node_name = eq_inst.covers['nodes'][SemFrame_node_name]
                 missing_info = SemRep_node_name
                 return (phon_form, missing_info, expressed, eq_inst)
-      
+            
         return (phon_form, missing_info, expressed, eq_inst)
     
     #######################

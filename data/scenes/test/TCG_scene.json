@@ -1,0 +1,175 @@
+{
+ "scene": {
+  "resolution": [1025,768],
+  "schemas": {
+   "sc_0": {
+    "name": "BALLERINA",
+    "location": [164,530],
+    "size": [192,451],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "BALLERINA"
+   },
+   "sc_0-1": {
+    "name": "ENTITY_1",
+    "location": [144,510],
+    "size": [212,471],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "SCENE",
+    "schema": "ENTITY_SCENE"
+   },
+   "sc_0-2": {
+    "name": "IS_1",
+    "location": [0,0],
+    "size": [0,0],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "IS",
+    "from": "ENTITY_1",
+    "to": "BALLERINA"
+   },
+    "sc_1": {
+    "name": "CELLIST",
+    "location": [197,131],
+    "size": [171,530],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "OBJECT",
+    "schema": "CELLIST"
+   },
+   "sc_1-1": {
+    "name": "ENTITY_2",
+    "location": [177,111],
+    "size": [191,550],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "SCENE",
+    "schema": "ENTITY_SCENE"
+   },
+    "sc_1-2": {
+    "name": "IS_2",
+    "location": [0,0],
+    "size": [0,0],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "IS",
+    "from": "ENTITY_2",
+    "to": "CELLIST"
+   },
+   "sc_2": {
+    "name": "SPLASH",
+    "location": [316,307],
+    "size": [255,102],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "ACTION",
+    "schema": "SPLASH"
+   },
+   "sc_2-1": {
+    "name": "ACTION_1",
+    "location": [296,287],
+    "size": [275,122],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "SCENE",
+    "schema": "ACTION_SCENE"
+   },
+    "sc_2-2": {
+    "name": "IS_3",
+    "location": [0,0],
+    "size": [0,0],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "IS",
+    "from": "ACTION_1",
+    "to": "SPLASH"
+   },
+   "sc_3": {
+    "name": "SPLASH_AGT",
+    "location": [0,0],
+    "size": [0,0],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "SPLASHER",
+    "from": "ACTION_1",
+    "to": "ENTITY_1"
+   },
+   "sc_4": {
+    "name": "SPLASH_PT",
+    "location": [0,0],
+    "size": [0,0],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "SPLASHEE",
+    "from": "ACTION_1",
+    "to": "ENTITY_2"
+   },
+   "sc_5": {
+    "name": "EVENT_1",
+    "location": [100,100],
+    "size": [700,700],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "SCENE",
+    "schema": "EVENT_SCENE"
+   },
+   "sc_5-1": {
+    "name": "IS_4",
+    "location": [0,0],
+    "size": [0,0],
+    "saliency": "auto",
+    "uncertainty": "1",
+    "type": "RELATION",
+    "schema": "IS",
+    "from": "EVENT_1",
+    "to": "ACTION_1"
+   }
+  },
+  
+  "subscenes": {
+  "ss_0": {
+    "name": "BALLERINA",
+    "schemas": [
+     "BALLERINA",
+	 "IS_1",
+	 "ENTITY_1"
+    ],
+	"saliency":1.0,
+	"uncertainty":"auto"
+   },
+   "ss_1": {
+    "name": "CELLIST",
+    "schemas": [
+     "CELLIST",
+	 "IS_2",
+	 "ENTITY_2"
+    ],
+	"saliency":0.98,
+	"uncertainty":"auto"
+   },
+   "ss_2": {
+    "name": "SPLASH_EVT",
+    "schemas": [
+     "ENTITY_1",
+     "ENTITY_2",
+     "SPLASH",
+	 "IS_3",
+	 "ACTION_1",
+     "SPLASH_AGT",
+     "SPLASH_PT",
+	 "EVENT_1",
+	 "IS_4"
+    ],
+	"saliency":0.95,
+	"uncertainty":"auto"
+   }
+  }
+ }
+}
