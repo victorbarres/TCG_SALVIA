@@ -776,10 +776,10 @@ class WM(SYSTEM_SCHEMA):
         """
         self.schema_insts.remove(schema_inst)
         for flink in self.coop_links[:]:
-                    if (flink.inst_from == inst) or (flink.inst_to == inst):
+                    if (flink.inst_from == schema_inst) or (flink.inst_to == schema_inst):
                         self.coop_links.remove(flink)
         for flink in self.comp_links[:]:
-            if (flink.inst_from == inst) or (flink.inst_to == inst):
+            if (flink.inst_from == schema_inst) or (flink.inst_to == schema_inst):
                 self.comp_links.remove(flink)
                 
     def find_instance(self, schema_inst_name):
@@ -939,7 +939,7 @@ class WM(SYSTEM_SCHEMA):
         """
         for inst in self.schema_insts[:]:
             if not inst.alive:
-                self.schema_insts.remove(inst)
+                self.remove_instance(inst)
     
     def end_competitions(self):
         """
