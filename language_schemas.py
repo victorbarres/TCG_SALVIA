@@ -721,7 +721,7 @@ class GRAMMATICAL_WM_P(WM):
                 
         self.convey_sem_activations(sem_input)
         self.update_activations()
-        self.limit_memory(max_capacity=10, max_prob=1.0, option=0)
+        self.limit_memory(max_capacity=None, max_prob=1.0, option=1)
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
@@ -775,23 +775,28 @@ class GRAMMATICAL_WM_P(WM):
             cover_nodes = inst.covers['nodes']
             cover_edges = inst.covers['edges']
             
-            act = 0.0
-            count = 0
+            act_sem = 0.0
+            act_edge = 0.0
+            count_sem = 0
+            count_edge = 0
             # Propagate semantic node activation
             for node in sem_input['nodes']:
                 inst_node = next((k for k,v in cover_nodes.items() if v==node), None) # Instances covers the node through sf_node
                 if inst_node:
                     inst_form = inst.content.node2form(inst_node)
                     if inst_form == None or isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form or does not have a symlink.. (formalization)                      
-                        act += sem_input['nodes'][node]
-                        count += 1
+                        act_sem += sem_input['nodes'][node]
+                        count_sem += 1
             
             # Propagate semantic relation activation
             for edge in sem_input['edges']:
                 inst_edge = next((k for k,v in cover_edges.items() if v==edge), None)
                 if inst_edge:
-                    act += sem_input['edges'][edge] # Edge always propagate their activation since they are obligatory formalized in a TCG cxn.
-                    count +=1
+                    act_edge += sem_input['edges'][edge] # Edge always propagate their activation since they are obligatory formalized in a TCG cxn.
+                    count_edge +=1
+                    
+            act = act_sem + act_edge
+            count = count_sem + count_edge
             
             # Normalization
             if normalization and count>0:

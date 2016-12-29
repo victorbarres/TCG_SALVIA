@@ -772,9 +772,15 @@ class WM(SYSTEM_SCHEMA):
     
     def remove_instance(self, schema_inst):
         """
-        To do: Remove the C2-links...
+        Removes the instance and all the associated C2-links
         """
         self.schema_insts.remove(schema_inst)
+        for flink in self.coop_links[:]:
+                    if (flink.inst_from == inst) or (flink.inst_to == inst):
+                        self.coop_links.remove(flink)
+        for flink in self.comp_links[:]:
+            if (flink.inst_from == inst) or (flink.inst_to == inst):
+                self.comp_links.remove(flink)
                 
     def find_instance(self, schema_inst_name):
         """
@@ -934,12 +940,6 @@ class WM(SYSTEM_SCHEMA):
         for inst in self.schema_insts[:]:
             if not inst.alive:
                 self.schema_insts.remove(inst)
-                for flink in self.coop_links[:]:
-                    if (flink.inst_from == inst) or (flink.inst_to == inst):
-                        self.coop_links.remove(flink)
-                for flink in self.comp_links[:]:
-                    if (flink.inst_from == inst) or (flink.inst_to == inst):
-                        self.comp_links.remove(flink)
     
     def end_competitions(self):
         """
@@ -963,6 +963,9 @@ class WM(SYSTEM_SCHEMA):
     def limit_memory(self, max_capacity=None, max_prob=0.01, option=1):
         """
         """
+        if option==0: #do nothing
+            return
+            
         if option==1: # Limit on the instances
             num_insts = len(self.schema_insts)
             if max_capacity == None or num_insts == 0: # No limitation or no instances yet
@@ -996,9 +999,7 @@ class WM(SYSTEM_SCHEMA):
                 self.coop_links.remove(link)
                 print "\nt:%i, Killed! %s -> %s, memory_usage:%g, threshold:%g\n" %(self.t, link.inst_from.name, link.inst_to.name, memory_usage, threshold)
                 print num_links
-            
-
-        
+   
     ############################
     ### STATE SAVING METHODS ###
     ############################
@@ -1208,7 +1209,7 @@ class F_LINK(object):
         - asymmetry_coef (FLOAT): 0 <= asymmetry_coef <= 1
         - weight_func (Lambda function): Function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:0.5*x):
+    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:x):
         """
         """
         self.inst_from = inst_from
@@ -1505,7 +1506,7 @@ class ASSEMBLAGE(FUNCTION_SCHEMA):
         data['schema_insts'] = [s.name for s in self.schema_insts]
         data['coop_links'] = [l.get_info() for l in self.coop_links]
         data['activation'] = self.activation
-        return data            
+        return data
 
 #################################
 ##### BRAIN MAPPING CLASSES #####
