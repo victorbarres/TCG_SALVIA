@@ -752,56 +752,90 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def convey_sem_activations(self, sem_input, normalization=True):
+    def convey_sem_activations(self, sem_input, normalization=True, use_groups=[1]):
         """
         Args:
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
-            - weight (FLOAT) = weight to apply to the sem_activation value.'
-            - normalization (BOOL) = If True, the propagation of the activation is normalized by the number of nodes and edges covered.
+            - normalization (BOOL): If True, the propagation of the activation is normalized by the number of nodes and edges covered.
+            - use_groups ([INT]): only convey activations to cxn instnaces of group in use_groups.
         
-        Notes:
-            For now, a construction receives activations from semantic working memory if :
+        If use_groups = []
+            A construction receives activations from semantic working memory if :
                 - 1. It's semframe covers at least one semrep node that has not yet been 
             expressed. 
-                - 2. The SemFrame node that covers is linked to a TP_PHON or does not have an attached SymLink (implicitely formalized)
-                - 3. It's semframe covers a semrep relations that has not yet been expressed.
-            The overarching principles is that a cxn_inst receives activation from an unexpressed semantic schema that it formalizes.
-            In the case of nodes, formalization means lexicalizations. Relations are necessarily formalized in the current framework.
-            
-            This is more inclusive that only lexical items.
+                - 2. The SemFrame node that covers is linked to a TP_PHON
+            This can be modified by changing the formula for 
             
         """
         for inst in self.schema_insts:
             cover_nodes = inst.covers['nodes']
             cover_edges = inst.covers['edges']
             
-            act_sem = 0.0
+            act_node_phon = 0.0
+            act_node_slot = 0.0
+            act_node_none = 0.0
             act_edge = 0.0
-            count_sem = 0
+            count_node_phon = 0
+            count_node_slot = 0
+            count_node_none = 0
             count_edge = 0
-            # Propagate semantic node activation
+            # Compute semantic node activation
             for node in sem_input['nodes']:
                 inst_node = next((k for k,v in cover_nodes.items() if v==node), None) # Instances covers the node through sf_node
                 if inst_node:
                     inst_form = inst.content.node2form(inst_node)
-                    if inst_form == None or isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form or does not have a symlink.. (formalization)                      
-                        act_sem += sem_input['nodes'][node]
-                        count_sem += 1
-            
-            # Propagate semantic relation activation
+                    if isinstance(inst_form, construction.TP_PHON): # sf_node is linked to a TP_PHON form or does not have a symlink.. (formalization)                      
+                        act_node_phon += sem_input['nodes'][node]
+                        count_node_phon += 1
+                    elif inst_form == None: # sf_node does not have a symlink.. (formalization)    
+                        act_node_none += sem_input['nodes'][node]
+                        count_node_none += 1
+                    else: # sf_node linked to a slot.
+                        act_node_slot += sem_input['nodes'][node]
+                        count_node_slot += 1
+                        
+            # Compute semantic relation activation
             for edge in sem_input['edges']:
                 inst_edge = next((k for k,v in cover_edges.items() if v==edge), None)
                 if inst_edge:
                     act_edge += sem_input['edges'][edge] # Edge always propagate their activation since they are obligatory formalized in a TCG cxn.
                     count_edge +=1
-                    
-            act = act_sem + act_edge
-            count = count_sem + count_edge
+            
+            # Propagate activation
+            if use_groups:
+                W_1 = 1.0 # Weight of activation propagation to in groups
+                W_2 = 0.1 # Weight of activation propagation to out groups
+                if inst.content.group in use_groups:
+                    node_weight = 1.0
+                    edge_weight = 1.0
+                    act_node = act_node_phon + act_node_none + act_node_slot # I propagate everything
+                    count_node = count_node_phon + count_node_none + count_node_slot
+                    act = node_weight*act_node + edge_weight*act_edge
+                    act *= W_1
+                    count = node_weight*count_node + edge_weight*count_edge
+                else:
+                    node_weight = 1.0
+                    edge_weight = 1.0
+                    act_node = act_node_phon + act_node_none + act_node_slot # I propagate everything
+                    count_node = count_node_phon + count_node_none + count_node_slot
+                    act = (node_weight*act_node + edge_weight*act_edge)*W_2
+                    act *= W_2
+                    count = node_weight*count_node + edge_weight*count_edge
+            else:
+                #######################################
+                ### CHANGE IF WANT TO USE OTHER POLICY.
+                node_weight = 1.0
+                edge_weight = 0.0
+                act_node = act_node_phon + act_node_none # I propagate activation to lexicalized nodes.
+                count_node = count_node_phon + count_node_none
+                act = node_weight*act_node + edge_weight*act_edge
+                count = node_weight*count_node + edge_weight*count_edge
             
             # Normalization
             if normalization and count>0:
                 act = act/count # normalizing removes advantage for constructions that cover more content.
             inst.activation.E += act
+            
     
     def apply_pressure(self, pressure, option=0):
         """

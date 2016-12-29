@@ -484,7 +484,7 @@ class CXN:
         new_cxn.name = self.name
         new_cxn.clss = self.clss
         new_cxn.preference = self.preference
-        new_cxn.group = self.preference
+        new_cxn.group = self.group
         
         (new_semframe, sem_corr) = self.SemFrame.copy()
         (new_synform, syn_corr) = self.SynForm.copy()

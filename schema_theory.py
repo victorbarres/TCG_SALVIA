@@ -600,8 +600,12 @@ class INST_ACTIVATION(object):
         self.act0 = float(act0)
         self.tau = float(tau)
         self.act_rest = float(act_rest)
-        self.W = {'W_I':int_weight, 'W_E':ext_weight, 'W_self':0.0}
         self.k = float(k)
+        if self.act_rest == 0.0:
+            err_msg = "logistic function undefined for sigma(0) = act_rest = 0"
+            raise ValueError(err_msg)
+        self.x0 = np.log(1.0/self.act_rest - 1.0)/self.k # Compute x0 so that sigma(0) = act_rest   
+        self.W = {'W_I':int_weight, 'W_E':ext_weight, 'W_self':0.0}
         self.dt = float(dt) 
         self.t = self.t0
         self.act = self.act0
@@ -614,15 +618,14 @@ class INST_ACTIVATION(object):
         """
         Int: total internal input
         """
-        alpha = (1.0 - 1.0/self.tau) # Time constant (leak rate)
+        alpha =  1.0/self.tau # Time constant (leak rate)
         noise =  random.normalvariate(self.noise_mean, self.noise_std) # noise value
         act_int = self.W['W_I']*Int + self.W['W_self']*self.act # Weighted internal input
         act_ext = self.W['W_E']*self.E #  Weighted external input
         Input = act_int + act_ext # Total input before noise (linear summation option)
 #        Input = act_ext + act_int*act_ext # Total input before noise (modulation option 1)
 
-        
-        new_act = alpha*self.act + (1.0 - alpha)*self.logistic(Input + noise) # Updated activation
+        new_act = (1.0 - alpha)*self.act + alpha*self.logistic(Input + noise) # Updated activation
         self.act = new_act
         self.t += self.dt
         self.save_vals["t"].append(self.t)
@@ -633,13 +636,8 @@ class INST_ACTIVATION(object):
     def logistic(self, x):
         """
         Activation function.
-        """
-        if self.act_rest == 0.0:
-            err_msg = "logistic function undefined for sigma(0) = act_rest = 0"
-            raise ValueError(err_msg)
-            
-        x0 = np.log(1.0/self.act_rest - 1)/self.k     # Compute x0 so that sigma(0) = act_rest    
-        output = 1.0/(1.0 + np.exp(-1.0*self.k*(x-x0)))
+        """  
+        output = 1.0/(1.0 + np.exp(-1.0*self.k*(x-self.x0)))
         return output
         
 #############################
@@ -791,7 +789,7 @@ class WM(SYSTEM_SCHEMA):
         schema_inst = next((inst for inst in self.schema_insts if inst.name == schema_inst_name), None)
         return schema_inst
         
-    def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None):
+    def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None, coop_asymetry =None):
         """
         Add a cooperation link between two instances.
         A cooperation link can only be added if the two instances are not already in competition.
@@ -807,7 +805,9 @@ class WM(SYSTEM_SCHEMA):
             
         if weight == None:
             weight=self.params['C2']['coop_weight']
-        new_link = COOP_LINK(inst_from, inst_to, weight*qual, self.params['C2']['coop_asymmetry'])
+        if coop_asymetry == None:
+            coop_asymetry = self.params['C2']['coop_asymmetry']
+        new_link = COOP_LINK(inst_from, inst_to, weight*qual, coop_asymetry)
         new_link.set_connect(port_from, port_to)
         self.coop_links.append(new_link)
 
@@ -845,7 +845,7 @@ class WM(SYSTEM_SCHEMA):
         for f_link in f_links:
             self.coop_links.remove(f_link)
         
-    def add_comp_link(self, inst_from, inst_to, weight=None):
+    def add_comp_link(self, inst_from, inst_to, weight=None, comp_asymetry=None):
         """
         Add a competition link between two instances.
         A competition link can only be added if the two instances are not already in cooperation.
@@ -862,7 +862,9 @@ class WM(SYSTEM_SCHEMA):
         
         if weight == None:
             weight=self.params['C2']['comp_weight']
-        new_link = COMP_LINK(inst_from, inst_to, weight, self.params['C2']['comp_asymmetry'])
+        if comp_asymetry == None:
+            comp_asymetry = self.params['C2']['comp_asymmetry']
+        new_link = COMP_LINK(inst_from, inst_to, weight, comp_asymetry)
         self.comp_links.append(new_link)
         
     def find_comp_links(self, inst_from='any', inst_to='any'):
@@ -1207,16 +1209,17 @@ class F_LINK(object):
         - inst_to (SCHEMA_INST)
         - weight (FLOAT)
         - asymmetry_coef (FLOAT): 0 <= asymmetry_coef <= 1
-        - weight_func (Lambda function): Function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
+        - weight_func (STR): String code of a lambda function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:x):
+    def __init__(self, inst_from=None, inst_to=None, weight=0.0, asymmetry_coef=0.0, weight_func_str='lambda x,y,z:x'):
         """
         """
         self.inst_from = inst_from
         self.inst_to = inst_to
         self.weight = float(weight)
         self.asymmetry_coef = float(asymmetry_coef)
-        self.weight_func=weight_func
+        self.weight_func_str = weight_func_str
+        exec('self.weight_func = ' + weight_func_str)
     
     def update_weight(self, new_weight):
         self.weight = float(new_weight)
@@ -1230,7 +1233,7 @@ class F_LINK(object):
         self.update_weight(new_weight)
     
     def copy(self):
-        new_flink = F_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
+        new_flink = F_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef, weight_func_str=self.weight_func_str)
         return new_flink
         
     ####################
@@ -1239,7 +1242,7 @@ class F_LINK(object):
     def get_info(self):
         """
         """
-        data = {"inst_from":self.inst_from.name, "inst_to":self.inst_to.name, "weight":self.weight, "asymmetry_coef":self.asymmetry_coef}
+        data = {"inst_from":self.inst_from.name, "inst_to":self.inst_to.name, "weight":self.weight, "asymmetry_coef":self.asymmetry_coef, "weight_func_str":self.weight_func_str}
         return data
     
 class COOP_LINK(F_LINK):
@@ -1251,15 +1254,15 @@ class COOP_LINK(F_LINK):
         - inst_to (SCHEMA_INST)
         - weight (FLOAT)
         - asymmetry_coef (FLOAT): 0 <= asymmetry_coef <= 1
-        - weight_func (Lambda function): Function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
+        - weight_func (STR): String code of a lambda function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
     
     Data:        
         - connect (CONNECT)
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:x):
+    def __init__(self, inst_from=None, inst_to=None, weight=1.0, asymmetry_coef=0.0, weight_func_str='lambda x,y,z:x'):
         """
         """
-        F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef, weight_func)
+        F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef, weight_func_str)
         self.connect = CONNECT()
     
     def set_connect(self, port_from, port_to, weight=0.0, delay=0.0):
@@ -1276,7 +1279,7 @@ class COOP_LINK(F_LINK):
         return self.connect.port_from and self.connect.port_to
     
     def copy(self):
-        new_flink = COOP_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef)
+        new_flink = COOP_LINK(inst_from=self.inst_from, inst_to=self.inst_to, weight=self.weight, asymmetry_coef=self.asymmetry_coef, weight_func_str=self.weight_func_str)
         new_flink.connect = self.connect.copy()
         return new_flink
     
@@ -1299,12 +1302,12 @@ class COMP_LINK(F_LINK):
         - inst_to (SCHEMA_INST)
         - weight (FLOAT)
         - asymmetry_coef (float): 0 <= asymmetry_coef <= 1
-        - weight_func (Lambda function): Function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
+        - weight_func_str (STR): String code of a lambda function to update weigths at each f-link update. Lambda function lambda x,y,x : f(x,y,z) that takes three arguments: x = current weight, y = activation of inst_from, z = activation of inst_to, and returns a new weight.
     """
-    def __init__(self, inst_from=None, inst_to=None, weight=-1.0, asymmetry_coef=0.0, weight_func=lambda x,y,z:x): #Symmetric links
+    def __init__(self, inst_from=None, inst_to=None, weight=-1.0, asymmetry_coef=0.0, weight_func_str='lambda x,y,z:x'): #Symmetric links
         """
         """
-        F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef, weight_func)
+        F_LINK.__init__(self, inst_from, inst_to, weight, asymmetry_coef, weight_func_str)
 
 class ASSEMBLAGE(FUNCTION_SCHEMA):
     """

@@ -48,7 +48,7 @@ def parameters(system_names):
         'dyn.act_rest':0.001,
         'dyn.k':10.0, # Need to analyze the impact of that factor.
         'dyn.noise_mean':0.0,
-        'dyn.noise_std':1.0,
+        'dyn.noise_std':0.1,
         'C2.confidence_threshold':0.3, #0.7
         'C2.prune_threshold':0.01, #0.01 # Manipulations can yield "broca's aphasia" (0.3)
         'C2.coop_weight':1.0,
