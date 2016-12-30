@@ -126,7 +126,7 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
 
 def run_model(model, sem_gen, input_name, max_time=900, seed=None, verbose=0, prob_times=[]):
     """
-    Run the model "model" for an semantic gerator "sem_gent" using the input "input_name"
+    Run the model "model" for an semantic gerator "sem_gen" using the input "input_name"
     Verbose modes: 0 -> no output printed. 1 -> only final utterance printed, 2 -> input and utterances printed as they are received and produced.
     prob_times ([INT]): For time in list, saves a view of LinguisticWM concise in tmp folder.
     """
@@ -180,9 +180,9 @@ def run_model(model, sem_gen, input_name, max_time=900, seed=None, verbose=0, pr
     return (res, ' '.join(out_utterance))
     
     
-def run_prod_diagnostics(verbose=2, prob_times=[]):
+def run_diagnostics(verbose=2, prob_times=[]):
     """
-    Allows to run a set of production diagnostics.
+    Allows to run a set of diagnostics.
     """
     DIAGNOSTIC_FILE = 'diagnostic_kuchinksy.json'
     SPEED_PARAM = 600
@@ -363,5 +363,5 @@ def run_grid_search():
                 f.write(new_line)
     
 if __name__=='__main__':
-    run_prod_diagnostics(verbose=3, prob_times=[])
+    run_diagnostics(verbose=3, prob_times=[])
     

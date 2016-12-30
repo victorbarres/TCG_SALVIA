@@ -29,7 +29,7 @@ def parameters(system_names):
         },
         
     'Semantic_WM':{
-        'dyn.tau':1000.0,
+        'dyn.tau':10000.0,
         'dyn.int_weight':1.0,
         'dyn.ext_weight':1.0,
         'dyn.act_rest':0.001,
@@ -125,7 +125,7 @@ def parameters(system_names):
         },
         
     'Visual_WM':{
-        'dyn.tau':1000.0,
+        'dyn.tau':10000.0,
         'dyn.int_weight':1.0,
         'dyn.ext_weight':1.0,
         'dyn.act_rest':0.001,

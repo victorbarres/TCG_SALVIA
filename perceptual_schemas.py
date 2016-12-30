@@ -455,7 +455,7 @@ class VISUAL_WM(WM):
         """
         """
         super(VISUAL_WM, self).reset()
-        self.SceneRep = nx.Digraph
+        self.SceneRep = nx.DiGraph()
         
     def process(self):
         """
