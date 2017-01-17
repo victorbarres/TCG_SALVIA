@@ -4,6 +4,7 @@
 
 Defines visual scene structure related classes for TCG.
 """
+from __future__ import division
 import perceptual_schemas as ps  
 ###########################
 #### Perceptual process ###
@@ -143,7 +144,6 @@ class SUB_SCENE(object):
             return False
         self.area = schema_insts[0].content['area']
         for schema_inst in schema_insts[1:]:
-            
             self.area = ps.AREA.hull(self.area, schema_inst.content['area'])
         return True
     

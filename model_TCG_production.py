@@ -3,79 +3,26 @@
 @author: Victor Barres
 Functions required to run the TCG production system defined in TCG_model as "TCG_production_system".
  - Set the model and the input generator using set_model() and set_input()
- - If the model is to be run only on one input and one set of parameter use run_model()
+ - If the model is to be run only on one input and one set of parameter use runl()
  - If the model is to be run as part of grid search over a parameter space use "grid_search"
  - Use main() to run grid_search + run on multiple inputs.
 """
+from __future__ import division
 import random
+import time
+import json
 
+from schema_theory import st_save
 import language_schemas as ls
 from loader import TCG_LOADER
 from TCG_models import TCG_production_system
 from viewer import TCG_VIEWER
-from prod_analysis import prod_analyses, prod_statistics
+from prod_analysis import prod_summary, BLEU
 
 TMP_FOLDER = './tmp'
-    
-def test_run(seed=None):
-    """
-    Test run function for the production model.
-    """
-    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
-        random.seed(seed)
-        seed = random.randint(0,10**9)
-        print "seed = %i" %seed
-        
-    random.seed(seed)
-    SEM_INPUT = 'sem_inputs.json' # semantic input files (no macros)
-    INPUT_NAME = 'blue_woman_kick_man' # Name of the input to use.
-    
-    FOLDER = './tmp/TEST_%s_%s/' %(INPUT_NAME, str(seed)) # Folder where the simulation results will be saved.
-    
-    language_system_P = TCG_production_system(grammar_name='TCG_grammar_VB_main', semantics_name='TCG_semantics_main') # Create model
-    
-    # Set up semantic input generator    
-    conceptLTM = language_system_P.schemas['Concept_LTM']
-    sem_inputs = TCG_LOADER.load_sem_input(SEM_INPUT, "./data/sem_inputs/")   
-    speed_param = 1
-    sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param)
- 
-    generator = sem_gen.sem_generator(INPUT_NAME)
-    
-    (sem_insts, next_time, prop) = generator.next() #Getting the initial input.
-    
-    # Test paramters
-    language_system_P.params['Control']['task']['start_produce'] = 3100
-    language_system_P.params['Control']['task']['time_pressure'] = 200
-    language_system_P.params['Grammatical_WM_P']['C2']['confidence_threshold'] = 0.3
-    
-    set_up_time = -10 # Starts negative to let the system settle before it receives its first input. Also, easier to handle input arriving at t=0.
-    max_time = 3000
-    save_states = [30, 700, 2000]
-    
-    flag = False
-    for t in range(set_up_time, max_time):
-        if next_time != None and t>next_time:
-            (sem_insts, next_time, prop) = generator.next()
-            print "t:%i, sem: %s (prop: %s)" %(t, ', '.join([inst.name for inst in sem_insts]), prop)
-            language_system_P.set_input(sem_insts)
-        language_system_P.update()
-        output = language_system_P.get_output()
-        if not(language_system_P.schemas['Grammatical_WM_P'].comp_links) and t>10 and not(flag):
-            print "t:%i, Competition done" % t
-            flag = True
-            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
-            language_system_P.params['Control']['task']['start_produce'] = t + 10
-        if output['Utter']:
-            print "t:%i, '%s'" %(t, output['Utter'])
-        if t - set_up_time in save_states:
-            TCG_VIEWER.display_lingWM_state(language_system_P.schemas['Semantic_WM'], language_system_P.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
-    
-    language_system_P.schemas['Semantic_WM'].show_SemRep()
-    language_system_P.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=True,  c2_network=False)
-    language_system_P.save_sim(FOLDER, 'test_language_output.json')
-    
-    return language_system_P
+
+##################
+#### RUNNING MODEL
 
 def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}):
     """
@@ -84,9 +31,10 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     Args:
         - semantics_name (STR): Name of the semantic file containing the perceptual, world, and conceptualization knowledge.
         - grammar_name (STR): Name of the grammar file to use.
-        - model_prams (dict): Dictionary defining the model parameters (if different than default)
+        - model_prams (DICT): Dictionary defining the model parameters (if different than default)
     
-    Returns: production model
+    Returns: 
+        - production model
     """
     
     model = TCG_production_system(grammar_name=grammar_name, semantics_name=semantics_name)
@@ -100,86 +48,238 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
     Sets up a TCG ISRF inputs generator for TCG production model.
     
     Args:
-        - sem_name (STR): Semantic input name.
+        - model (): model to which the inputs will be sent
+        - input_name (STR): name of the input to be used.
         - sem_input_file (STR): Semantic input file name. For non-macro input, set to 'ALL' to load all inputs from file.
         - sem_input_macro (BOOL): True is the input is an ISRF macro.
         - speed_param (INT): multiplier of the rate defined in the ISRF input (by default the ISFR rate is 1.)
     
-    Returns input SEM_GENERATOR object.
+    Returns:
+        - input SEM_GENERATOR object.
     """
     SEM_INPUT_PATH = './data/sem_inputs/'
+    
     
     conceptLTM = model.schemas['Concept_LTM']
     if not(sem_input_macro):
         sem_inputs = TCG_LOADER.load_sem_input(sem_input_file, SEM_INPUT_PATH)
         if input_name == 'ALL':
-            sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param)
+            sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param, is_macro=sem_input_macro)
+            sem_gen.ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
         else:
             sem_input = {input_name:sem_inputs[input_name]}
-            sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=speed_param)
+            sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=speed_param,is_macro=sem_input_macro)
+            ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
+            sem_gen.ground_truths = ground_truths.get(input_name, None)
     if sem_input_macro:
         sem_inputs = TCG_LOADER.load_sem_macro(input_name, sem_input_file, SEM_INPUT_PATH)
-        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param)
+        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param, is_macro=sem_input_macro)
+        ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
+        sem_gen.ground_truths = ground_truths.get(input_name, None)
     
-    return sem_gen    
+    return sem_gen
     
-
-def run_model(model, sem_gen, input_name, max_time=900, seed=None, verbose=0, prob_times=[]):
+def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False):
     """
     Run the model "model" for an semantic gerator "sem_gen" using the input "input_name"
-    Verbose modes: 0 -> no output printed. 1 -> only final utterance printed, 2 -> input and utterances printed as they are received and produced.
+    Verbose modes: 0,1 -> no output printed. 2 -> only final utterance printed, 3 -> input and utterances printed as they are received and produced. >3 -> 10steps after sem_input received added to prob_times as well as 10 steps before max_time
     prob_times ([INT]): For time in list, saves a view of LinguisticWM concise in tmp folder.
+    
+    Returns:
+        outputs (DICT): {time:model.get_output()} for all time in simulation time steps for which model's output is not empty.
     """
     if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
         random.seed(seed)
         seed = random.randint(0,10**9)
     random.seed(seed)
     
-    FOLDER = '%s/TEST_%s_%s/' %(TMP_FOLDER, input_name, str(seed))
+    sim_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     
-    generator = sem_gen.sem_generator(input_name, verbose = (verbose>1))
+    if not(sim_name):
+        sim_name = '%s_%s_(%s)' %(sim_time, input_name, str(seed))
+    else:
+        sim_name = '%s_%s_(%s)' %(sim_time, sim_name, str(seed))
+    
+    FOLDER = '%s/%s/' %(sim_folder, sim_name)
+    
+    if save: # Saving model and sem_gen
+        st_save(model, model.name, FOLDER)
+        st_save(sem_gen, 'sem_gen', FOLDER)
+    
+    # initializing generator for the model.
+    generator = sem_gen.sem_generator(input_name, verbose = (verbose>2))
     (sem_insts, next_time, prop) = generator.next()
-    model.initialize_states()
+    model.initialize_states() # initializing model
     
-    if verbose>2:
+    if verbose>3:
         prob_times.append(max_time-10)# Will save the state 10 steps before max_time
     
-    out_data = []
-    out_utterance = []
+    outputs = {}
+    test_not_empty = lambda l: [x for x in l.values() if x!= None] != []
+    
     for t in range(max_time):
         if  next_time != None and t>=next_time:
             (sem_insts, next_time, prop) = generator.next()
             model.set_input(sem_insts)
-            if verbose>2:
+            if verbose > 3:
                 prob_times.append(t + 10) #Will save the state 10 step after introduction of new inputs.
         model.update()
         # Store output
         output = model.get_output()
-        if output['Grammatical_WM_P']:
-            out_data.extend(output['Grammatical_WM_P'])
-        if output['Utter']:
-            if verbose > 1:
-                 print "t:%i, '%s'" %(t, output['Utter'])
-            out_utterance.append(output['Utter'])
-        if t in prob_times:
+        if test_not_empty(output): # filter out ouputs with all valyues == None
+            outputs[t] = output
+        # Display methods
+        if output['Utter'] and verbose > 2:
+            print "t:%i, '%s'" %(t, output['Utter'])
+        if t in prob_times: # Saving figures for prob times.
             TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
             
-    
+    # Display end states
     if verbose>2:
         model.schemas['Semantic_WM'].show_SemRep()
-        model.schemas['Grammatical_WM_P'].show_dynamics(inst_act=True, WM_act=False, c2_levels=True,  c2_network=False)
-            
-    # Output analysis
-    res = prod_analyses(out_data)
-    model.save_sim(file_path = FOLDER, file_name = 'output.json')
-    model.reset()
+        model.schemas['Grammatical_WM_P'].show_dynamics()
+    
+    if save:
+        model.save_sim(file_path = FOLDER, file_name = 'output.json')
+        
+    model.reset() # Gets model ready for next use.
     
     # Prints utterance in verbose mode.
-    if verbose == 1:
-        print ' '.join(out_utterance)
-    return (res, ' '.join(out_utterance))
+    if verbose > 1:                
+        print get_produced_utterances(outputs)
     
+    return outputs   
+
+def get_produced_utterances(outputs):
+    """
+    Args:
+        - outputs (DICT): output generate by run()
+    Returns:
+        - produced utterances from run outputs
+    """
+    utterance_list = []
+    start= '<START>'
+    end ='<END>'
+    produced_utterance = ''
+    for t in sorted(outputs):
+        w = outputs[t]['Phonological_WM_P']
+        if w:
+            utterance = '<%i>%s' %(t, ' '.join(w))
+            produced_utterance += utterance
+            utterance_list.append(' '.join(w))
+            
+    utterance_output = start + produced_utterance + end if produced_utterance else None
+        
+    return utterance_output, utterance_list
+
+def get_requested_info(outputs):
+    """
+    Args:
+        - outputs (DICT): output generate by run()
+    Returns:
+        - TD requested info
+    """
+    request_list = []
+    start= '<START>'
+    end = '<END>'
+    requested_info = ''
+    for t in sorted(outputs):
+        r = outputs[t]['Semantic_WM']
+        if r:
+            request = '<%i>%s' %(t, r)
+            requested_info += request
+            request_list.append(r)
+    request_output = start + requested_info + end if requested_info else None
+    return request_output, request_list
+
+def bleu_scores(utter_list, ground_truth, n_gram=1):
+    """
+    Returns the listof BLEU scores for each utterance that composes prod_utterance defined as the output of get_produced_utterances()
+    """
+    scores = []
+    for utterance in utter_list:
+        score = BLEU(utterance, ground_truth, n_gram)
+        scores.append(score)
+    return scores
     
+def summarize_data(outputs, ground_truth=None):
+    """
+    Args:
+        - outputs (DICT): output generate by run()
+        - ground_truth (ARRAY): Array of ground truth utterances
+    Returns:
+        - summary of outputs from run()
+    
+    Notes:
+        - should take a function from the analyses modules as argument.
+    """
+    # GramWM
+    data_to_analyze = [] # data should be ordered by time
+    times = outputs.keys()
+    times.sort()
+    for t in times:
+        v = outputs[t]['Grammatical_WM_P']
+        if v:
+            data_to_analyze.extend(v)
+    gram_analysis = prod_summary(data_to_analyze)
+    
+    # PhonWM
+    phon_analysis = {}
+    utter, utter_list = get_produced_utterances(outputs)
+    phon_analysis['utterance'] = utter
+    max_BLEU_score = None
+    if ground_truth and utter_list:
+        BLEU_scores = bleu_scores(utter_list, ground_truth)
+        max_BLEU_score = max(BLEU_scores)
+    phon_analysis['max_BLEU_score'] = max_BLEU_score
+        
+    # SemWM
+    sem_analysis = {}
+    request, request_list = get_requested_info(outputs)
+    sem_analysis['requested_info'] = request             
+    
+    summary = {'GramWM':gram_analysis, 'PhonWM':phon_analysis, 'SemWM':sem_analysis}
+    return summary
+                       
+def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman_kick_man_static', sem_input_file='diagnostic.json', sem_input_macro=False, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=0, save=True):
+    """
+    Runs the model
+    
+    Returns
+        - out (ARRAY): Array of model's outputs (single output if not macro, series of output if macro.)
+    """
+    model = set_model(semantics_name, grammar_name, model_params=model_params)
+    sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro)
+    
+    ground_truth = sem_gen.ground_truths
+    
+    out = {}
+    if sem_gen.is_macro:
+        for name in sem_gen.sem_inputs:
+            out[name] = run(model, sem_gen, name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save)
+    else:
+        out[name] = run(model, sem_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save)
+    
+    if verbose > 0:
+        for k,v in out.iteritems():
+            (utter, utter_list) = get_produced_utterances(v)
+            (info, info_list) = get_requested_info(v)
+            print '\n\n#############'
+            print 'macro: %s\n' %sem_gen.is_macro
+            if sem_gen.is_macro:
+                print 'macro_name: %s \n' % input_name 
+            print 'input_name: %s\n' %k
+            print 'utterances:\n'
+            print '%s\n' % utter
+            print 'requested info:\n'
+            print '%s\n' % info
+            print 'analysis:\n'
+            print '%s\n\n' %json.dumps(summarize_data(v, ground_truth), sort_keys=True, indent=4)
+            print '#############'
+    return out
+    
+###############
+#### DIAGNOSTIC 
 def run_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of diagnostics.
@@ -224,43 +324,122 @@ def run_diagnostics(verbose=2, prob_times=[]):
     for input_name in diagnostic_cases:
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
-        res = run_model(model, my_inputs, input_name, max_time, seed, verbose=verbose, prob_times=prob_times)
+        res = run(model, my_inputs, input_name, max_time, seed, verbose=verbose, prob_times=prob_times)
         print "\nRESULTS:\n"
         print res
 
-def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
+############################
+#### PARAMTER SPACE ANALYSIS      
+
+def parameter_space(folder=None, input_rate=100):
     """
-    Runs model for input "input_name" over the search space defined by "model_params_set".
+    Defines and returns a parameter space.
+    
+    Args:
+        - folder (STR): Folder path. If defined, the parameter set dictionary is pickled and saved to this folder.
+        - input_rate: input_rate that will be used for the SemGen object, serves as a time reference.
+    
+    Returns:
+        - model_params_set (DICT): a parameter space dictionary.
+    
+    Note:
+    - I should allow this to be passed to a model?
+    - For many of those things I should allow those to be saved and then reloaded.
+    - I NEED TO INCLUDE THE USE OF GROUPS LEXICAL VS NON-LEXICAL CXN PARAMTERS!!!
+    - I NEED TO INCLUDE THE STYLE PARAMTERS
+    
+    """
+    import itertools
+    import numpy as np
+    
+    # Defining fixed input rate
+    INPUT_RATE = input_rate # This serves as a time reference for the range of Tau and task parameters
+    
+    # Set up the model's parameter search space.
+    model_params_set = []
+    
+    # Task parameters
+    start_produces = np.linspace(1, INPUT_RATE*10, 2)
+    time_pressures = np.linspace(1, INPUT_RATE*10, 2)
+    
+    # C2 parameters
+    coop_weights = [1.0] #np.linspace(1.0, 10.0, 2)
+    coop_asymmetries = [1.0] #np.linspace(0.0, 1.0, 2)
+    comp_weights = [-10.0]
+    prune_thresholds = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01 # Manipulations can yield "broca's aphasia" (0.3)
+    conf_tresholds = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
+    sub_threholds = [0.8]
+    deact_weights = [0.0] #np.linspace(0.0, 0.9, 2)
+    
+    # Dyn parameters
+    taus = np.linspace(INPUT_RATE, INPUT_RATE*10, 2) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    ks= np.linspace(1, 10, 2) # Interesting effects, bifurcation at a given value.
+    act_rests = [0.001] # Act rest does not take into account the noise.
+    noise_stds = np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
+    ext_weights = np.linspace(1, 10, 2)
+    
+    param_iter = itertools.product(start_produces, time_pressures, coop_weights, coop_asymmetries, comp_weights, prune_thresholds, conf_tresholds, sub_threholds, deact_weights, taus, ks, act_rests, noise_stds, ext_weights)
+    for start_produce, time_pressure, coop_weight, coop_asymmetry, comp_weight, prune_threshold, conf_threshold, sub_threshold, deact_weight, tau, k, act_rest, noise_std, ext_weight in param_iter:
+                params = {'Control.task.start_produce':start_produce,  
+                          'Control.task.time_pressure':time_pressure,
+                          'Grammatical_WM_P.C2.coop_weight':coop_weight, 
+                          'Grammatical_WM_P.C2.coop_asymmetry':coop_asymmetry,
+                          'Grammatical_WM_P.C2.comp_weight':comp_weight, 
+                          'Grammatical_WM_P.C2.prune_threshold': prune_threshold, 
+                          'Grammatical_WM_P.C2.confidence_threshold':conf_threshold,
+                          'Grammatical_WM_P.C2.sub_threshold_r':sub_threshold,
+                          'Grammatical_WM_P.C2.deact_weight':deact_weight,
+                          'Grammatical_WM_P.dyn.tau':tau, # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+                          'Grammatical_WM_P.dyn.k': k,
+                          'Grammatical_WM_P.dyn.act_rest': act_rest,
+                          'Grammatical_WM_P.dyn.noise_std':noise_std,
+                          'Grammatical_WM_P.dyn.ext_weight':ext_weight}
+
+                model_params_set.append(params)
+    
+    # Defining parameter name mapping
+    param_name_mapping = {'Control.task.start_produce':'start_produce',  
+                      'Control.task.time_pressure':'time_pressure',
+                      'Grammatical_WM_P.C2.coop_weight':'coop_weight', 
+                      'Grammatical_WM_P.C2.coop_asymmetry':'coop_asymmetry',
+                      'Grammatical_WM_P.C2.comp_weight':'comp_weight', 
+                      'Grammatical_WM_P.C2.prune_threshold': 'prune_threshold', 
+                      'Grammatical_WM_P.C2.confidence_threshold':'conf_threshold',
+                      'Grammatical_WM_P.C2.sub_threshold_r':'sub_threshold',
+                      'Grammatical_WM_P.C2.deact_weight':'deact_weight',
+                      'Grammatical_WM_P.dyn.tau':'tau',
+                      'Grammatical_WM_P.dyn.k':'k',
+                      'Grammatical_WM_P.dyn.act_rest':'act_rest',
+                      'Grammatical_WM_P.dyn.noise_std':'noise_std',
+                      'Grammatical_WM_P.dyn.ext_weight':'ext_weight'}
+                
+    
+    if folder:
+        st_save(model_params_set, 'parameter_set', folder, 'params')
+        st_save(param_name_mapping, 'param_name_mapping', folder, 'params')
+    
+    return (model_params_set, param_name_mapping) 
+        
+        
+def grid_search(model, sem_gen, input_name, max_time, folder, model_params_set=[], num_restarts=10, seed=None, verbose=1, save_models=True):
+    """
+    Runs model "model" for all the inputs in "sem_gen" over the search space defined by "model_params_set".
     For each point of the search space, model is ran "num_restarts" times.
     
     Args:
-        - input_name (STR): Name of the semantic input (needs to be in sem_macros.json)
+        - model (): the model
+        - sem_gen (): the semantic input generator. Needs to be generated by macros
+        - input_name (STR): name of the input (necessary since for now we only use macros as inputs)
         - model_params_set (ARRAY): Array of model paramters dict.
         - num_restarts (INT): Number of restarts for each model run.
         
-    Note: If a macro is used as input, the number of inputs generated by the macro multiplies the parameter space.
-        
-    To do: I should have grid search take a model and SemGen as input.
+    Returns:
+        - output (ARRAY): Array of model's summarized outputs for each run in the grid search
     """
     import time
     t0 = time.time()
-    
-    # Defining inputs.
-    sem_input_file = 'sem_macros.json'
-    sem_input_macro = True # For now it only uses macros
-    
-    
-    semantics_name = 'TCG_semantics_main'
-    grammar_name = 'TCG_grammar_VB_main'
-    
-    
-    #Setting up model
-    model  = set_model(semantics_name, grammar_name)
-    
-    #Setting up input
-    sem_gen = set_inputs(model, sem_input_file, input_name, sem_input_macro)
-    
-    output = []
+
+    grid_output = []
     count = 1
     
     num_sim = len(sem_gen.sem_inputs)*num_restarts*len(model_params_set)
@@ -270,98 +449,197 @@ def grid_search(input_name, model_params_set=[], num_restarts=10, seed=None):
         for name in sem_gen.sem_inputs:
             param_dict = {'input_name':input_name, 'num_restarts': num_restarts}
             param_dict.update(model_params)
-            if sem_input_macro:
-                param_vals = eval(name)
-                param_dict.update(param_vals)
+            # Storing the parameters defined by the input names of a macro input.
+            param_vals = eval(name)
+            param_dict.update(param_vals)
             for i in range(num_restarts):
-                run_output = []
                 start = time.time()
-                (sim_output, utterance) = run_model(model, sem_gen, name, seed=seed, verbose=0)
-                run_output.append(sim_output)
+                sim_name = '%s_%s' %(input_name, name)
+                sim_output = run(model, sem_gen, name, sim_name=sim_name, sim_folder=folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=[], save=save_models)
+                # Summerize output
+                summarized_output = summarize_data(sim_output, sem_gen.ground_truths)
+                run_output = {'input_name':input_name, 'params':param_dict, 'sim_output':summarized_output}
+                grid_output.append(run_output)
+                
                 end = time.time()
-                print "SIMULATION %i OF %i (%.2fs)" %(count, num_sim, end - start)
-                sim_stats = prod_statistics(run_output)
-                run_outputs = { 'params': param_dict, 'sim_stats':sim_stats, 'utterance':utterance}
-                output.append(run_outputs)
+                sim_time = end - start
+                remaining_time = (num_sim - count)*sim_time
+                remaining_time = time.strftime("%H:%M:%S", time.gmtime(remaining_time))
+                if verbose>0:
+                    print "RUN %i OF %i (%.2fs) (remaining %s)" %(count, num_sim, sim_time, remaining_time)
                 count +=1
     
     tf = time.time()
-    print "TOTAL SIMULATION TIME: %.2f" %(tf-t0)
-    return output
-    
-    
-def run_grid_search():
+    tot_time = tf-t0
+    grid_time = time.strftime("%H:%M:%S", time.gmtime(tot_time))
+    if verbose>0:
+        print "TOTAL GRID SEARCH TIME: %s" %(grid_time)
+    return grid_output
+   
+def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=True):
     """
     Runs the production model using grid_search.
-    """
-    import numpy as np
     
-    # Set up the model's parameter search space.
-    model_params_set = []
-    start_produce_samples = [800] #np.linspace(1,500,10)
-    conf_samples = np.linspace(0.3,0.3, 1)
-    for start_param in start_produce_samples:
-        for conf_param in conf_samples:
-            params = {'Control.task.start_produce':start_param, 
-                      'Grammatical_WM_P.C2.confidence_threshold':conf_param}
-            model_params_set.append(params)
+    Returns:
+        - output ({input_name(STR):grid_search_output(ARRAY)}
+    If save = True, saves results to .json file
+    If intermediate_save = True: saves to json at the end of each grid_search
+    """
+#    import numpy as np
+    
+    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
+        random.seed(seed)
+        seed = random.randint(0,10**9)
+    random.seed(seed)
+    
+    sim_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    
+    if not(sim_name):
+        sim_name = '%s_(%s)' %(sim_time, str(seed))
+    else:
+        sim_name = '%s_%s_(%s)' %(sim_time, sim_name, str(seed))
+    
+    folder = '%s/%s/' %(sim_folder, sim_name)
+    
+    verbose = 1
+        
+    # Defining the number of restarts
+    NUM_RESTARTS = 1
+
+    # Defining fixed input rate
+    INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
+    
+    # Defining simulation time
+    max_time = 20*INPUT_RATE
+    
+    
+    # Saving meta parameters
+    meta_params = {'seed':seed, 'num_restarts':NUM_RESTARTS, 'input_rate':INPUT_RATE, 'max_time':max_time}
+    st_save(meta_params, 'meta_parameters', folder, 'params')
+    
+    # Set up and save the model's parameter search space.
+    (model_params_set, param_name_mapping) = parameter_space(folder, INPUT_RATE)
+    
+    #Setting up and saving model
+    semantics_name = 'TCG_semantics_main'
+    grammar_name = 'TCG_grammar_VB_main'
+    model  = set_model(semantics_name, grammar_name)
+    st_save(model, model.name, folder)
+    
+    # Defining inputs.
+    sem_input_file = 'benchmark.json'
+    sem_input_macro = True # For now it only uses macros
     
     # Define the set of inputs on which the model will be run.
-    inputs = ["test_naming"]
-    
-    # If seed != None, then all the restart will yield the same results.
-    seed=None    
-    
-    # Define the number of restarts
-    num_restarts = 10
-    
+    inputs = ["test_naming", "test_naming_ambiguous", "test_naming_2", "young_woman_static","young_woman_dyn","woman_kick_man_static", "woman_kick_man_dyn", "young_woman_punch_man_static", "young_woman_punch_man_dyn", "man_who_kick_can_static", "woman_punch_man_kick_can_static", "woman_punch_man_kick_can_dyn", "woman_in_blue_static"] 
+#    inputs = ["scene_girlkickboy"]
+#    inputs = ["woman_kick_man_static", "young_woman_punch_man_static", "woman_punch_man_kick_can_static"]
+#    inputs = ["woman_kick_man_static"]
+    output = {}
+    print "SIMULATION STARTING"
+    start_time = time.time()
     # Run the grid search for inputs X parameters X num_restarts
+    count = 1
     for name in inputs:
         input_name = name
-        output = grid_search(input_name=input_name, model_params_set=model_params_set, num_restarts=num_restarts, seed=seed)
-        if output:
-            header = {'params':[], 'outputs':['syntactic_complexity_mean', 'syntactic_complexity_std', 'utterance_length_mean', 'utterance_length_std', 'active', 'passive', 'total_constructions', 'produced', 'utterance']}
-            dat = []
-            for run_dat in output:
-                if not header['params']:
-                    header['params'] += run_dat ['params'].keys()
-                new_row = []
-                params_vals = [run_dat['params'][param] for param in header['params']]
-                output_stats = run_dat['sim_stats']
-                if not output_stats['utterance_lengths']:
-                    produced = False
-                    syntactic_complexity_mean = np.NaN
-                    syntactic_complexity_std = np.NaN
-                    utterance_length_mean = np.NaN
-                    utterance_length_std = np.NaN
-                    active = np.NaN
-                    passive = np.NaN
-                    total_constructions = np.NaN
-                    utterance = ''
-                else:
-                    produced = True
-                    syntactic_complexity_mean = output_stats['syntactic_complexity']['mean']
-                    syntactic_complexity_std = output_stats['syntactic_complexity']['std']
-                    utterance_length_mean = output_stats['utterance_lengths']['mean']
-                    utterance_length_std = output_stats['utterance_lengths']['std']
-                    active = output_stats['cxn_usage_count'].get('SVO', 0)
-                    passive = output_stats['cxn_usage_count'].get('PAS_SVO', 0)
-                    total_constructions = output_stats['cxn_usage_count']['total_count']
-                    utterance = run_dat['utterance']
-                output_vals = [syntactic_complexity_mean, syntactic_complexity_std, utterance_length_mean, utterance_length_std, active, passive, total_constructions, produced, utterance]
-                new_row += params_vals + output_vals
-                dat.append(new_row)
+        print "\nProcessing input: %s (%i/%s)" %(input_name, count,len(inputs))
+        #Setting up and saving input generator
+        sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param=INPUT_RATE)
+        st_save(sem_gen, 'sem_gen_' + input_name, folder)
         
-        # Write results to file
-        line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
-        file_name = './simulation_analyses/%s.csv' % input_name
-        with open(file_name, 'w') as f:
-            header = line(header['params'] + header['outputs'])
-            f.write(header)
-            for d in dat:
-                new_line = line(d)
-                f.write(new_line)
+        grid_output = grid_search(model=model, sem_gen=sem_gen, input_name=input_name, max_time=max_time, folder=folder, model_params_set=model_params_set, num_restarts=NUM_RESTARTS, seed=seed, verbose=verbose, save_models=False)
+        
+        output[name] = grid_output
+        
+        # if intermediate_save, saves to json each grid_search
+        if intermediate_save:
+            print "SAVING"
+            st_save(grid_output, name, folder,'grd')
+            grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
+        
+        # If speak, give audio feedback
+        if speak:
+            tell_me('Grid search %i done. %i remaining.' %(count, len(inputs) - count))
+        count +=1
+    
+        # saves full grid search
+    if save:
+        st_save(output, 'full_grid_search', folder, 'grd')
+        if not(intermediate_save):
+            print "SAVING ALL"
+            for input_name, grid_output in output.iteritems():
+                grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
+    print "\nDONE!"
+    end_time = time.time()
+    sim_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))
+    print "TOTAL SIMULATION TIME: %s" %sim_time
+    
+    # if speak, give audio feedback
+    if speak:
+        tell_me('Your work is done.')
+        
+    return output
+    
+
+
+def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping):
+    """
+    Only saves the statistical analysis of run outputs
+    """
+    import numpy as np
+    param_names = meta_params.keys() + grid_output[0]['params'].keys()
+    gram_output_names = grid_output[0]['sim_output']['GramWM'].keys()
+    sem_output_names = grid_output[0]['sim_output']['SemWM'].keys()
+    phon_output_names = grid_output[0]['sim_output']['PhonWM'].keys()
+    header = [param_name_mapping.get(name, name) for name in param_names] + gram_output_names + sem_output_names + phon_output_names
+    line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
+    
+    file_name = './%s/%s.csv' %(folder, input_name)
+    with open(file_name, 'w') as f:
+         header = line(header)
+         f.write(header)
+         for output in grid_output:
+            params = output['params']
+            params.update(meta_params) # adding meta parameters
+            param_row = []
+            for name in param_names:
+                val = params[name] if params[name]!=None else np.NaN
+                param_row.append(val)
+            
+            sim_output = output['sim_output']
+            output_row = []
+            # GramWM
+            sim_stats = sim_output['GramWM']
+            for name in gram_output_names:
+                val = sim_stats[name]['mean']
+                output_row.append(val)
+            # SemWM
+            sim_stats = sim_output['SemWM']
+            for name in sem_output_names:
+                val = sim_stats[name] if sim_stats[name] else np.NaN
+                output_row.append(val)
+            
+            # PhonWM
+            sim_stats = sim_output['PhonWM']
+            for name in phon_output_names:
+                val = sim_stats[name] if sim_stats[name] else np.NaN
+                output_row.append(val)
+            
+            # write to csv
+            new_line = line(param_row + output_row)
+            f.write(new_line)
+
+def tell_me(utterance):
+    """
+    Simple function to produce an utterance sound output
+    """
+    TTS = ls.TEXT2SPEECH(rate_percent=80)
+    TTS.utterance = utterance
+    TTS.utter()
     
 if __name__=='__main__':
-    run_diagnostics(verbose=3, prob_times=[])
-    
+#    run_diagnostics(verbose=3, prob_times=[])
+#    run_grid_search()
+    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
+#    run_model()
+#    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name='woman_kick_man_dyn', sem_input_file='benchmark.json', sem_input_macro=True, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=4, save=True)

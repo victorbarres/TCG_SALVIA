@@ -13,8 +13,11 @@ Dependencies:
     - Uses construction
     - Uses TCG_graph
 """
+from __future__ import division
 import matplotlib.pyplot as plt
 import re
+import os
+import json
 
 import networkx as nx
 import pyttsx
@@ -456,6 +459,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_visual_WM')
+        self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
@@ -488,7 +492,7 @@ class SEMANTIC_WM(WM):
         
         if cpt_insts:
             for inst in cpt_insts:
-               self.add_instance(inst) # Does not deal with updating already existing nodes. Need to add that.
+               self.add_instance(inst)
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
@@ -598,9 +602,11 @@ class SEMANTIC_WM(WM):
             return output
         
         missing_info = self.inputs['from_grammatical_WM_P']['missing_info']
-        print "Requesting more info about %s" %missing_info
+#        print "Requesting more info about %s" %missing_info
         
         cpt_schema_inst = self.find_instance(missing_info)
+        var_name = cpt_schema_inst.trace.get('ref', '')
+        self.outputs['to_output'] = '%s(%s)' %(missing_info,var_name)
         output = cpt_schema_inst.trace['per_inst']
         return output
         
@@ -711,7 +717,11 @@ class GRAMMATICAL_WM_P(WM):
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
-        
+    
+    #####################
+    ### STATE UPDATE  ###
+    #####################   
+    
     def process(self):
         """
         """
@@ -724,7 +734,8 @@ class GRAMMATICAL_WM_P(WM):
                 
         self.convey_sem_activations(sem_input)
         self.update_activations()
-        self.limit_memory(max_capacity=None, max_prob=1.0, option=0)
+        # Here define memory limitations
+        #self.limit_memory(max_capacity=None, max_prob=1.0, option=0)
         self.prune()
         
         if ctrl_input and ctrl_input['produce']:
@@ -739,9 +750,6 @@ class GRAMMATICAL_WM_P(WM):
                 else:
                     self.outputs['to_phonological_WM_P'] = []
     
-    ############################
-    ### state update methods ###
-    ############################
     def add_new_insts(self, new_insts):
         """
         Args:
@@ -839,28 +847,194 @@ class GRAMMATICAL_WM_P(WM):
                 act = act/count # normalizing removes advantage for constructions that cover more content.
             inst.activation.E += act
             
+    ###############################
+    ### COOPERATIVE COMPUTATION ###
+    ###############################
+    def cooperate(self, new_inst):        
+       """
+       For each cxn instance already active in GrammaticalWM, checks whether it can enter in cooperation with the new_inst.
+       
+       Args:
+           - new_inst (CXN_SCHEMA_INST): A cxn schema instance (that was just instantiated in GrammaticalWM)
+          
+       Notes:
+           - For now, the match quality (match_qual) is still binary so it is used to define or not a cooperative functional link.
+           - This should be updated to use match_qual to account for the strength of the cooperative functional link created.
+       """
+       for old_inst in self.schema_insts:
+           if new_inst != old_inst:
+               match = GRAMMATICAL_WM_P.match(new_inst, old_inst)
+               if match["match_cat"] == 1:
+                   for match_qual, link in match["links"]:
+                       if match_qual > 0:
+                           self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
     
-    def apply_pressure(self, pressure, option=0):
+    def compete(self, new_inst):
         """
-        Tests various ways to apply time pressure.
+        For each cxn instance already active in GrammaticalWM, checks whether it competes with the new_inst
+        
+        Args:
+           - new_inst (CXN_SCHEMA_INST): A cxn schema instance (that was just instantiated in GrammaticalWM)
         """
-        if option==0: # Do nothing
-            try_produce = True
-        elif option == 1: # Simply trigger production when pressure reaches 1.
-            try_produce = pressure>=1
-        elif option == 2: #Applies pressure by ramping up C2
-            for link in [l for l in self.coop_links if l.weight != 0]: # Make sure not to reactivate old weights.
-                link.update_weight(self.params['C2']['coop_weight'] + self.params['C2']['coop_weight']*pressure)
-            for link in self.comp_links:
-                link.update_weight(self.params['C2']['comp_weight'] + self.params['C2']['comp_weight']*pressure)  
-            try_produce = True     
+        for old_inst in self.schema_insts:
+           if new_inst != old_inst:
+               match = GRAMMATICAL_WM_P.match(new_inst, old_inst)
+               if match["match_cat"] == -1:
+                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
+        
+#        # Possible addition...
+#        # Construction that correspond to 2 different hypotheses regarding which slot the new isnt should link to compete. 
+#        # This is might be problematic. See my notes in notebook.
+#        for inst1 in self.schema_insts:
+#            for inst2 in self.schema_insts:
+#                if inst1 != inst2:
+#                    link1 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst1)]
+#                    link2 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst2)]
+#                    if link1 and link2:
+#                        self.add_comp_link(inst_from=inst1, inst_to=inst2)
+    
+    @staticmethod
+    def overlap(inst1, inst2):
+        """
+        Returns the set of SemRep nodes and edges on which inst1 and inst2 overlaps.
+        
+        Args:
+            - inst1 (CXN_SCHEMA_INST): A cxn instance
+            - inst2 (CXN_SCHEMA_INST): A cxn instance
+        """
+        overlap = {}
+        overlap["nodes"] = [n for n in inst1.trace["semrep"]["nodes"] if n in inst2.trace["semrep"]["nodes"]]
+        overlap["edges"] = [e for e in inst1.trace["semrep"]["edges"] if e in inst2.trace["semrep"]["edges"]]
+        if not(overlap['nodes']) and not(overlap['edges']):
+            return None
+        return overlap
+    
+    
+    @staticmethod
+    def comp_link(inst_1, inst_2, SR_node):
+        """
+        Checks whether inst1 and inst2 are in competition if they overlap on a SemRep node.
+        
+        Args:
+            - inst1 (CXN_SCHEMA_INST): A cxn instance
+            - inst2 (CXN_SCHEMA_INST): A cxn instance
+            - SR_node (): SemRep node on which both instances overlap
+        
+        Notes:
+            The case of an overlap on an edge is handled directly by the match function.
+        """
+        competition = False
+        cxn_1 = inst_1.content
+        sf_1 = [cxn_1.find_elem(k) for k,v in inst_1.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
+        cxn_2 = inst_2.content
+        sf_2 = [cxn_2.find_elem(k) for k,v in inst_2.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+        
+        cond1 = (sf_1.name not in cxn_1.SymLinks.SL) or isinstance(cxn_1.node2form(sf_1), construction.TP_PHON) # cxn_1 formalizes the node entity
+        cond2 = (sf_2.name not in cxn_2.SymLinks.SL) or isinstance(cxn_2.node2form(sf_2), construction.TP_PHON) # cxn_2 formalizes the node entity
+        
+        if cond1 and cond2:
+            competition = True
+        return competition
+        
+    @staticmethod    
+    def coop_link(inst_p, inst_c, SR_node):
+        """
+        Returns functional link between cooperating construction if it exists as well as quality of match (match_qual).
+        
+        Args:
+            - inst_p (CXN_SCHEMA_INST): A cxn instance (parent)
+            - inst_c (CXN_SCHEMA_INST): A cxn instance (child)
+            - SR_node (): SemRep node on which both instances overlap
+        
+        Notes:
+            - For now match_qual is actualy categorical!
+        """
+        cxn_p = inst_p.content
+        sf_p = [cxn_p.find_elem(k) for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
+        cxn_c = inst_c.content
+        sf_c = [cxn_c.find_elem(k) for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
+             
+        
+        # Type constraints (Obligatory)
+        syn1 = (sf_p.name in cxn_p.SymLinks.SL) and isinstance(cxn_p.node2form(sf_p), construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
+        sem1 = sf_c.head # sf_c is a head node
+        
+        # Metric constraints (Qualitative)
+        if syn1 and sem1:
+            slot_p = cxn_p.node2form(sf_p)
+            syn2 = cxn_c.class_match(slot_p) # Syntactic match
+            sem2 = sf_c.concept.match(sf_p.concept) # Semantic match (Light semantics)
+            link = {"inst_from": inst_c, "port_from":inst_c.find_port("output"), "inst_to": inst_p, "port_to":inst_p.find_port(slot_p.order)}
+            # For now syn2 and sem2 are treated as categorical, but should be anlalogical.
+            if syn2 and sem2:
+                match_qual = 1
+            else:
+                match_qual = 0
+            return (match_qual, link)
+        return None
+    
+    @staticmethod
+    def match(inst1, inst2):
+        """
+        Args:
+            - inst1 (CXN_SCHEMA_INST): A cxn instance
+            - inst2 (CXN_SCHEMA_INST): A cxn instance
+            
+        IMPORTANT NOTE: IT IS NOT CLEAR WHY THE ABSENCE OF LINK SHOULD NECESSARILY MEAN COMPETITION....
+            Think about the case of a lexical cxn LEX_CXN linking to a Det_CXN itself linking to a SVO_CXN, we don't want LEX_CXN to enter in competition with
+            SVO_CXN, even though they can't link since the LEX_CXN doesn't match the class restriction of SVO_CXN (LEX_CXN is N, not NP).
+        
+        For now I set the case not(links) to match=0. This is incorrect, since it does not allow to handle properly the case of lexical competition.
+        """
+        match_cat = 0
+        links = []
+        if inst1 == inst2:
+           match_cat = 0 # CHECK THAT
+           return {"match_cat":match_cat, "links":links}
+         
+        overlap = GRAMMATICAL_WM_P.overlap(inst1, inst2)
+        
+        #Check that relation exists
+        if not(overlap):
+            match_cat = 0
+            return {"match_cat":match_cat, "links":links}
+        
+        #Check competition
+        if overlap["edges"]: # Syntactic competition
+            match_cat = -1
+            return {"match_cat":match_cat, "links":links}
         else:
-            error_msg = 'Invalid apply pressure option'
-            raise ValueError(error_msg)
+            for n in overlap["nodes"]:
+                competition = GRAMMATICAL_WM_P.comp_link(inst1, inst2, n)
+                if competition:
+                    match_cat = -1
+                    return {"match_cat":match_cat, "links":links}
         
-        return try_produce
+        #Check cooperation
+        flag1 = False
+        flag2 = False
+        for n in overlap["nodes"]:
+            link = GRAMMATICAL_WM_P.coop_link(inst1, inst2, n)
+            if link:
+                flag1 = True
+                links.append(link)
+            link = GRAMMATICAL_WM_P.coop_link(inst2, inst1, n)
+            if link:
+                flag2 = True
+                links.append(link)
         
-
+        if flag1 and flag2:
+            print "LOOP %s %s" %(inst1.name, inst2.name) # Warns that there are direct loops.
+            
+        if links:
+            match_cat = 1
+        else:
+            match_cat = 0 # since we have already ruled out the possibiliyt of competition
+        return {"match_cat":match_cat, "links":links}
+        
+    ##################################
+    ### LINGUISTIC FORM PRODUCTION ###
+    ##################################
     def produce_form(self, sem_input, phon_input):
         """
         Generates the meanining to form transduction based on the current C2 state.
@@ -898,7 +1072,8 @@ class GRAMMATICAL_WM_P(WM):
                 assemblages.remove(winner_assemblage)
                 
                 # Save winner assemblage to state
-                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0]})
+                partial_readout = False if missing_info == None else True
+                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0], 'partial_readout':partial_readout})
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -1129,194 +1304,29 @@ class GRAMMATICAL_WM_P(WM):
             if link.inst_to in winner_insts:
                 link.inst_from.alive = False
         self.prune()
-
-    ###############################
-    ### cooperative computation ###
-    ###############################
-    def cooperate(self, new_inst):        
-       """
-       For each cxn instance already active in GrammaticalWM, checks whether it can enter in cooperation with the new_inst.
-       
-       Args:
-           - new_inst (CXN_SCHEMA_INST): A cxn schema instance (that was just instantiated in GrammaticalWM)
-          
-       Notes:
-           - For now, the match quality (match_qual) is still binary so it is used to define or not a cooperative functional link.
-           - This should be updated to use match_qual to account for the strength of the cooperative functional link created.
-       """
-       for old_inst in self.schema_insts:
-           if new_inst != old_inst:
-               match = GRAMMATICAL_WM_P.match(new_inst, old_inst)
-               if match["match_cat"] == 1:
-                   for match_qual, link in match["links"]:
-                       if match_qual > 0:
-                           self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
     
-    def compete(self, new_inst):
+    def apply_pressure(self, pressure, option=0):
         """
-        For each cxn instance already active in GrammaticalWM, checks whether it competes with the new_inst
-        
-        Args:
-           - new_inst (CXN_SCHEMA_INST): A cxn schema instance (that was just instantiated in GrammaticalWM)
+        Tests various ways to apply time pressure.
         """
-        for old_inst in self.schema_insts:
-           if new_inst != old_inst:
-               match = GRAMMATICAL_WM_P.match(new_inst, old_inst)
-               if match["match_cat"] == -1:
-                   self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
-        
-#        # Possible addition...
-#        # Construction that correspond to 2 different hypotheses regarding which slot the new isnt should link to compete. 
-#        # This is might be problematic. See my notes in notebook.
-#        for inst1 in self.schema_insts:
-#            for inst2 in self.schema_insts:
-#                if inst1 != inst2:
-#                    link1 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst1)]
-#                    link2 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst2)]
-#                    if link1 and link2:
-#                        self.add_comp_link(inst_from=inst1, inst_to=inst2)
-    
-    @staticmethod
-    def overlap(inst1, inst2):
-        """
-        Returns the set of SemRep nodes and edges on which inst1 and inst2 overlaps.
-        
-        Args:
-            - inst1 (CXN_SCHEMA_INST): A cxn instance
-            - inst2 (CXN_SCHEMA_INST): A cxn instance
-        """
-        overlap = {}
-        overlap["nodes"] = [n for n in inst1.trace["semrep"]["nodes"] if n in inst2.trace["semrep"]["nodes"]]
-        overlap["edges"] = [e for e in inst1.trace["semrep"]["edges"] if e in inst2.trace["semrep"]["edges"]]
-        if not(overlap['nodes']) and not(overlap['edges']):
-            return None
-        return overlap
-    
-    
-    @staticmethod
-    def comp_link(inst_1, inst_2, SR_node):
-        """
-        Checks whether inst1 and inst2 are in competition if they overlap on a SemRep node.
-        
-        Args:
-            - inst1 (CXN_SCHEMA_INST): A cxn instance
-            - inst2 (CXN_SCHEMA_INST): A cxn instance
-            - SR_node (): SemRep node on which both instances overlap
-        
-        Notes:
-            The case of an overlap on an edge is handled directly by the match function.
-        """
-        competition = False
-        cxn_1 = inst_1.content
-        sf_1 = [cxn_1.find_elem(k) for k,v in inst_1.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
-        cxn_2 = inst_2.content
-        sf_2 = [cxn_2.find_elem(k) for k,v in inst_2.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
-        
-        cond1 = (sf_1.name not in cxn_1.SymLinks.SL) or isinstance(cxn_1.node2form(sf_1), construction.TP_PHON) # cxn_1 formalizes the node entity
-        cond2 = (sf_2.name not in cxn_2.SymLinks.SL) or isinstance(cxn_2.node2form(sf_2), construction.TP_PHON) # cxn_2 formalizes the node entity
-        
-        if cond1 and cond2:
-            competition = True
-        return competition
-        
-    @staticmethod    
-    def coop_link(inst_p, inst_c, SR_node):
-        """
-        Returns functional link between cooperating construction if it exists as well as quality of match (match_qual).
-        
-        Args:
-            - inst_p (CXN_SCHEMA_INST): A cxn instance (parent)
-            - inst_c (CXN_SCHEMA_INST): A cxn instance (child)
-            - SR_node (): SemRep node on which both instances overlap
-        
-        Notes:
-            - For now match_qual is actualy categorical!
-        """
-        cxn_p = inst_p.content
-        sf_p = [cxn_p.find_elem(k) for k,v in inst_p.covers["nodes"].iteritems() if v == SR_node][0] # Find SemFrame node that covers the SemRep node
-        cxn_c = inst_c.content
-        sf_c = [cxn_c.find_elem(k) for k,v in inst_c.covers["nodes"].iteritems() if v==SR_node][0] # Find SemFrame node that covers the SemRep node
-             
-        
-        # Type constraints (Obligatory)
-        syn1 = (sf_p.name in cxn_p.SymLinks.SL) and isinstance(cxn_p.node2form(sf_p), construction.TP_SLOT) # sf_p is linked to a slot in cxn_p
-        sem1 = sf_c.head # sf_c is a head node
-        
-        # Metric constraints (Qualitative)
-        if syn1 and sem1:
-            slot_p = cxn_p.node2form(sf_p)
-            syn2 = cxn_c.class_match(slot_p) # Syntactic match
-            sem2 = sf_c.concept.match(sf_p.concept) # Semantic match (Light semantics)
-            link = {"inst_from": inst_c, "port_from":inst_c.find_port("output"), "inst_to": inst_p, "port_to":inst_p.find_port(slot_p.order)}
-            # For now syn2 and sem2 are treated as categorical, but should be anlalogical.
-            if syn2 and sem2:
-                match_qual = 1
-            else:
-                match_qual = 0
-            return (match_qual, link)
-        return None
-    
-    @staticmethod
-    def match(inst1, inst2):
-        """
-        Args:
-            - inst1 (CXN_SCHEMA_INST): A cxn instance
-            - inst2 (CXN_SCHEMA_INST): A cxn instance
-            
-        IMPORTANT NOTE: IT IS NOT CLEAR WHY THE ABSENCE OF LINK SHOULD NECESSARILY MEAN COMPETITION....
-            Think about the case of a lexical cxn LEX_CXN linking to a Det_CXN itself linking to a SVO_CXN, we don't want LEX_CXN to enter in competition with
-            SVO_CXN, even though they can't link since the LEX_CXN doesn't match the class restriction of SVO_CXN (LEX_CXN is N, not NP).
-        
-        For now I set the case not(links) to match=0. This is incorrect, since it does not allow to handle properly the case of lexical competition.
-        """
-        match_cat = 0
-        links = []
-        if inst1 == inst2:
-           match_cat = 0 # CHECK THAT
-           return {"match_cat":match_cat, "links":links}
-         
-        overlap = GRAMMATICAL_WM_P.overlap(inst1, inst2)
-        
-        #Check that relation exists
-        if not(overlap):
-            match_cat = 0
-            return {"match_cat":match_cat, "links":links}
-        
-        #Check competition
-        if overlap["edges"]: # Syntactic competition
-            match_cat = -1
-            return {"match_cat":match_cat, "links":links}
+        if option==0: # Do nothing
+            try_produce = True
+        elif option == 1: # Simply trigger production when pressure reaches 1.
+            try_produce = pressure>=1
+        elif option == 2: #Applies pressure by ramping up C2
+            for link in [l for l in self.coop_links if l.weight != 0]: # Make sure not to reactivate old weights.
+                link.update_weight(self.params['C2']['coop_weight'] + self.params['C2']['coop_weight']*pressure)
+            for link in self.comp_links:
+                link.update_weight(self.params['C2']['comp_weight'] + self.params['C2']['comp_weight']*pressure)  
+            try_produce = True     
         else:
-            for n in overlap["nodes"]:
-                competition = GRAMMATICAL_WM_P.comp_link(inst1, inst2, n)
-                if competition:
-                    match_cat = -1
-                    return {"match_cat":match_cat, "links":links}
+            error_msg = 'Invalid apply pressure option'
+            raise ValueError(error_msg)
         
-        #Check cooperation
-        flag1 = False
-        flag2 = False
-        for n in overlap["nodes"]:
-            link = GRAMMATICAL_WM_P.coop_link(inst1, inst2, n)
-            if link:
-                flag1 = True
-                links.append(link)
-            link = GRAMMATICAL_WM_P.coop_link(inst2, inst1, n)
-            if link:
-                flag2 = True
-                links.append(link)
-        
-        if flag1 and flag2:
-            print "LOOP %s %s" %(inst1.name, inst2.name) # Warns that there are direct loops.
-            
-        if links:
-            match_cat = 1
-        else:
-            match_cat = 0 # since we have already ruled out the possibiliyt of competition
-        return {"match_cat":match_cat, "links":links}
+        return try_produce
     
     ##################
-    ### assemblage ###
+    ### ASSEMBLAGE ###
     ##################    
     def assemble(self):
         """
@@ -1589,9 +1599,9 @@ class GRAMMATICAL_WM_P(WM):
             
         return (phon_form, missing_info, expressed, eq_inst)
     
-    #######################
-    ### DISPLAY METHODS ###
-    #######################
+    ###############
+    ### DISPLAY ###
+    ###############
     def draw_assemblages(self):
         """
         Draws all the assemblages currently defined by the working memory.
@@ -1758,6 +1768,7 @@ class PHON_WM_P(WM):
         self.add_port('OUT', 'to_utter')
         self.add_port('OUT', 'to_grammatical_WM_P')
         self.add_port('OUT', 'to_control')
+        self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':2, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
@@ -1770,7 +1781,6 @@ class PHON_WM_P(WM):
         super(PHON_WM_P, self).reset()
         self.phon_sequence = []
         
-    
     def process(self):
         """
         """
@@ -1785,6 +1795,7 @@ class PHON_WM_P(WM):
             self.phon_sequence.extend(new_phon_sequence)
             self.outputs['to_utter'] = [phon_inst.content['word_form'] for phon_inst in new_phon_sequence]
             self.outputs['to_control'] = True
+            self.outputs['to_output'] = [phon_inst.content['word_form'] for phon_inst in new_phon_sequence]
         else:
             self.outputs['to_utter'] =  None
         
@@ -1806,8 +1817,6 @@ class PHON_WM_P(WM):
             self.needs_filler = True
         elif phon_sequence:
             self.needs_filler = False
-            
-            
 
     ####################
     ### JSON METHODS ###
@@ -1821,6 +1830,8 @@ class PHON_WM_P(WM):
 
 class UTTER(SYSTEM_SCHEMA):
     """
+    Simple algorithmic implementation of a proxy for the language motor system realizing the
+    phonological plan sequence stored in PHON_WM_P into a temporal sequence of words.
     """
     def __init__(self, name='Utter'):
         SYSTEM_SCHEMA.__init__(self,name)
@@ -2567,17 +2578,19 @@ class SEM_GENERATOR(object):
     Notes: 
         - Does not allow for verbal guidance. Designed for purely serial update of semanticWM state.
     """
-    def __init__(self, sem_inputs, conceptLTM, speed_param=1):
+    def __init__(self, sem_inputs, conceptLTM, speed_param=1, is_macro=False, ground_truths = None):
         """
         Args:
             - sem_input: a semantic input dict loaded using TCG_LOADER.load_sem_input()
             - conceptLTM (CONCEPT_LTM): Contains concept schemas.
             - speed_param (FLOAT): speed_param >0. Factor applied to the  timing of the input.
+            - is_macro (BOOL): True if the input is a sem_gen macro.
         """ 
         self.sem_inputs = sem_inputs
         self.conceptLTM = conceptLTM
         self.speed_param = speed_param
-        
+        self.is_macro = is_macro
+        self.ground_truths = ground_truths
         self.preprocess_inputs()
     
     def preprocess_inputs(self):
@@ -2694,6 +2707,16 @@ class SEM_GENERATOR(object):
                 next_time = None
             
             yield (instances, next_time, ' , '.join(prop_list))
+    
+    def save(self, file_name, file_path):
+        """
+        Saves its content as json.
+        """
+        my_file = file_path + file_name + '_speed_' + str(self.speed_param)
+        if not(os.path.exists(file_path)):
+            os.mkdir(file_path)
+        with open(my_file, 'wb') as f:
+            json.dump(self.sem_inputs, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 class UTTER_GENERATOR(object):
     """
@@ -2765,4 +2788,8 @@ class UTTER_GENERATOR(object):
             
 ###############################################################################
 if __name__=='__main__':
-    print "No test case implemented"
+#    print "No test case implemented"
+    test_sentence = "Your work is done"
+    TTS = TEXT2SPEECH(rate_percent=80)
+    TTS.utterance = test_sentence
+    TTS.utter()

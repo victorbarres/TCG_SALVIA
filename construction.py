@@ -7,6 +7,7 @@ The Template Classes define all the basic template elements that are used to bui
 
 Uses NetworkX module to represent construction SemFrame graph and SynForm graph.
 """
+from __future__ import division
 import matplotlib.pyplot as plt
 import networkx as nx
 import viewer

@@ -30,16 +30,6 @@
 			  "comments": "test naming for two entities."
 			},
 			
-		"woman_static":{
-			"sem_rate":1,
-			"propositions": {
-				"P1":["ENTITY(e,F,0.8)", "WOMAN(woman)", "IS(is)", "is(e, woman)"]
-			},
-			"sequence":["P1"],
-			"timing":[],
-			"comments":"test naming with lexical competition, a0 given"
-		},
-			
 		"young_woman_static": {
 			"sem_rate": 1,
 			 "propositions"  : {
@@ -170,5 +160,20 @@
 			"timing":[],
 			"comments":"test for the IN_COLOR construction."
 		}
+	},
+	"outputs":{
+		"test_naming":["man"],
+		"test_naming_ambiguous":["woman", "lady"],
+		"test_naming_2":["woman man", "man woman", "lady man", "man lady"],
+		"young_woman_static":["young woman", "young lady"],
+		"young_woman_dyn":["young woman", "young lady"],
+		"woman_kick_man_static":["woman kick man", "man is kick -ed by woman", "lady kick man", "man is kick -ed by lady"],
+		"woman_kick_man_dyn":["woman kick man", "man is kicked by woman", "lady kick man", "man is kicked by lady"],
+		"young_woman_punch_man_static":["young woman punch man", "man is punch -ed by woman who is young", "woman who is young punch man", "man is punch -ed by young woman", "young lady punch man", "man is punch -ed by lady who is young", "lady who is young punch man", "man is punch -ed by young lady"],
+		"young_woman_punch_man_dyn":["young woman punch man", "man is punch -ed by woman who is young", "woman who is young punch man", "man is punch -ed by young woman","young lady punch man", "man is punch -ed by lady who is young", "lady who is young punch man", "man is punch -ed by young lady"],
+		"woman_punch_man_kick_can_static":["woman punch man who kick can", "man who kick can is punch -ed by woman", "woman punch man can is punch -ed by", "man can is punch -ed by is punch -ed by woman", "lady punch man who kick can", "man who kick can is punch -ed by lady", "lady punch man can is punch -ed by", "man can is kick -ed by is punch -ed by lady"],
+		"woman_punch_man_kick_can_dyn":["woman punch man who kick can", "man who kick can is punch -ed by woman", "woman punch man can is punch -ed by", "man can is punch -ed by is punch -ed by woman", "lady punch man who kick can", "man who kick can is punch -ed by lady", "lady punch man can is punch -ed by", "man can is kick -ed by is punch -ed by lady"],
+		"woman_in_blue_static":["woman wear blue dress", "woman in blue", "lady wear blue dress", "lady in blue"]
 	}
+		
 }

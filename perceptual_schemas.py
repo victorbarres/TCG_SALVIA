@@ -13,6 +13,7 @@ Dependencies:
     - Uses viewer
     - Uses scene
 """
+from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 import random
@@ -83,7 +84,7 @@ class AREA(object):
             - area (AREA)
         """
         cond1  = self.contains(area.center())
-        cond2 = (self.w*self.h) > (area.w*area.h)
+        cond2 = (self.w*self.h) >= (area.w*area.h)
         
         return (cond1 and cond2)
     
@@ -466,9 +467,8 @@ class VISUAL_WM(WM):
             init_act = ss_input['init_act']
             new_insts = []
             for inst in sub_scene.nodes + sub_scene.edges:
-                if not(inst in self.schema_insts):
-                    inst.set_activation(init_act)
-                    self.add_instance(inst)
+                new = self.add_instance(inst, init_act)
+                if new:
                     new_insts.append(inst)
             self.update_SceneRep(new_insts)
         self.update_activations()
@@ -486,6 +486,7 @@ class VISUAL_WM(WM):
             - Does not handle the case of percept instance updating.
             - SceneRep carries the instance and the percept.
         """
+        # Add new instances
         if per_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in per_insts if not(isinstance(i.trace, PERCEPT_SCHEMA_REL))]:
@@ -498,6 +499,7 @@ class VISUAL_WM(WM):
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
                 self.SceneRep.add_edge(node_from, node_to, per_inst=rel_inst, percept=rel_inst.content['percept'],  new=True)
+        
     
     def show_SceneRep(self):
         node_labels = dict((n, '%s(%.1f)' %(n, d['per_inst'].activity)) for n,d in self.SceneRep.nodes(data=True))
@@ -730,17 +732,18 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
                 output['next_saccade'] = self.t
                 print 't: %i, trigger next saccade' % self.t
                 self.outputs['to_visual_WM'] =  {'subscene':self.subscene, 'init_act':self.subscene.saliency}
-                self.subscene.saliency = -1 # THIS NEEDS TO BE CHANGED!! 
+                self.subscene.saliency = - 1 # THIS NEEDS TO BE CHANGED!! 
                 self.subscene = None
         
         # TD guidance
-        percept_schema_inst = self.inputs['from_visual_WM']
-        if percept_schema_inst:
-            self.focus_area = percept_schema_inst.content['area']
-            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccade.
-            area_center = self.focus_area.center()
-            area_radius = self.focus_area.radius()
-            print "t:%i, TD focus orientation to %s, area (x=%i, y=%i, r=%i)" %(self.t, percept_schema_inst.name, area_center[0], area_center[1], area_radius)
+        self.TD_guidance()
+#        percept_schema_inst = self.inputs['from_visual_WM']
+#        if percept_schema_inst:
+#            self.focus_area = percept_schema_inst.content['area']
+#            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccade.
+#            area_center = self.focus_area.center()
+#            area_radius = self.focus_area.radius()
+#            print "t:%i, TD focus orientation to %s, area (x=%i, y=%i, r=%i)" %(self.t, percept_schema_inst.name, area_center[0], area_center[1], area_radius)
         
         self.outputs['to_output'] =  output
 
@@ -757,7 +760,7 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
             if ss.saliency > max_saliency:
                 max_saliency = ss.saliency
                 new_ss = ss
-        
+
         self.subscene = new_ss
 #        ############ Test of strategy of zoom-in first. #############
 #        if not(self.focus_area):
@@ -774,11 +777,12 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
             - The definition of what is "in focus" is incorrect
         """
         in_focus_ss = []
-        candidates = [ss for ss in self.scene_data.subscenes if ss.saliency >0] # Don't consider the subscenes whose saliency has already been set to -1
+        candidates = [ss for ss in self.scene_data.subscenes]
         
         if self.focus_area:
             for ss in candidates:
-                if ss.area != self.focus_area and self.focus_area.includes(ss.area):
+#                if ss.area != self.focus_area and self.focus_area.includes(ss.area):
+                if self.focus_area.includes(ss.area):
                     in_focus_ss.append(ss)
                     
             if not(in_focus_ss): # No subscene in focus
@@ -788,6 +792,24 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
             in_focus_ss = candidates
         
         return in_focus_ss
+    
+    def TD_guidance(self, verbose=1):
+        """
+        """
+        percept_schema_inst = self.inputs['from_visual_WM']
+        if percept_schema_inst:
+            self.focus_area = percept_schema_inst.content['area'] # Modify focus area
+            if verbose>0 and self.focus_area:
+                area_center = self.focus_area.center()
+                area_radius = self.focus_area.radius()
+                print "t:%i, TD focus orientation to %s, area (x=%i, y=%i, r=%i)" %(self.t, percept_schema_inst.name, area_center[0], area_center[1], area_radius)
+            
+            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccade.
+
+            in_focus_ss = self.in_focus()
+            for ss in in_focus_ss:
+                ss.saliency = 1 # Boosts the saliency of all the subscenes in focus.
+        
     #######################
     ### DISPLAY METHODS ###
     #######################

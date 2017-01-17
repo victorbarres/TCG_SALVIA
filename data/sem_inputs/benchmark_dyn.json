@@ -1,0 +1,89 @@
+{ 
+	"input_macros":{
+		"test_naming": {
+			"sem_input_frame":{
+				"sem_rate": 1,
+				 "propositions"  : {
+					"P1": ["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", "ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"P2": [ "ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"]
+				  },
+				  "sequence" :["P1", "P2"],
+				  "timing":[],
+				  "comments": "test naming for two entities."
+			},
+			"substitutions":{
+			}
+		},
+			
+		"young_woman_dyn": {
+			"sem_input_frame":{
+				"sem_rate": 1,
+				 "propositions"  : {
+					"P1":["ENTITY(e,F,0.9)"],
+					"P2":["WOMAN(woman)", "IS(is)", "is(e, woman)"],
+					"P3":["YOUNG(young, 0.8)", "MODIFY(mod, 0.7)", "mod(e, young)"]
+				  },
+				  "sequence" :["P1", "P2", "P3"],
+				  "timing":[],
+				  "comments": "test property-modifier dynamic."
+			},
+			"substitutions":{
+			}
+		},
+		
+		"woman_kick_man_dyn":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"P3":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"], 
+					"P4":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["P1", "P2", "P3", "P4"],
+				"timing":[],
+				"comments":"test transitive dynamic."
+			},
+			"substitutions":{
+			}
+		},
+
+		"young_woman_punch_man_dyn":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions": {
+					"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+						"EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+						"PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
+						"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"P3":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
+				},
+				"sequence":["P1", "P2", "P3"],
+				"timing":[],
+				"comments":"Actions + property modifier dynamic."
+			},
+			"substitutions":{
+			}
+		},
+		
+		"woman_punch_man_kick_can_dyn":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions": {
+					"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+						"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+						"EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "PUNCH(punch)", "IS(is4)", "is4(a1, punch)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e2)", "pt1(a1, e1)"],
+					"P2":["ENTITY(e3,F)", "WATERING_CAN(can)", "IS(is5)", "is5(e3, can)",
+						"EVENT(evt2,F)", "ACTION(a2,F)", "IS(is6)", "is6(evt2,a2)", "KICK(kick)", "IS(is7)", "is7(a2, kick)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a2, e3)",
+						"MODIFY(mod1)", "mod1(e1, evt2)"]
+				},
+				"sequence":["P1", "P2"],
+				"timing":[],
+				"comments":"Actions + property modifier dynamic."
+			},
+			"substitutions":{
+			}
+		}
+	}
+}

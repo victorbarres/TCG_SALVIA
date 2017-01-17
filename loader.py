@@ -16,6 +16,7 @@ TCG data loader module
     
     All other methods should be considered private and are subject to change.
 """
+from __future__ import division
 import json
 import re
 
@@ -533,6 +534,7 @@ class TCG_LOADER(object):
             return substitution_set
             
         substitution_set = build_substitution_set(substitutions)
+                             
         sem_inputs = {str(substitution): substitute(sem_input_frame, substitution) for substitution in substitution_set}
         
         return sem_inputs
@@ -546,6 +548,17 @@ class TCG_LOADER(object):
         # Open and read file
         json_data = TCG_LOADER.json_read(file_name, path = file_path)
         return json_data['inputs']
+    
+    @staticmethod
+    def load_ground_truths(file_name = '', file_path = './'):
+        """
+        Loads and returns the ground_truths data defined in in file_path\file_name.
+        Return None if error.
+        """
+        # Open and read file
+        json_data = TCG_LOADER.json_read(file_name, path = file_path)
+        ground_truths = json_data.get('ground_truths', {})
+        return ground_truths
             
         
 ###############################################################################

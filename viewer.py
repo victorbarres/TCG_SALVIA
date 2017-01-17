@@ -8,6 +8,7 @@ Defines the TCG_VIEWER class that allows to view a certain dataset into the TCG 
 
 Can be also be use in command line: python viewer.py
 """
+from __future__ import division
 import os, shutil
 import SimpleHTTPServer
 import SocketServer
@@ -263,9 +264,24 @@ class TCG_VIEWER:
             subprocess.call(cmd, shell=True)
     
     ##############################
-    ### Static display methods ###
-    
-    
+    ### Static display methods ###   
+    @staticmethod
+    def __obj_to_color(my_obj):
+        """
+        Takes and object and returns a color value in RGB deterministically defined from object hash.
+        """
+        char_len = 2
+        max_val = (2**8 -1) #8bit
+        h = hash(my_obj)
+        int1= h % max_val
+        int2 =  hash(str(int1)) % max_val
+        int3 =  hash(str(int2)) % max_val
+        
+        get_hex = lambda i : hex(i)[2:] # get hex value striped the initial '0x'
+        pad_hex = lambda i : '0'*(char_len - len(get_hex(i))) + get_hex(i)
+        rgb_str = '#' + pad_hex(int1) + pad_hex(int2) + pad_hex(int3)
+        return rgb_str
+        
     @staticmethod
     def _create_concepts_cluster(cpt_knowledge, name=None):
         """
@@ -505,15 +521,17 @@ class TCG_VIEWER:
         """
         Returns a DOT cluster containing the C2 graph, with the instances as nodes without display instances content.
         """
+        font_size = '14'
         font_name = 'consolas'
         inst_shape = 'box'
-        inst_color = 'grey'
-        inst_fill_color = 'grey'
+        style = 'filled, rounded'
         
         C2_cluster = pydot.Cluster('C2_cluster', label='', color='white', fill='white')
         for inst in insts:
             label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, inst.name, inst.activity)
-            new_node = pydot.Node(inst.name, label=label, shape=inst_shape, color=inst_color, fillcolor=inst_fill_color)
+            inst_fill_color = TCG_VIEWER.__obj_to_color(inst.name)
+            inst_color = inst_fill_color
+            new_node = pydot.Node(inst.name, label=label, shape=inst_shape, style=style, color=inst_color, fillcolor=inst_fill_color, fontsize=font_size, fontname=font_name)
             C2_cluster.add_node(new_node)
         
         for coop_link in coop_links:
@@ -590,8 +608,8 @@ class TCG_VIEWER:
         NOTE: would need to add phonological WM
         """        
         font_name = 'consolas'
-        cover_color = 'grey'
         cover_style = 'dashed'
+        edge_color = 'grey'
         
         lingWM_cluster = pydot.Cluster('linguisticWM')
         
@@ -617,9 +635,10 @@ class TCG_VIEWER:
             node_covers = cxn_inst.covers['nodes'] # I am only going to show the node covers for simplicity
             for n1, n2 in node_covers.iteritems():
                 if not(concise):
-                    new_edge = pydot.Edge(n1, n2, dir='both', color=cover_color, style=cover_style, splines='spline')
+                    new_edge = pydot.Edge(n1, n2, dir='both', color=edge_color, style=cover_style, splines='spline')
                 else:
-                    new_edge = pydot.Edge(cxn_inst.name, n2, dir='both', color=cover_color, style=cover_style, splines='spline')
+                    edge_color = TCG_VIEWER.__obj_to_color(cxn_inst.name)
+                    new_edge = pydot.Edge(cxn_inst.name, n2, dir='both', color=edge_color, style=cover_style, splines='spline')
                 lingWM_cluster.add_edge(new_edge)
         
         return lingWM_cluster
@@ -982,7 +1001,6 @@ class TCG_VIEWER:
         
         # Display perceptual schemas and area
         for per_schema in scene.schemas:
-            print per_schema.name
             if not(isinstance(per_schema.trace, perceptual_schemas.PERCEPT_SCHEMA_REL)):
                 area = per_schema.content['area']
                 pos = (area.y, area.x)

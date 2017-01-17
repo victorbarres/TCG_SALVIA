@@ -168,7 +168,7 @@ def time_pressure_dynamic(file_path="./my_sim/", file_name="sim.csv", output_fol
     
 
 if __name__ == "__main__":
-    file_name = 'blue_woman_kick_man'
+    file_name = 'transitive_action_static'
     file_path = "./analyses/%s/" % file_name
 #    active_passive_static(file_path=file_path, file_name=file_name+'.csv')
 #    active_passive_dynamic(file_path=file_path, file_name=file_name+'.csv')

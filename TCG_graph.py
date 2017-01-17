@@ -6,6 +6,7 @@ TCG graph operations
 
 Uses networkx
 """
+from __future__ import division
 from networkx import DiGraph
 from networkx.algorithms import isomorphism
 

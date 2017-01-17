@@ -6,6 +6,7 @@ Define perceptual knowledge related classes for TCG.
 
 Uses NetworkX module to represent the semantic net.
 """
+from __future__ import division
 from knowledge_rep import K_ENT, K_REL, K_NET
 
 class PERCEPT(K_ENT):

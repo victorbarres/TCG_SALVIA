@@ -15,6 +15,7 @@ Dependencies:
     - pickle to save models.
     - pprint for printing data
 """
+from __future__ import division
 import abc
 import time
 import os
@@ -1082,89 +1083,97 @@ class WM(SYSTEM_SCHEMA):
     #######################
     ### DISPLAY METHODS ###
     #######################
-    def show_dynamics(self, inst_act=True, WM_act=True, c2_levels=True, c2_network=True):
+    def show_dynamics(self, folder=None):
         """
         Note:
             - I am computing the density considering all links as unweighted and bidirectional.This does not take into account the assymetry coef or the weights.
         """
+        if folder and not(os.path.exists(folder)):
+            os.mkdir(folder)
+            
         # Plot instance activations
-        if inst_act:
-            plt.figure(facecolor='white')
-            title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g], noise: [mean:%g, std:%g], C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
-                                self.name,
-                                self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
-                                self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
-                                  self.params['C2']['coop_weight'], self.params['C2']['comp_weight'],  self.params['C2']['coop_asymmetry'], self.params['C2']['comp_asymmetry'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
-            plt.title(title)
-            plt.xlabel('time', fontsize=14)
-            plt.ylabel('activity', fontsize=14)
-            for inst in self.save_state['insts'].keys():
-                plt.plot(self.save_state['insts'][inst]['t'], self.save_state['insts'][inst]['act'], label=inst, linewidth=2)
-            axes = plt.gca()
-            axes.set_ylim([0,1])
-            axes.set_xlim([0, max(self.save_state['WM_activity']['t'])])
-            plt.axhline(y=self.params['C2']['prune_threshold'], color='k',ls='dashed')
-            plt.axhline(y=self.params['C2']['confidence_threshold'], color='r',ls='dashed')
-            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
-            plt.show()
+        f1 = plt.figure(facecolor='white')
+        title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g]\n noise: [mean:%g, std:%g], \n C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
+                            self.name,
+                            self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
+                            self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
+                              self.params['C2']['coop_weight'], self.params['C2']['comp_weight'],  self.params['C2']['coop_asymmetry'], self.params['C2']['comp_asymmetry'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
+        plt.title(title)
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('activity', fontsize=14)
+        for inst in self.save_state['insts'].keys():
+            plt.plot(self.save_state['insts'][inst]['t'], self.save_state['insts'][inst]['act'], label=inst, linewidth=2)
+        axes = plt.gca()
+        axes.set_ylim([0,1])
+        axes.set_xlim([0, max(self.save_state['WM_activity']['t'])])
+        plt.axhline(y=self.params['C2']['prune_threshold'], color='k',ls='dashed')
+        plt.axhline(y=self.params['C2']['confidence_threshold'], color='r',ls='dashed')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         
-        # Plot global activity values.
-        num_plots =  len([val for val in [WM_act, c2_levels] if val==True])
+        if folder:
+            file_name = '%s/%s' %(folder, 'inst_dynamics.pdf')
+            plt.savefig(file_name, bbox_inches='tight')
+        else:
+            f1.show()
         
-        if num_plots != 0:
-            plt.figure(facecolor='white')
-            i=0
-            #plot WM activity
-            if WM_act:
-                i+=1
-                plt.subplot(num_plots,1, i)
-                plt.title('WM activity')
-                plt.xlabel('time', fontsize=14)
-                plt.ylabel('activity', fontsize=14)
-                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['act'], linewidth=2, color='k', label='act')
-                plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
-                plt.margins(0.1, 0.1)
+        #plot WM activity
+        f2 = plt.figure(facecolor='white')
+        plt.title('WM activity')
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('activity', fontsize=14)
+        plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['act'], linewidth=2, color='k', label='act')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+        plt.margins(0.1, 0.1)
+        if folder:
+            file_name = '%s/%s' %(folder, 'WM_activity.pdf')
+            plt.savefig(file_name, bbox_inches='tight')
+        else:
+            f2.show()
                 
-            # Plot c2 levels
-            if c2_levels:
-                i+=1            
-                plt.subplot(num_plots,1, i)
-                plt.title('C2 levels')
-                plt.xlabel('time', fontsize=14)
-                plt.ylabel('activation transfer', fontsize=14)
-                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['comp'], linewidth=2, color='r', label='competition')
-                plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['coop'], linewidth=2, color='g', label='cooperation')
-                tot_c2 = [v1 + v2 for (v1, v2) in zip(self.save_state['WM_activity']['comp'], self.save_state['WM_activity']['coop'])]
-                plt.plot(self.save_state['WM_activity']['t'], tot_c2, '--',  linewidth=2, color='k', label='total')
-                plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
-                plt.margins(0.1, 0.1)
+        # Plot C2  network data
+        plt.subplots(nrows=1, ncols=3, facecolor='white')
+        plt.tight_layout()
+        plt.subplot(3,1,1)
+        plt.title('C2 levels')
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('activation transfer', fontsize=14)
+        plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['comp'], linewidth=2, color='r', label='competition')
+        plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['coop'], linewidth=2, color='g', label='cooperation')
+        tot_c2 = [v1 + v2 for (v1, v2) in zip(self.save_state['WM_activity']['comp'], self.save_state['WM_activity']['coop'])]
+        plt.plot(self.save_state['WM_activity']['t'], tot_c2, '--',  linewidth=2, color='k', label='total')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+        plt.margins(0.1, 0.1)
             
+        
+        # Plot c2 
+        plt.subplot(3,1,2)
+        plt.tight_layout()
+        plt.title('C2 instances and links')
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('number', fontsize=14)
+        plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_insts'],  linewidth=2, color='b', label='num insts')
+        plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_coop_links'],  linewidth=2, color='g', label='num coop links')
+        plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_comp_links'],  linewidth=2, color='r', label='num comp links')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+        plt.margins(0.1, 0.1)
+        
+        plt.subplot(3,1,3)
+        plt.title('C2 network density')
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('density', fontsize=14)
+        coop_density = [2.0*e_coop/(n*(n-1)) if n>1 else 0 for (n,e_coop) in zip(self.save_state['WM_activity']['c2_network']['num_insts'],self.save_state['WM_activity']['c2_network']['num_coop_links'])]           
+        comp_density = [2.0*e_comp/(n*(n-1)) if n>1 else 0 for (n,e_comp) in zip(self.save_state['WM_activity']['c2_network']['num_insts'],self.save_state['WM_activity']['c2_network']['num_comp_links'])]
+        plt.plot(self.save_state['WM_activity']['t'], coop_density,  linewidth=2, color='g', label='coop density')
+        plt.plot(self.save_state['WM_activity']['t'], comp_density,  linewidth=2, color='r', label='comp density')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+        plt.margins(0.1, 0.1)
+            
+        if folder:
+            file_name = '%s/%s' %(folder, 'C2_analysis.pdf')
+            plt.savefig(file_name, bbox_inches='tight')
+        else:
             plt.show()
         
-        # Plot c2 network data
-        if c2_network:
-            plt.figure(facecolor='white')    
-            plt.subplot(2,1,1)
-            plt.title('C2 instances and links')
-            plt.xlabel('time', fontsize=14)
-            plt.ylabel('number', fontsize=14)
-            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_insts'],  linewidth=2, color='b', label='num insts')
-            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_coop_links'],  linewidth=2, color='g', label='num coop links')
-            plt.plot(self.save_state['WM_activity']['t'], self.save_state['WM_activity']['c2_network']['num_comp_links'],  linewidth=2, color='r', label='num comp links')
-            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
-            plt.margins(0.1, 0.1)
-            
-            plt.subplot(2,1,2)
-            plt.title('C2 network density')
-            plt.xlabel('time', fontsize=14)
-            plt.ylabel('density', fontsize=14)
-            coop_density = [2.0*e_coop/(n*(n-1)) if n>1 else 0 for (n,e_coop) in zip(self.save_state['WM_activity']['c2_network']['num_insts'],self.save_state['WM_activity']['c2_network']['num_coop_links'])]           
-            comp_density = [2.0*e_comp/(n*(n-1)) if n>1 else 0 for (n,e_comp) in zip(self.save_state['WM_activity']['c2_network']['num_insts'],self.save_state['WM_activity']['c2_network']['num_comp_links'])]
-            plt.plot(self.save_state['WM_activity']['t'], coop_density,  linewidth=2, color='g', label='coop density')
-            plt.plot(self.save_state['WM_activity']['t'], comp_density,  linewidth=2, color='r', label='comp density')
-            plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
-            plt.margins(0.1, 0.1)
-            plt.show()
             
         
     def show_state(self):
@@ -1801,10 +1810,11 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         
         return sys_params
     
-    def save_sim(self, file_path = './tmp/', file_name = 'output.json'):
+    def save_sim(self, file_path = './tmp/', file_name = 'output'):
         """
+        Saves the simulation results to file_path as 'file_name.json'
         """
-        my_file = file_path + file_name
+        my_file = file_path + file_name + '.json'
         if not(os.path.exists(file_path)):
             os.mkdir(file_path)
         with open(my_file, 'wb') as f:
@@ -1886,29 +1896,28 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         """
         print "MODEL PARAMETERS"
         pprint.pprint(self.params, indent=1, width=1)
-            
+             
 ############################
 ##### MODULE FUNCTIONS #####
 ############################
-def save(model, path='./tmp/'):
+def st_save(my_object, object_name, path,extension='st'):
     """
-    Saves a model using pickle.
+    Saves an object using pickle.
     """
-    file_name = path + model.name
+    file_name = '%s%s.%s' %(path,object_name,extension)
     if not(os.path.exists(path)):
             os.mkdir(path)
-            
     with open(file_name, 'w') as f:
-        pickle.dump(model, f)
+        pickle.dump(my_object, f)
 
-def load(model_name,path='./tmp/'):
+def st_load(object_name,path):
     """
-    loads a model using pickle.
+    Loads an object using pickle.
     """
-    file_name = path + model_name
+    file_name = path + object_name
     with open(file_name, 'r') as f:
-        model  = pickle.load(f)
-        return model
+        my_object  = pickle.load(f)
+        return my_object
     return None
         
 ###############################################################################

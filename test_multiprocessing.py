@@ -6,10 +6,10 @@ Created on Fri Jun 17 14:26:46 2016
 
 Test running models on mutliprocessing.
 """
-
+from __future__ import division
 from joblib import Parallel, delayed
 
-from test_TCG_production import run_model
+from model_TCG_production import run_model
 
 
 def multi_proc(num_tests=1, n_jobs=-1, verbose=1):
@@ -31,7 +31,7 @@ def multi_proc(num_tests=1, n_jobs=-1, verbose=1):
 if __name__=='__main__':
     import sys
     import pprint as pp
-    if len(sys.argv) == 0:
+    if len(sys.argv) < 4:
         print "Missing arguments!"
         print "run: python test_multiprocessing.py num_tests(INT) num_jobs(INT) verbose(INT)"
     

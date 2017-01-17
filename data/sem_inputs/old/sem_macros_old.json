@@ -21,6 +21,16 @@
 		},
 		"transitive_action_static":{
 			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions": {
+					"P1":["ENTITY(e1,F, x1)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+						"ENTITY(e2,F, x2)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+						"EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)",
+						"KICK(kick)", "IS(is4)", "is4(a1, kick)", 
+						"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+			"sequence":["P1"],
+			"timing":[],
 				"sem_rate":10,
 				"propositions":{
 					"P1":["BOY(b1, x1)", "MAN(m1, x2)", "KICK(a1, x3)", "AGENT(r1, x4)", "PATIENT(r2, x5)", "r1(a1, b1)", "r2(a1, m1)"]
@@ -30,10 +40,7 @@
 			},
 			"substitutions":{
 				"x1":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
-				"x2":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"],
-				"x3":["1.0"],
-				"x4":["1.0"],
-				"x5":["1.0"]
+				"x2":["0.5", "0.6", "0.7", "0.8", "0.9", "1.0"]
 			}
 		},
 		"transitive_action_dynamic_patient_first":{

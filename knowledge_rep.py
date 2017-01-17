@@ -6,6 +6,7 @@ For now only implements semantic net.
 
 Uses NetworkX module to represent the semantic net.
 """
+from __future__ import division
 import matplotlib.pyplot as plt
 import networkx as nx
 

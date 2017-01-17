@@ -4,6 +4,7 @@
 
 Define semantic network related classes for TCG.
 """
+from __future__ import division
 from knowledge_rep import K_ENT, K_REL, K_NET
 
 class CONCEPT(K_ENT):

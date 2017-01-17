@@ -4,6 +4,7 @@
 
 Contains functions that can instantiate various TCG models and submodels.
 """
+from __future__ import division
 import schema_theory as st
 import language_schemas as ls
 import perceptual_schemas as ps
@@ -84,8 +85,8 @@ def parameters(system_names):
         
     'Control':{
         'task.mode':'produce',
-        'task.time_pressure':200.0,
-        'task.start_produce':400.0,
+        'task.time_pressure': 10.0, #200.0,
+        'task.start_produce': 1.0, #00.0,
         'style.activation':0.7, #0.7
         'style.sem_length':0.5, #0.5
         'style.form_length':0.0, #0.0
@@ -206,7 +207,7 @@ def TCG_production_system(name='language_system_P',
     model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     
     model.set_input_ports([semanticWM.find_port('from_conceptualizer')])
-    model.set_output_ports([utter.find_port('to_output'), grammaticalWM_P.find_port('to_output')])
+    model.set_output_ports([utter.find_port('to_output'),phonWM_P.find_port('to_output'), grammaticalWM_P.find_port('to_output'), semanticWM.find_port('to_output')])
     
     # Parameters
     system_names = model.schemas.keys()
@@ -378,7 +379,7 @@ def TCG_language_system(name='language_system',
     model_params = parameters(system_names)
     model.update_params(model_params)
     
-    grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']*0.5
+#    grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']*0.5
     
     # Loading data
     semantics_file = "%s.json" % semantics_name

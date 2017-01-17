@@ -97,7 +97,7 @@
 	{
 		"name" : "PAS_SVO",
 		"class" : "S",
-		"preference" : 0.7,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -121,7 +121,7 @@
 	{
 		"name" : "DOUBLE_OBJ",
 		"class" : "S",
-		"preference" : 0.8,
+		"preference" : 1,
 		"group": 2,
 		"SemFrame" : 
 		{
@@ -734,7 +734,7 @@
 	{
 		"name" : "WOMAN2",
 		"class" : "N",
-		"preference" : 0.5,
+		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
