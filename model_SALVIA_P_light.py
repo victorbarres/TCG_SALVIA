@@ -2,33 +2,29 @@
 """
 @author: Victor Barres
 
-Test TCG description
+SALVIA_P model light version (No VisualWM and Conceptualization)
 """
 import random
 
-from TCG_models import SALVIA_P, SALVIA_P_verbal_guidance
+from TCG_models import SALVIA_P_light
 from viewer import TCG_VIEWER
 from loader import TCG_LOADER
 
 TMP_FOLDER = './tmp'
     
-def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', verbal_guidance=False, model_params = {}):
+def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}):
     """
-    Sets up a SALVIA_P.
+    Sets up a SALVIA_P_light
     
     Args:
         - semantics_name (STR): Name of the semantic file containing the perceptual, world, and conceptualization knowledge.
         - grammar_name (STR): Name of the grammar file to use.
-        - verbal_guidance (BOOL): If true returns SAVLIA_P_verbal_guidance.
         - model_prams (dict): Dictionary defining the model parameters (if different than default)
     
-    Returns: SALVIA_P model
+    Returns: SALVIA_P_light model
     """
     
-    if verbal_guidance:
-        model = SALVIA_P_verbal_guidance(grammar_name=grammar_name, semantics_name=semantics_name)
-    else:
-        model = SALVIA_P(grammar_name=grammar_name, semantics_name=semantics_name)
+    model = SALVIA_P_light(grammar_name=grammar_name, semantics_name=semantics_name)
         
     if model_params:
         model.update_params(model_params)
@@ -36,38 +32,35 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     return model
     
 
-def set_inputs(model, input_name, input_file='TCG_scene.json', show_scene=True):
+def set_inputs(model, input_name, input_file='kuchinsky.json'):
     """
-    Sets up a SCENE input for SALVIA_P model
+    Sets up a SCENE_LIGHT input for SALVIA_P_light model
     
     Args:
-        - sem_name (STR): Semantic input name.
-        - sem_input_file (STR): Semantic input file name. For non-macro input, set to 'ALL' to load all inputs from file.
-        - sem_input_macro (BOOL): True is the input is an ISRF macro.
-        - speed_param (INT): multiplier of the rate defined in the ISRF input (by default the ISFR rate is 1.)
+        - input_name (STR): scene input name.
+        - input_input_file (STR): scene_input file name.
     
-    Returns input SEM_GENERATOR object.
+    Sets up the SCENE_LIGHT input for the model.
     """
     
     # Defining scene input
-    SCENE_INPUT_PATH  = "./data/scenes/"
-    SCENE_FOLDER = "%s%s/" %(SCENE_INPUT_PATH, input_name)
-    IMG_FILE = SCENE_FOLDER + 'scene.png'
+    SCENE_INPUT_PATH  = "./data/scene_inputs/"
     
-    perceptLTM = model.schemas['Percept_LTM']
-    my_scene = TCG_LOADER.load_scene(input_file, SCENE_FOLDER, perceptLTM)
+    conceptLTM = model.schemas['Concept_LTM']
+    my_scene = TCG_LOADER.load_scene_light(input_file, SCENE_INPUT_PATH, input_name, conceptLTM)
+    
     model.set_input(my_scene)
     
-    return (input_name, IMG_FILE)
+    return input_name
 
-def run(model, sim_name, max_time=900, seed=None, verbose=0, prob_times=[], IMG_FILE =''):
+def run(model, sim_name, max_time=900, seed=None, verbose=0, prob_times=[]):
     """
     Run the model "model".
     
-    input_name(STR): input name
-    Verbose modes: 0 -> no output printed.
-    prob_times ([INT]): 
-    IMG_FILE (STR): path to the image file (to display saccades.)
+    Args:
+        - input_name(STR): input name
+        - Verbose modes: 0 -> no output printed.
+        - prob_times ([INT]):
     """
     if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
         random.seed(seed)
@@ -81,7 +74,6 @@ def run(model, sim_name, max_time=900, seed=None, verbose=0, prob_times=[], IMG_
     model.initialize_states()
     
     out_data = []
-    out_fixation = []
     out_utterance = []
      
     if verbose>1:
@@ -98,56 +90,46 @@ def run(model, sim_name, max_time=900, seed=None, verbose=0, prob_times=[], IMG_
                 if verbose > 1:
                     print "t:%i, '%s'" %(t, output['Utter'])
                 out_utterance.append(output['Utter'])
-            if output['Subscene_recognition']:
-                eye_pos = output['Subscene_recognition']['eye_pos']
-                subscene = output['Subscene_recognition']['subscene']
-                if eye_pos:
-                    out_fixation.append({'time':t, 'pos':eye_pos, 'subscene':subscene})
-                    if verbose>1:
-                        vals = [(u,v) for u,v in output['Subscene_recognition'].iteritems() if v]
-                        print "t:%i, '%s'" %(t, vals)
+            if output['Scene_perception'] and verbose >3:
+                vals = [(u,v) for u,v in output['Scene_perception'].iteritems() if v]
+                if vals:
+                    print "t:%i, '%s'" %(t, vals)
         if t in prob_times:
-                TCG_VIEWER.display_WMs_state(model.schemas['Visual_WM'], model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
                 TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True)
                 TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True)
     
     if verbose >2:
-        model.schemas['Subscene_recognition'].show_scene(IMG_FILE)
-        model.schemas['Visual_WM'].show_SceneRep()
 #        model.schemas['Visual_WM'].show_dynamics()
         model.schemas['Semantic_WM'].show_SemRep()
 #        model.schemas['Semantic_WM'].show_dynamics()
         model.schemas['Grammatical_WM_P'].show_dynamics()
 #        model.schemas['Grammatical_WM_P'].show_state()
-        if IMG_FILE:
-            TCG_VIEWER.display_saccades(out_fixation, IMG_FILE, ss_radius=True)
     
     model.save_sim(file_path = FOLDER, file_name = 'output.json')
     model.reset()
     
     # Prints utterance and fixation sequence in verbose mode.
     if verbose > 0:
-        print ## FIXATIONS ##
-        print out_fixation
         print ## UTTERANCES ##
         print ' '.join(out_utterance)
 
     ## NO DATA ANALYSIS HERE
 
-def run_diagnostics(verbal_guidance=False, verbose=2, prob_times=[]):
+def run_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_NAME = 'test'
-    SPEED_PARAM = 50
-    MODEL_PARAMS = {'Subscene_recognition.recognition_time':SPEED_PARAM, 
+    DIAGNOSTIC_NAME = "act_man"
+    SPEED_PARAM = 100
+    MODEL_PARAMS = {'Scene_perception.recognition_time':SPEED_PARAM, 
                     'Control.task.start_produce':0.0, 
-                    'Control.task.time_pressure':200, 
+                    'Control.task.time_pressure':10, 
                     'Grammatical_WM_P.dyn.ext_weight':1.0, 
                     'Grammatical_WM_P.C2.prune_threshold': 0.01, 
                     'Grammatical_WM_P.C2.coop_weight':1.0, 
                     'Grammatical_WM_P.C2.comp_weight':-10.0, 
-                    'Grammatical_WM_P.C2.coop_asymmetry':1.0}
+                    'Grammatical_WM_P.C2.coop_asymmetry':1.0,
+                    'Grammatical_WM_P.C2.confidence_threshold':0.3}
     
     # Attempts to model lesion
 #    MODEL_PARAMS['Grammatical_WM_P.C2.coop_weight']=0.1 # Reduce cooperation weights
@@ -159,14 +141,14 @@ def run_diagnostics(verbal_guidance=False, verbose=2, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time =3000
+    max_time =1000
     seed=None
     ###    
     
-    model = set_model(semantics_name, grammar_name,verbal_guidance=verbal_guidance, model_params=MODEL_PARAMS)
-    (input_name, IMG_FILE) = set_inputs(model, input_name=DIAGNOSTIC_NAME, show_scene=True)
+    model = set_model(semantics_name, grammar_name, model_params=MODEL_PARAMS)
+    input_name = set_inputs(model, input_name=DIAGNOSTIC_NAME)
     
-    run(model, sim_name=input_name, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, IMG_FILE=IMG_FILE)
+    run(model, sim_name=input_name, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times)
 
 if __name__ == '__main__':
-   run_diagnostics(verbal_guidance=True, verbose=3, prob_times=[])
+   run_diagnostics(verbose=3, prob_times=[])

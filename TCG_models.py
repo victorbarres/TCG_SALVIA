@@ -86,7 +86,7 @@ def parameters(system_names):
     'Control':{
         'task.mode':'produce',
         'task.time_pressure': 10.0, #200.0,
-        'task.start_produce': 1.0, #00.0,
+        'task.start_produce': 1.0, #400.0,
         'style.activation':0.7, #0.7
         'style.sem_length':0.5, #0.5
         'style.form_length':0.0, #0.0
@@ -140,6 +140,10 @@ def parameters(system_names):
         },
         
     'Subscene_recognition':{
+        'recognition_time':50
+        },
+        
+    'Scene_perception':{
         'recognition_time':50
         }
     }
@@ -432,8 +436,7 @@ def SALVIA_P(name='SALVIA_P',
                         'Cxn_retrieval_P':[], 
                         'Phonological_WM_P':['left_BA6'],
                         'Utter':[''],
-                        'Control':['DLPFC'], 
-                        'Concept_LTM':['']}
+                        'Control':['DLPFC']}
                         
     schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
    
@@ -442,7 +445,6 @@ def SALVIA_P(name='SALVIA_P',
     model.add_schemas(schemas)
     
     # Defining connections
-    model.add_connection(perceptLTM, 'to_subscene_rec', subscene_rec, 'from_percept_LTM')
     model.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec')
     
     model.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
@@ -473,7 +475,6 @@ def SALVIA_P(name='SALVIA_P',
     
     # Parameters
     system_names = model.schemas.keys()
-    print system_names
     model_params = parameters(system_names)
     model.update_params(model_params)
     
@@ -521,74 +522,122 @@ def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
     
     return model
     
-def SALVIA_P_saliency(name='SALVIA_P_saliency'):
+def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
+                   grammar_name='TCG_grammar_VB_main', 
+                   semantics_name = 'TCG_semantics_main',
+                   grammar_path = './data/grammars/',
+                   semantics_path = './data/semantics/'):
     """
-    Creates and returns the SALVIA production model that include a simple saliency map
+    Creates and returns a light version of the SALVIA production model.
+    It bypasses the VisualWM and the Conceptualizer
     """
-    model = SALVIA_P(name)
-    
     # Instantiating all the necessary system schemas
-    simpleSM = ps.SIMPLE_SALIENCY_MAP()
+    scene_perception = ps.SCENE_PERCEPTION()
+
+    conceptLTM = ls.CONCEPT_LTM()
+    
+    semanticWM = ls.SEMANTIC_WM()
+    grammaticalWM_P = ls.GRAMMATICAL_WM_P()
+    grammaticalLTM = ls.GRAMMATICAL_LTM()
+    cxn_retrieval_P = ls.CXN_RETRIEVAL_P()
+    phonWM_P = ls.PHON_WM_P()
+    control = ls.CONTROL()
+    utter = ls.UTTER()
     
     # Defining schema to brain mappings.
-    model.brain_mapping['Saliency_map'] = ['Dorsal_stream', 'IPS']
-    
-    # Adding system schemas
-    schemas = [simpleSM] 
+    brain_mappings = {'Scene_perception':['Ventral stream'],
+                        'Concept_LTM':[''],
+                        'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
+                        'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
+                        'Grammatical_LTM':['left_STG', 'left_MTG'],
+                        'Cxn_retrieval_P':[], 
+                        'Phonological_WM_P':['left_BA6'],
+                        'Utter':[''],
+                        'Control':['DLPFC']}
+                        
+    schemas = [scene_perception, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
+   
+   # Creating model and adding system schemas
+    model = st.MODEL(name)
     model.add_schemas(schemas)
     
     # Defining connections
-    visualWM = model.schemas['Visual_WM']
-    subscene_rec = model.schemas['Subscene_recognition']
+    model.add_connection(scene_perception, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
+    model.add_connection(semanticWM, 'to_visual_WM', scene_perception, 'from_semantic_WM')
+    
+    model.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
+    model.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
+    model.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
+    model.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
+    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
+    model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
+    model.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
+    model.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+    model.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
+    model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
+    model.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
+    model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    
 
-    model.add_connection(simpleSM, 'to_visual_WM', visualWM, 'from_saliency_map')
-    model.add_connection(visualWM, 'to_saliency_map', simpleSM, 'from_visual_WM')
-    model.add_connection(simpleSM, 'to_subscene_rec', subscene_rec, 'from_saliency_map')
-    
-    # Defining input and output ports 
-    model.input_ports.append(simpleSM.find_port('from_input'))
-    
-    return model
-
-def TCG_SemWM(name='TCG_semantic_WM', 
-              semantics_name = 'TCG_semantics',
-              semantics_path = './data/semantics/'):
-    """
-    Test model that only includes the Semantic WM. 
-    Note that Control is required to send the "produce" signal.
-    """
-    
-    # Instantiating all the necessary system schemas
-    semanticWM = ls.SEMANTIC_WM()
-    conceptLTM = ls.CONCEPT_LTM()
-    control = ls.CONTROL()
-    
-    # Defining schema to brain mappings.    
-    mapping = {'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus']}
-    
-    # Initializing model
-    model = st.MODEL('Semantic_WM')
-    language_schemas = [conceptLTM, semanticWM, control]
-    model.add_schemas(language_schemas)
+    model.set_input_ports([scene_perception.find_port('from_input')])
+    model.set_output_ports([utter.find_port('to_output'), scene_perception.find_port('to_output')])
     
     # Setting up schema to brain mappings
-    brain_mapping = st.BRAIN_MAPPING()
-    brain_mapping.schema_mapping = mapping
-    model.brain_mapping = brain_mapping
+    description_brain_mapping = st.BRAIN_MAPPING()
+    description_brain_mapping.schema_mapping = brain_mappings
+    model.brain_mapping = description_brain_mapping
     
-    # Setting up language model.
-    model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
-    model.set_input_ports([semanticWM.find_port('from_conceptualizer')])
-    model.set_output_ports([semanticWM.find_port('to_cxn_retrieval_P')])
-        
+    # Parameters
+    system_names = model.schemas.keys()
+    model_params = parameters(system_names)
+    model.update_params(model_params)
+    
+    grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']
     # Loading data
-    semantics_file = "%s.json" %semantics_name
+    
+    semantics_file = "%s.json" % semantics_name
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
     
-    # Initialize conceptual LTM content
+    grammar_file = "%s.json" %grammar_name
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
+        
+    # Initialize concept LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
     
+    # Initialize grammatical LTM content
+    grammaticalLTM.initialize(my_grammar)
+    
     return model
+    
+#def SALVIA_P_saliency(name='SALVIA_P_saliency'):
+#    """
+#    Creates and returns the SALVIA production model that include a simple saliency map
+#    """
+#    model = SALVIA_P(name)
+#    
+#    # Instantiating all the necessary system schemas
+#    simpleSM = ps.SIMPLE_SALIENCY_MAP()
+#    
+#    # Defining schema to brain mappings.
+#    model.brain_mapping['Saliency_map'] = ['Dorsal_stream', 'IPS']
+#    
+#    # Adding system schemas
+#    schemas = [simpleSM] 
+#    model.add_schemas(schemas)
+#    
+#    # Defining connections
+#    visualWM = model.schemas['Visual_WM']
+#    subscene_rec = model.schemas['Subscene_recognition']
+#
+#    model.add_connection(simpleSM, 'to_visual_WM', visualWM, 'from_saliency_map')
+#    model.add_connection(visualWM, 'to_saliency_map', simpleSM, 'from_visual_WM')
+#    model.add_connection(simpleSM, 'to_subscene_rec', subscene_rec, 'from_saliency_map')
+#    
+#    # Defining input and output ports 
+#    model.input_ports.append(simpleSM.find_port('from_input'))
+#    
+#    return model
+
 
 #def create_model(model_name):
 #    """

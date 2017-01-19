@@ -193,7 +193,7 @@ class SCENE(object):
         self.subscenes = []
         self.schemas = []
     
-    def clear(self):
+    def reset(self):
         """
         Reset scene.
         """
@@ -201,7 +201,6 @@ class SCENE(object):
         self.height = 0
         self.subscenes = []
         self.schemas = []
-        self.focus_regions = []
 
     def find_schema(self, name):
         """
@@ -239,6 +238,88 @@ class SCENE(object):
             if not(self.find_schema(schema_inst.name)):
                 self.schemas.append(schema_inst)
         return True
+
+class SCENE_LIGHT(object):
+    """
+    Light version of a scene being perceived.
+    Bypasses perceptual schemas to go directly to conceptual schemas.
+    
+    Data:
+        - subscenes ({STR:[CPT_INST]}): maps subscene names onto array of concept instances.
+        - scene_structure (DICT): Directed acyclic graph dictionary with nodes as subscenes.
+    """
+    def __init__(self):
+        """
+        """
+        self.subscenes = {}
+        self.scene_structure = {}
+    
+    def reset(self):
+        """
+        Reset scene.
+        """
+        self.subscenes = {}
+        self.scene_structure = {}
+    
+    def add_subscene(self, ss_name, content, saliency, anchor):
+        """
+        Add subscene to scene
+        """
+        self.subscenes[ss_name] = {"content":content, "saliency":saliency, "anchor":anchor}
+
+    def find_subscene(self, anchor_name):
+        """
+        Return the name of the subscene associated to a given anchor.
+        Args:
+            - anchor_name(STR): Name of an anchor schema inst
+        """
+        subscenes = [ss_name for ss_name, val in self.subscenes.iteritems() if val["anchor"].name == anchor_name]
+        
+        subscene = subscenes[0] if subscenes else None
+        return subscene
+    
+    def find_daughters(self, ss_name):
+        """
+        Finds the daughters of the subscene with name ss_name in the scene_structure
+        """
+        daughters = self.scene_structure.get(ss_name, [])
+        return daughters
+    
+    def find_parents(self, ss_name):
+        """
+        Finds the parents of the subscene with name ss_name in the scene_sturcture
+        """
+        parents = []
+        for name, daughters in self.scene_structure.iteritems():
+            if ss_name in daughters:
+                parents.append(name)
+                
+        return parents
+        
+    def get_content(self, ss_name):
+        """
+        """
+        return self.subscenes[ss_name]['content']
+    
+    def get_saliency(self, ss_name):
+        """
+        """
+        return self.subscenes[ss_name]['saliency']
+
+    def get_anchor(self, ss_name):
+        """
+        """
+        return self.subscenes[ss_name]['anchor']
+    
+    def update_saliency(self, ss_name, saliency_val):
+        """
+        Updates the saliency of ss_name to saliency_val
+        """
+        self.subscenes[ss_name]['saliency'] = saliency_val
+        
+    
+    
+    
 ###############################################################################
 if __name__=='__main__':
     print "No test case implemented."

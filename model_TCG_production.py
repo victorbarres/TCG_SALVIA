@@ -3,21 +3,21 @@
 @author: Victor Barres
 Functions required to run the TCG production system defined in TCG_model as "TCG_production_system".
  - Set the model and the input generator using set_model() and set_input()
- - If the model is to be run only on one input and one set of parameter use runl()
- - If the model is to be run as part of grid search over a parameter space use "grid_search"
- - Use main() to run grid_search + run on multiple inputs.
+ - If the model is to be run only on one input and one set of parameter use run()
+ - Run directly a model using run_model()
+ - If the model is to be run as part of grid search over a parameter space use "run_grid_search"
 """
 from __future__ import division
 import random
 import time
 import json
 
-from schema_theory import st_save
-import language_schemas as ls
-from loader import TCG_LOADER
 from TCG_models import TCG_production_system
 from viewer import TCG_VIEWER
+from loader import TCG_LOADER
+from schema_theory import st_save
 from prod_analysis import prod_summary, BLEU
+import language_schemas as ls
 
 TMP_FOLDER = './tmp'
 
@@ -249,7 +249,7 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
         - out (ARRAY): Array of model's outputs (single output if not macro, series of output if macro.)
     """
     model = set_model(semantics_name, grammar_name, model_params=model_params)
-    sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro)
+    sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param)
     
     ground_truth = sem_gen.ground_truths
     
@@ -640,6 +640,6 @@ def tell_me(utterance):
 if __name__=='__main__':
 #    run_diagnostics(verbose=3, prob_times=[])
 #    run_grid_search()
-    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
+#    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
-#    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name='woman_kick_man_dyn', sem_input_file='benchmark.json', sem_input_macro=True, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=4, save=True)
+    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_kick_man_dyn", sem_input_file='benchmark.json', sem_input_macro=True, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=4, save=True)

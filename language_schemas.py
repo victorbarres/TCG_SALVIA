@@ -489,10 +489,12 @@ class SEMANTIC_WM(WM):
             cpt_insts = cpt_insts1
         if mode == 'listen':
             cpt_insts = cpt_insts2
-        
+            
         if cpt_insts:
             for inst in cpt_insts:
-               self.add_instance(inst)
+                self.add_instance(inst)
+                    
+        
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
@@ -550,19 +552,23 @@ class SEMANTIC_WM(WM):
         Updates the SemRep: Adds the nodes and edges needed based on the receivd concept instances.
         
         NOTE:
-            - Does not handle the case of concept instance updating.
+            - Does not handle the case of concept instance updating. Concepts cannot be updated (Monotonous growth of the SemRep)
             - SemRep carries the instance and the concept. The concept field is redundant, but is useful in order to be able to define
             SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
         """
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
+                if self.SemRep.has_node(inst.name):
+                    continue
                 self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, expressed=False)
             
             # Then add the relations
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
+                if self.SemRep.has_edge(node_from, node_to):
+                    continue
                 self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
             
 #            # Update concept frames
@@ -602,7 +608,6 @@ class SEMANTIC_WM(WM):
             return output
         
         missing_info = self.inputs['from_grammatical_WM_P']['missing_info']
-#        print "Requesting more info about %s" %missing_info
         
         cpt_schema_inst = self.find_instance(missing_info)
         var_name = cpt_schema_inst.trace.get('ref', '')
@@ -1054,17 +1059,19 @@ class GRAMMATICAL_WM_P(WM):
             Make sure to revisit all the different options below.
         """        
         score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
-        self.end_competitions() # When production is triggered, a decision is forced for all the competitions.
+
+#        self.end_competitions() #When production is triggered, a decision is forced for all the competitions.
         assemblages = self.assemble()
         data = []
         winner_found = False
         if assemblages:
             phon_WM_output = []
             sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
-            winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
-            while winner_assemblage and winner_assemblage.score >= score_threshold:
+            winner_dat, score = self.get_winner_assemblage(assemblages, sem_input, phon_input)
+
+            while winner_dat and score >= score_threshold:
                 winner_found = True
-                (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(winner_assemblage)
+                (winner_assemblage, phon_form, missing_info, expressed, eq_inst) = winner_dat
                 phon_WM_output.extend(phon_form)
                 sem_WM_output['nodes'].extend(expressed['nodes'])
                 sem_WM_output['edges'].extend(expressed['edges'])
@@ -1090,12 +1097,13 @@ class GRAMMATICAL_WM_P(WM):
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
                 self.post_prod_state(winner_assemblage)
                 
-                if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblage then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED!
-                    for assemblage in assemblages:
-                        assemblage.update_activation()
-                    winner_assemblage = self.get_winner_assemblage(assemblages, sem_input, phon_input)
+                for assemblage in assemblages:
+                    assemblage.update_activation()
+                    
+                if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblage then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED
+                    winner_dat, score = self.get_winner_assemblage(assemblages, sem_input, phon_input)
                 else:
-                    winner_assemblage = None
+                    winner_dat = None
             
             if winner_found:
                 return {'phon_WM_output':phon_WM_output, 'sem_WM_output':sem_WM_output, 'to_output':data}
@@ -1106,13 +1114,16 @@ class GRAMMATICAL_WM_P(WM):
 
     def get_winner_assemblage(self, assemblages, sem_input, phon_input):
         """
-        Returns the winner assemblages and their equivalent instances.
+        Returns the winner assemblage and its equivalent instances.
         
         Args: 
             - assemblages ([ASSEMBLAGE])
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
             - phon_input ([STR]): Sequence of phon content. Used to compute continuity score
         
+        Return:
+            - (assemblage_dat, score) if a winner if found, None otherwise.
+            
         Notes:
             - Need to discuss the criteria that come into play in choosing the winner assemblages.
             - As for the SemRep covered weight, the constructions should receive activation from the SemRep instances. 
@@ -1125,13 +1136,15 @@ class GRAMMATICAL_WM_P(WM):
         w2 = self.params['style']['sem_length'] # SemRep covered weight
         w3 = self.params['style']['form_length'] # SynForm length weight  
         w4 = self.params['style']['continuity'] # Utterance continuity weight  
-        winner = None
+        winner_dat = None
         scores = {'sem_length':[], 'form_length':[], 'utterance_continuity': [], 'continuity': [], 'eq_insts':[]}
             
         # Computing the equivalent instance for each assemblage.
         # For each assemblage stores the values of relevant scores.
+        assemblages_dat = [] 
         for assemblage in assemblages:
-            (phon_form, missing_info, expressed, eq_inst) = self.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage.                
+            (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage. 
+            assemblages_dat.append((assemblage, phon_form, missing_info, expressed, eq_inst))               
             sem_length_nodes = len([sf_node for sf_node, semrep_node in eq_inst.covers['nodes'].iteritems() if (semrep_node in sem_input['nodes'])]) # Only counts nodes that have NOT already been expressed.
             sem_length_edges = len([sf_edge for sf_edge, semrep_edge in eq_inst.covers['edges'].iteritems() if semrep_edge in sem_input['edges']]) # Only counts edges that have NOT already been expressed. 
 
@@ -1151,9 +1164,9 @@ class GRAMMATICAL_WM_P(WM):
         max_sem_length = max(scores['sem_length'])
         max_form_length = max(scores['form_length'])
         max_continuity = max(scores['continuity'])
-        
         if max_sem_length==0: # Doesn't return anything if the assemblage doesn't cover unexpressed info.
-            return None
+            output = (None, None)
+            return output
         else:
             scores['sem_length'] = [s/max_sem_length for s in scores['sem_length']]
         
@@ -1167,18 +1180,22 @@ class GRAMMATICAL_WM_P(WM):
         else:
             scores['continuity'] = [s/max_continuity for s in scores['continuity']]
         
-        max_score = None
+        # Finding winner assemblage
+        winner_score = None
+        
         for i in range(len(assemblages)):
-            score = w1*assemblages[i].activation + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i]
-            assemblages[i].score = score
-            if not(max_score):
-                max_score = score
-                winner = assemblages[i]
-            if score>max_score:
-                max_score = score
-                winner = assemblages[i]
-                
-        return winner
+            score = w1*assemblages[i].activation + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i] # Scoring assemblage
+            has_form = scores['form_length'][i] != 0
+            if has_form: # An assembalge is considered only if it has a form to produce.
+                if not(winner_score):
+                    winner_score = score
+                    winner_dat = assemblages_dat[i]
+                if score>winner_score:
+                    winner_score = score
+                    winner_dat = assemblages_dat[i]
+            
+        output = (winner_dat, winner_score)
+        return output
  
 #    def replace_assemblage(self, assemblage):
 #        """
@@ -1676,7 +1693,6 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             for e in SemRep.edges_iter():
                 d = SemRep.get_edge_data(e[0], e[1])
                 d['new'] = False
-        
         self.cxn_instances = []
     
     def instantiate_cxns(self, SemRep, cxn_schemas, WK=None):
@@ -2554,11 +2570,12 @@ class CONTROL(SYSTEM_SCHEMA):
         data['state'] = self.state
         return data
         
-#########################
-##### EXTRA CLASSES #####
-#########################         
+###############################
+##### INPUT-OUPUT CLASSES #####
+###############################
 class TEXT2SPEECH(object):
     """
+    Simple TTS system.
     """
     def __init__(self, rate_percent=100):
         self.rate_percent = float(rate_percent)/100
@@ -2572,22 +2589,122 @@ class TEXT2SPEECH(object):
             self.engine.say(self.utterance)
             self.engine.runAndWait()
             self.utterance = None
+            
+class ISRF_INTERPRETER(object):
+    """
+    Interprets ISRF expressions.
+    """
+    def __init__(self, conceptLTM):
+        self.conceptLTM = conceptLTM
+        self.name_table = {}
+
+    def reset(self):
+        """
+        Resets the interpeter
+        """
+        self.name_table = {}
+    
+    def prop_interpreter(self, proposition):
+        """
+        For a given proposition defined as a list of terms (STR), 
+        returns the associated set of concept schema instances
+        
+        Args:
+            - propositions ([STR]): An array of ISRF defined terms.
+
+        Notes:
+            - A concept is only interpreted into an instance once. Following interpretations are skipped.
+        """
+        # For reference.
+#        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
+#        cpt_name_pattern = r"[A-Z0-9_]+"
+#        var_name_pattern = r"[a-z0-9]+"
+#        frame_flag_pattern = r"F"
+#        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
+#        cpt_var_flag_pattern = r"\?"
+        
+        # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var, F, act) - act and F optional -  or var1(var2, var3) (and ?CONCEPT(var))
+        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
+        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation does without activation
+        
+        instances = []
+        for term in proposition:  
+            # Case1:
+            match1 = re.search(func_pattern_cpt, term)
+            match2 = re.search(func_pattern_rel, term)
+            if match1:
+                dat = match1.groupdict()
+                cpt_var = dat['cpt_var'] == '?'
+                concept = dat['operator']
+                var = dat['var']
+                if self.name_table.has_key(var): # Do not reinterpret a schema inst that has already been interpreted.
+                    cpt_inst = self.name_table[var]
+                    instances.append(cpt_inst)
+                    continue
+                cpt_schema = self.conceptLTM.find_schema(name=concept)
+                cpt_frame = dat.get('frame', None)
+                cpt_act = dat.get('act', None)
+                    
+                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
+                cpt_inst.trace['per_inst'] = cpt_inst.name # Trick to facilitate bypassing visualWM when necessary.
+                if cpt_frame:
+                    cpt_inst.frame = True
+                if cpt_act:
+                    cpt_inst.set_activation(float(cpt_act))
+                if cpt_var:
+                    cpt_inst.unbound = True
+                self.name_table[var] = cpt_inst
+                instances.append(cpt_inst)
+            
+            elif match2:
+                dat = match2.groupdict()
+                rel = dat['operator']
+                arg1 = dat['var1']
+                arg2 = dat['var2']
+                if not((rel in self.name_table) and (arg1 in self.name_table) and (arg2 in self.name_table)):
+                    print "ERROR: variable used before it is defined."
+                else:
+                    rel_inst = self.name_table[rel]
+                    rel_inst.content['pFrom'] = self.name_table[arg1]
+                    rel_inst.content['pTo'] = self.name_table[arg2]
+            else:
+                print "ERROR, unknown formula"
+                print term
+                    
+        return instances
+    
+    def get_instance(self, var_name):
+        """
+        Returns the instance associated with the variable name var_name.
+        """
+        return self.name_table[var_name]
+    
 
 class SEM_GENERATOR(object):
     """
+    Serves to generate incremental semantic inputs to the SemanticWM as defined by ISRF format.
+    
+    Data:
+        - sem_inputs (DICT): Dictionary of all inputs in text form
+        - conceptLTM (CONCEPT_LTM): Direct access to the conceptual long term memory
+        - speed_param (FLOAT): speed_param >0. Factor applied to the timing of the input to slow it down (<1) or speed it up (>1).
+        - is_macro (BOOL): True if the input is a sem_gen macro.
+        - ground_truths (DICT): Dictionary associating sem_inputs to an array of utterances each providing a ground-truth linguistic expression of the semantic content.
+    
     Notes: 
         - Does not allow for verbal guidance. Designed for purely serial update of semanticWM state.
     """
-    def __init__(self, sem_inputs, conceptLTM, speed_param=1, is_macro=False, ground_truths = None):
+    def __init__(self, sem_inputs, conceptLTM, speed_param=1, is_macro=False, ground_truths=None):
         """
         Args:
-            - sem_input: a semantic input dict loaded using TCG_LOADER.load_sem_input()
+            - sem_inputs: a semantic input dict loaded using TCG_LOADER.load_sem_input()
             - conceptLTM (CONCEPT_LTM): Contains concept schemas.
-            - speed_param (FLOAT): speed_param >0. Factor applied to the  timing of the input.
+            - speed_param (FLOAT): speed_param >0. Factor applied to the timing of the input.
             - is_macro (BOOL): True if the input is a sem_gen macro.
+            - ground_truths (DICT): Dictionary associating sem_inputs to an array of utterances each providing a ground-truth linguistic expression of the semantic content.
         """ 
         self.sem_inputs = sem_inputs
-        self.conceptLTM = conceptLTM
+        self.interpreter = ISRF_INTERPRETER(conceptLTM)
         self.speed_param = speed_param
         self.is_macro = is_macro
         self.ground_truths = ground_truths
@@ -2595,6 +2712,7 @@ class SEM_GENERATOR(object):
     
     def preprocess_inputs(self):
         """
+        Adds timing sequence for the based on input rate if only sem_rate has been provided.
         """
         for name, sem_input in self.sem_inputs.iteritems():
             sem_rate = float(sem_input['sem_rate'])*self.speed_param
@@ -2618,6 +2736,9 @@ class SEM_GENERATOR(object):
     def show_input(self, input_name):
         """
         Show the content of input "input_name".
+        
+        Args:
+            - input_name (STR): name of the sem_input to show
         """
         sem_input = self.sem_inputs.get(input_name, None)
         if sem_input:
@@ -2626,7 +2747,7 @@ class SEM_GENERATOR(object):
             timing = sem_input['timing']
             for i in range(len(sequence)):
                 print 't: %.1f, prop: %s' %(timing[i], ' , '.join(propositions[sequence[i]]))
-            
+                               
     def sem_generator(self, input_name, verbose=False):
         """
         Creates a generator based on a semantic_data loaded by TCG_LOADER.load_sem_input().
@@ -2635,18 +2756,10 @@ class SEM_GENERATOR(object):
         Args:
             - input_name (STR): name of the sem_input to be loaded in the generator.
             - verbose (BOOL): Flag
+        
+        Yields:
+            - next_input ([INST], INT, STR): array of concept instances, the next time at which the generator should be called, the proposition in text format.
         """
-        # For reference.
-#        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
-#        cpt_pattern = r"[A-Z0-9_]+"
-#        var_pattern = r"[a-z0-9]+"
-#        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
-#        cpt_var_pattern = r"\?[A-Z0-9_]+"
-        
-        # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var) or var1(var2, var3) (and ?CONCEPT(var))
-        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
-        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation does without activation
-        
         sem_input = self.sem_inputs[input_name]
         propositions = sem_input['propositions']
         sequence = sem_input['sequence']
@@ -2655,50 +2768,12 @@ class SEM_GENERATOR(object):
         next_timing = timing[0]
         yield ([], next_timing, '')
             
-        name_table = {}
         for idx in range(len(sequence)):          
-            instances = []
             prop_name = sequence[idx]
-            prop_list = propositions[prop_name]
+            proposition = propositions[prop_name]
             if verbose:
-                print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(propositions[sequence[idx]]))
-            for prop in prop_list:  
-                # Case1:
-                match1 = re.search(func_pattern_cpt, prop)
-                match2 = re.search(func_pattern_rel, prop)
-                if match1:
-                    dat = match1.groupdict()
-                    cpt_var = dat['cpt_var'] == '?'
-                    concept = dat['operator']
-                    var = dat['var']                        
-                    cpt_schema = self.conceptLTM.find_schema(name=concept)
-                    cpt_frame = dat.get('frame', None)
-                    cpt_act = dat.get('act', None)
-                        
-                    cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
-                    if cpt_frame:
-                        cpt_inst.frame = True
-                    if cpt_act:
-                        cpt_inst.set_activation(float(cpt_act))
-                    if cpt_var:
-                        cpt_inst.unbound = True
-                    name_table[var] = cpt_inst
-                    instances.append(cpt_inst)
-                
-                elif match2:
-                    dat = match2.groupdict()
-                    rel = dat['operator']
-                    arg1 = dat['var1']
-                    arg2 = dat['var2']
-                    if not((rel in name_table) and (arg1 in name_table) and (arg2 in name_table)):
-                        print "ERROR: variable used before it is defined."
-                    else:
-                        rel_inst = name_table[rel]
-                        rel_inst.content['pFrom'] = name_table[arg1]
-                        rel_inst.content['pTo'] = name_table[arg2]
-                else:
-                    print "ERROR, unknown formula"
-                    print prop
+                print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(proposition))
+            instances = self.interpreter.prop_interpreter(proposition)
             
             next_idx = idx + 1       
             if next_idx<len(timing):
@@ -2706,7 +2781,9 @@ class SEM_GENERATOR(object):
             else:
                 next_time = None
             
-            yield (instances, next_time, ' , '.join(prop_list))
+            yield (instances, next_time, ' , '.join(proposition))
+        
+        self.interpreter.reset()
     
     def save(self, file_name, file_path):
         """
@@ -2765,6 +2842,9 @@ class UTTER_GENERATOR(object):
         Eeach time next() function is called, returns a word-form (STRING) as well as the next time at which the generator should be called.
         Args:
             - ling_input: a linguistic input dict loaded using load_ling_input()
+        
+        Yields:
+            - next_input (STR, INT): word form input and the next time at which the generator should be called.
         """        
         ling_input = self.ling_inputs[input_name]
         utterance = ling_input['utterance']

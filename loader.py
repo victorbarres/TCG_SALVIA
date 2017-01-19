@@ -9,7 +9,7 @@ TCG data loader module
     Loader for world knowledge, grammar, and scenes.
     
     To load conceptual knowledge use load_conceptual_knowledge method (returns a conceptual_knowledge)
-    To load perceptual knowledge use load_perceptual_knowledge fmethod (returns a perceptual_knowledge)
+    To load perceptual knowledge use load_perceptual_knowledge method (returns a perceptual_knowledge)
     To load conceptualization use load_conceptualization method (returns a conceptualization)
     To load grammar use load_grammar method (returns a grammar)
     To load visual scene use load_scene method (returns a scene)
@@ -20,10 +20,14 @@ from __future__ import division
 import json
 import re
 
-import concept as cpt
-import percept as per
-import construction as cxn
-import saliency_matlab as smat
+
+import scene as SCN
+import concept as CPT
+import percept as PER
+import construction as CXN
+import perceptual_schemas as PER_SCHEMAS
+import language_schemas  as ls
+import saliency_matlab as SMAT
 
 class TCG_LOADER(object):
 
@@ -62,11 +66,11 @@ class TCG_LOADER(object):
             # Create new concept entity
             sub_cpt = cpt_knowledge.find_meaning(concept)
             if not(sub_cpt):
-                sub_cpt = cpt.CONCEPT(name=concept, meaning=concept)
+                sub_cpt = CPT.CONCEPT(name=concept, meaning=concept)
                 cpt_knowledge.add_ent(sub_cpt)
     
             # Create new concept relation
-            new_semrel = cpt.SEM_REL(aType=atype, from_cpt=sub_cpt, to_cpt=sup_cpt)
+            new_semrel = CPT.SEM_REL(aType=atype, from_cpt=sub_cpt, to_cpt=sup_cpt)
             
             # update sem_net
             flag = cpt_knowledge.add_relation(new_semrel)
@@ -86,11 +90,11 @@ class TCG_LOADER(object):
         
         for percept in per_data:
             # Create new percept entity
-            sub_per = per.PERCEPT_CAT(name=percept, meaning=percept)
+            sub_per = PER.PERCEPT_CAT(name=percept, meaning=percept)
             per_knowledge.add_ent(sub_per)
     
             # Create new percept relation
-            new_semrel = per.SEM_REL(aType=atype, from_per=sub_per, to_per=sup_per)
+            new_semrel = PER.SEM_REL(aType=atype, from_per=sub_per, to_per=sup_per)
             
             # update sem_net
             flag = per_knowledge.add_relation(new_semrel)
@@ -99,10 +103,10 @@ class TCG_LOADER(object):
             
             if(isinstance(per_data[percept], list)):
                 for token in per_data[percept]:
-                    tok_per = per.PERCEPT_TOKEN(name=token, meaning=token)
+                    tok_per = PER.PERCEPT_TOKEN(name=token, meaning=token)
                     per_knowledge.add_ent(tok_per)
                      # Create new percept relation
-                    new_semrel = per.SEM_REL(aType='is_token', from_per=tok_per, to_per=sub_per)
+                    new_semrel = PER.SEM_REL(aType='is_token', from_per=tok_per, to_per=sub_per)
                     # update sem_net
                     flag = per_knowledge.add_relation(new_semrel)
                     if not(flag):
@@ -124,7 +128,7 @@ class TCG_LOADER(object):
         """
         """
         # Create new node
-        new_node = cxn.TP_NODE()
+        new_node = CXN.TP_NODE()
         name = aNode['name']
         new_node.name = '%s_%i' %(name, new_node.id)
         
@@ -147,7 +151,7 @@ class TCG_LOADER(object):
         """
         """    
         # Create new relation
-        new_rel = cxn.TP_REL()
+        new_rel = CXN.TP_REL()
         name = aRel['name']
         new_rel.name = '%s_%i' %(name, new_rel.id)
         
@@ -173,7 +177,7 @@ class TCG_LOADER(object):
     def read_slot(new_cxn, aSlot, name_table):
         """
         """
-        new_slot = cxn.TP_SLOT()
+        new_slot = CXN.TP_SLOT()
         name = aSlot['name']
         new_slot.name = '%s_%i' %(name, new_slot.id)
             
@@ -188,7 +192,7 @@ class TCG_LOADER(object):
     def read_phon(new_cxn, aPhon, name_table): # REWORK THIS? SHOULD I RECONSIDER THE PHON TYPE?
         """
         """
-        new_phon = cxn.TP_PHON()
+        new_phon = CXN.TP_PHON()
         name = aPhon['name']
         new_phon.name = '%s_%i' %(name, new_phon.id)
         new_phon.cxn_phonetics = aPhon['phon']
@@ -250,7 +254,7 @@ class TCG_LOADER(object):
         """
         """
         # Create new cxn  
-        new_cxn = cxn.CXN()
+        new_cxn = CXN.CXN()
         new_cxn.name = aCxn['name']
         new_cxn.clss = aCxn['class']
         if 'preference' in aCxn:
@@ -281,11 +285,11 @@ class TCG_LOADER(object):
     
     #def read_sc_obj(new_rgn, aObj, name_table):
     #    # Create new object
-    #    new_obj = scn.SC_OBJECT()
+    #    new_obj = SCN.SC_OBJECT()
     #    new_obj.name = aObj['name']
     #    new_obj.region = new_rgn
     #    
-    #    new_concept = cpt.CONCEPT()
+    #    new_concept = CPT.CONCEPT()
     #    new_concept.create(meaning = aObj['concept'])
     #    new_obj.concept = new_concept
     #    
@@ -298,11 +302,11 @@ class TCG_LOADER(object):
     #    
     #def read_sc_rel(new_rgn, aRel, name_table):
     #    # Create new object
-    #    new_rel = scn.SC_REL()
+    #    new_rel = SCN.SC_REL()
     #    new_rel.name = aRel['name']
     #    new_rel.region = new_rgn
     #    
-    #    new_concept = cpt.CONCEPT()
+    #    new_concept = CPT.CONCEPT()
     #    new_concept.create(meaning = aRel['concept'])
     #    new_rel.concept = new_concept
     #        
@@ -317,7 +321,7 @@ class TCG_LOADER(object):
     #def read_percept(new_rgn, perceive, name_table):
     #    for schema_name in perceive:
     #         # Create new percept
-    #        new_per = scn.PERCEPT()
+    #        new_per = SCN.PERCEPT()
     #        # Update region and name table
     #        new_rgn.percepts.append(new_per)
     #        name_table['percepts'][new_per] = schema_name
@@ -330,17 +334,17 @@ class TCG_LOADER(object):
     #def read_update(new_rgn, updates, name_table):
     #    for sc_name, new_meaning in updates.iteritems():
     #        # Create new percept
-    #        new_per = scn.PERCEPT()
-    #        new_concept = cpt.CONCEPT(meaning = new_meaning)
-    #        new_per.concept = new_concept
-    #        new_per.replace_concept = True
+    #        new_per = SCN.PERCEPT()
+    #        new_concept = CPT.CONCEPT(meaning = new_meaning)
+    #        new_PER.concept = new_concept
+    #        new_PER.replace_concept = True
     #        # Update region name table
     #        new_rgn.percepts.append(new_per)
     #        name_table['percepts'][new_per] = sc_name
     #            
     #def read_region(scene, aRgn, name_table):
     #    # Create new region
-    #    new_rgn = scn.REGION()
+    #    new_rgn = SCN.REGION()
     #    new_rgn.name = aRgn['name']
     #    
     #    new_rgn.x = aRgn['location'][0]
@@ -389,10 +393,10 @@ class TCG_LOADER(object):
         cpt_data = json_data['CONCEPTUAL_KNOWLEDGE']
         
         # Create conceptual knowledge object
-        my_conceptual_knowledge = cpt.CONCEPTUAL_KNOWLEDGE()
+        my_conceptual_knowledge = CPT.CONCEPTUAL_KNOWLEDGE()
         
         top = 'CONCEPT'
-        top_cpt = cpt.CONCEPT(name=top, meaning=top)
+        top_cpt = CPT.CONCEPT(name=top, meaning=top)
         my_conceptual_knowledge.add_ent(top_cpt)
         
         flag = TCG_LOADER.read_concept("is_a", top_cpt, my_conceptual_knowledge, cpt_data)
@@ -413,10 +417,10 @@ class TCG_LOADER(object):
         per_data = json_data['PERCEPTUAL_KNOWLEDGE']
         
         # Create peceptual_knowledge object
-        my_perceptual_knowledge = per.PERCEPTUAL_KNOWLEDGE()
+        my_perceptual_knowledge = PER.PERCEPTUAL_KNOWLEDGE()
         
         top = 'PERCEPT'
-        top_per = per.PERCEPT_CAT(name=top, meaning=top)
+        top_per = PER.PERCEPT_CAT(name=top, meaning=top)
         my_perceptual_knowledge.add_ent(top_per)
         
         flag = TCG_LOADER.read_percept('is_a', top_per, my_perceptual_knowledge, per_data)
@@ -434,7 +438,7 @@ class TCG_LOADER(object):
         #Open and read file
         json_data = TCG_LOADER.json_read(file_name, path=file_path)
         czer_data = json_data['CONCEPTUALIZATION']
-        my_conceptualization = per.CONCEPTUALIZATION()
+        my_conceptualization = PER.CONCEPTUALIZATION()
         for cpt in czer_data:
             if not(cpt_knowledge.has_concept(cpt)):
                 print "%s: concept not found in sem_net" %cpt
@@ -458,7 +462,7 @@ class TCG_LOADER(object):
         gram_data = json_data['grammar']
         
         # Create grammar object
-        my_grammar = cxn.GRAMMAR()
+        my_grammar = CXN.GRAMMAR()
         
         for aCxn in gram_data:
             TCG_LOADER.read_cxn(my_grammar, aCxn, cpt_knowledge)
@@ -466,23 +470,116 @@ class TCG_LOADER(object):
         return my_grammar
     
     @staticmethod               
-    def load_scene(file_name = '', file_path = './'):
+    def load_scene(file_name = '', file_path = './', percept_LTM = None):
         """
-        Loads and returns a DICT containing the visual scene data defined in file_path\file_name. Return None if error.
-        
-        Note: Might want to check that the perceptual schemas are indeed defined in perceptual knowledge.
+        Loads and returns a SCENE containing the visual scene data defined in file_path\file_name.
+        Args:
+            - file_name (STR)
+            - file_path (STR)
+            - percept_LTM (PERCEPT_LTM):
         """
         # Open and read file
         json_data = TCG_LOADER.json_read(file_name, path = file_path)
-        my_scene = json_data['scene']
+        scene_input = json_data['scene']
+        
+        # Get perceptual schemas
+        per_schemas = percept_LTM.schemas
+        
+        # Build scene
+        my_scene = SCN.SCENE()
+        my_scene.width = scene_input['resolution'][0]
+        my_scene.height = scene_input['resolution'][1]
+            
+        name_table = {}
+        for i in  [s for s in scene_input['schemas'].keys() if scene_input['schemas'][s]['type'] != 'RELATION']: # First instantiate all the schemas that are not relations.
+            dat = scene_input['schemas'][i]
+            schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
+            inst = PER_SCHEMAS.PERCEPT_SCHEMA_INST(schema, trace=schema)
+            area = PER_SCHEMAS.AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1])
+            area.set_BU_saliency(BU_saliency_map=None) # THIS NEEDS TO BE CHANGED (for now random)    
+            inst.set_area(area)
+            if dat['saliency'] == 'auto':
+                inst.set_saliency(area.saliency)  # Does this make any sense at all??
+            else:
+                inst.set_saliency(dat['saliency'])
+            inst.content['uncertainty'] = int(dat['uncertainty'])
+            name_table[dat['name']] = inst
+        
+        for i in  [s for s in scene_input['schemas'].keys() if scene_input['schemas'][s]['type'] == 'RELATION']: # Now dealing with relations
+            dat = scene_input['schemas'][i]
+            schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
+            inst = PER_SCHEMAS.PERCEPT_SCHEMA_INST(schema, trace=schema)
+            inst.content['pFrom'] = name_table[dat['from']]
+            inst.content['pTo'] = name_table[dat['to']]
+            area = PER_SCHEMAS.AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1]) # This means that the area is gonna be of size 0
+            area.set_BU_saliency(BU_saliency_map=None) # THIS NEEDS TO BE CHANGED (for now random)            
+            inst.set_area(area)
+            if dat['saliency'] == 'auto':
+                inst.set_saliency(area.saliency) # Does this make any sense at all?? 
+            else:
+                inst.set_saliency(dat['saliency'])
+            inst.content['uncertainty'] = int(dat['uncertainty'])
+            name_table[dat['name']] = inst
+        
+        # Build subscenes
+        for ss in scene_input['subscenes'].keys():
+            dat = scene_input['subscenes'][ss]
+            subscene = SCN.SUB_SCENE(name = dat['name'])
+            for schema in dat['schemas']:
+                subscene.add_per_schema(name_table[schema])
+            
+            if dat['saliency'] != 'auto':
+                subscene.saliency = float(dat['saliency'])
+            
+            if dat['uncertainty'] != 'auto':
+                subscene.uncertainty = int(dat['uncertainty'])
+            
+            my_scene.add_subscene(subscene)
+        
         return my_scene
+    
+    @staticmethod               
+    def load_scene_light(file_name = '', file_path = './', scene_name = '', concept_LTM = None):
+        """
+        Loads and returns a SCENE_LIGHT containing the scene_input data defined in file_path\file_name.
+        Args:
+            - file_name (STR)
+            - file_path (STR)
+            - scene_name (STR)
+            - concept_LTM (CONCEPT_LTM):
+        """
+        
+        # Open and read file
+        json_data = TCG_LOADER.json_read(file_name, path = file_path)
+        scene_dat = json_data['inputs'][scene_name]
+        
+        # Build scene
+        my_scene = SCN.SCENE_LIGHT()
+        subscenes = scene_dat['subscenes']
+        scene_structure = scene_dat['scene_structure']
+        BU_saliency = scene_dat['BU_saliency']
+        BU_saliency.reverse() # For simplicity later!
+
+        # Interpreting subscenes
+        interpreter = ls.ISRF_INTERPRETER(concept_LTM)
+        for ss_name, val in subscenes.iteritems():
+            proposition = val['sem_input']
+            cpt_instances = interpreter.prop_interpreter(proposition)
+            saliency = (BU_saliency.index(ss_name) + 1)/len(BU_saliency) # Saliency is simply defined based on the index in the BU_saliency list (reversed)
+            anchor = interpreter.get_instance(val['anchor'])
+            my_scene.add_subscene(ss_name, cpt_instances, saliency, anchor)
+        
+        my_scene.scene_structure = scene_structure
+        
+        return my_scene
+        
     
     @staticmethod    
     def load_BU_saliency(file_name = '', file_path = './'):
         """
         Loads and returns the saliency data defined in in file_path\file_name.mat Return None if error.
         """
-        saliency_data = smat.SALIENCY_DATA()
+        saliency_data = SMAT.SALIENCY_DATA()
         saliency_data.load(file_path + file_name) # This needs to eb better integrated with the scene data.
         return saliency_data
     

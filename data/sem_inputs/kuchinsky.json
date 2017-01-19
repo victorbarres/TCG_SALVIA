@@ -23,7 +23,22 @@
 				},
 				"sequence" :["ACTION_AREA", "WOMAN_AREA"],
 				"timing":[],
-				"comments":"Transitive action event frame. Then agent 'woman'"
+				"comments":"Transitive action event frame. Then agent 'woman' (lexical competition)"
+			},
+			"substitutions":{
+			}			
+		},
+		
+		"evt_act_man":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+					"WOMAN_AREA":["MAN(man)", "IS(is2)", "is2(e1, man)"]
+				},
+				"sequence" :["ACTION_AREA", "WOMAN_AREA"],
+				"timing":[],
+				"comments":"Transitive action event frame. Then agent 'man' (no lexical competition)"
 			},
 			"substitutions":{
 			}			
