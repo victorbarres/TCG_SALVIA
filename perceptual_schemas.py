@@ -768,6 +768,10 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
         - uncertainty (INT): Remaining uncertainy in subscene perception.
         - next_saccade (BOOL): True ->  Triggers next saccade when the perception of the subscene is done. Else False.
         - focus (STR): Current subscene defining the focus. None -> no specific focus.
+        
+    Notes:
+        - For now, given the simplicity of the defininion of focus, I am not making use of the scene structure.
+        - But strategies of exploration could be also implemented.
     """
     def __init__(self, name='Scene_perception', verbose=1):
         SYSTEM_SCHEMA.__init__(self, name)
@@ -813,6 +817,7 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
                 output['saliency'] = saliency
                 output['focus'] = self.focus
                 if self.verbose > 0:
+                    print 't: %i, chaning gaze focus' % self.t
                     print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene, saliency)
                 self.uncertainty = self.params['recognition_time']
                 output['uncertainty'] = self.uncertainty
@@ -823,8 +828,6 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
             if self.uncertainty <0:
                 self.next_saccade = True
                 output['next_saccade'] = self.t
-                if self.verbose >0:
-                    print 't: %i, trigger next saccade' % self.t
                 sem_inputs = self.scene.get_content(self.subscene)
                 self.outputs['to_semantic_WM'] = sem_inputs
                 self.scene.update_saliency(self.subscene, -1)
@@ -857,23 +860,19 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
     
     def in_focus(self):
         """
-        Returns the set of subscenes that are currently in focus.
-        A subscene is in focus if it is a daughter of the focus subscene.
-        If the focus area is not defined, all the subscenes are in focus.
-        If there are no sub_scene to return within the focus area, all the subscenes are in focus and reset focus to None.
+        Simplified version of the focus.
+        If no focus: returns all subscenes
+        else returns only the subscene in focus.
+        I am NOT making use of the scene structure.
         """
-        in_focus_ss = []
         candidates = [ss for ss in self.scene.subscenes]
-        
         if self.focus:
-            in_focus_ss = self.scene.find_daughters(self.focus)
-            if not(in_focus_ss): # No subscene in focus
-                self.focus_area = None
-        
-        if not(self.focus):
+            in_focus_ss = [self.focus]
+            self.focus = None
+        else:
             in_focus_ss = candidates
         
-        return in_focus_ss
+        return in_focus_ss 
     
     def TD_guidance(self):
         """
@@ -883,6 +882,7 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
             if self.verbose >0:
                 print "t:%i, requesting more information about %s." %(self.t, cpt_schema_inst_name)
             self.focus = self.scene.find_subscene(cpt_schema_inst_name) # Modify focus area
+            
             if self.verbose>0 and self.focus:
                 print "t:%i, TD focus orientation to %s" %(self.t, self.focus)
             
