@@ -642,4 +642,4 @@ if __name__=='__main__':
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
-    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_kick_man_dyn", sem_input_file='benchmark.json', sem_input_macro=True, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=4, save=True)
+    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="act_kick_woman_man", sem_input_file='kuchinsky.json', sem_input_macro=True, max_time=900, seed=None, speed_param=40, prob_times=[], verbose=4, save=True)

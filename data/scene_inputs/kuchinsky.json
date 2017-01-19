@@ -2,8 +2,8 @@
 	"inputs":{		
 		"act_kick_woman_man":{
 			"subscenes":{
-				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"], "anchor":"evt1"},
-				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"a1"},
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
 				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
 				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"}
 			},
@@ -11,7 +11,7 @@
 				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
 				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"]
 			},
-			"BU_saliency":["WOMAN_AREA", "ACTION_AREA", "KICK_AREA", "MAN_AREA"],
+			"BU_saliency":["WOMAN_AREA", "ACTION_AREA", "MAN_AREA", "KICK_AREA"],
 			"comments":"test"
 		},
 		

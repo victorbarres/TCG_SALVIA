@@ -1068,6 +1068,9 @@ class GRAMMATICAL_WM_P(WM):
             phon_WM_output = []
             sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
             winner_dat, score = self.get_winner_assemblage(assemblages, sem_input, phon_input)
+            if winner_dat:
+                self.set_winners(winner_dat[0])
+                
 
             while winner_dat and score >= score_threshold:
                 winner_found = True

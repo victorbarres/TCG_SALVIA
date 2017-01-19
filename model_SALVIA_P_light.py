@@ -119,8 +119,8 @@ def run_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_NAME = "act_man"
-    SPEED_PARAM = 100
+    DIAGNOSTIC_NAME = "act_kick_woman_man"
+    SPEED_PARAM = 70
     MODEL_PARAMS = {'Scene_perception.recognition_time':SPEED_PARAM, 
                     'Control.task.start_produce':0.0, 
                     'Control.task.time_pressure':10, 
