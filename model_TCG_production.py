@@ -284,9 +284,16 @@ def run_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'diagnostic_kuchinksy.json'
-    SPEED_PARAM = 600
-    MODEL_PARAMS = {'Control.task.start_produce':0.0, 'Control.task.time_pressure':1000, 'Grammatical_WM_P.dyn.ext_weight':1.0, 'Grammatical_WM_P.C2.prune_threshold': 0.01, 'Grammatical_WM_P.C2.coop_weight':1.0, 'Grammatical_WM_P.C2.comp_weight':-10.0, 'Grammatical_WM_P.C2.coop_asymmetry':1.0}
+    DIAGNOSTIC_FILE = 'diagnostic.json'
+    SEM_MACRO = False
+    SPEED_PARAM = 100
+    MODEL_PARAMS = {'Control.task.start_produce':0.0, 
+                    'Control.task.time_pressure':400, 
+                    'Grammatical_WM_P.dyn.ext_weight':1.0, 
+                    'Grammatical_WM_P.C2.prune_threshold': 0.01, 
+                    'Grammatical_WM_P.C2.coop_weight':1.0, 
+                    'Grammatical_WM_P.C2.comp_weight':-10.0, 
+                    'Grammatical_WM_P.C2.coop_asymmetry':1.0}
     
     # Attempts to model lesion
 #    MODEL_PARAMS['Grammatical_WM_P.C2.coop_weight']=0.1 # Reduce cooperation weights
@@ -298,12 +305,12 @@ def run_diagnostics(verbose=2, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time =3000
+    max_time =1000
     seed=None
     ###    
     
-    model = set_model(semantics_name, grammar_name, model_params=MODEL_PARAMS)
-    my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro = False, speed_param=SPEED_PARAM)
+    model = set_model(semantics_name, grammar_name, model_params = MODEL_PARAMS)
+    my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro=SEM_MACRO, speed_param=SPEED_PARAM)
     
     input_names = my_inputs.sem_inputs.keys()
     diagnostic_list = dict(zip(range(len(input_names)), input_names))
@@ -638,8 +645,8 @@ def tell_me(utterance):
     TTS.utter()
     
 if __name__=='__main__':
-#    run_diagnostics(verbose=3, prob_times=[])
+    run_diagnostics(verbose=3, prob_times=[])
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
-    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="act_kick_woman_man", sem_input_file='kuchinsky.json', sem_input_macro=True, max_time=900, seed=None, speed_param=40, prob_times=[], verbose=4, save=True)
+#    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="act_kick_woman_man", sem_input_file='kuchinsky.json', sem_input_macro=True, max_time=900, seed=None, speed_param=40, prob_times=[], verbose=4, save=True)

@@ -722,7 +722,8 @@ class GRAMMATICAL_WM_P(WM):
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
-    
+        self.refractory_period = 10
+        self.time_to_next_prod = 0
     #####################
     ### STATE UPDATE  ###
     #####################   
@@ -747,13 +748,18 @@ class GRAMMATICAL_WM_P(WM):
             self.params['style'] = ctrl_input['params_style']
             try_produce = self.apply_pressure(ctrl_input['pressure'], option=1)
             if try_produce:
-                output = self.produce_form(sem_input, phon_input)
-                if output:
-                    self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
-                    self.outputs['to_semantic_WM'] =  output['sem_WM_output']
-                    self.outputs['to_output'] = output['to_output']
+                if self.time_to_next_prod<=0:
+                    output = self.produce_form(sem_input, phon_input)
+                    self.time_to_next_prod = self.refractory_period
+                
+                    if output:
+                        self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
+                        self.outputs['to_semantic_WM'] =  output['sem_WM_output']
+                        self.outputs['to_output'] = output['to_output']
+                    else:
+                        self.outputs['to_phonological_WM_P'] = []
                 else:
-                    self.outputs['to_phonological_WM_P'] = []
+                    self.time_to_next_prod -= 1
     
     def add_new_insts(self, new_insts):
         """
@@ -1057,8 +1063,8 @@ class GRAMMATICAL_WM_P(WM):
             - Might want to revisit assemble.
             - Need to think about whether or not read-out means terminating all the competitions.
             Make sure to revisit all the different options below.
-        """        
-        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
+        """  
+#        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
 
 #        self.end_competitions() #When production is triggered, a decision is forced for all the competitions.
         assemblages = self.assemble()
@@ -1068,11 +1074,11 @@ class GRAMMATICAL_WM_P(WM):
             phon_WM_output = []
             sem_WM_output = {'nodes':[], 'edges':[], 'missing_info':None}
             winner_dat, score = self.get_winner_assemblage(assemblages, sem_input, phon_input)
-            if winner_dat:
+            if winner_dat: # LOOK INTO THIS!!! THIS IS AN IMPORTANT STEP
                 self.set_winners(winner_dat[0])
                 
-
-            while winner_dat and score >= score_threshold:
+            
+#            while winner_dat and score >= score_threshold: # REMOVED RECURSIVITY. Only one connected subgraph of SemRep can be epxressed at the time.
                 winner_found = True
                 (winner_assemblage, phon_form, missing_info, expressed, eq_inst) = winner_dat
                 phon_WM_output.extend(phon_form)
@@ -1094,19 +1100,22 @@ class GRAMMATICAL_WM_P(WM):
                  # Option3: Removes coop links + adds the equivalent instance.
 #                self.dismantle_assemblage2(winner_assemblage)
                 
-                # Option4: Keeps all the coop_links but bumps down the activation values of all the isntances that are part of the winner assemblage.
+                # Option4: Keeps all the coop_links but bumps down the activation values of all the instances that are part of the winner assemblage.
 #                self.reset_assemblage(winner_assemblage)
                 
-                #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
-                self.post_prod_state(winner_assemblage)
+#                #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
+#                self.post_prod_state(winner_assemblage)
                 
-                for assemblage in assemblages:
-                    assemblage.update_activation()
-                    
-                if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblage then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED
-                    winner_dat, score = self.get_winner_assemblage(assemblages, sem_input, phon_input)
-                else:
-                    winner_dat = None
+                #Option6: Sets all the coop_weights to 0. So f-link remains but inst participating in assemblage decay unless they are reused.
+#                self.deactivate_coop_weigts()
+                
+#                for assemblage in assemblages:
+#                    assemblage.update_activation()
+#                    
+#                if assemblages and not(missing_info): # For now I added the caveat that if one read-out an incomplete assemblage then no other assemblage could be read afterwards. THIS SHOULD BE MODIFIED
+#                    winner_dat, score = self.get_winner_assemblage(assemblages, sem_input, phon_input)
+#                else:
+#                    winner_dat = None
             
             if winner_found:
                 return {'phon_WM_output':phon_WM_output, 'sem_WM_output':sem_WM_output, 'to_output':data}
@@ -1184,6 +1193,7 @@ class GRAMMATICAL_WM_P(WM):
             scores['continuity'] = [s/max_continuity for s in scores['continuity']]
         
         # Finding winner assemblage
+#        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
         winner_score = None
         
         for i in range(len(assemblages)):
@@ -1196,7 +1206,8 @@ class GRAMMATICAL_WM_P(WM):
                 if score>winner_score:
                     winner_score = score
                     winner_dat = assemblages_dat[i]
-            
+#        if winner_score < score_threshold:
+#            return (None, None)
         output = (winner_dat, winner_score)
         return output
  
@@ -1321,8 +1332,10 @@ class GRAMMATICAL_WM_P(WM):
         for link in self.comp_links:
             if link.inst_from in winner_insts:
                 link.inst_to.alive = False
+                print "pruning %s" %link.inst_to.name
             if link.inst_to in winner_insts:
                 link.inst_from.alive = False
+                print "pruning %s" %link.inst_from.name
         self.prune()
     
     def apply_pressure(self, pressure, option=0):
