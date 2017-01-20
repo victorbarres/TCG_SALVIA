@@ -305,8 +305,9 @@ def run_diagnostics(verbose=2, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time =1000
+    max_time =2000
     seed=None
+    save = False
     ###    
     
     model = set_model(semantics_name, grammar_name, model_params = MODEL_PARAMS)
@@ -331,7 +332,7 @@ def run_diagnostics(verbose=2, prob_times=[]):
     for input_name in diagnostic_cases:
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
-        res = run(model, my_inputs, input_name, max_time, seed, verbose=verbose, prob_times=prob_times)
+        res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save)
         print "\nRESULTS:\n"
         print res
 

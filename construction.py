@@ -346,15 +346,18 @@ class TP_SYMLINKS(TP_ELEM):
     def form2node(self, form_name):
         """
         Returns the name of node associated with the form name "form_name"
+        Returns None if the node name cannot be found.
         """
         res = [n for n,v in self.SL.iteritems() if v==form_name]
-        return res[0]
-    
+        output = res[0] if len(res) >0 else None 
+        return output
+        
     def node2form(self, node_name):
         """
         Returns the name of the form element associated with the node name "node_name"
+        Returs None if the node_name cannot be found.
         """
-        return self.SL[node_name]
+        return self.SL.get(node_name, None)
         
 ############################    
 ### Construction classes ###

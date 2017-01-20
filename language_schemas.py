@@ -1332,10 +1332,8 @@ class GRAMMATICAL_WM_P(WM):
         for link in self.comp_links:
             if link.inst_from in winner_insts:
                 link.inst_to.alive = False
-                print "pruning %s" %link.inst_to.name
             if link.inst_to in winner_insts:
                 link.inst_from.alive = False
-                print "pruning %s" %link.inst_from.name
         self.prune()
     
     def apply_pressure(self, pressure, option=0):
@@ -1619,16 +1617,24 @@ class GRAMMATICAL_WM_P(WM):
         """
         eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
         expressed = {'nodes':eq_inst.trace['semrep']['nodes'][:], 'edges':eq_inst.trace['semrep']['edges'][:]} # Deep copy
+#        partially_expressed =  {'nodes':[], 'edges':[]}
         phon_form = []
         missing_info = None
         for form in eq_inst.content.SynForm.form:
-            if isinstance(form, construction.TP_PHON):
+            if isinstance(form, construction.TP_PHON): # Deal with lexicalized info
                 phon_form.append(form.cxn_phonetics)
-            else:
+                # Finding SemRep nodes that are tied to this form (THIS IS OK TO DO BECAUSE OF THE STRONG LIMITATION OF SEMREP FORMAT THAT ONLY ALLOWS A FORM TO BE MAPPED ONTO NODES - AND EVEN SINGLE NODES - AND NOT RELATIONS.)
+#                SemFrame_node_name = eq_inst.content.SymLinks.form2node(form.name)
+#                if SemFrame_node_name: # TP_PHON are not necessarily linked to a SemFrame node.
+#                    SemRep_node_name = eq_inst.covers['nodes'][SemFrame_node_name]
+#                    partially_expressed['nodes'].append(SemRep_node_name)
+            else: # find what is the missing info
                 SemFrame_node_name = eq_inst.content.SymLinks.form2node(form.name)
                 SemRep_node_name = eq_inst.covers['nodes'][SemFrame_node_name]
                 missing_info = SemRep_node_name
+#                expressed = partially_expressed # Only considered as expressed the SemRep nodes that mapped onto the partially expressed SemFrame.
                 return (phon_form, missing_info, expressed, eq_inst)
+#            print partially_expressed
             
         return (phon_form, missing_info, expressed, eq_inst)
     
