@@ -40,11 +40,11 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     
     Data:
         - KNOWEDGE SCHEMA data:
-                    - id (int): Unique id
-                    - name (str): schema name
-                    - LTM (LTM): Associated long term memory.
-                    - content (CXN):
-                    - init_act (float): Initial activation value.        
+            - id (int): Unique id
+            - name (str): schema name
+            - LTM (LTM): Associated long term memory.
+            - content (CXN):
+            - init_act (float): Initial activation value.        
     """
     def __init__(self, aCXN, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=aCXN.name, content=aCXN, init_act=init_act)
@@ -1080,7 +1080,7 @@ class GRAMMATICAL_WM_P(WM):
             
 #            while winner_dat and score >= score_threshold: # REMOVED RECURSIVITY. Only one connected subgraph of SemRep can be epxressed at the time.
                 winner_found = True
-                (winner_assemblage, phon_form, missing_info, expressed, eq_inst) = winner_dat
+                (winner_assemblage, phon_form, missing_info, expressed, eq_inst, a2i_map) = winner_dat
                 phon_WM_output.extend(phon_form)
                 sem_WM_output['nodes'].extend(expressed['nodes'])
                 sem_WM_output['edges'].extend(expressed['edges'])
@@ -1089,7 +1089,7 @@ class GRAMMATICAL_WM_P(WM):
                 
                 # Save winner assemblage to state
                 partial_readout = False if missing_info == None else True
-                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0], 'partial_readout':partial_readout})
+                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0], 'a2i_map':a2i_map.copy(), 'partial_readout':partial_readout})
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -1155,8 +1155,8 @@ class GRAMMATICAL_WM_P(WM):
         # For each assemblage stores the values of relevant scores.
         assemblages_dat = [] 
         for assemblage in assemblages:
-            (phon_form, missing_info, expressed, eq_inst) = GRAMMATICAL_WM_P.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage. 
-            assemblages_dat.append((assemblage, phon_form, missing_info, expressed, eq_inst))               
+            (phon_form, missing_info, expressed, eq_inst, a2i_map) = GRAMMATICAL_WM_P.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage. 
+            assemblages_dat.append((assemblage, phon_form, missing_info, expressed, eq_inst, a2i_map))               
             sem_length_nodes = len([sf_node for sf_node, semrep_node in eq_inst.covers['nodes'].iteritems() if (semrep_node in sem_input['nodes'])]) # Only counts nodes that have NOT already been expressed.
             sem_length_edges = len([sf_edge for sf_edge, semrep_edge in eq_inst.covers['edges'].iteritems() if semrep_edge in sem_input['edges']]) # Only counts edges that have NOT already been expressed. 
 
@@ -1459,35 +1459,40 @@ class GRAMMATICAL_WM_P(WM):
     @staticmethod
     def assemblage2inst(assemblage):
         """
-        For a given construction instance assemblage, returns the instance equivalent to the assemblage by Unification.
+        For a given construction instance assemblage, returns 
+            (1) the instance equivalent to the assemblage by Unification.
+            (2) a DICT mapping the name of the TP_ELEM of the assemblage onto the TP_ELEM of the eq_inst.
+            This mapping allows to compute direct relations between the structure of the assemblage and the compact equivalent instance form.
+            The dictionary also provides (for convenience) the names of the TP_ELEM for each instance in the assemblage.
         
         Args:
             - assemblage (ASSEMBLAGE): An construction instance assemblage
         """
         new_assemblage = assemblage.copy()
         coop_links = new_assemblage.coop_links
-
+        a2i_map = {'sem_map':{}, 'syn_map':{}}
         while len(coop_links)>0:
-            new_assemblage = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
+            (new_assemblage, new_cxn_inst, a2i_map) = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0], a2i_map)
             coop_links = new_assemblage.coop_links
         eq_inst = new_assemblage.schema_insts[0]
         eq_inst.activity = new_assemblage.activation
-        return eq_inst
+        return (eq_inst, a2i_map)
       
     @staticmethod      
-    def reduce_assemblage(assemblage, coop_link):
+    def reduce_assemblage(assemblage, coop_link, a2i_map):
         """
         Returns a new, reduced, assemblage in which the instances cooperating (as defined by 'coop_link') have been combined.
         
         Args:
             - assemblage (ASSEMBLAGE): A construction instance assemblage.
             - coop_link (COOP_LINK): A cooperation link belonging to the assemblage.
+            - a2i_map (DICT): assemblage2instance name mapping to be updated
         """
         inst_p = coop_link.inst_to
         inst_c = coop_link.inst_from
         connect = coop_link.connect
         
-        (new_cxn_inst, port_corr) = GRAMMATICAL_WM_P.combine_schemas(inst_p, inst_c, connect)
+        (new_cxn_inst, port_corr, a2i_map) = GRAMMATICAL_WM_P.combine_schemas(inst_p, inst_c, connect, a2i_map)
         
         new_assemblage = ASSEMBLAGE()
         new_assemblage.activation = assemblage.activation
@@ -1515,10 +1520,10 @@ class GRAMMATICAL_WM_P(WM):
                 new_link.connect.port_from = port_corr['out_ports'][coop_link.connect.port_from]
             new_assemblage.add_link(new_link)
         
-        return new_assemblage
+        return (new_assemblage, new_cxn_inst, a2i_map)
     
     @staticmethod
-    def combine_schemas(inst_to, inst_from, connect):
+    def combine_schemas(inst_to, inst_from, connect, a2i_map):
         """
         Returns a new cxn_instance and the mapping between inst_to and inst_from ports to new_cxn_inst ports.
         
@@ -1526,6 +1531,7 @@ class GRAMMATICAL_WM_P(WM):
             - inst_to (CXN_SCHEMA_INST):
             - inst_from (CXN_SCHEMA_INST):
             - connect (CONNECT): A CONNECT object associated with a cooperation link between inst_to and inst_from.
+            - a2i_map (DICT): assemblage2instance name mapping to be updated.
         """
         inst_p = inst_to
         port_p = connect.port_to
@@ -1535,7 +1541,7 @@ class GRAMMATICAL_WM_P(WM):
         inst_c = inst_from
         cxn_c = inst_c.content        
         
-        (new_cxn, c) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
+        (new_cxn, c, u_map) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
         new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
         
         # Define new_cxn trace
@@ -1571,7 +1577,25 @@ class GRAMMATICAL_WM_P(WM):
                     break
         port_corr['out_ports'][inst_p.find_port('output')] = new_cxn_inst.find_port('output')
       
-        return (new_cxn_inst, port_corr)
+        # Update a2i_map
+        for map_type in ['sem_map', 'syn_map']: # There must be a cleaner way to do that! Rethink the data structure used.
+            new = {} 
+            to_remove = []
+            my_map = u_map[map_type]
+            for k,v in a2i_map[map_type].iteritems():
+                new[k] = []
+                for i in v:
+                    if my_map.has_key(i):
+                        new[k].extend(my_map[i])
+                        to_remove.append(i)
+                    else:
+                        new[k].extend([i])
+            for i in to_remove:
+                my_map.pop(i)
+            new.update(my_map)
+            a2i_map[map_type] = new
+        
+        return (new_cxn_inst, port_corr, a2i_map)
             
 #    @staticmethod                
 #    def form_read_out_LR(assemblage):
@@ -1613,30 +1637,56 @@ class GRAMMATICAL_WM_P(WM):
         Returns: (phon_form, missing_info, expressed) with:
             - phon_form = the longest consecutive TP_PHON sequence that can be uttered.
             - missing_info (STR) = Name of the SemRep node associated with the first TP_SLOT encountered, represented the missing information.
-            - expressed = the semrep that the assemblage expresses (nodes and relations) as defined in the instance trace.
+            - expressed = the semrep that the assemblage expresses (nodes and relations) as defined in the trace of the instances that have been used.
         """
-        eq_inst = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
-        expressed = {'nodes':eq_inst.trace['semrep']['nodes'][:], 'edges':eq_inst.trace['semrep']['edges'][:]} # Deep copy
-#        partially_expressed =  {'nodes':[], 'edges':[]}
-        phon_form = []
+        (eq_inst, a2i_map) = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
+            
+        
+        phon_list = []
         missing_info = None
         for form in eq_inst.content.SynForm.form:
             if isinstance(form, construction.TP_PHON): # Deal with lexicalized info
-                phon_form.append(form.cxn_phonetics)
-                # Finding SemRep nodes that are tied to this form (THIS IS OK TO DO BECAUSE OF THE STRONG LIMITATION OF SEMREP FORMAT THAT ONLY ALLOWS A FORM TO BE MAPPED ONTO NODES - AND EVEN SINGLE NODES - AND NOT RELATIONS.)
-#                SemFrame_node_name = eq_inst.content.SymLinks.form2node(form.name)
-#                if SemFrame_node_name: # TP_PHON are not necessarily linked to a SemFrame node.
-#                    SemRep_node_name = eq_inst.covers['nodes'][SemFrame_node_name]
-#                    partially_expressed['nodes'].append(SemRep_node_name)
-            else: # find what is the missing info
+                phon_list.append(form)
+            else: # find what is the missing info and stop
                 SemFrame_node_name = eq_inst.content.SymLinks.form2node(form.name)
                 SemRep_node_name = eq_inst.covers['nodes'][SemFrame_node_name]
                 missing_info = SemRep_node_name
-#                expressed = partially_expressed # Only considered as expressed the SemRep nodes that mapped onto the partially expressed SemFrame.
-                return (phon_form, missing_info, expressed, eq_inst)
-#            print partially_expressed
-            
-        return (phon_form, missing_info, expressed, eq_inst)
+                break
+        
+        phon_form = [phon.cxn_phonetics for phon in phon_list]
+        
+        # Define the semantic content expressed
+        if not(missing_info): # Everything has been expressed.
+            expressed = {'nodes':eq_inst.trace['semrep']['nodes'][:], 'edges':eq_inst.trace['semrep']['edges'][:]} # Deep copy
+        else:
+            nodes = set([])
+            edges = set([])
+            phon_set = set([phon.name for phon in phon_list])
+            for inst in assemblage.schema_insts:
+                syn_names = []
+                for f in inst.content['SynForm'].form:
+                    mapped_names = a2i_map(f.name)
+                    syn_names.extend(mapped_names)
+                syn_names = set(syn_names)
+                shared = syn_names.intersection(phon_set)
+                # Case 1: None of the SynForm has been expressed
+                if not(shared):
+                    continue
+                # Case 2: The whole SynForm has been expressed
+                if shared == syn_names:
+                    nodes.update(inst.trace['semrep']['nodes'][:])
+                    edges.update(inst.trace['semrep']['edges'][:])
+                # Case 3: The SynForm has been partially expressed
+                else:
+                    for form_name in shared:
+                        SemFrame_node_name = eq_inst.content.SymLinks.form2node(form_name)
+                        if SemFrame_node_name:
+                            SemRep_node_name = eq_inst.covers['nodes'][SemFrame_node_name]
+                            nodes.update(SemRep_node_name)
+                
+                expressed = {'nodes':list(nodes), 'edges':list(edges)}
+          
+        return (phon_form, missing_info, expressed, eq_inst, a2i_map)
     
     ###############
     ### DISPLAY ###

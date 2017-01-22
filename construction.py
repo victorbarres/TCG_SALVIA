@@ -257,15 +257,20 @@ class TP_SEMFRAME(TP_ELEM):
         new_SF = SF_p_copy
         
         name_corr = {}
-        for n1, n2 in c_p.iteritems():
-            if n1 != node_p_name:
-                name_corr[n1] = n2
-            else:
-                name_corr[n1] = node_c.name
-        for n1, n2 in c_c.iteritems():
-            name_corr[n1] = n2
+        name_corr.update(c_p)
+        name_corr[node_p_name] = node_c.name
+        name_corr.update(c_c)
+#        for n1, n2 in c_p.iteritems():
+#            if n1 != node_p_name:
+#                name_corr[n1] = n2
+#            else:
+#                name_corr[n1] = node_c.name
+#        for n1, n2 in c_c.iteritems():
+#            name_corr[n1] = n2
 
-        return (new_SF, name_corr)
+        u_map = dict([(k,[v]) for k,v in name_corr.iteritems()]) # Different format than name_corr to match with the SynForm version
+
+        return (new_SF, name_corr, u_map)
         
 class TP_SYNFORM(TP_ELEM):
     """
@@ -322,14 +327,21 @@ class TP_SYNFORM(TP_ELEM):
             new_synform.add_syn_elem(elem)
             
         name_corr = {}
-        for n1, n2 in c_p.iteritems():
-            if n1 != slot_p_name:
-                name_corr[n1] = n2
+        name_corr.update(c_p)
+        name_corr.pop(slot_p_name)
+        name_corr.update(c_c)
         
-        for n1, n2 in c_c.iteritems():
-            name_corr[n1] = n2
+        u_map = dict([(k,[v]) for k,v in name_corr.iteritems()])
+        u_map[slot_p_name] = c_c.values()
+        
+#        for n1, n2 in c_p.iteritems():
+#            if n1 != slot_p_name:
+#                name_corr[n1] = n2
+#        
+#        for n1, n2 in c_c.iteritems():
+#            name_corr[n1] = n2
             
-        return (new_synform, name_corr)
+        return (new_synform, name_corr, u_map)
     
 class TP_SYMLINKS(TP_ELEM):
     """
@@ -514,8 +526,8 @@ class CXN:
         """
         node_p = cxn_p.form2node(slot_p)
         node_c = cxn_c.SemFrame.get_head()
-        (new_semframe, sem_corr) = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p.name, cxn_c.SemFrame, node_c.name)
-        (new_synform, syn_corr) = TP_SYNFORM.unify(cxn_p.SynForm, slot_p.name, cxn_c.SynForm)
+        (new_semframe, sem_corr, u_map_sem) = TP_SEMFRAME.unify(cxn_p.SemFrame, node_p.name, cxn_c.SemFrame, node_c.name)
+        (new_synform, syn_corr, u_map_syn) = TP_SYNFORM.unify(cxn_p.SynForm, slot_p.name, cxn_c.SynForm)
         
         new_cxn = CXN()
 #        new_cxn.name = "[%s-U(%i)-%s]" %(cxn_p.name, slot_p.order, cxn_c.name)
@@ -534,13 +546,17 @@ class CXN:
             new_cxn.SymLinks.SL[sem_corr[k]]=syn_corr[v]
         
         name_corr = {}
-        for n1, n2 in sem_corr.iteritems():
-            name_corr[n1] = n2
-        
-        for n1, n2 in syn_corr.iteritems():
-            name_corr[n1] = n2
-        
-        return (new_cxn, name_corr)
+        name_corr.update(sem_corr)
+        name_corr.update(syn_corr)
+#        for n1, n2 in sem_corr.iteritems():
+#            name_corr[n1] = n2
+#        
+#        for n1, n2 in syn_corr.iteritems():
+#            name_corr[n1] = n2
+
+        u_map = {'sem_map':u_map_sem, 'syn_map':u_map_syn}
+
+        return (new_cxn, name_corr, u_map)
     
     def show(self):
         """
@@ -616,21 +632,21 @@ if __name__=='__main__':
     from loader import TCG_LOADER
     
     # Loading data
-    grammar_name = 'TCG_grammar_VB'
+    grammar_name = 'TCG_grammar_VB_main'
     
-    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics_main.json", "./data/semantics/")
     grammar_file = "%s.json" %grammar_name
     my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
     cxn = my_grammar.constructions[0]
-    cxn2 = my_grammar.constructions[1]
+    cxn2 = my_grammar.constructions[3]
     
-    (cxn3, c) = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
+    (cxn3, c, u_map) = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
 #    cxn3.SemFrame.draw()
 #    print [f.name for f in cxn3.SynForm.form]
 #    print cxn3.SymLinks.SL
     
-    cxn.show()
+    cxn3.show()
     
     
     
