@@ -260,13 +260,6 @@ class TP_SEMFRAME(TP_ELEM):
         name_corr.update(c_p)
         name_corr[node_p_name] = node_c.name
         name_corr.update(c_c)
-#        for n1, n2 in c_p.iteritems():
-#            if n1 != node_p_name:
-#                name_corr[n1] = n2
-#            else:
-#                name_corr[n1] = node_c.name
-#        for n1, n2 in c_c.iteritems():
-#            name_corr[n1] = n2
 
         u_map = dict([(k,[v]) for k,v in name_corr.iteritems()]) # Different format than name_corr to match with the SynForm version
 
@@ -333,13 +326,6 @@ class TP_SYNFORM(TP_ELEM):
         
         u_map = dict([(k,[v]) for k,v in name_corr.iteritems()])
         u_map[slot_p_name] = c_c.values()
-        
-#        for n1, n2 in c_p.iteritems():
-#            if n1 != slot_p_name:
-#                name_corr[n1] = n2
-#        
-#        for n1, n2 in c_c.iteritems():
-#            name_corr[n1] = n2
             
         return (new_synform, name_corr, u_map)
     
@@ -548,11 +534,6 @@ class CXN:
         name_corr = {}
         name_corr.update(sem_corr)
         name_corr.update(syn_corr)
-#        for n1, n2 in sem_corr.iteritems():
-#            name_corr[n1] = n2
-#        
-#        for n1, n2 in syn_corr.iteritems():
-#            name_corr[n1] = n2
 
         u_map = {'sem_map':u_map_sem, 'syn_map':u_map_syn}
 

@@ -1089,7 +1089,7 @@ class GRAMMATICAL_WM_P(WM):
                 
                 # Save winner assemblage to state
                 partial_readout = False if missing_info == None else True
-                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0], 'a2i_map':a2i_map.copy(), 'partial_readout':partial_readout})
+                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0], 'a2i_map':a2i_map.copy(), 'expressed':expressed.copy(), 'partial_readout':partial_readout})
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)
@@ -1471,10 +1471,17 @@ class GRAMMATICAL_WM_P(WM):
         new_assemblage = assemblage.copy()
         coop_links = new_assemblage.coop_links
         a2i_map = {'sem_map':{}, 'syn_map':{}}
-        while len(coop_links)>0:
-            (new_assemblage, new_cxn_inst, a2i_map) = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0], a2i_map)
-            coop_links = new_assemblage.coop_links
-        eq_inst = new_assemblage.schema_insts[0]
+        if coop_links: # not a trivial assemblage composed of a single instance.
+            while len(coop_links)>0:
+                (new_assemblage, new_cxn_inst, a2i_map) = GRAMMATICAL_WM_P.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0], a2i_map)
+                coop_links = new_assemblage.coop_links
+            eq_inst = new_assemblage.schema_insts[0]
+        else:
+            inst = new_assemblage.schema_insts[0] #It would be best to make a copy(?)
+            #Trivial mapping onto itself
+            a2i_map['sem_map'] = dict([(sem_elem.name, sem_elem.name) for sem_elem in inst.content.SemFrame.nodes + inst.content.SemFrame.edges])
+            a2i_map['syn_map'] = dict([(syn_elem.name, syn_elem.name) for syn_elem in inst.content.SynForm.form])
+            eq_inst = inst
         eq_inst.activity = new_assemblage.activation
         return (eq_inst, a2i_map)
       
@@ -1580,14 +1587,14 @@ class GRAMMATICAL_WM_P(WM):
         # Update a2i_map
         for map_type in ['sem_map', 'syn_map']: # There must be a cleaner way to do that! Rethink the data structure used.
             new = {} 
-            to_remove = []
+            to_remove = set([])
             my_map = u_map[map_type]
             for k,v in a2i_map[map_type].iteritems():
                 new[k] = []
                 for i in v:
                     if my_map.has_key(i):
                         new[k].extend(my_map[i])
-                        to_remove.append(i)
+                        to_remove.add(i)
                     else:
                         new[k].extend([i])
             for i in to_remove:
@@ -1663,11 +1670,15 @@ class GRAMMATICAL_WM_P(WM):
             edges = set([])
             phon_set = set([phon.name for phon in phon_list])
             for inst in assemblage.schema_insts:
-                syn_names = []
-                for f in inst.content['SynForm'].form:
-                    mapped_names = a2i_map(f.name)
-                    syn_names.extend(mapped_names)
-                syn_names = set(syn_names)
+                syn_names = set([])
+                print "HERE1"
+                print inst.name
+                print [f.name for f in inst.content.SynForm.form]
+                print a2i_map['syn_map'].keys()
+                print ''
+                for f in inst.content.SynForm.form:
+                    mapped_names = a2i_map['syn_map'][f.name]
+                    syn_names.update(mapped_names)
                 shared = syn_names.intersection(phon_set)
                 # Case 1: None of the SynForm has been expressed
                 if not(shared):
@@ -1682,9 +1693,9 @@ class GRAMMATICAL_WM_P(WM):
                         SemFrame_node_name = eq_inst.content.SymLinks.form2node(form_name)
                         if SemFrame_node_name:
                             SemRep_node_name = eq_inst.covers['nodes'][SemFrame_node_name]
-                            nodes.update(SemRep_node_name)
+                            nodes.add(SemRep_node_name)
                 
-                expressed = {'nodes':list(nodes), 'edges':list(edges)}
+            expressed = {'nodes':list(nodes), 'edges':list(edges)}
           
         return (phon_form, missing_info, expressed, eq_inst, a2i_map)
     

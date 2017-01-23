@@ -129,24 +129,28 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
         if test_not_empty(output): # filter out ouputs with all valyues == None
             outputs[t] = output
         # Display methods
-        if output['Utter'] and verbose > 2:
-            print "t:%i, '%s'" %(t, output['Utter'])
+        if output['Grammatical_WM_P'] and output['Grammatical_WM_P'][0]['phon_form']:
+            if verbose > 2:
+                print "t:%i, '%s'" %(t, ' '.join(output['Grammatical_WM_P'][0]['phon_form']))
+            if verbose >3:
+                prob_times.append(t + 10) #Will save the state 10 steps after utterance
         if t in prob_times: # Saving figures for prob times.
             TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
-            
-    # Display end states
-    if verbose>2:
-        model.schemas['Semantic_WM'].show_SemRep()
-        model.schemas['Grammatical_WM_P'].show_dynamics()
     
     if save:
         model.save_sim(file_path = FOLDER, file_name = 'output.json')
         
-    model.reset() # Gets model ready for next use.
-    
     # Prints utterance in verbose mode.
     if verbose > 1:                
         print get_produced_utterances(outputs)
+           
+    # Display end states
+    if verbose>2:
+        model.schemas['Semantic_WM'].show_SemRep()
+        model.schemas['Grammatical_WM_P'].show_dynamics()
+        
+         
+    model.reset() # Gets model ready for next use.
     
     return outputs   
 
@@ -646,7 +650,7 @@ def tell_me(utterance):
     TTS.utter()
     
 if __name__=='__main__':
-    run_diagnostics(verbose=3, prob_times=[])
+    run_diagnostics(verbose=4, prob_times=[])
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()

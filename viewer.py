@@ -578,22 +578,25 @@ class TCG_VIEWER:
         """
         node_font_size = '14'
         edge_font_size = '12'
-        style = 'filled'
+        style_unexpressed = 'filled'
+        style_expressed = 'dashed'
         node_fill_color = 'lightgrey'
-        node_color = 'white'
+        node_color = 'lightgrey'
         node_shape = 'oval'
         font_name = 'consolas'
         semrep_cluster = pydot.Cluster(name, label='', color='white', fillcolor='white')
         
         
         for n, d in semrep.nodes(data=True):
+            style = style_expressed if d['expressed'] else style_unexpressed
             label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['cpt_inst'].name, d['cpt_inst'].activity)
             new_node = pydot.Node(n, label=label, shape=node_shape, style=style, color=node_color, fillcolor=node_fill_color, fontsize=node_font_size, fontname=font_name)
             semrep_cluster.add_node(new_node)
             
         for u,v, d in semrep.edges(data=True):
+            style = style_expressed if d['expressed'] else style_unexpressed
             label = '<<FONT FACE="%s">%s (%.1f)</FONT>>' %(font_name, d['cpt_inst'].name, d['cpt_inst'].activity)
-            new_edge = pydot.Edge(u, v, label=label,  fontsize=edge_font_size, fontname=font_name, penwidth='2')
+            new_edge = pydot.Edge(u, v, label=label, style = style, fontsize=edge_font_size, fontname=font_name, penwidth='2')
             semrep_cluster.add_edge(new_edge)
         
         return semrep_cluster
