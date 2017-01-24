@@ -743,7 +743,7 @@ class GRAMMATICAL_WM_P(WM):
         self.prune()
 
         # Here define memory limitations
-        wm_limit = self.limit_memory(max_capacity=3, max_prob=1.0, option=1)
+        wm_limit = self.limit_memory(max_capacity=4, max_prob=1.0, option=1)
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']
@@ -1065,7 +1065,7 @@ class GRAMMATICAL_WM_P(WM):
             - Need to think about whether or not read-out means terminating all the competitions.
             Make sure to revisit all the different options below.
         """  
-#        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity']
+#        score_threshold = self.params['style']['activation']*self.params['C2']['confidence_threshold'] + self.params['style']['sem_length'] + self.params['style']['form_length'] + self.params['style']['continuity'] # Uncomment to use confidence threshold
 
 #        self.end_competitions() #When production is triggered, a decision is forced for all the competitions.
         assemblages = self.assemble()
@@ -1077,16 +1077,18 @@ class GRAMMATICAL_WM_P(WM):
             winner_dat, score = self.get_winner_assemblage(assemblages, sem_input, phon_input)
             if winner_dat: # LOOK INTO THIS!!! THIS IS AN IMPORTANT STEP
                 self.set_winners(winner_dat[0])
-                
-            
-#            while winner_dat and score >= score_threshold: # REMOVED RECURSIVITY. Only one connected subgraph of SemRep can be epxressed at the time.
+
+#            while winner_dat and score >= score_threshold: # Uncomment to use confidence threshold and recursive reading
+#            if winner_dat and score >= score_threshold: # Uncomment to use confidence threshold without recursive reading
                 winner_found = True
-                (winner_assemblage, phon_form, missing_info, expressed, eq_inst, a2i_map) = winner_dat
+                (winner_assemblage, phon_form, missing_info, expressed, eq_inst, a2i_map, insts_used) = winner_dat
                 phon_WM_output.extend(phon_form)
                 sem_WM_output['nodes'].extend(expressed['nodes'])
                 sem_WM_output['edges'].extend(expressed['edges'])
                 sem_WM_output['missing_info'] = missing_info
-                assemblages.remove(winner_assemblage)
+                for inst in insts_used:
+                    inst.done = True
+#                assemblages.remove(winner_assemblage)
                 
                 # Save winner assemblage to state
                 partial_readout = False if missing_info == None else True
@@ -1156,8 +1158,8 @@ class GRAMMATICAL_WM_P(WM):
         # For each assemblage stores the values of relevant scores.
         assemblages_dat = [] 
         for assemblage in assemblages:
-            (phon_form, missing_info, expressed, eq_inst, a2i_map) = GRAMMATICAL_WM_P.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage. 
-            assemblages_dat.append((assemblage, phon_form, missing_info, expressed, eq_inst, a2i_map))               
+            (phon_form, missing_info, expressed, eq_inst, a2i_map, insts_used) = GRAMMATICAL_WM_P.form_read_out(assemblage) # In order to test for continuity, I have to read_out every assemblage. 
+            assemblages_dat.append((assemblage, phon_form, missing_info, expressed, eq_inst, a2i_map, insts_used))               
             sem_length_nodes = len([sf_node for sf_node, semrep_node in eq_inst.covers['nodes'].iteritems() if (semrep_node in sem_input['nodes'])]) # Only counts nodes that have NOT already been expressed.
             sem_length_edges = len([sf_edge for sf_edge, semrep_edge in eq_inst.covers['edges'].iteritems() if semrep_edge in sem_input['edges']]) # Only counts edges that have NOT already been expressed. 
 
@@ -1646,6 +1648,8 @@ class GRAMMATICAL_WM_P(WM):
             - phon_form = the longest consecutive TP_PHON sequence that can be uttered.
             - missing_info (STR) = Name of the SemRep node associated with the first TP_SLOT encountered, represented the missing information.
             - expressed = the semrep that the assemblage expresses (nodes and relations) as defined in the trace of the instances that have been used.
+            - a2i_map = TP_ELEMs name mapping between assemblage instances and eq_inst
+            - insts_used = the list of cxn_instances that have been fully used.
         """
         (eq_inst, a2i_map) = GRAMMATICAL_WM_P.assemblage2inst(assemblage)
             
@@ -1663,11 +1667,11 @@ class GRAMMATICAL_WM_P(WM):
         
         phon_form = [phon.cxn_phonetics for phon in phon_list]
         
+        insts_used = []
         # Define the semantic content expressed
         if not(missing_info): # Everything has been expressed.
             expressed = {'nodes':eq_inst.trace['semrep']['nodes'][:], 'edges':eq_inst.trace['semrep']['edges'][:]} # Deep copy
-            for inst in assemblage.schema_insts:
-                inst.done = True
+            insts_used = assemblage.schema_insts[:]
         else:
             nodes = set([])
             edges = set([])
@@ -1685,7 +1689,7 @@ class GRAMMATICAL_WM_P(WM):
                 if shared == syn_names:
                     nodes.update(inst.trace['semrep']['nodes'][:])
                     edges.update(inst.trace['semrep']['edges'][:])
-                    inst.done = True
+                    insts_used.append(inst)
                 # Case 3: The SynForm has been partially expressed
                 else:
                     for form_name in shared:
@@ -1696,7 +1700,7 @@ class GRAMMATICAL_WM_P(WM):
                 
             expressed = {'nodes':list(nodes), 'edges':list(edges)}
           
-        return (phon_form, missing_info, expressed, eq_inst, a2i_map)
+        return (phon_form, missing_info, expressed, eq_inst, a2i_map, insts_used)
     
     ###############
     ### DISPLAY ###

@@ -337,8 +337,8 @@ def run_diagnostics(verbose=2, prob_times=[]):
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
         res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save)
-        print "\nRESULTS:\n"
-        print res
+#        print "\nRESULTS:\n"
+#        print res
 
 ############################
 #### PARAMTER SPACE ANALYSIS      

@@ -986,6 +986,9 @@ class WM(SYSTEM_SCHEMA):
             return False
             
         if option==1: #Kills all the instances necessary starting with the ones with the lowest value
+            if max_capacity == None: # No limitation
+                return []
+            
             active_insts = sort_inst([inst for inst in self.schema_insts if not(inst.done)])
             inactive_insts = [inst for inst in self.schema_insts if inst.done]
             inst_list = active_insts + inactive_insts # Will try to get rid of the instances that are "done" first
