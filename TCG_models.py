@@ -62,7 +62,8 @@ def parameters(system_names):
         'C2.coop_asymmetry':0.0,
         'C2.comp_asymmetry':0.0,
         'C2.sub_threshold_r':0.8,
-        'C2.deact_weight':0.0 # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
+        'C2.deact_weight':0.0, # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
+        'C2.refractory_period':10
         },
         
     'Phonological_WM_P':{

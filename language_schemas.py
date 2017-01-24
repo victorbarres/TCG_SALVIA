@@ -68,7 +68,7 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - outputs (DICT): At each time steps stores the ouputs
             - alive (bool): status flag
             - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schemas":[CXN_SCHEMA]}): Pointer to the elements that triggered the instantiation.
-            - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
+        - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
     """
     def __init__(self, cxn_schema, trace, mapping, copy=True):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
@@ -720,7 +720,7 @@ class GRAMMATICAL_WM_P(WM):
         self.add_port('OUT', 'to_phonological_WM_P')
         self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
-        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8, 'refractory_period':10}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         self.refractory_period = 10
         self.time_to_next_prod = 0
@@ -740,17 +740,18 @@ class GRAMMATICAL_WM_P(WM):
                 
         self.convey_sem_activations(sem_input)
         self.update_activations()
-        # Here define memory limitations
-        #self.limit_memory(max_capacity=None, max_prob=1.0, option=0)
         self.prune()
+
+        # Here define memory limitations
+        wm_limit = self.limit_memory(max_capacity=3, max_prob=1.0, option=1)
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']
             try_produce = self.apply_pressure(ctrl_input['pressure'], option=1)
-            if try_produce:
+            if try_produce or wm_limit: # If the limit in wm has been reached the system tries to produce.
                 if self.time_to_next_prod<=0:
                     output = self.produce_form(sem_input, phon_input)
-                    self.time_to_next_prod = self.refractory_period
+                    self.time_to_next_prod = self.params['C2']['refractory_period']
                 
                     if output:
                         self.outputs['to_phonological_WM_P'] = output['phon_WM_output']
@@ -1665,17 +1666,14 @@ class GRAMMATICAL_WM_P(WM):
         # Define the semantic content expressed
         if not(missing_info): # Everything has been expressed.
             expressed = {'nodes':eq_inst.trace['semrep']['nodes'][:], 'edges':eq_inst.trace['semrep']['edges'][:]} # Deep copy
+            for inst in assemblage.schema_insts:
+                inst.done = True
         else:
             nodes = set([])
             edges = set([])
             phon_set = set([phon.name for phon in phon_list])
             for inst in assemblage.schema_insts:
                 syn_names = set([])
-                print "HERE1"
-                print inst.name
-                print [f.name for f in inst.content.SynForm.form]
-                print a2i_map['syn_map'].keys()
-                print ''
                 for f in inst.content.SynForm.form:
                     mapped_names = a2i_map['syn_map'][f.name]
                     syn_names.update(mapped_names)
@@ -1687,6 +1685,7 @@ class GRAMMATICAL_WM_P(WM):
                 if shared == syn_names:
                     nodes.update(inst.trace['semrep']['nodes'][:])
                     edges.update(inst.trace['semrep']['edges'][:])
+                    inst.done = True
                 # Case 3: The SynForm has been partially expressed
                 else:
                     for form_name in shared:

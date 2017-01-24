@@ -494,6 +494,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
     Data:
         - content (KNOWLEDGE_SCHEMA)
         - alive (bool): status flag
+        - done (bool): True if the instance is done with its function.
         - trace (): Pointer to the element that triggered the instantiation.
         - activity (FLOAT): activity value for schema instance
         - params: {'act':{t0:FLOAT, act0: FLOAT, dt:FLOAT, tau:FLOAT, int_weight:FLOAT, ext_weight:FLOAT, sact_rest:FLOAT, k:FLOAT, noise_mean:FLOAT, noise_std:FLOAT}}
@@ -505,6 +506,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         FUNCTION_SCHEMA.__init__(self,name="")
         self.content = None      
         self.alive = False
+        self.done = False
         self.trace = None
         self.activity = 0
         self.params['act'] = {'t0':0.0, 'act0': 1.0, 'dt':0.1, 'int_weight': 1.0, 'ext_weight': 1.0, 'tau':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
@@ -586,6 +588,7 @@ class SCHEMA_INST(FUNCTION_SCHEMA):
         """
         data = super(SCHEMA_INST, self).get_state()
         data['alive'] = self.alive
+        data['done'] = self.done
         data['content'] = {}
         data['trace'] = {}
         
@@ -972,13 +975,35 @@ class WM(SYSTEM_SCHEMA):
     def limit_memory(self, max_capacity=None, max_prob=0.01, option=1):
         """
         """
-        if option==0: #do nothing
-            return
+        def sort_inst(inst_list):
+            """
+            Sort the instance list by activity values (highest to lowest)
+            """
+            sorted_inst_list = sorted(inst_list[:], key = lambda x:x.activity, reverse=True)
+            return sorted_inst_list
+        
+        if option==0: #Do nothing
+            return False
             
-        if option==1: # Limit on the instances
-            num_insts = len(self.schema_insts)
+        if option==1: #Kills all the instances necessary starting with the ones with the lowest value
+            active_insts = sort_inst([inst for inst in self.schema_insts if not(inst.done)])
+            inactive_insts = [inst for inst in self.schema_insts if inst.done]
+            inst_list = active_insts + inactive_insts # Will try to get rid of the instances that are "done" first
+            kill_list = []
+            memory_usage = 1 - (max_capacity - len(inst_list))/float(max_capacity)
+            while memory_usage >1 and inst_list:
+                inst = inst_list.pop()
+                inst.alive = False
+                self.remove_instance(inst)
+                kill_list.append(inst.name)
+                print "\nt:%i, Killed! %s (%.2f, done=%i) memory_usage:%.2f\n" %(self.t, inst.name, inst.activity, inst.done, memory_usage)
+                memory_usage = 1 - (max_capacity - len(inst_list))/float(max_capacity)
+            return kill_list
+
+        if option==2: # Limit on the instances
+            num_insts = len([inst for inst in self.schema_insts if not(inst.done)])
             if max_capacity == None or num_insts == 0: # No limitation or no instances yet
-                return
+                return []
             
             memory_usage = 1 - (max_capacity - num_insts)/float(max_capacity)
     #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
@@ -987,15 +1012,18 @@ class WM(SYSTEM_SCHEMA):
             val = np.random.rand()
             idx = np.random.randint(0,num_insts)
             inst = self.schema_insts[idx]
+            kill_list = []
             if val < threshold:
                 inst.alive = False
+                self.remove_instance(inst)
+                kill_list.append(inst.name)
                 print "\nt:%i, Killed! %s memory_usage:%g, threshold:%g\n" %(self.t, inst.name, memory_usage, threshold)
-            return
+            return kill_list
             
-        if option==2: # limit on the coop_links
+        if option==3: # limit on the coop_links
             num_links = len(self.coop_links)
             if max_capacity == None or num_links == 0: # No limitation or no links yet
-                return
+                return []
             
             memory_usage = 1 - (max_capacity - num_links)/float(max_capacity)
     #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
@@ -1004,10 +1032,13 @@ class WM(SYSTEM_SCHEMA):
             val = np.random.rand()
             idx = np.random.randint(0,num_links)
             link = self.coop_links[idx]
+            kill_list = []
             if val < threshold:
                 self.coop_links.remove(link)
+                kill_list.append((link.inst_from.name, link.inst_to.name))
                 print "\nt:%i, Killed! %s -> %s, memory_usage:%g, threshold:%g\n" %(self.t, link.inst_from.name, link.inst_to.name, memory_usage, threshold)
                 print num_links
+            return kill_list
    
     ############################
     ### STATE SAVING METHODS ###
