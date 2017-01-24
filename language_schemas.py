@@ -743,7 +743,7 @@ class GRAMMATICAL_WM_P(WM):
         self.prune()
 
         # Here define memory limitations
-        wm_limit = self.limit_memory(max_capacity=4, max_prob=1.0, option=1)
+        wm_limit = self.limit_memory(max_capacity=None, max_prob=1.0, option=1)
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']

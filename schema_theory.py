@@ -22,6 +22,7 @@ import os
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import pickle
 import pprint
 
@@ -1207,7 +1208,56 @@ class WM(SYSTEM_SCHEMA):
             plt.savefig(file_name, bbox_inches='tight')
         else:
             plt.show()
+            
+    def show_dynamics_anim(self, folder=None):
+        """
+        """
+            
+        # Plot instance activations
+        fig = plt.figure(facecolor='white')
+        max_time = int(max(self.save_state['WM_activity']['t']))
+        ax1 = plt.axes(xlim=(0, max_time), ylim=(0, 1))
+        title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g]\n noise: [mean:%g, std:%g], \n C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
+                            self.name,
+                            self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
+                            self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
+                              self.params['C2']['coop_weight'], self.params['C2']['comp_weight'],  self.params['C2']['coop_asymmetry'], self.params['C2']['comp_asymmetry'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
+        plt.title(title)
+        plt.xlabel('time', fontsize=14)
+        plt.ylabel('activity', fontsize=14)
         
+        inst_names = self.save_state['insts'].keys()
+        num_lines = len(inst_names)
+        lines = []
+        for index in range(num_lines):
+            lobj = ax1.plot([],[],lw=2, label=inst_names[index])[0]
+            lines.append(lobj)
+        
+        plt.axhline(y=self.params['C2']['prune_threshold'], color='k',ls='dashed')
+        plt.axhline(y=self.params['C2']['confidence_threshold'], color='r',ls='dashed')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
+            
+        def init():
+            for line in lines:
+                line.set_data([], [])
+            return lines
+        
+        def animate(i):
+            for k in range(num_lines):
+                if i in self.save_state['insts'][inst_names[k]]['t']:
+                    index = self.save_state['insts'][inst_names[k]]['t'].index(i)
+                    lines[k].set_data(self.save_state['insts'][inst_names[k]]['t'][:index], self.save_state['insts'][inst_names[k]]['act'][:index])
+                elif i > max(self.save_state['insts'][inst_names[k]]['t']):
+                    lines[k].set_data(self.save_state['insts'][inst_names[k]]['t'], self.save_state['insts'][inst_names[k]]['act'])
+                else:
+                    lines[k].set_data([], [])
+            return lines 
+        
+        anim = animation.FuncAnimation(fig, animate, init_func=init,
+                               frames=max_time, interval=1, blit=True)
+        
+        plt.show()
+    
             
         
     def show_state(self):

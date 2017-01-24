@@ -148,6 +148,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
     if verbose>2:
         model.schemas['Semantic_WM'].show_SemRep()
         model.schemas['Grammatical_WM_P'].show_dynamics()
+        model.schemas['Grammatical_WM_P'].show_dynamics_anim()
         
          
     model.reset() # Gets model ready for next use.
