@@ -1209,14 +1209,19 @@ class WM(SYSTEM_SCHEMA):
         else:
             plt.show()
             
-    def show_dynamics_anim(self, folder=None):
+    def show_dynamics_anim(self, folder=None, step=10):
         """
+        step (INT): step betwween time values read (t_vals = range(0, max_time, step))
         """
+        if folder and not(os.path.exists(folder)):
+            os.mkdir(folder)
             
         # Plot instance activations
         fig = plt.figure(facecolor='white')
         max_time = int(max(self.save_state['WM_activity']['t']))
-        ax1 = plt.axes(xlim=(0, max_time), ylim=(0, 1))
+        ax = fig.add_subplot(111, autoscale_on=False,
+                     xlim=(0, max_time), ylim=(0, 1))
+
         title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g]\n noise: [mean:%g, std:%g], \n C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
                             self.name,
                             self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
@@ -1227,12 +1232,15 @@ class WM(SYSTEM_SCHEMA):
         plt.ylabel('activity', fontsize=14)
         
         inst_names = self.save_state['insts'].keys()
-        num_lines = len(inst_names)
+        num_obj = len(inst_names)
         lines = []
-        for index in range(num_lines):
-            lobj = ax1.plot([],[],lw=2, label=inst_names[index])[0]
+        texts = []
+        for index in range(num_obj):
+            lobj = ax.plot([],[],lw=2, label=inst_names[index])[0]
             lines.append(lobj)
-        
+            tobj = ax.text(0,0,inst_names[index])
+            texts.append(tobj)
+            
         plt.axhline(y=self.params['C2']['prune_threshold'], color='k',ls='dashed')
         plt.axhline(y=self.params['C2']['confidence_threshold'], color='r',ls='dashed')
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
@@ -1240,23 +1248,45 @@ class WM(SYSTEM_SCHEMA):
         def init():
             for line in lines:
                 line.set_data([], [])
-            return lines
+            for text in texts:
+                text.set_position((0,0))
+            artists = lines + texts
+            return artists
         
         def animate(i):
-            for k in range(num_lines):
+            for k in range(num_obj):
                 if i in self.save_state['insts'][inst_names[k]]['t']:
                     index = self.save_state['insts'][inst_names[k]]['t'].index(i)
-                    lines[k].set_data(self.save_state['insts'][inst_names[k]]['t'][:index], self.save_state['insts'][inst_names[k]]['act'][:index])
+                    lines[k].set_data(self.save_state['insts'][inst_names[k]]['t'][:index], self.save_state['insts'][inst_names[k]]['act'][:index])             
+                    t = self.save_state['insts'][inst_names[k]]['t'][index]
+                    y = self.save_state['insts'][inst_names[k]]['act'][index]
+                    texts[k].set_text(inst_names[k])
+                    texts[k].set_position((t,y))
                 elif i > max(self.save_state['insts'][inst_names[k]]['t']):
                     lines[k].set_data(self.save_state['insts'][inst_names[k]]['t'], self.save_state['insts'][inst_names[k]]['act'])
+                    texts[k].set_text('')
                 else:
                     lines[k].set_data([], [])
-            return lines 
+                    texts[k].set_text('')
+            artists = lines + texts
+            return artists
         
+        frames = range(0,max_time,step)
         anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=max_time, interval=1, blit=True)
+                               frames=frames, repeat=True, repeat_delay=10, interval=1, blit=True)
         
-        plt.show()
+        if folder:
+            # Set up formatting for the movie files
+            plt.rcParams['animation.ffmpeg_path'] ='C:\\ffmpeg\\bin\\ffmpeg.exe'
+            FFMpegWriter = animation.writers['ffmpeg']
+            metadata = dict(title='WM_activity', artist='SALVIA_TCG',
+                comment='')
+            writer = FFMpegWriter(fps=24, metadata=metadata, bitrate=None)
+            file_name = '%s/%s' %(folder, 'WM_activity.mp4')
+            anim.save(file_name, writer=writer)
+            plt.close(fig)
+        else:
+            plt.show()
     
             
         

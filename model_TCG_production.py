@@ -79,7 +79,7 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
     
     return sem_gen
     
-def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False):
+def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10):
     """
     Run the model "model" for an semantic gerator "sem_gen" using the input "input_name"
     Verbose modes: 0,1 -> no output printed. 2 -> only final utterance printed, 3 -> input and utterances printed as they are received and produced. >3 -> 10steps after sem_input received added to prob_times as well as 10 steps before max_time
@@ -146,9 +146,14 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
            
     # Display end states
     if verbose>2:
-        model.schemas['Semantic_WM'].show_SemRep()
-        model.schemas['Grammatical_WM_P'].show_dynamics()
-        model.schemas['Grammatical_WM_P'].show_dynamics_anim()
+        model.schemas['Grammatical_WM_P'].show_dynamics(folder=FOLDER)
+        
+    if anim:
+        if save:
+            print "saving animation (might take some time!)"
+            model.schemas['Grammatical_WM_P'].show_dynamics_anim(folder=FOLDER, step=anim_step)
+        else:
+            model.schemas['Grammatical_WM_P'].show_dynamics_anim(step=anim_step)
         
          
     model.reset() # Gets model ready for next use.
@@ -246,7 +251,7 @@ def summarize_data(outputs, ground_truth=None):
     summary = {'GramWM':gram_analysis, 'PhonWM':phon_analysis, 'SemWM':sem_analysis}
     return summary
                        
-def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman_kick_man_static', sem_input_file='diagnostic.json', sem_input_macro=False, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=0, save=True):
+def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman_kick_man_static', sem_input_file='diagnostic.json', sem_input_macro=False, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=0, save=True, anim=False):
     """
     Runs the model
     
@@ -310,9 +315,10 @@ def run_diagnostics(verbose=2, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time =2000
+    max_time =1000
     seed=None
     save = False
+    anim = True
     ###    
     
     model = set_model(semantics_name, grammar_name, model_params = MODEL_PARAMS)
@@ -337,7 +343,7 @@ def run_diagnostics(verbose=2, prob_times=[]):
     for input_name in diagnostic_cases:
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
-        res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save)
+        res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim)
 #        print "\nRESULTS:\n"
 #        print res
 
