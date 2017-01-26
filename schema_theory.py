@@ -1166,9 +1166,10 @@ class WM(SYSTEM_SCHEMA):
             f2.show()
                 
         # Plot C2  network data
-        plt.subplots(nrows=1, ncols=3, facecolor='white')
+        plt.subplots(nrows=3, ncols=1, facecolor='white')
+        
+        plt.subplot(3,1,1)      
         plt.tight_layout()
-        plt.subplot(3,1,1)
         plt.title('C2 levels')
         plt.xlabel('time', fontsize=14)
         plt.ylabel('activation transfer', fontsize=14)
