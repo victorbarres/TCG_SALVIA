@@ -718,13 +718,14 @@ class WM(SYSTEM_SCHEMA):
         - coop_links ([COOP_LINK]):
         - comp_links ([COMP_LINK]):
         - params (DICT): {'dyn': {'tau':FLOAT, 'int_weight':FLOAT, 'ext_weight':FLOAT,'act_rest':FLOAT,'k':FLOAT, 'noise_mean':FLOAT, 'noise_var':FLOAT},
-                          'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT, 'coop_asymmetry':FLOAT, 'comp_asymmetry':FLOAT, 'P_comp':FLOAT, 'P_coop':FLOAT}}
+                          'C2': {'coop_weight':FLOAT, 'comp_weight':FLOAT, 'prune_threshold':FLOAT, 'confidence_threshold':FLOAT, 'coop_asymmetry':FLOAT, 'comp_asymmetry':FLOAT, 'max_capacity':INT, 'P_comp':FLOAT, 'P_coop':FLOAT}}
             Note:
             - coop_weight (FLOAT): weight of cooperation f-links
             - comp_weight (FLOAT): weight of competition f-links
             - int_weight (FLOAT): weight given to internal effects on C2
             - ext_weight (FLOAT): weight given to external effects on C2
             - prune_threshold (FLOAT): Below this threshold the instances are considered inactive (Alive=False)
+            - max_capacity (INT): The maximum capacity of the memory (if None, no limitation). Used in limit_memory()
         - save_state (DICT): Saves the history of the WM states. DOES NOT SAVE THE F_LINKS!!! NEED TO FIX THAT.
     """
     def __init__(self, name=''):
@@ -733,7 +734,7 @@ class WM(SYSTEM_SCHEMA):
         self.coop_links = []
         self.comp_links = []
         self.params['dyn'] = {'tau':10.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.1}
-        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0}
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0}
         self.save_state = {'insts':{}, 
                            'WM_activity': {'t':[], 'act':[], 'comp':[], 'coop':[], 
                                            'c2_network':{'num_insts':[], 'num_coop_links':[], 'num_comp_links':[]}}}
@@ -973,7 +974,7 @@ class WM(SYSTEM_SCHEMA):
     ###########################
     ### DEGRADATION METHODS ###
     ###########################
-    def limit_memory(self, max_capacity=None, max_prob=0.01, option=1):
+    def limit_memory(self, option=1):
         """
         """
         def sort_inst(inst_list):
@@ -987,6 +988,7 @@ class WM(SYSTEM_SCHEMA):
             return False
             
         if option==1: #Kills all the instances necessary starting with the ones with the lowest value
+            max_capacity = self.params['C2']['max_capacity']
             if max_capacity == None: # No limitation
                 return []
             
@@ -1003,46 +1005,48 @@ class WM(SYSTEM_SCHEMA):
                 print "\nt:%i, Killed! %s (%.2f, done=%i) memory_usage:%.2f\n" %(self.t, inst.name, inst.activity, inst.done, memory_usage)
                 memory_usage = 1 - (max_capacity - len(inst_list))/float(max_capacity)
             return kill_list
-
-        if option==2: # Limit on the instances
-            num_insts = len([inst for inst in self.schema_insts if not(inst.done)])
-            if max_capacity == None or num_insts == 0: # No limitation or no instances yet
-                return []
-            
-            memory_usage = 1 - (max_capacity - num_insts)/float(max_capacity)
-    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
-            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
-            
-            val = np.random.rand()
-            idx = np.random.randint(0,num_insts)
-            inst = self.schema_insts[idx]
-            kill_list = []
-            if val < threshold:
-                inst.alive = False
-                self.remove_instance(inst)
-                kill_list.append(inst.name)
-                print "\nt:%i, Killed! %s memory_usage:%g, threshold:%g\n" %(self.t, inst.name, memory_usage, threshold)
-            return kill_list
-            
-        if option==3: # limit on the coop_links
-            num_links = len(self.coop_links)
-            if max_capacity == None or num_links == 0: # No limitation or no links yet
-                return []
-            
-            memory_usage = 1 - (max_capacity - num_links)/float(max_capacity)
-    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
-            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
-            
-            val = np.random.rand()
-            idx = np.random.randint(0,num_links)
-            link = self.coop_links[idx]
-            kill_list = []
-            if val < threshold:
-                self.coop_links.remove(link)
-                kill_list.append((link.inst_from.name, link.inst_to.name))
-                print "\nt:%i, Killed! %s -> %s, memory_usage:%g, threshold:%g\n" %(self.t, link.inst_from.name, link.inst_to.name, memory_usage, threshold)
-                print num_links
-            return kill_list
+#        
+#        ### The options below are probabilistic.
+#        max_prob = 0.1
+#        if option==2: # Limit on the instances
+#            num_insts = len([inst for inst in self.schema_insts if not(inst.done)])
+#            if max_capacity == None or num_insts == 0: # No limitation or no instances yet
+#                return []
+#            
+#            memory_usage = 1 - (max_capacity - num_insts)/float(max_capacity)
+#    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
+#            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
+#            
+#            val = np.random.rand()
+#            idx = np.random.randint(0,num_insts)
+#            inst = self.schema_insts[idx]
+#            kill_list = []
+#            if val < threshold:
+#                inst.alive = False
+#                self.remove_instance(inst)
+#                kill_list.append(inst.name)
+#                print "\nt:%i, Killed! %s memory_usage:%g, threshold:%g\n" %(self.t, inst.name, memory_usage, threshold)
+#            return kill_list
+#            
+#        if option==3: # limit on the coop_links
+#            num_links = len(self.coop_links)
+#            if max_capacity == None or num_links == 0: # No limitation or no links yet
+#                return []
+#            
+#            memory_usage = 1 - (max_capacity - num_links)/float(max_capacity)
+#    #        threshold = min(max_prob, memory_usage*max_prob) # linear threshold
+#            threshold = 0 if (memory_usage<1) else max_prob # binary threshold
+#            
+#            val = np.random.rand()
+#            idx = np.random.randint(0,num_links)
+#            link = self.coop_links[idx]
+#            kill_list = []
+#            if val < threshold:
+#                self.coop_links.remove(link)
+#                kill_list.append((link.inst_from.name, link.inst_to.name))
+#                print "\nt:%i, Killed! %s -> %s, memory_usage:%g, threshold:%g\n" %(self.t, link.inst_from.name, link.inst_to.name, memory_usage, threshold)
+#                print num_links
+#            return kill_list
    
     ############################
     ### STATE SAVING METHODS ###

@@ -386,6 +386,7 @@ def parameter_space(folder=None, input_rate=100):
     coop_weights = [1.0] #np.linspace(1.0, 10.0, 2)
     coop_asymmetries = [1.0] #np.linspace(0.0, 1.0, 2)
     comp_weights = [-10.0]
+    max_capacity = [None]
     prune_thresholds = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01 # Manipulations can yield "broca's aphasia" (0.3)
     conf_tresholds = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
     sub_threholds = [0.8]
@@ -405,6 +406,7 @@ def parameter_space(folder=None, input_rate=100):
                           'Grammatical_WM_P.C2.coop_weight':coop_weight, 
                           'Grammatical_WM_P.C2.coop_asymmetry':coop_asymmetry,
                           'Grammatical_WM_P.C2.comp_weight':comp_weight, 
+                          'Grammatical_WM_P.C2.max_capacity':max_capacity,
                           'Grammatical_WM_P.C2.prune_threshold': prune_threshold, 
                           'Grammatical_WM_P.C2.confidence_threshold':conf_threshold,
                           'Grammatical_WM_P.C2.sub_threshold_r':sub_threshold,
@@ -422,7 +424,8 @@ def parameter_space(folder=None, input_rate=100):
                       'Control.task.time_pressure':'time_pressure',
                       'Grammatical_WM_P.C2.coop_weight':'coop_weight', 
                       'Grammatical_WM_P.C2.coop_asymmetry':'coop_asymmetry',
-                      'Grammatical_WM_P.C2.comp_weight':'comp_weight', 
+                      'Grammatical_WM_P.C2.comp_weight':'comp_weight',
+                      'Grammatical_WM_P.C2.max_capacity':'max_capacity',
                       'Grammatical_WM_P.C2.prune_threshold': 'prune_threshold', 
                       'Grammatical_WM_P.C2.confidence_threshold':'conf_threshold',
                       'Grammatical_WM_P.C2.sub_threshold_r':'sub_threshold',

@@ -40,7 +40,8 @@ def parameters(system_names):
         'C2.confidence_threshold':0.0,
         'C2.prune_threshold':0.01,
         'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0
+        'C2.comp_weight':0.0,
+        'C2.max_capacity':None
         },
         
     'Conceptualizer':{},
@@ -59,8 +60,9 @@ def parameters(system_names):
         'C2.prune_threshold':0.01, #0.01 # Manipulations can yield "broca's aphasia" (0.3)
         'C2.coop_weight':1.0,
         'C2.comp_weight':-10.0, # Needs to compensate for the dominance of cooperation link.
-        'C2.coop_asymmetry':0.0,
+        'C2.coop_asymmetry':1.0,
         'C2.comp_asymmetry':0.0,
+        'C2.max_capacity':None,
         'C2.sub_threshold_r':0.8,
         'C2.deact_weight':0.0, # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
         'C2.refractory_period':10
@@ -77,7 +79,8 @@ def parameters(system_names):
         'C2.confidence_threshold':0.0,
         'C2.prune_threshold':0.01,
         'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0
+        'C2.comp_weight':0.0,
+        'C2.max_capacity':None
         },
         
     'Utter':{
@@ -105,7 +108,8 @@ def parameters(system_names):
         'C2.confidence_threshold':0.0,
         'C2.prune_threshold':0.01,
         'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0
+        'C2.comp_weight':0.0,
+        'C2.max_capacity':None,
         },
         
     'Grammatical_WM_C':{
@@ -120,8 +124,9 @@ def parameters(system_names):
         'C2.prune_threshold':0.01, 
         'C2.coop_weight':1.0,
         'C2.comp_weight':-10.0, 
-        'C2.coop_asymmetry':0.0,
+        'C2.coop_asymmetry':1.0,
         'C2.comp_asymmetry':0.0,
+        'C2.max_capacity':None,
         'C2.sub_threshold_r':0.8,
         'C2.deact_weight':0.0
         },
@@ -137,7 +142,8 @@ def parameters(system_names):
         'C2.confidence_threshold':0.0,
         'C2.prune_threshold':0.01,
         'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0
+        'C2.comp_weight':0.0,
+        'C2.max_capacity':None
         },
         
     'Subscene_recognition':{
