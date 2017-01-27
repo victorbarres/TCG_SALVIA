@@ -1092,7 +1092,7 @@ class GRAMMATICAL_WM_P(WM):
                 
                 # Save winner assemblage to state
                 partial_readout = False if missing_info == None else True
-                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0], 'a2i_map':a2i_map.copy(), 'expressed':expressed.copy(), 'partial_readout':partial_readout})
+                data.append({'t':self.t, 'assemblage':winner_assemblage.copy(), 'phon_form':phon_form[:], 'eq_inst':eq_inst.content.copy()[0], 'a2i_map':a2i_map.copy(), 'expressed':expressed.copy(), 'partial_readout':partial_readout, 'insts_used':insts_used})
                 
                 # Option1: Replace the assemblage by it's equivalent instance
 #                self.replace_assemblage(winner_assemblage)

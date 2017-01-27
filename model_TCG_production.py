@@ -251,7 +251,7 @@ def summarize_data(outputs, ground_truth=None):
     summary = {'GramWM':gram_analysis, 'PhonWM':phon_analysis, 'SemWM':sem_analysis}
     return summary
                        
-def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman_kick_man_static', sem_input_file='diagnostic.json', sem_input_macro=False, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=0, save=True, anim=False):
+def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman_kick_man_static', sem_input_file='diagnostic.json', sem_input_macro=False, max_time=900, seed=None, speed_param=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -266,9 +266,9 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     out = {}
     if sem_gen.is_macro:
         for name in sem_gen.sem_inputs:
-            out[name] = run(model, sem_gen, name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save)
+            out[name] = run(model, sem_gen, name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
     else:
-        out[name] = run(model, sem_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save)
+        out[name] = run(model, sem_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
     
     if verbose > 0:
         for k,v in out.iteritems():
@@ -317,8 +317,9 @@ def run_diagnostics(verbose=2, prob_times=[]):
     grammar_name='TCG_grammar_VB_main'  
     max_time =1000
     seed=None
-    save = False
-    anim = True
+    save = True
+    anim = False
+    anim_step = 10
     ###    
     
     model = set_model(semantics_name, grammar_name, model_params = MODEL_PARAMS)
@@ -343,7 +344,7 @@ def run_diagnostics(verbose=2, prob_times=[]):
     for input_name in diagnostic_cases:
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
-        res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim)
+        res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
 #        print "\nRESULTS:\n"
 #        print res
 
@@ -657,8 +658,8 @@ def tell_me(utterance):
     TTS.utter()
     
 if __name__=='__main__':
-    run_diagnostics(verbose=4, prob_times=[])
+#    run_diagnostics(verbose=4, prob_times=[])
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
-#    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="act_kick_woman_man", sem_input_file='kuchinsky.json', sem_input_macro=True, max_time=900, seed=None, speed_param=40, prob_times=[], verbose=4, save=True)
+    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="act_kick_woman_man", sem_input_file='kuchinsky.json', sem_input_macro=True, max_time=900, seed=None, speed_param=40, prob_times=[], verbose=4, save=True, anim=False, anim_step=10)

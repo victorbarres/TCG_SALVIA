@@ -1278,7 +1278,7 @@ class WM(SYSTEM_SCHEMA):
         
         if folder:
             # Set up formatting for the movie files
-            plt.rcParams['animation.ffmpeg_path'] ='C:\\ffmpeg\\bin\\ffmpeg.exe'
+#            plt.rcParams['animation.ffmpeg_path'] ='C:\\ffmpeg\\bin\\ffmpeg.exe'
             FFMpegWriter = animation.writers['ffmpeg']
             metadata = dict(title='WM_activity', artist='SALVIA_TCG',
                 comment='')

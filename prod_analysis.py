@@ -9,9 +9,9 @@ import numpy as np
 
 #########################################
 ### GRAMMATICAL WM OUTPUTS PROCESSING ###
-def tree_data(assemblage):
+def tree_data(assemblage, insts_used):
     """
-    Given an cxn_assemblage(Tree), returns the number of inner_nodes and outter_nodes (leaves)
+    Given an cxn_assemblage(Tree),  and the instances usedreturns the number of inner_nodes and outter_nodes (leaves)
     
     Args:
         assemblage (ASSEMBLAGE): A CXN assemblage.
@@ -26,6 +26,8 @@ def tree_data(assemblage):
     while nodes:
         n = nodes.pop()
         inner = False
+        if not(n in insts_used):
+            continue
         for e in edges:
             if e.inst_to == n:
                 inner = True
@@ -44,7 +46,7 @@ def syntactic_complexity(data):
     """
     syn_complexity = {'nodes':[], 'inner_nodes':[]}
     for dat in data:
-        (outter_nodes, inner_nodes) = tree_data(dat['assemblage'])
+        (outter_nodes, inner_nodes) = tree_data(dat['assemblage'], dat['insts_used'])
         syn_complexity['nodes'].append(len(outter_nodes) + len(inner_nodes))
         syn_complexity['inner_nodes'].append(len(inner_nodes))
     return syn_complexity
@@ -58,7 +60,7 @@ def cxn_usage_count(data):
     """
     cxn_usage = {}
     for d in data:
-        cxn_insts = d['assemblage'].schema_insts
+        cxn_insts = [inst for inst in d['assemblage'].schema_insts if inst in d['insts_used']]
         for inst in cxn_insts:
             cxn_name = inst.content.name
             if cxn_usage.has_key(cxn_name):
@@ -98,15 +100,28 @@ def utterance_lengths(data):
     
     return utter_length
     
+def partial_readout(data):
+    """
+    Given an the assemblage_out data state of a GRAMMATICAL_WM_P schema,
+    Returns
+        - a list of in {0,1}: 1 if the utterance is a partial readout, 0 otherwise.
+    """
+    partial_readout = [1 if dat['partial_readout'] else 0 for dat in data]
+    return partial_readout
+    
 def prod_analyses(data):
     """
     Carries out all the analyses and returns a single output
     """
     res = {}
+    res['num_utterances'] = len(data)
     res['syntactic_complexity'] = syntactic_complexity(data)
+    res['global_syntactic_complexity'] = float(sum(res['syntactic_complexity']['inner_nodes']))/float(sum(res['syntactic_complexity']['nodes']))
     res['cxn_usage_count'] = cxn_usage_count(data)
     res['utterance_intervals'] = utterance_intervals(data)
     res['utterance_lengths'] = utterance_lengths(data)
+    res['structural_compactness'] = sum(res['utterance_lengths'])/float(res['num_utterances'])
+    res['partial_readout'] = partial_readout(data)
     
     return [res]
 
@@ -122,12 +137,18 @@ def prod_statistics(res_list):
     """
     import numpy as np
     
-    total_res = {'syntactic_complexity':[], 'cxn_usage_count':{}, 'utterance_intervals':[], 'utterance_lengths':[]}
+    total_res = {'num_utterances':[], 'syntactic_complexity':[], 'global_syntactic_complexity':[], 'cxn_usage_count':{}, 'utterance_intervals':[], 'utterance_lengths':[], 'structural_compactness':[], 'partial_readout':[]}
     
     for res in res_list:
+        field_name = 'num_utterances'
+        total_res[field_name].append(res[field_name])
+        
         field_name = 'syntactic_complexity'
         for i in range(len(res[field_name]['inner_nodes'])):
             total_res[field_name].append(float(res[field_name]['inner_nodes'][i])/float(res[field_name]['nodes'][i]))
+        
+        field_name = 'global_syntactic_complexity'
+        total_res[field_name].append(res[field_name])
         
         field_name = 'cxn_usage_count'
         for k,v in res[field_name].iteritems():
@@ -137,18 +158,21 @@ def prod_statistics(res_list):
                 total_res[field_name][k] = [v]
         
         field_name = 'utterance_intervals'
-        for val in res[field_name]:
-            total_res[field_name].append(val)
+        total_res[field_name].extend(res[field_name])
         
         field_name = 'utterance_lengths'
-        for val in res[field_name]:
-            total_res[field_name].append(val)
+        total_res[field_name].extend(res[field_name])
         
+        field_name = 'structural_compactness'
+        total_res[field_name].append(res[field_name])
+        
+        field_name = 'partial_readout'
+        total_res[field_name].extend(res[field_name])
                 
     res_stats = {}
     my_stats = lambda vals:{"num":len(vals), "sum":np.sum(vals), "mean":np.mean(vals), "std":np.std(vals), "max":np.max(vals), "min":np.min(vals)}  
     
-    for field_name in ['syntactic_complexity', 'utterance_intervals', 'utterance_lengths']:  
+    for field_name in ['num_utterances', 'syntactic_complexity', 'global_syntactic_complexity', 'utterance_intervals', 'utterance_lengths', 'structural_compactness', 'partial_readout']:  
         if total_res[field_name]:
             res_stats[field_name] = my_stats(total_res[field_name])
         else:
