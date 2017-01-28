@@ -1,0 +1,183 @@
+{ 
+	"inputs":{
+		"easy_objects_hard_action_agent_cued":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"]
+			},
+			"BU_saliency":["WOMAN_AREA", "MAN_AREA", "KICK_AREA", "ACTION_AREA"],
+			"comments":"Easy objects, hard action, agent cued"
+		},
+		
+		"easy_objects_hard_action_patient_cued":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"]
+			},
+			"BU_saliency":["MAN_AREA", "WOMAN_AREA", "KICK_AREA", "ACTION_AREA"],
+			"comments":"Easy objects, hard action, patient cued"
+		},
+		
+		"easy_action_hard_objects_agent_first":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"]
+			},
+			"BU_saliency":["ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+			"comments":"Easy action, hard objects, first object = agent"
+		},
+		
+		"easy_action_hard_objects_patient_first":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"]
+			},
+			"BU_saliency":["ACTION_AREA", "KICK_AREA", "MAN_AREA", "WOMAN_AREA"],
+			"comments":"Easy action, hard objects, first object = patient"
+		},
+		
+		"easy_action_hard_objects_agent_cued":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"]
+			},
+			"BU_saliency":["WOMAN_AREA", "ACTION_AREA", "KICK_AREA", "MAN_AREA"],
+			"comments":"Easy action, hard objects, agent cued."
+		},
+		
+		"easy_action_hard_objects_patient_cued":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"]
+			},
+			"BU_saliency":["MAN_AREA","ACTION_AREA", "KICK_AREA", "WOMAN_AREA"],
+			"comments":"Easy action, hard objects, patient cued"
+		},
+		
+		"easy_action_hard_objects_modifier_agent_first":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"},
+				"WOMAN_FACE_AREA":{"sem_input":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"], "anchor":"woman"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"],
+				"WOMAN_AREA":["WOMAN_FACE_AREA"]
+			},
+			"BU_saliency":["ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "MAN_AREA", "WOMAN_FACE_AREA"],
+			"comments":"Easy action, hard objects + modifier, first object = agent"
+		},
+		
+		"easy_action_hard_objects_modifier_patient_first":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"},
+				"WOMAN_FACE_AREA":{"sem_input":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"], "anchor":"woman"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"],
+				"WOMAN_AREA":["WOMAN_FACE_AREA"]
+			},
+			"BU_saliency":["ACTION_AREA", "KICK_AREA", "MAN_AREA", "WOMAN_AREA", "WOMAN_FACE_AREA"],
+			"comments":"Easy action, hard objects + modifier, first object = patient"
+		},
+		
+		"easy_action_hard_objects_modifier_agent_cued":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"},
+				"WOMAN_FACE_AREA":{"sem_input":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"], "anchor":"woman"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"],
+				"WOMAN_AREA":["WOMAN_FACE_AREA"]
+			},
+			"BU_saliency":["WOMAN_AREA", "ACTION_AREA", "KICK_AREA", "MAN_AREA", "WOMAN_FACE_AREA"],
+			"comments":"Easy action, hard objects + modifier, agent_cued"
+		},
+		
+		"easy_action_hard_objects_modifier_patient_cued":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"evt1"},
+				"KICK_AREA":{"sem_input":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"},
+				"WOMAN_FACE_AREA":{"sem_input":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"], "anchor":"woman"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"KICK_AREA":["WOMAN_AREA", "MAN_AREA"],
+				"WOMAN_AREA":["WOMAN_FACE_AREA"]
+			},
+			"BU_saliency":["MAN_AREA", "ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "WOMAN_FACE_AREA"],
+			"comments":"Easy action, hard objects + modifier, patient_cued"
+		},
+		
+		"two_actions_modifier":{
+			"subscenes":{
+				"ACTION_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"], "anchor":"evt1"},
+				"PUNCH_AREA":{"sem_input":["PUNCH(punch)", "IS(is4)", "is4(a1, punch)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"a1"},
+				"WOMAN_AREA":{"sem_input":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"], "anchor":"e2"},
+				"MAN_AREA":{"sem_input":["MAN(man)", "IS(is1)", "is1(e1, man)"], "anchor":"e1"},
+				"WATERING_CAN_AREA":{"sem_input":["ENTITY(e3,F)", "WATERING_CAN(can)", "IS(is5)", "is5(e3, can)"], "anchor":"e3"},
+				"KICK_AREA":{"sem_input":["EVENT(evt2,F)", "ACTION(a2,F)", "IS(is6)", "is6(evt2,a2)", "KICK(kick)", "IS(is7)", "is7(a2, kick)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a2, e3)",
+					"MODIFY(mod1)", "mod1(e1, evt2)"] "anchor":"a2"}
+			},
+			"scene_structure":{
+				"ACTION_AREA":["PUNCH_AREA", "WOMAN_AREA", "MAN_AREA"],
+				"PUNCH_AREA":["WOMAN_AREA", "MAN_AREA"],
+				"MAN_AREA":["KICK_AREA", "WATERING_CAN_AREA"],
+				"KICK_AREA":["WATERING_CAN_AREA"]
+				
+			},
+			"BU_saliency":["ACTION_AREA", "PUNCH_AREA", "WOMAN_AREA", "MAN_AREA", "WATERING_CAN_AREA", "KICK_AREA"],
+			"comments":"Two actions, modifier"
+		}
+
+	}
+}
