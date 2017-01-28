@@ -137,7 +137,7 @@ def prod_statistics(res_list):
     """
     import numpy as np
     
-    total_res = {'num_utterances':[], 'syntactic_complexity':[], 'global_syntactic_complexity':[], 'cxn_usage_count':{}, 'utterance_intervals':[], 'utterance_lengths':[], 'structural_compactness':[], 'partial_readout':[]}
+    total_res = {'num_utterances':[], 'syntactic_complexity':[], 'global_syntactic_complexity':[], 'cxn_usage_count':{}, 'PASSIVE':[], 'ACTIVE':[], 'utterance_intervals':[], 'utterance_lengths':[], 'structural_compactness':[], 'partial_readout':[]}
     
     for res in res_list:
         field_name = 'num_utterances'
@@ -168,7 +168,13 @@ def prod_statistics(res_list):
         
         field_name = 'partial_readout'
         total_res[field_name].extend(res[field_name])
-                
+        
+        field_name = 'ACTIVE'
+        total_res[field_name].append(res['cxn_usage_count'].get('SVO', 0))
+        
+        field_name = 'PASSIVE'     
+        total_res[field_name].append(res['cxn_usage_count'].get('PAS_SVO', 0))
+        
     res_stats = {}
     my_stats = lambda vals:{"num":len(vals), "sum":np.sum(vals), "mean":np.mean(vals), "std":np.std(vals), "max":np.max(vals), "min":np.min(vals)}  
     
@@ -183,7 +189,6 @@ def prod_statistics(res_list):
         res_stats['cxn_usage_count'][k] = my_stats(v)
 
     res_stats['cxn_usage_count']['mean'] = res_stats['cxn_usage_count']['total_count']['mean']
-    
     return res_stats
 
 def prod_summary(data):

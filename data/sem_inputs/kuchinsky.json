@@ -1,82 +1,131 @@
 { 
 	"input_macros":{
-		"evt_act_static":{
+		"girl_man_kick_act_agent_cued":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions"  : {
-					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e2)", "pt1(a1, e1)"]
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"KICK_AREA":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "IS(is3)", "is3(evt1,a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
 				},
-				"sequence" :["ACTION_AREA"],
+				"sequence" :["GIRL_AREA", "MAN_AREA", "KICK_AREA", "ACTION_AREA"],
 				"timing":[],
-				"comments":"Only transitive action event frame, no content."
-			},
-			"substitutions":{
-			}
-		},
-
-		"evt_act_woman":{
-			"sem_input_frame":{
-				"sem_rate":1,
-				"propositions"  : {
-					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
-					"WOMAN_AREA":["WOMAN(woman)", "IS(is2)", "is2(e1, woman)"]
-				},
-				"sequence" :["ACTION_AREA", "WOMAN_AREA"],
-				"timing":[],
-				"comments":"Transitive action event frame. Then agent 'woman' (lexical competition)"
-			},
-			"substitutions":{
-			}			
-		},
-		
-		"evt_act_man":{
-			"sem_input_frame":{
-				"sem_rate":1,
-				"propositions"  : {
-					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
-					"WOMAN_AREA":["MAN(man)", "IS(is2)", "is2(e1, man)"]
-				},
-				"sequence" :["ACTION_AREA", "WOMAN_AREA"],
-				"timing":[],
-				"comments":"Transitive action event frame. Then agent 'man' (no lexical competition)"
-			},
-			"substitutions":{
-			}			
-		},
-		
-		"evt_act_man_kick":{
-			"sem_input_frame":{
-				"sem_rate":1,
-				"propositions"  : {
-					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
-					"MAN_AREA":["MAN(man)", "IS(is2)", "is2(e1, man)"],
-					"KICK_AREA":["KICK(kick)", "IS(is3)", "is3(a1, kick)"]
-				},
-				"sequence" :["ACTION_AREA", "MAN_AREA", "KICK_AREA"],
-				"timing":[],
-				"comments":"Transitive action event frame. Then agent 'man' (no lexical competition), then 'kick'."
+				"comments":"Easy objects, hard action, agent_cued, no lexical competition"
 			},
 			"substitutions":{
 			}
 		},
 		
-		"evt_act_woman_kick":{
+		"man_girl_kick_act_patient_cued":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions"  : {
-					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
-					"WOMAN_AREA":["WOMAN(woman)", "IS(is2)", "is2(e1, woman)"],
-					"KICK_AREA":["KICK(kick)", "IS(is3)", "is3(a1, kick)"]
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"KICK_AREA":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "IS(is3)", "is3(evt1,a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
 				},
-				"sequence" :["ACTION_AREA", "WOMAN_AREA", "KICK_AREA"],
+				"sequence" :["MAN_AREA", "GIRL_AREA", "KICK_AREA", "ACTION_AREA"],
 				"timing":[],
-				"comments":"Transitive action event frame. Then agent 'woman' (lexical competition), then 'kick'."
+				"comments":"Easy objects, hard action,  patient cued, no lexical competition"
 			},
 			"substitutions":{
 			}
 		},
 		
-		"man_woman_kick_act":{
+		"act_kick_girl_man":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
+					
+				},
+				"sequence" :["ACTION_AREA", "KICK_AREA", "GIRL_AREA", "MAN_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, no lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_girl_man_agent_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
+					
+				},
+				"sequence" :["GIRL_AREA", "ACTION_AREA", "KICK_AREA", "MAN_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, agent_cued, no lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_man_girl":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
+					
+				},
+				"sequence" :["ACTION_AREA", "KICK_AREA", "MAN_AREA", "GIRL_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, no lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		
+		"act_kick_man_girl_patient_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
+					
+				},
+				"sequence" :["MAN_AREA", "ACTION_AREA", "KICK_AREA",  "GIRL_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, patient_cued, no lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"woman_man_kick_act_agent_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"WOMAN_AREA":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"KICK_AREA":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "IS(is3)", "is3(evt1,a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["WOMAN_AREA", "MAN_AREA", "KICK_AREA", "ACTION_AREA"],
+				"timing":[],
+				"comments":"Easy objects, hard action, agent cued, agent lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		
+		"man_woman_kick_act_patient_cued":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions"  : {
@@ -87,7 +136,7 @@
 				},
 				"sequence" :["MAN_AREA", "WOMAN_AREA", "KICK_AREA", "ACTION_AREA"],
 				"timing":[],
-				"comments":"Easy objects, hard action"
+				"comments":"Easy objects, hard action, patient cued, agent lexical competition"
 			},
 			"substitutions":{
 			}
@@ -99,71 +148,174 @@
 				"propositions"  : {
 					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
 					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
-					"WOMAN_AREA":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
-					"MAN_AREA":["MAN(man)", "IS(is1)", "is1(e1, man)"]
+					"WOMAN_AREA":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
 					
 				},
 				"sequence" :["ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
 				"timing":[],
-				"comments":"Easy action, hard objects"
+				"comments":"Easy action, hard objects, agent lexical competition"
 			},
 			"substitutions":{
 			}
 		},
 		
-		"act_kick_woman_man_young":{
+		"act_kick_woman_man_agent_cued":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions"  : {
 					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
 					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
-					"WOMAN":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
-					"MAN_AREA":["MAN(man)", "IS(is1)", "is1(e1, man)"],
-					"WOMAN_FACE_AREA":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
-				},
-				"sequence" :["ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "MAN_AREA", "WOMAN_FACE_AREA"],
-				"timing":[],
-				"comments":"Easy action, hard objects + modifier"
-			},
-			"substitutions":{
-			}
-		},
-
-		
-		"woman_punch_man_kick_can":{
-			"sem_input_frame":{
-				"sem_rate":1,
-				"propositions": {
-					"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
-					"P2":["PUNCH(punch)", "IS(is4)", "is4(a1, punch)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
-					"P3":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
-					"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"],
-					"P5":["ENTITY(e3,F)", "WATERING_CAN(can)", "IS(is5)", "is5(e3, can)"],
-					"P6":["EVENT(evt2,F)", "ACTION(a2,F)", "IS(is6)", "is6(evt2,a2)", "KICK(kick)", "IS(is7)", "is7(a2, kick)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a2, e3)",
-						"MODIFY(mod1)", "mod1(e1, evt2)"]
-				},
-				"sequence" :["P1", "P2", "P3", "P4", "P5", "P6"],
-				"timing":[],
-				"comments":"Two actions, modifier"
-			},
-			"substitutions":{
-			}
-		},
-		
-		"Jin_ex":{
-				"sem_input_frame":{
-				"sem_rate":1,
-				"propositions"  : {
-					"P1":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
-					"P2":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
-					"P3":["KICK(kick)", "IS(is4)", "is4(a1, kick)"],
-					"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"],
-					"P5":["EVENT(evt2, F)", "IS(is5)", "is5(evt2, e1)", "YOUNG(young)", "MODIFY(mod1)", "mod1(evt2, young)"]
+					"WOMAN_AREA":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
 					
 				},
-				"sequence" :["P1", "P2", "P3", "P4", "P5"],
+				"sequence" :["WOMAN_AREA", "ACTION_AREA", "KICK_AREA", "MAN_AREA"],
 				"timing":[],
-				"comments":"Example presented by Jin in his modeling paper. Different treatment of relative clause in my case."
+				"comments":"Easy action, hard objects, agent cued,  agent lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_man_woman":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"WOMAN_AREA":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
+					
+				},
+				"sequence" :["ACTION_AREA", "KICK_AREA", "MAN_AREA", "WOMAN_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, agent lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_man_woman_patient_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"WOMAN_AREA":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"]
+					
+				},
+				"sequence" :["MAN_AREA", "ACTION_AREA", "KICK_AREA", "WOMAN_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, patient cued, agent lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"girl_woman_kick_act_agent_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"WOMAN_AREA":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"KICK_AREA":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "IS(is3)", "is3(evt1,a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["GIRL_AREA", "WOMAN_AREA", "KICK_AREA", "ACTION_AREA"],
+				"timing":[],
+				"comments":"Easy objects, hard action, agent cued, patient lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		
+		"woman_girl_kick_act_patient_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"WOMAN_AREA":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"KICK_AREA":["ACTION(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "IS(is3)", "is3(evt1,a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["WOMAN_AREA", "GIRL_AREA", "KICK_AREA", "ACTION_AREA"],
+				"timing":[],
+				"comments":"Easy objects, hard action, patient cued, patient lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_girl_woman":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"WOMAN_AREA":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)"]
+					
+				},
+				"sequence" :["ACTION_AREA", "KICK_AREA", "GIRL_AREA", "WOMAN_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, patient lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_girl_woman_agent_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"WOMAN_AREA":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)"]
+					
+				},
+				"sequence" :["GIRL_AREA", "ACTION_AREA", "KICK_AREA", "WOMAN_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, agent cued, patient lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_woman_girl":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"WOMAN_AREA":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)"]
+					
+				},
+				"sequence" :["ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "GIRL_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, patient lexical competition"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"act_kick_woman_girl_patient_cued":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"ACTION_AREA":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+					"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"WOMAN_AREA":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)"]
+					
+				},
+				"sequence" :["WOMAN_AREA", "ACTION_AREA", "KICK_AREA", "GIRL_AREA"],
+				"timing":[],
+				"comments":"Easy action, hard objects, patient cued, patient lexical competition"
 			},
 			"substitutions":{
 			}

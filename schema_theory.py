@@ -795,7 +795,7 @@ class WM(SYSTEM_SCHEMA):
         schema_inst = next((inst for inst in self.schema_insts if inst.name == schema_inst_name), None)
         return schema_inst
         
-    def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None, coop_asymetry =None):
+    def add_coop_link(self, inst_from, port_from, inst_to, port_to, qual=1.0, weight=None, coop_asymetry=None):
         """
         Add a cooperation link between two instances.
         A cooperation link can only be added if the two instances are not already in competition.
