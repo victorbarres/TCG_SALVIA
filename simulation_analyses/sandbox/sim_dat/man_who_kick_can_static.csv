@@ -1,0 +1,65 @@
+seed,input_rate,max_time,num_restarts,deact_weight,time_pressure,act_rest,input_name,sub_threshold,coop_weight,k,tau,comp_weight,coop_asymmetry,prune_threshold,start_produce,num_restarts,noise_std,ext_weight,conf_threshold,utterance_intervals,cxn_usage_count,syntactic_complexity,utterance_lengths,requested_info,max_BLEU_score,utterance
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><28>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><30>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,25.0,4.0,0.166666666667,2.5,nan,nan,<START><44>man that kick<69>watering can<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><25>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><65>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><25>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><256>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><283>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,163.0,4.0,0.166666666667,2.5,nan,nan,<START><469>man that kick<632>watering can<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><231>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><618>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><231>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,4.0,0.25,7.0,nan,nan,<START><1003>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,7.0,nan,nan,<START><1003>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1149>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,4.0,nan,nan,<START><1003>man kick watering can<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1291>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,4.0,0.25,7.0,nan,nan,<START><1003>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,4.0,0.25,7.0,nan,nan,<START><1003>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1149>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,4.0,0.25,4.0,nan,nan,<START><1003>man kick watering can<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1291>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,4.0,0.25,8.0,nan,nan,<START><1003>man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,man_who_kick_can_static,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan

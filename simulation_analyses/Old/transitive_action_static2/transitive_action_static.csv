@@ -1,0 +1,481 @@
+Grammatical_WM_P.C2.prune_threshold,Control.task.start_produce,num_restarts,Control.task.time_pressure,x2,Grammatical_WM_P.dyn.ext_weight,Grammatical_WM_P.dyn.act_rest,input_name,Grammatical_WM_P.C2.coop_weight,Grammatical_WM_P.dyn.noise_std,Grammatical_WM_P.dyn.k,Grammatical_WM_P.C2.confidence_threshold,x1,Grammatical_WM_P.C2.comp_weight,Grammatical_WM_P.C2.coop_asymmetry,syntactic_complexity_mean,syntactic_complexity_std,utterance_length_mean,utterance_length_std,active,passive,total_constructions,produced,utterance
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,lady kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,6.0,0.0,0,1,4,True,man is kick -ed by woman
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,0.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,0.8,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,1,0.3,1.0,10.0,1.0,nan,nan,nan,nan,nan,nan,nan,False,
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,5,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,5,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,5,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,0.8,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,0.8,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man
+0.01,0,5,400,1.0,1.0,0.001,transitive_action_static,1.0,1.0,10,0.3,1.0,10.0,1.0,0.25,0.0,3.0,0.0,1,0,4,True,woman kick man

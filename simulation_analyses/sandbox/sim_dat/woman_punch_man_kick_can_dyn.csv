@@ -1,0 +1,65 @@
+seed,input_rate,max_time,num_restarts,deact_weight,time_pressure,act_rest,input_name,sub_threshold,coop_weight,k,tau,comp_weight,coop_asymmetry,prune_threshold,start_produce,num_restarts,noise_std,ext_weight,conf_threshold,utterance_intervals,cxn_usage_count,syntactic_complexity,utterance_lengths,requested_info,max_BLEU_score,utterance
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,130.0,8.0,0.25,6.5,nan,1.0,<START><27>man is punch -ed by lady<157>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,137.0,8.0,0.25,6.5,nan,1.0,<START><29>man is punch -ed by lady<166>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,139.0,11.0,0.194444444444,5.33333333333,nan,1.0,<START><51>man is punch -ed by lady<329>man that kick is punch -ed by lady watering can<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,115.0,8.0,0.25,5.0,nan,1.0,<START><25>woman punch man<140>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,115.5,11.0,0.194444444444,5.33333333333,nan,1.0,<START><67>man is punch -ed by lady<298>man that kick is punch -ed by lady watering can<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,109.0,8.0,0.25,5.0,nan,1.0,<START><25>woman punch man<134>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,304.0,8.0,0.25,6.5,nan,1.0,<START><256>man is punch -ed by lady<560>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,7.0,0.285714285714,13.0,nan,0.846153846154,<START><324>man that watering can is kick -ed by is punch -ed by lady<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,641.0,8.0,0.25,6.5,nan,1.0,<START><471>man is punch -ed by lady<1112>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,229.0,8.0,0.25,5.0,nan,1.0,<START><231>woman punch man<460>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,714.0,8.0,0.25,6.5,nan,1.0,<START><624>man is punch -ed by lady<1338>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,211.0,8.0,0.25,5.0,nan,1.0,<START><231>woman punch man<442>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>man kick watering can woman punch man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>woman punch man man kick watering can<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>man kick watering can woman punch man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,7.0,0.285714285714,13.0,nan,0.846153846154,<START><1003>man that watering can is kick -ed by is punch -ed by lady<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>woman punch man man kick watering can<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,0.0,8.0,0.25,5.0,nan,0.8,<START><1003>woman punch man watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,nan,4.0,0.25,7.0,nan,0.857142857143,<START><1003>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,nan,4.0,0.25,3.0,nan,1.0,<START><1003>woman punch man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,1.0,0.3,nan,4.0,0.25,7.0,nan,0.857142857143,<START><1179>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,1.0,10.0,0.3,0.0,8.0,0.25,6.5,nan,0.846153846154,<START><1003>man is punch -ed by woman watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,1.0,0.3,nan,7.0,0.285714285714,10.0,nan,0.8,<START><1391>woman punch man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1.0,1,2.0,10.0,0.3,0.0,8.0,0.25,6.5,nan,0.846153846154,<START><1003>man is punch -ed by lady watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>man kick watering can woman punch man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>woman punch man man kick watering can<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>man kick watering can woman punch man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,7.0,0.285714285714,13.0,nan,0.846153846154,<START><1003>man that watering can is kick -ed by is punch -ed by lady<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,0.0,8.0,0.25,3.5,nan,0.714285714286,<START><1003>woman punch man man kick watering can<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,0.0,8.0,0.25,5.0,nan,0.8,<START><1003>woman punch man watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,6.0,8.0,0.25,5.0,nan,1.0,<START><1003>watering can is kick -ed by man<1009>woman punch man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,88.0,8.0,0.25,5.0,nan,1.0,<START><1003>woman punch man<1091>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,4.0,0.25,7.0,nan,0.857142857143,<START><1179>watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,0.0,8.0,0.25,6.5,nan,0.846153846154,<START><1003>man is punch -ed by woman watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,7.0,0.285714285714,10.0,nan,0.8,<START><1391>woman punch man that watering can is kick -ed by<END>
+378948134,100,2000,1,0.0,1.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,0.0,8.0,0.25,6.5,nan,0.846153846154,<START><1003>man is punch -ed by lady watering can is kick -ed by man<END>
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,100.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,1.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,1.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,1.0,0.3,nan,0.0,nan,nan,nan,nan,nan
+378948134,100,2000,1,0.0,1000.0,0.001,woman_punch_man_kick_can_dyn,0.8,1.0,10.0,1000.0,-10.0,1.0,0.01,1000.0,1,2.0,10.0,0.3,nan,0.0,nan,nan,nan,nan,nan

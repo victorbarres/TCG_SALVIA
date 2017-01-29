@@ -116,11 +116,11 @@ def prod_analyses(data):
     res = {}
     res['num_utterances'] = len(data)
     res['syntactic_complexity'] = syntactic_complexity(data)
-    res['global_syntactic_complexity'] = float(sum(res['syntactic_complexity']['inner_nodes']))/float(sum(res['syntactic_complexity']['nodes']))
+    res['global_syntactic_complexity'] = float(sum(res['syntactic_complexity']['inner_nodes']))/float(sum(res['syntactic_complexity']['nodes'])) if sum(res['syntactic_complexity']['nodes']) else 0
     res['cxn_usage_count'] = cxn_usage_count(data)
     res['utterance_intervals'] = utterance_intervals(data)
     res['utterance_lengths'] = utterance_lengths(data)
-    res['structural_compactness'] = sum(res['utterance_lengths'])/float(res['num_utterances'])
+    res['structural_compactness'] = sum(res['utterance_lengths'])/float(res['num_utterances']) if res['num_utterances'] else 0
     res['partial_readout'] = partial_readout(data)
     
     return [res]
@@ -145,7 +145,7 @@ def prod_statistics(res_list):
         
         field_name = 'syntactic_complexity'
         for i in range(len(res[field_name]['inner_nodes'])):
-            total_res[field_name].append(float(res[field_name]['inner_nodes'][i])/float(res[field_name]['nodes'][i]))
+            total_res[field_name].append(float(res[field_name]['inner_nodes'][i])/float(res[field_name]['nodes'][i]) if res[field_name]['nodes'][i] else 0)
         
         field_name = 'global_syntactic_complexity'
         total_res[field_name].append(res[field_name])
