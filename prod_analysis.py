@@ -178,7 +178,7 @@ def prod_statistics(res_list):
     res_stats = {}
     my_stats = lambda vals:{"num":len(vals), "sum":np.sum(vals), "mean":np.mean(vals), "std":np.std(vals), "max":np.max(vals), "min":np.min(vals)}  
     
-    for field_name in ['num_utterances', 'syntactic_complexity', 'global_syntactic_complexity', 'utterance_intervals', 'utterance_lengths', 'structural_compactness', 'partial_readout']:  
+    for field_name in ['num_utterances', 'syntactic_complexity', 'PASSIVE', 'ACTIVE', 'global_syntactic_complexity', 'utterance_intervals', 'utterance_lengths', 'structural_compactness', 'partial_readout']:  
         if total_res[field_name]:
             res_stats[field_name] = my_stats(total_res[field_name])
         else:
