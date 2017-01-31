@@ -611,7 +611,7 @@ class SEMANTIC_WM(WM):
         
         cpt_schema_inst = self.find_instance(missing_info)
         var_name = cpt_schema_inst.trace.get('ref', '')
-        self.outputs['to_output'] = '%s(%s)' %(missing_info,var_name)
+        self.outputs['to_output'] = {'missing_info':missing_info, 'var_name':var_name}
         output = cpt_schema_inst.trace['per_inst']
         return output
         
@@ -1201,7 +1201,8 @@ class GRAMMATICAL_WM_P(WM):
         
         for i in range(len(assemblages)):
             score = w1*assemblages[i].activation + w2*scores['sem_length'][i] + w3*(1-scores['form_length'][i]) + w4*scores['continuity'][i] # Scoring assemblage
-            has_form = scores['form_length'][i] != 0
+            # change if winner needs to express a form.
+            has_form = True #scores['form_length'][i] != 0
             if has_form: # An assembalge is considered only if it has a form to produce.
                 if not(winner_score):
                     winner_score = score
@@ -1844,11 +1845,11 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
         """
         # Compute match qual value based on focus values.
         focus_match = 1
-        for cxn_node, sem_node_name in a_sub_iso['nodes'].iteritems():
-            sem_node_act = SemRep.node[sem_node_name]['cpt_inst'].activity
-            if cxn_node.focus:
-                focus = 1
-                focus_match -= focus - sem_node_act # This is much too simple. But placeholder for now.            
+#        for cxn_node, sem_node_name in a_sub_iso['nodes'].iteritems():
+#            sem_node_act = SemRep.node[sem_node_name]['cpt_inst'].activity
+#            if cxn_node.focus:
+#                focus = 1
+#                focus_match -= focus - sem_node_act # This is much too simple. But placeholder for now.            
         return focus_match
     
     ####################

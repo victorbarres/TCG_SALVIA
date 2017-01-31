@@ -1,0 +1,31 @@
+{ 
+	"inputs":{
+		"scene_incremental":{
+			"subscenes":{
+				"WOMAN_AREA_CUED":{"sem_input":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)"], "anchor":"e1"},
+				"PEOPLE_AREA":{"sem_input":["ENTITY(e2,F)", "PEOPLE(girl)", "IS(is2)", "is2(e2, people)"], "anchor":"e2"},
+				"TALK_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "TALK(talk)", "IS(is4)", "is4(a1, talk)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"], "anchor":"a1"}
+			},
+			"scene_structure":{
+				"TALK_AREA":["WOMAN_AREA_CUED", "PEOPLE_AREA"]
+			},
+			"BU_saliency" :["WOMAN_AREA_CUED", "TALK_AREA", "PEOPLE_AREA"],
+			"comments":"Kuchinsky's example of difficult event and easy objects. TCG Scene: incremental strategy."
+		},
+		
+		"scene_structural":{
+			"subscenes":{
+				"MOUSE_AREA":{"sem_input":["ENTITY(e1,F)", "MOUSE(mouse)", "IS(is1)", "is1(e1, mouse)"], "anchor":"e1"},
+				"TURTLE_AREA_CUED":{"sem_input":["ENTITY(e2,F)", "TURTLE(turtle)", "IS(is2)", "is2(e2, turtle)"], "anchor":"e2"},
+				"SQUIRT_AREA":{"sem_input":["ACTION(a1,F)", "SQUIRT(squirt)", "IS(is4)", "is4(a1, squirt)"], "anchor":"a1"},
+				"GIST_AREA":{"sem_input":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],"anchor":"evt1"}
+			},
+			"scene_structure":{
+				"GIST_AREA":["MOUSE_AREA", "TURTLE_AREA", "SQUIRT_AREA"]
+			},
+			"BU_saliency" :["GIST", "TURTLE_AREA_CUED", "SQUIRT_AREA", "MOUSE_AREA"],
+			"comments":"Kuchinsky's example of difficult event and easy objects. TCG Scene: incremental strategy."
+		}
+
+	}
+}

@@ -196,7 +196,7 @@ def get_requested_info(outputs):
     for t in sorted(outputs):
         r = outputs[t]['Semantic_WM']
         if r:
-            request = '<%i>%s' %(t, r)
+            request = '<%i>%s(%s)' %(t, r['missing_info'], r['var_name'])
             requested_info += request
             request_list.append(r)
     request_output = start + requested_info + end if requested_info else None
@@ -247,7 +247,8 @@ def summarize_data(outputs, ground_truth=None):
     sem_analysis = {}
     request, request_list = get_requested_info(outputs)
     sem_analysis['requested_info'] = request
-    sem_analysis['num_requests'] = len(request_list)       
+    sem_analysis['num_requests'] = len(request_list)
+    sem_analysis['first_request']= request_list[0]['var_name'] if len(request_list)>0 else None
     
     summary = {'GramWM':gram_analysis, 'PhonWM':phon_analysis, 'SemWM':sem_analysis}
     return summary
@@ -380,13 +381,13 @@ def parameter_space(folder=None, input_rate=100):
     model_params_set = []
     
     # Task parameters
-    start_produces = np.linspace(1, INPUT_RATE*10, 2)
-    time_pressures = np.linspace(1, INPUT_RATE*5, 2)
+    start_produces = [10] #np.linspace(1, INPUT_RATE*10, 2)
+    time_pressures = [INPUT_RATE/2, INPUT_RATE*5] #np.linspace(INPUT_RATE/2, INPUT_RATE*10, 10)
     
     # C2 parameters
-    coop_weights =  np.linspace(1.0, 10.0, 2)
+    coop_weights =  [1.0] #np.linspace(1.0, 10.0, 2)
     coop_asymmetries = [1.0] #np.linspace(0.0, 1.0, 2)
-    comp_weights = [-10.0, -1.0]
+    comp_weights = [-10.0]
     max_capacity = [None]
     prune_thresholds = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01 # Manipulations can yield "broca's aphasia" (0.3)
     conf_tresholds = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
@@ -394,11 +395,11 @@ def parameter_space(folder=None, input_rate=100):
     deact_weights = [0.0] #np.linspace(0.0, 0.9, 2)
     
     # Dyn parameters
-    taus = np.linspace(INPUT_RATE, INPUT_RATE*10, 2) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
-    ks= np.linspace(1, 10, 2) # Interesting effects, bifurcation at a given value.
+    taus = [INPUT_RATE*10] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    ks= [10] #np.linspace(1, 10, 2) # Interesting effects, bifurcation at a given value.
     act_rests = [0.001] # Act rest does not take into account the noise.
     noise_stds = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
-    ext_weights = np.linspace(1, 10, 2)
+    ext_weights = [1.0] #np.linspace(1, 10, 2)
     
     param_iter = itertools.product(start_produces, time_pressures, coop_weights, coop_asymmetries, comp_weights, max_capacity, prune_thresholds, conf_tresholds, sub_threholds, deact_weights, taus, ks, act_rests, noise_stds, ext_weights)
     for start_produce, time_pressure, coop_weight, coop_asymmetry, comp_weight, max_capacity, prune_threshold, conf_threshold, sub_threshold, deact_weight, tau, k, act_rest, noise_std, ext_weight in param_iter:
@@ -528,13 +529,13 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     verbose = 1
         
     # Defining the number of restarts
-    NUM_RESTARTS = 2
+    NUM_RESTARTS = 10
 
     # Defining fixed input rate
     INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
     
     # Defining simulation time
-    max_time = 20*INPUT_RATE
+    max_time = 10*INPUT_RATE
     
     
     # Saving meta parameters
@@ -546,34 +547,48 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     
     #Setting up and saving model
     semantics_name = 'TCG_semantics_main'
-    grammar_name = 'TCG_grammar_VB_main'
+    grammar_name = 'TCG_grammar_VB_SVO_only'
     model  = set_model(semantics_name, grammar_name)
     st_save(model, model.name, folder)
     
     # Defining inputs.
-    sem_input_file = 'benchmark.json'
+    sem_input_file = 'kuchinsky_simple.json'
     sem_input_macro = True # For now it only uses macros
     
     # Define the set of inputs on which the model will be run.
+    #    inputs = ["scene_girlkickboy"]
+    #    inputs = ["woman_kick_man_static", "young_woman_punch_man_static", "woman_punch_man_kick_can_static"]
+    #    inputs = ["woman_kick_man_static"]
+    
     benchmark_inputs = ["test_naming", "test_naming_ambiguous", "test_naming_2", "young_woman_static","young_woman_dyn","woman_kick_man_static", "woman_kick_man_dyn", "young_woman_punch_man_static", "young_woman_punch_man_dyn", "woman_punch_man_kick_can_static", "woman_punch_man_kick_can_dyn", "woman_in_blue_static"] 
-#    inputs = ["scene_girlkickboy"]
-#    inputs = ["woman_kick_man_static", "young_woman_punch_man_static", "woman_punch_man_kick_can_static"]
-#    inputs = ["woman_kick_man_static"]
-    kuchinksy_inputs = ["girl_man_kick_act_agent_cued", "man_girl_kick_act_patient_cued", "act_kick_girl_man", "act_kick_girl_man_agent_cued","act_kick_man_girl", "act_kick_man_girl_patient_cued",
-                        "woman_man_kick_act_agent_cued", "man_woman_kick_act_patient_cued", "act_kick_woman_man", "act_kick_woman_man_agent_cued","act_kick_man_woman", "act_kick_man_woman_patient_cued",
-                        "girl_woman_kick_act_agent_cued", "woman_girl_kick_act_patient_cued", "act_kick_girl_woman", "act_kick_girl_woman_agent_cued","act_kick_woman_girl", "act_kick_woman_girl_patient_cued"
-                        ]
+
+    kuchinksy_inputs = [u'event_agent_patient_action', u'patient_event_agent_action', u'action_event_agent_patient', 
+                         u'event_agent_action_patient', u'event_patient_agent_action', u'action_patient_agent_event', 
+                         u'action_patient_event_agent', u'patient_agent_action_event', u'patient_agent_event_action', 
+                         u'agent_action_event_patient', u'action_agent_event_patient', u'patient_action_event_agent', 
+                         u'event_action_agent_patient', u'event_patient_action_agent', u'agent_event_patient_action', 
+                         u'agent_patient_action_event', u'patient_event_action_agent', u'action_agent_patient_event', 
+                         u'agent_action_patient_event', u'agent_patient_event_action', u'event_action_patient_agent', 
+                         u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent'
+                        ] # 24 inputs (all the permutations)
+                        
+    kuchinsky_simple = ["agent_patient_action", "patient_agent_action",
+                        "action_agent_patient", "action_patient_agent",
+                        "agent_action_patient", "patient_action_agent"
+                        ] # 6 inputs (all the permutations)
+                        
+    kuchinsky_jin = ["scene_incremental", "scene_structural"]
+                        
     threshold_inputs = ["girl_man_kick_act_agent_cued", "man_girl_kick_act_patient_cued", "act_kick_girl_man", "act_kick_girl_man_agent_cued","act_kick_man_girl", "act_kick_man_girl_patient_cued",
                         "woman_man_kick_act_agent_cued", "man_woman_kick_act_patient_cued", "act_kick_woman_man", "act_kick_woman_man_agent_cued","act_kick_man_woman", "act_kick_man_woman_patient_cued",
                         "girl_woman_kick_act_agent_cued", "woman_girl_kick_act_patient_cued", "act_kick_girl_woman", "act_kick_girl_woman_agent_cued","act_kick_woman_girl", "act_kick_woman_girl_patient_cued",
                         "young_woman_punch_man_dyn", "young_woman_punch_man_dyn_agent_cued", "young_woman_punch_man_dyn_patient_cued", 
                         "complex1_dyn", "complex2_dyn", "complex3_dyn", "complex4_dyn", "complex5_dyn"
                         ]
-    threshold_inputs2 = ["young_woman_punch_man_dyn", "young_woman_punch_man_dyn_agent_cued", "young_woman_punch_man_dyn_patient_cued", 
-                        "complex1_dyn", "complex2_dyn", "complex3_dyn", "complex4_dyn", "complex5_dyn"
-                        ]
-    
-    inputs = benchmark_inputs
+                        
+    test_inputs = [u'event_action_patient_agent', u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent']
+                        
+    inputs = kuchinsky_jin
     output = {}
     print "SIMULATION STARTING"
     start_time = time.time()
@@ -680,6 +695,6 @@ def tell_me(utterance):
 if __name__=='__main__':
 #    run_diagnostics(verbose=4, prob_times=[])
 #    run_grid_search()
-    output  = run_grid_search(sim_name='benchmark', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
+    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
 #    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="act_kick_woman_man", sem_input_file='kuchinsky.json', sem_input_macro=True, max_time=900, seed=None, speed_param=40, prob_times=[], verbose=4, save=True, anim=False, anim_step=10)
