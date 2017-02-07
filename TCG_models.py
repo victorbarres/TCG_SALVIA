@@ -10,6 +10,12 @@ import language_schemas as ls
 import perceptual_schemas as ps
 from loader import TCG_LOADER
 
+GRAMMAR_PATH = './data/grammars/'
+GRAMMAR_NAME = 'TCG_grammar_VB_main'
+SEMANTICS_PATH = './data/semantics/'
+SEMANTICS_NAME = 'TCG_semantics_main'
+
+
 def parameters(system_names):
     """
     Returns a parameter dictionary containing the path and values for the parameters associated with each system whose name is given in system_names
@@ -111,6 +117,8 @@ def parameters(system_names):
         'C2.comp_weight':0.0,
         'C2.max_capacity':None,
         },
+    
+    'Cxn_retrieval_C':{},
         
     'Grammatical_WM_C':{
         'dyn.tau':100.0, 
@@ -162,11 +170,11 @@ def parameters(system_names):
             system_params[path] = v
     return system_params
     
-def TCG_production_system(name='language_system_P', 
-                          grammar_name='TCG_grammar_VB_main', 
-                          semantics_name = 'TCG_semantics_main',
-                          grammar_path = './data/grammars/',
-                          semantics_path = './data/semantics/'):
+def TCG_production_system(name = 'language_system_P', 
+                          grammar_name = GRAMMAR_NAME, 
+                          semantics_name = SEMANTICS_NAME,
+                          grammar_path = GRAMMAR_PATH,
+                          semantics_path = SEMANTICS_PATH):
     """
     Creates and returns the TCG production model.
     """
@@ -225,6 +233,8 @@ def TCG_production_system(name='language_system_P',
     model_params = parameters(system_names)
     model.update_params(model_params)
     
+    control.set_mode('produce')
+    
     # Loading data
     semantics_file = "%s.json" % semantics_name
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
@@ -240,11 +250,11 @@ def TCG_production_system(name='language_system_P',
     return model
 
 
-def TCG_comprehension_system(name='language_system_C',
-                             grammar_name='TCG_grammar_VB', 
-                             semantics_name = 'TCG_semantics',
-                             grammar_path = './data/grammars/',
-                             semantics_path = './data/semantics/'):
+def TCG_comprehension_system(name = 'language_system_C',
+                             grammar_name = GRAMMAR_NAME, 
+                             semantics_name = SEMANTICS_NAME,
+                             grammar_path = GRAMMAR_PATH,
+                             semantics_path = SEMANTICS_PATH):
     """
     Creates and returns the TCG comprehension model.
     """
@@ -290,14 +300,11 @@ def TCG_comprehension_system(name='language_system_C',
     model.set_input_ports([phonWM_C.find_port('from_input')])
     model.set_output_ports([semanticWM.find_port('to_visual_WM')])
     
-    
     # Parameters
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
     
-    
-    grammaticalLTM.init_act = grammaticalWM_C.params['C2']['confidence_threshold']*0.5
     control.set_mode('listen')
     
     # Loading data
@@ -314,11 +321,11 @@ def TCG_comprehension_system(name='language_system_C',
     
     return model
 
-def TCG_language_system(name='language_system',
-                        grammar_name='TCG_grammar_VB_main', 
-                        semantics_name = 'TCG_semantics_main',
-                        grammar_path = './data/grammars/',
-                        semantics_path = './data/semantics/'):
+def TCG_language_system(name = 'language_system',
+                        grammar_name = GRAMMAR_NAME, 
+                        semantics_name = SEMANTICS_NAME,
+                        grammar_path = GRAMMAR_PATH,
+                        semantics_path = SEMANTICS_PATH):
     """
     Creates and returns the TCG language model, including both production and comprehension.
     """
@@ -369,18 +376,19 @@ def TCG_language_system(name='language_system',
     model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
     model.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
     model.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
-    model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     model.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
+    model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     model.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
+    model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
     
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
     model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
     model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
     model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
-    model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
-    model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
     model.add_connection(conceptLTM, 'to_semantic_WM', semanticWM, 'from_concept_LTM')
+    model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     
     model.set_input_ports([phonWM_C.find_port('from_input')])
     model.set_output_ports([utter.find_port('to_output')])
@@ -389,8 +397,6 @@ def TCG_language_system(name='language_system',
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
-    
-#    grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']*0.5
     
     # Loading data
     semantics_file = "%s.json" % semantics_name
@@ -405,13 +411,13 @@ def TCG_language_system(name='language_system',
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
     
-    return 
+    return model
     
 def SALVIA_P(name='SALVIA_P',
-           grammar_name='TCG_grammar_VB_main', 
-           semantics_name = 'TCG_semantics_main',
-           grammar_path = './data/grammars/',
-           semantics_path = './data/semantics/'):
+           grammar_name = GRAMMAR_NAME, 
+           semantics_name = SEMANTICS_NAME,
+           grammar_path = GRAMMAR_PATH,
+           semantics_path = SEMANTICS_PATH):
     """
     Creates and returns the SALVIA production model.
     """
@@ -512,10 +518,10 @@ def SALVIA_P(name='SALVIA_P',
     return model
     
 def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
-                           grammar_name='TCG_grammar_VB_main', 
-                           semantics_name = 'TCG_semantics_main',
-                           grammar_path = './data/grammars/',
-                           semantics_path = './data/semantics/'):
+                             grammar_name = GRAMMAR_NAME, 
+                             semantics_name = SEMANTICS_NAME,
+                             grammar_path = GRAMMAR_PATH,
+                             semantics_path = SEMANTICS_PATH):
     """
     Creates and returns the SALVIA model with verbal guidance.
     """
@@ -530,10 +536,10 @@ def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
     return model
     
 def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
-                   grammar_name='TCG_grammar_VB_main', 
-                   semantics_name = 'TCG_semantics_main',
-                   grammar_path = './data/grammars/',
-                   semantics_path = './data/semantics/'):
+                   grammar_name = GRAMMAR_NAME, 
+                   semantics_name = SEMANTICS_NAME,
+                   grammar_path = GRAMMAR_PATH,
+                   semantics_path = SEMANTICS_PATH):
     """
     Creates and returns a light version of the SALVIA production model.
     It bypasses the VisualWM and the Conceptualizer
@@ -659,5 +665,6 @@ def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
         
 
 if __name__ == '__main__':
-    production_system = TCG_production_system()
+    model = TCG_language_system()
+    model.system2dot(image_type='png', disp=True)
 #    st.save(production_system)

@@ -2006,6 +2006,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
                 plt.title(title)
                 img = plt.imread(img_name)
                 plt.imshow(img)
+                plt.show()
     
     def show_params(self):
         """

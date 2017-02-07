@@ -2487,9 +2487,8 @@ class GRAMMATICAL_WM_C(WM):
             eq_inst = inst
         eq_inst.activity = new_assemblage.activation
         return (eq_inst, a2i_map)
-      
+       
     @staticmethod      
-     @staticmethod      
     def reduce_assemblage(assemblage, coop_link, a2i_map):
         """
         Returns a new, reduced, assemblage in which the instances cooperating (as defined by 'coop_link') have been combined.
