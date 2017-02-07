@@ -657,6 +657,7 @@ class SEMANTIC_WM(WM):
         nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
         nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
         nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
+        plt.show()
 
 ###################
 ### GRAMMAR LTM ###
@@ -2653,7 +2654,7 @@ class GRAMMATICAL_WM_C(WM):
         Returns:
             - sem_frame = the SemFrame of the equivalent instance.
         """
-        eq_inst = GRAMMATICAL_WM_C.assemblage2inst(assemblage)
+        (eq_inst, a2i_map) = GRAMMATICAL_WM_C.assemblage2inst(assemblage)
         sem_frame = eq_inst.content.SemFrame      
         return sem_frame
     
