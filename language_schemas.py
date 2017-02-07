@@ -2293,13 +2293,15 @@ class GRAMMATICAL_WM_C(WM):
     def get_winner_assemblage(self, assemblages):
         """
         Args: assemblages ([ASSEMBLAGE])
-        Note: Need to discuss the criteria that come into play in choosing the winner assemblages.
+        Notes: 
+            - Need to discuss the criteria that come into play in choosing the winner assemblages.
+            - Check how this should be udpated on the basis of the method used for production.
         """
         winner = None
         max_score = None
         # Computing the equivalent instance for each assemblage.
         for assemblage in assemblages:
-            eq_inst = self.assemblage2inst(assemblage)
+            (eq_inst, a2i_map) = self.assemblage2inst(assemblage)
             score = eq_inst.activity
             if not(max_score):
                 max_score = score

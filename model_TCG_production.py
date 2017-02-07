@@ -23,7 +23,6 @@ TMP_FOLDER = './tmp'
 
 ##################
 #### RUNNING MODEL
-
 def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}):
     """
     Sets up a TCG production model.
@@ -349,8 +348,8 @@ def run_diagnostics(verbose=2, prob_times=[]):
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
         res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
-#        print "\nRESULTS:\n"
-#        print res
+        print "\nRESULTS:\n"
+        print res
 
 ############################
 #### PARAMTER SPACE ANALYSIS      
@@ -700,5 +699,6 @@ if __name__=='__main__':
 #    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
     out, out2str = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_punch_man_dyn", sem_input_file='TCG_AAAI_input.json', sem_input_macro=False, max_time=1000, seed=None, speed_param=100, prob_times=[], verbose=4, save=True, anim=False, anim_step=1)
-    with open('./output.txt', 'w') as f:
+    file_name = './%s/output.txt' %TMP_FOLDER
+    with open(file_name, 'w') as f:
         f.write(out2str)

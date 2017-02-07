@@ -1153,7 +1153,7 @@ class WM(SYSTEM_SCHEMA):
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         
         if folder:
-            file_name = '%s/%s' %(folder, 'inst_dynamics.pdf')
+            file_name = '%s/%s_%s' %(folder, self.name, 'inst_dynamics.pdf')
             plt.savefig(file_name, bbox_inches='tight')
         else:
             f1.show()
@@ -1167,7 +1167,7 @@ class WM(SYSTEM_SCHEMA):
         plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
         plt.margins(0.1, 0.1)
         if folder:
-            file_name = '%s/%s' %(folder, 'WM_activity.pdf')
+            file_name = '%s/%s_%s' %(folder, self.name, 'WM_activity.pdf')
             plt.savefig(file_name, bbox_inches='tight')
         else:
             f2.show()
@@ -1212,7 +1212,7 @@ class WM(SYSTEM_SCHEMA):
         plt.margins(0.1, 0.1)
             
         if folder:
-            file_name = '%s/%s' %(folder, 'C2_analysis.pdf')
+            file_name = '%s/%s_%s' %(folder, self.name, 'C2_analysis.pdf')
             plt.savefig(file_name, bbox_inches='tight')
         else:
             plt.show()
@@ -1285,13 +1285,11 @@ class WM(SYSTEM_SCHEMA):
             metadata = dict(title='WM_activity', artist='SALVIA_TCG',
                 comment='')
             writer = FFMpegWriter(fps=24, metadata=metadata, bitrate=None)
-            file_name = '%s/%s' %(folder, 'WM_activity.mp4')
+            file_name = '%s/%s_%s' %(folder, self.name, 'WM_inst_activity.mp4')
             anim.save(file_name, writer=writer)
             plt.close(fig)
         else:
-            plt.show()
-    
-            
+            plt.show()      
         
     def show_state(self):
         """
