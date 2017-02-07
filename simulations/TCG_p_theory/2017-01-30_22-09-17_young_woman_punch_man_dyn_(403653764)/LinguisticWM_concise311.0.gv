@@ -1,0 +1,87 @@
+digraph LinguisticWM_concise {
+rankdir=LR;
+style=rounded;
+compound=true;
+labeljust=l;
+penwidth=2;
+subgraph cluster_linguisticWM {
+subgraph cluster_semWM {
+label=<<FONT FACE="consolas">Semantic WM (t:311.0)</FONT>>;
+subgraph cluster_SemRep {
+color=white;
+fillcolor=white;
+label="";
+MAN_170 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">MAN_170 (1.0)</FONT>>];
+YOUNG_188 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">YOUNG_188 (1.0)</FONT>>];
+PUNCH_177 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">PUNCH_177 (1.0)</FONT>>];
+ENTITY_169 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">ENTITY_169 (1.0)</FONT>>];
+WOMAN_184 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">WOMAN_184 (1.0)</FONT>>];
+ACTION_174 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">ACTION_174 (1.0)</FONT>>];
+EVENT_173 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">EVENT_173 (1.0)</FONT>>];
+ENTITY_176 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">ENTITY_176 (1.0)</FONT>>];
+ENTITY_169 -> MAN_170  [fontname=consolas, label=<<FONT FACE="consolas">IS_171 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ACTION_174 -> ENTITY_169  [fontname=consolas, label=<<FONT FACE="consolas">PATIENT_180 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ACTION_174 -> ENTITY_176  [fontname=consolas, label=<<FONT FACE="consolas">AGENT_179 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ACTION_174 -> PUNCH_177  [fontname=consolas, label=<<FONT FACE="consolas">IS_178 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+EVENT_173 -> ACTION_174  [fontname=consolas, label=<<FONT FACE="consolas">IS_175 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ENTITY_176 -> WOMAN_184  [fontname=consolas, label=<<FONT FACE="consolas">IS_185 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ENTITY_176 -> YOUNG_188  [fontname=consolas, label=<<FONT FACE="consolas">MODIFY_189 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+}
+
+}
+
+subgraph cluster_gramWM {
+label=<<FONT FACE="consolas">Grammatical WM (t:311.0)</FONT>>;
+subgraph cluster_C2_cluster {
+color=white;
+label="";
+fill=white;
+MAN_172 [shape=box, fontname=consolas, fontsize=14, fillcolor="#c383dd", color="#c383dd", style="filled, rounded", label=<<FONT FACE="consolas">MAN_172 (0.9)</FONT>>];
+SVO_181 [shape=box, fontname=consolas, fontsize=14, fillcolor="#f65a5e", color="#f65a5e", style="filled, rounded", label=<<FONT FACE="consolas">SVO_181 (0.0)</FONT>>];
+PAS_SVO_182 [shape=box, fontname=consolas, fontsize=14, fillcolor="#2689df", color="#2689df", style="filled, rounded", label=<<FONT FACE="consolas">PAS_SVO_182 (0.8)</FONT>>];
+PUNCH_183 [shape=box, fontname=consolas, fontsize=14, fillcolor="#807501", color="#807501", style="filled, rounded", label=<<FONT FACE="consolas">PUNCH_183 (0.9)</FONT>>];
+WOMAN_186 [shape=box, fontname=consolas, fontsize=14, fillcolor="#f25e62", color="#f25e62", style="filled, rounded", label=<<FONT FACE="consolas">WOMAN_186 (0.1)</FONT>>];
+WOMAN2_187 [shape=box, fontname=consolas, fontsize=14, fillcolor="#aa3133", color="#aa3133", style="filled, rounded", label=<<FONT FACE="consolas">WOMAN2_187 (0.1)</FONT>>];
+ADJUNCT_N_190 [shape=box, fontname=consolas, fontsize=14, fillcolor="#10436d", color="#10436d", style="filled, rounded", label=<<FONT FACE="consolas">ADJUNCT_N_190 (0.4)</FONT>>];
+YOUNG_191 [shape=box, fontname=consolas, fontsize=14, fillcolor="#33dc89", color="#33dc89", style="filled, rounded", label=<<FONT FACE="consolas">YOUNG_191 (0.4)</FONT>>];
+MAN_172 -> SVO_181  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+MAN_172 -> PAS_SVO_182  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+PUNCH_183 -> SVO_181  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+PUNCH_183 -> PAS_SVO_182  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN_186 -> SVO_181  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN_186 -> PAS_SVO_182  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN2_187 -> SVO_181  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN2_187 -> PAS_SVO_182  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+ADJUNCT_N_190 -> SVO_181  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+ADJUNCT_N_190 -> PAS_SVO_182  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN_186 -> ADJUNCT_N_190  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN2_187 -> ADJUNCT_N_190  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+YOUNG_191 -> ADJUNCT_N_190  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+PAS_SVO_182 -> SVO_181  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+WOMAN2_187 -> WOMAN_186  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+}
+
+}
+
+MAN_172 -> MAN_170  [color="#c383dd", style=dashed, splines=spline, dir=both];
+MAN_172 -> ENTITY_169  [color="#c383dd", style=dashed, splines=spline, dir=both];
+SVO_181 -> ACTION_174  [color="#f65a5e", style=dashed, splines=spline, dir=both];
+SVO_181 -> EVENT_173  [color="#f65a5e", style=dashed, splines=spline, dir=both];
+SVO_181 -> ENTITY_176  [color="#f65a5e", style=dashed, splines=spline, dir=both];
+SVO_181 -> ENTITY_169  [color="#f65a5e", style=dashed, splines=spline, dir=both];
+PAS_SVO_182 -> EVENT_173  [color="#2689df", style=dashed, splines=spline, dir=both];
+PAS_SVO_182 -> ENTITY_169  [color="#2689df", style=dashed, splines=spline, dir=both];
+PAS_SVO_182 -> ENTITY_176  [color="#2689df", style=dashed, splines=spline, dir=both];
+PAS_SVO_182 -> ACTION_174  [color="#2689df", style=dashed, splines=spline, dir=both];
+PUNCH_183 -> PUNCH_177  [color="#807501", style=dashed, splines=spline, dir=both];
+PUNCH_183 -> ACTION_174  [color="#807501", style=dashed, splines=spline, dir=both];
+WOMAN_186 -> ENTITY_176  [color="#f25e62", style=dashed, splines=spline, dir=both];
+WOMAN_186 -> WOMAN_184  [color="#f25e62", style=dashed, splines=spline, dir=both];
+WOMAN2_187 -> WOMAN_184  [color="#aa3133", style=dashed, splines=spline, dir=both];
+WOMAN2_187 -> ENTITY_176  [color="#aa3133", style=dashed, splines=spline, dir=both];
+ADJUNCT_N_190 -> YOUNG_188  [color="#10436d", style=dashed, splines=spline, dir=both];
+ADJUNCT_N_190 -> ENTITY_176  [color="#10436d", style=dashed, splines=spline, dir=both];
+YOUNG_191 -> YOUNG_188  [color="#33dc89", style=dashed, splines=spline, dir=both];
+}
+
+}

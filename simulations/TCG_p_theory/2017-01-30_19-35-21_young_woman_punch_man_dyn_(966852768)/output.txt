@@ -1,0 +1,155 @@
+
+
+#############macro: False
+input_name: young_woman_punch_man_dyn
+utterances:
+<START><602>man is punch -ed by young lady<END>
+requested info:
+None
+analysis:
+{
+    "GramWM": {
+        "ACTIVE": {
+            "max": 0, 
+            "mean": 0.0, 
+            "min": 0, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 0
+        }, 
+        "PASSIVE": {
+            "max": 1, 
+            "mean": 1.0, 
+            "min": 1, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 1
+        }, 
+        "cxn_usage_count": {
+            "ADJUNCT_N": {
+                "max": 1, 
+                "mean": 1.0, 
+                "min": 1, 
+                "num": 1, 
+                "std": 0.0, 
+                "sum": 1
+            }, 
+            "MAN": {
+                "max": 1, 
+                "mean": 1.0, 
+                "min": 1, 
+                "num": 1, 
+                "std": 0.0, 
+                "sum": 1
+            }, 
+            "PAS_SVO": {
+                "max": 1, 
+                "mean": 1.0, 
+                "min": 1, 
+                "num": 1, 
+                "std": 0.0, 
+                "sum": 1
+            }, 
+            "PUNCH": {
+                "max": 1, 
+                "mean": 1.0, 
+                "min": 1, 
+                "num": 1, 
+                "std": 0.0, 
+                "sum": 1
+            }, 
+            "WOMAN2": {
+                "max": 1, 
+                "mean": 1.0, 
+                "min": 1, 
+                "num": 1, 
+                "std": 0.0, 
+                "sum": 1
+            }, 
+            "YOUNG": {
+                "max": 1, 
+                "mean": 1.0, 
+                "min": 1, 
+                "num": 1, 
+                "std": 0.0, 
+                "sum": 1
+            }, 
+            "mean": 6.0, 
+            "total_count": {
+                "max": 6, 
+                "mean": 6.0, 
+                "min": 6, 
+                "num": 1, 
+                "std": 0.0, 
+                "sum": 6
+            }
+        }, 
+        "global_syntactic_complexity": {
+            "max": 0.33333333333333331, 
+            "mean": 0.33333333333333331, 
+            "min": 0.33333333333333331, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 0.33333333333333331
+        }, 
+        "num_utterances": {
+            "max": 1, 
+            "mean": 1.0, 
+            "min": 1, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 1
+        }, 
+        "partial_readout": {
+            "max": 0, 
+            "mean": 0.0, 
+            "min": 0, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 0
+        }, 
+        "structural_compactness": {
+            "max": 7.0, 
+            "mean": 7.0, 
+            "min": 7.0, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 7.0
+        }, 
+        "syntactic_complexity": {
+            "max": 0.33333333333333331, 
+            "mean": 0.33333333333333331, 
+            "min": 0.33333333333333331, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 0.33333333333333331
+        }, 
+        "utterance_intervals": {
+            "max": NaN, 
+            "mean": NaN, 
+            "min": NaN, 
+            "num": 1, 
+            "std": NaN, 
+            "sum": NaN
+        }, 
+        "utterance_lengths": {
+            "max": 7, 
+            "mean": 7.0, 
+            "min": 7, 
+            "num": 1, 
+            "std": 0.0, 
+            "sum": 7
+        }
+    }, 
+    "PhonWM": {
+        "max_BLEU_score": null, 
+        "utterance": "<START><602>man is punch -ed by young lady<END>"
+    }, 
+    "SemWM": {
+        "first_request": null, 
+        "num_requests": 0, 
+        "requested_info": null
+    }
+}
+
+#############

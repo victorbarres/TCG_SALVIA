@@ -69,7 +69,7 @@ def parameters(system_names):
         },
         
     'Phonological_WM_P':{
-        'dyn.tau':100.0,
+        'dyn.tau':300.0,
         'dyn.int_weight':1.0,
         'dyn.ext_weight':1.0,
         'dyn.act_rest':0.001,
@@ -89,8 +89,8 @@ def parameters(system_names):
         
     'Control':{
         'task.mode':'produce',
-        'task.time_pressure': 10.0, #200.0,
-        'task.start_produce': 1.0, #400.0,
+        'task.time_pressure': 200, #200.0,
+        'task.start_produce': 400.0, #400.0,
         'style.activation':0.7, #0.7
         'style.sem_length':0.0, #0.5
         'style.form_length':0.0, #0.0

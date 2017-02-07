@@ -138,7 +138,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
             TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
     
     if save:
-        model.save_sim(file_path = FOLDER, file_name = 'output.json')
+        model.save_sim(file_path = FOLDER, file_name = 'output')
         
     # Prints utterance in verbose mode.
     if verbose > 1:                
@@ -262,7 +262,7 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     """
     model = set_model(semantics_name, grammar_name, model_params=model_params)
     sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param)
-    
+        
     ground_truth = sem_gen.ground_truths
     
     out = {}
@@ -270,25 +270,27 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
         for name in sem_gen.sem_inputs:
             out[name] = run(model, sem_gen, name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
     else:
-        out[name] = run(model, sem_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
+        out[input_name] = run(model, sem_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
     
     if verbose > 0:
+        out2str = ''
         for k,v in out.iteritems():
             (utter, utter_list) = get_produced_utterances(v)
             (info, info_list) = get_requested_info(v)
-            print '\n\n#############'
-            print 'macro: %s\n' %sem_gen.is_macro
+            out2str += '\n\n#############\n'
+            out2str += 'macro: %s\n' %sem_gen.is_macro
             if sem_gen.is_macro:
-                print 'macro_name: %s \n' % input_name 
-            print 'input_name: %s\n' %k
-            print 'utterances:\n'
-            print '%s\n' % utter
-            print 'requested info:\n'
-            print '%s\n' % info
-            print 'analysis:\n'
-            print '%s\n\n' %json.dumps(summarize_data(v, ground_truth), sort_keys=True, indent=4)
-            print '#############'
-    return out
+                out2str += 'macro_name: %s \n' % input_name 
+            out2str += 'input_name: %s\n' %k
+            out2str += 'utterances:\n'
+            out2str += '%s\n' % utter
+            out2str += 'requested info:\n'
+            out2str += '%s\n' % info
+            out2str += 'analysis:\n'
+            out2str += '%s\n\n' %json.dumps(summarize_data(v, ground_truth), sort_keys=True, indent=4)
+            out2str += '#############'
+        print out2str
+    return out, out2str
     
 ###############
 #### DIAGNOSTIC 
@@ -695,6 +697,8 @@ def tell_me(utterance):
 if __name__=='__main__':
 #    run_diagnostics(verbose=4, prob_times=[])
 #    run_grid_search()
-    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
+#    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
-#    out = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="act_kick_woman_man", sem_input_file='kuchinsky.json', sem_input_macro=True, max_time=900, seed=None, speed_param=40, prob_times=[], verbose=4, save=True, anim=False, anim_step=10)
+    out, out2str = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_punch_man_dyn", sem_input_file='TCG_AAAI_input.json', sem_input_macro=False, max_time=1000, seed=None, speed_param=100, prob_times=[], verbose=4, save=True, anim=False, anim_step=1)
+    with open('./output.txt', 'w') as f:
+        f.write(out2str)

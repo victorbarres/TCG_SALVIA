@@ -903,7 +903,7 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
         
         prog = 'dot'
-        file_type = 'svg'
+        file_type = 'pdf'
         if not(concise):
             name='LinguisticWM'
         else:

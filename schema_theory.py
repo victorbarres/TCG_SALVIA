@@ -1122,7 +1122,7 @@ class WM(SYSTEM_SCHEMA):
     #######################
     ### DISPLAY METHODS ###
     #######################
-    def show_dynamics(self, folder=None):
+    def show_dynamics(self, folder=None, show_params=False):
         """
         Note:
             - I am computing the density considering all links as unweighted and bidirectional.This does not take into account the assymetry coef or the weights.
@@ -1132,11 +1132,14 @@ class WM(SYSTEM_SCHEMA):
             
         # Plot instance activations
         f1 = plt.figure(facecolor='white')
-        title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g]\n noise: [mean:%g, std:%g], \n C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
-                            self.name,
-                            self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
-                            self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
-                              self.params['C2']['coop_weight'], self.params['C2']['comp_weight'],  self.params['C2']['coop_asymmetry'], self.params['C2']['comp_asymmetry'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
+        if show_params:
+            title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g]\n noise: [mean:%g, std:%g], \n C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
+                                self.name,
+                                self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
+                                self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
+                                  self.params['C2']['coop_weight'], self.params['C2']['comp_weight'],  self.params['C2']['coop_asymmetry'], self.params['C2']['comp_asymmetry'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
+        else:
+             title = '%s dynamics' %self.name
         plt.title(title)
         plt.xlabel('time', fontsize=14)
         plt.ylabel('activity', fontsize=14)
@@ -1227,11 +1230,7 @@ class WM(SYSTEM_SCHEMA):
         ax = fig.add_subplot(111, autoscale_on=False,
                      xlim=(0, max_time), ylim=(0, 1))
 
-        title = '%s dynamics \n dyn: [tau:%g, int_weight:%g, ext_weigt:%g,  act_rest:%g, k:%g]\n noise: [mean:%g, std:%g], \n C2: [coop:%g, comp:%g , coop_asymmetry:%g, comp_asymmetry:%g, prune:%g, conf:%g]' %(
-                            self.name,
-                            self.params['dyn']['tau'], self.params['dyn']['int_weight'], self.params['dyn']['ext_weight'], self.params['dyn']['act_rest'], self.params['dyn']['k'],
-                            self.params['dyn']['noise_mean'], self.params['dyn']['noise_std'], 
-                              self.params['C2']['coop_weight'], self.params['C2']['comp_weight'],  self.params['C2']['coop_asymmetry'], self.params['C2']['comp_asymmetry'], self.params['C2']['prune_threshold'], self.params['C2']['confidence_threshold'])
+        title = '%s dynamics' %self.name
         plt.title(title)
         plt.xlabel('time', fontsize=14)
         plt.ylabel('activity', fontsize=14)
@@ -1248,7 +1247,6 @@ class WM(SYSTEM_SCHEMA):
             
         plt.axhline(y=self.params['C2']['prune_threshold'], color='k',ls='dashed')
         plt.axhline(y=self.params['C2']['confidence_threshold'], color='r',ls='dashed')
-        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), fancybox=True, shadow=True, prop={'size':8})
             
         def init():
             for line in lines:

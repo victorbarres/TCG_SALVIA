@@ -1,0 +1,36 @@
+digraph LinguisticWM_concise {
+rankdir=LR;
+style=rounded;
+compound=true;
+labeljust=l;
+penwidth=2;
+subgraph cluster_linguisticWM {
+subgraph cluster_semWM {
+label=<<FONT FACE="consolas">Semantic WM (t:11.0)</FONT>>;
+subgraph cluster_SemRep {
+color=white;
+fillcolor=white;
+label="";
+ENTITY_169 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">ENTITY_169 (1.0)</FONT>>];
+MAN_170 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">MAN_170 (1.0)</FONT>>];
+ENTITY_169 -> MAN_170  [fontname=consolas, label=<<FONT FACE="consolas">IS_171 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+}
+
+}
+
+subgraph cluster_gramWM {
+label=<<FONT FACE="consolas">Grammatical WM (t:11.0)</FONT>>;
+subgraph cluster_C2_cluster {
+color=white;
+label="";
+fill=white;
+MAN_172 [shape=box, fontname=consolas, fontsize=14, fillcolor="#c383dd", color="#c383dd", style="filled, rounded", label=<<FONT FACE="consolas">MAN_172 (0.4)</FONT>>];
+}
+
+}
+
+MAN_172 -> MAN_170  [color="#c383dd", style=dashed, splines=spline, dir=both];
+MAN_172 -> ENTITY_169  [color="#c383dd", style=dashed, splines=spline, dir=both];
+}
+
+}
