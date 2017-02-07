@@ -1986,8 +1986,8 @@ class PHON_WM_C(WM):
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_control')
-        self.params['dyn'] = {'tau':2.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
-        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.params['dyn'] = {'tau':2, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
 
     
@@ -2008,6 +2008,16 @@ class PHON_WM_C(WM):
         
         self.update_activations()     
         self.prune()
+        
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def get_state(self):
+        """
+        """
+        data = super(PHON_WM_C, self).get_state()
+        data['phon_sequence'] = [phon_inst.content['word_form'] for phon_inst in self.phon_sequence]
+        return data
 
 class GRAMMATICAL_WM_C(WM):
     """
@@ -2021,16 +2031,20 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
-        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':0, 'comp_asymmetry':0,'P_comp':1.0, 'P_coop':1.0,  'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}  
+        self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['pred'] = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
-        
     
+    #####################
+    ### STATE UPDATE  ###
+    ##################### 
+         
     def process(self):
         """
         NOTES:
             - NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
+            - Might be worth adding a refractory period here again?
         """
         listen = self.inputs['from_control']
         if listen and self.state==-1:
@@ -2126,80 +2140,9 @@ class GRAMMATICAL_WM_C(WM):
                 self.compete(competing_insts)
                
             completed_insts = [inst for inst in incomplete_insts if not(inst.form_state)]
-    
-    def produce_meaning(self):
-        """
-        """
-        assemblages = self.assemble()
-        if assemblages:
-            winner_assemblage = self.get_winner_assemblage(assemblages)
-            if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
-                sem_frame =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
-                self.outputs['to_semantic_WM'] =  sem_frame
-                
-                #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
-                self.post_prod_state(winner_assemblage)
-    
-    
-    def get_winner_assemblage(self, assemblages):
-        """
-        Args: assemblages ([ASSEMBLAGE])
-        Note: Need to discuss the criteria that come into play in choosing the winner assemblages.
-        """
-        winner = None
-        max_score = None
-        # Computing the equivalent instance for each assemblage.
-        for assemblage in assemblages:
-            eq_inst = self.assemblage2inst(assemblage)
-            score = eq_inst.activity
-            if not(max_score):
-                max_score = score
-                winner = assemblage
-            if score>max_score:
-                max_score = score
-                winner = assemblage
-        return winner
-    
-    def post_prod_state(self, winner_assemblage):
-        """
-        Sets the grammatical state after production given a winner assemblage.
-        
-        NOTE directly taken from the production model
-        """
-        self.set_subthreshold(winner_assemblage.schema_insts)
-        self.deactivate_coop_weigts()
-    
-    def set_subthreshold(self, insts):
-        """
-        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.params['C2']['sub_threshold_r']
-        Args:
-            - insts ([CXN_INST])
-        
-        NOTE: directly taken from the production model.
-        """
-        r= self.params['C2']['sub_threshold_r']
-        for inst in insts:
-            inst.set_activation(r*self.params['C2']['confidence_threshold'])
-            
-    def deactivate_coop_weigts(self):
-        """
-        Sets all the coop_links to weight = self.params['C2']['deact_weight']
-        
-        NOTE: directly taken from the production model.
-        """
-        for coop_link in self.coop_links:
-            coop_link.weight = self.params['C2']['deact_weight']
-    
-    def set_pred_init(self):
-        """
-        Sets the stack of TD initial predictions pred_init.
-        The stacks is refilled as soon a state != 0.
-        Reinitialize state to state == 0 will then trigger the init predictions.
-        """
-        self.pred_init = self.params['pred']['pred_init'][:]
-    
+
     ###############################
-    ### cooperative computation ###
+    ### COOPERATIVE COMPUTATION ###
     ###############################
     def cooperate(self, inst1, inst2):
        """
@@ -2328,21 +2271,99 @@ class GRAMMATICAL_WM_C(WM):
                         match_cat = 0
                         
         return {"match_cat":match_cat, "links":links}
+                               
+                              
+    ##########################
+    ### MEANING PRODUCTION ###
+    ##########################                       
+    def produce_meaning(self):
+        """
+        """
+        assemblages = self.assemble()
+        if assemblages:
+            winner_assemblage = self.get_winner_assemblage(assemblages)
+            if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
+                sem_frame =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
+                self.outputs['to_semantic_WM'] =  sem_frame
+                
+                #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
+                self.post_prod_state(winner_assemblage)
+    
+    
+    def get_winner_assemblage(self, assemblages):
+        """
+        Args: assemblages ([ASSEMBLAGE])
+        Note: Need to discuss the criteria that come into play in choosing the winner assemblages.
+        """
+        winner = None
+        max_score = None
+        # Computing the equivalent instance for each assemblage.
+        for assemblage in assemblages:
+            eq_inst = self.assemblage2inst(assemblage)
+            score = eq_inst.activity
+            if not(max_score):
+                max_score = score
+                winner = assemblage
+            if score>max_score:
+                max_score = score
+                winner = assemblage
+        return winner
+    
+    def post_prod_state(self, winner_assemblage):
+        """
+        Sets the grammatical state after production given a winner assemblage.
+        
+        NOTE directly taken from the production model
+        """
+        self.set_subthreshold(winner_assemblage.schema_insts)
+        self.deactivate_coop_weigts()
+    
+    def set_subthreshold(self, insts):
+        """
+        Sets the activation of all the instances in insts to r*confidence_threshold where r= self.params['C2']['sub_threshold_r']
+        Args:
+            - insts ([CXN_INST])
+        
+        NOTE: directly taken from the production model.
+        """
+        r= self.params['C2']['sub_threshold_r']
+        for inst in insts:
+            inst.set_activation(r*self.params['C2']['confidence_threshold'])
+            
+    def deactivate_coop_weigts(self):
+        """
+        Sets all the coop_links to weight = self.params['C2']['deact_weight']
+        
+        NOTE: directly taken from the production model.
+        """
+        for coop_link in self.coop_links:
+            coop_link.weight = self.params['C2']['deact_weight']
+    
+    def set_pred_init(self):
+        """
+        Sets the stack of TD initial predictions pred_init.
+        The stacks is refilled as soon a state != 0.
+        Reinitialize state to state == 0 will then trigger the init predictions.
+        """
+        self.pred_init = self.params['pred']['pred_init'][:]
     
     ##################
-    ### Assemblage ###
+    ### ASSEMBLAGE ###
     ##################    
     def assemble(self):
         """
-        WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
+        Returns the set of all the assemblages ([ASSEMBLAGE]) that can be built given the current state of the GrammaticalWM.
         
-        NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. IS THIS IS THE ONE THA SHOULD BE CONSIDERED?
         
-        NOTE: THIS IS COPIED FROM GRAMMATICAL_WM_P and uses methods from GRAMMATICAL_WM_P!!
+        Notes:
+            - THIS IS COPIED FROM GRAMMATICAL_WM_P.
+            - WHAT ABOUT THE CASE WHERE THERE STILL IS COMPETITION GOING ON?
+            - NOTE THAT IN THE CASE OF MULTIPLE TREES GENERATED FROM THE SAME SET OF COOPERATION... THERE IS MAXIMUM SPANNING TREE. IS THIS IS THE ONE THAT SHOULD BE CONSIDERED?
+        
         """
-        inst_network = GRAMMATICAL_WM_P.build_instance_network(self.schema_insts, self.coop_links)
-
+        inst_network = GRAMMATICAL_WM_C.build_instance_network(self.schema_insts, self.coop_links)
         tops = [(n,None) for n in inst_network.nodes() if not(inst_network.successors(n))]
+        
         assemblages = []
         for t in tops:
             results = []
@@ -2354,72 +2375,138 @@ class GRAMMATICAL_WM_C(WM):
         # Compute assemblage activation values
         for assemblage in assemblages:
             assemblage.update_activation()
-            
+        
         return assemblages
         
+        
+    @staticmethod
+    def build_instance_network(schema_insts, coop_links):
+        """
+        Creates a NetworkX directed graph whose nodes are of the instances (type='instance') and their ports (type='port'), 
+        and the edges link the instances to the ports (type='inst2port') or the ports to the instances (coop_link) (type='port2inst')
+    
+        Args:
+            - schema_insts ([SCHEMA_INST]): Set of schema instances
+            - coop_links ([COOP_LINK]): Set of cooperation links defined between the schema instants
+        
+        Requires:
+            - NetworkX
+        
+        Notes:
+            - Directly copied from GrammaticalWM_P
+        """
+        graph = nx.DiGraph() # This could be built incrementally.....
+        for inst in schema_insts:
+            graph.add_node(inst, type="instance")
+            for port in inst.in_ports:
+                graph.add_node(port, type="port")
+                graph.add_edge(port, inst, type="port2inst")
+        for link in coop_links: # Does not requires the competition to be resolved (there could still be active competition links)
+            graph.add_edge(link.inst_from, link.connect.port_to, type="inst2port")
+        
+        return graph
+
+
 
     def get_trees(self, frontier, assemblage, graph, results):
         """
-        Recursive function
-        "Un-superpose" the trees!
-
-        DOES NOT HANDLE THE CASE WHERE THERE STILL IS SOME COMPETITION GOING ON.
-        NOTE: I think it does...
-        ALSO, it returns sub-optimal trees. (Not only the tree that contains all the cooperating instances in the WM).
+        For a given instance network (generated by build_instance_network) defined as a directed graph, returns all the sub-trees each sub-tree
+        defining an assemblage.
+        (Recursive function)
         
-        NOTE: THIS IS COPIED FROM GRAMMATICAL_WM_P!!
+        Args:
+            - frontier (): Frontier of the search space.
+            - assemblage (ASSEMBLAGE): 
+            - graph (NetworkX Digraph): Generated by build_instance_network
+            - results ([ASSEMBLAGE]): Recursively stores the assemblages (sub-trees)
+        
+        Notes:
+            - THIS IS COPIED FROM GRAMMATICAL_WM_P!!
+            - "Un-superpose" the trees!
+            - DOES NOT HANDLE THE CASE WHERE THERE STILL IS SOME COMPETITION GOING ON.
+                NOTE: I think it does...
+            - ALSO, it returns also sub-optimal trees. (Not only the tree that contains all the cooperating instances in the WM).
         """
-        new_frontiers = [[]]
+        new_frontiers = [[]] # Each frontier correspond to a possible choice between multiple cooperation options to a same port.
+        
         for node, link in frontier:
+            # Update assemblage
             assemblage.add_instance(node)
             if link:
                 assemblage.add_link(link)
+            
+            # For each element in the frontier, try to expand the tree.
             ports = graph.predecessors(node)
             for port in ports:
-                children = graph.predecessors(port)
+                children = graph.predecessors(port) # A port can be linked to multiple children, each representing a different hypothesis.
                 updated_frontiers = []
-                for child in children:
-                    flag =  child in assemblage.schema_insts
-                    if not(flag):
-                        link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child.find_port("output"), port_to=port)
-                        for f in new_frontiers:
-                            updated_frontiers.append(f[:] + [(child, link[0])])
-                new_frontiers = updated_frontiers
+                if not(children):
+                    pass
+                else:
+                    for child in children:
+                        flag =  child in assemblage.schema_insts
+                        if not(flag):
+                            link = self.find_coop_links(inst_from=child, inst_to=node, port_from=child.find_port("output"), port_to=port)
+                            for f in new_frontiers:
+                                updated_frontiers.append(f[:] + [(child, link[0])])
+                    new_frontiers = updated_frontiers # Wrong indentation. Not handling frontiers properly.
         if new_frontiers == [[]]:
             results.append(assemblage)
         else:
             for a_frontier in new_frontiers:
                 self.get_trees(a_frontier, assemblage.copy(), graph, results)
-        
-    
+           
     @staticmethod
     def assemblage2inst(assemblage):
         """
-        NOTE:
-            - Same method as in production.
+        For a given construction instance assemblage, returns 
+            (1) the instance equivalent to the assemblage by Unification.
+            (2) a DICT mapping the name of the TP_ELEM of the assemblage onto the TP_ELEM of the eq_inst.
+            This mapping allows to compute direct relations between the structure of the assemblage and the compact equivalent instance form.
+            The dictionary also provides (for convenience) the names of the TP_ELEM for each instance in the assemblage.
+        
+        Args:
+            - assemblage (ASSEMBLAGE): An construction instance assemblage
+        
+        Notes:
+            - Copied from GrammaticalWM_P!
         """
         new_assemblage = assemblage.copy()
         coop_links = new_assemblage.coop_links
-        while len(coop_links)>0:
-            new_assemblage = GRAMMATICAL_WM_C.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0])
-            coop_links = new_assemblage.coop_links
-        eq_inst = new_assemblage.schema_insts[0]
+        a2i_map = {'sem_map':{}, 'syn_map':{}}
+        if coop_links: # not a trivial assemblage composed of a single instance.
+            while len(coop_links)>0:
+                (new_assemblage, new_cxn_inst, a2i_map) = GRAMMATICAL_WM_C.reduce_assemblage(new_assemblage, new_assemblage.coop_links[0], a2i_map)
+                coop_links = new_assemblage.coop_links
+            eq_inst = new_assemblage.schema_insts[0]
+        else:
+            inst = new_assemblage.schema_insts[0] #It would be best to make a copy(?)
+            #Trivial mapping onto itself
+            a2i_map['sem_map'] = dict([(sem_elem.name, sem_elem.name) for sem_elem in inst.content.SemFrame.nodes + inst.content.SemFrame.edges])
+            a2i_map['syn_map'] = dict([(syn_elem.name, syn_elem.name) for syn_elem in inst.content.SynForm.form])
+            eq_inst = inst
         eq_inst.activity = new_assemblage.activation
-        return eq_inst
+        return (eq_inst, a2i_map)
       
     @staticmethod      
-    def reduce_assemblage(assemblage, coop_link):
+     @staticmethod      
+    def reduce_assemblage(assemblage, coop_link, a2i_map):
         """
         Returns a new, reduced, assemblage in which the instances cooperating (as defined by 'coop_link') have been combined.
         
-        NOTE:
-            - Same method as production.
+        Args:
+            - assemblage (ASSEMBLAGE): A construction instance assemblage.
+            - coop_link (COOP_LINK): A cooperation link belonging to the assemblage.
+            - a2i_map (DICT): assemblage2instance name mapping to be updated
+        
+        Notes:
+            - Copied froM GrammaticalWM_P
         """
         inst_p = coop_link.inst_to
         inst_c = coop_link.inst_from
         connect = coop_link.connect
         
-        (new_cxn_inst, port_corr) = GRAMMATICAL_WM_C.combine_schemas(inst_p, inst_c, connect)
+        (new_cxn_inst, port_corr, a2i_map) = GRAMMATICAL_WM_C.combine_schemas(inst_p, inst_c, connect, a2i_map)
         
         new_assemblage = ASSEMBLAGE()
         new_assemblage.activation = assemblage.activation
@@ -2447,14 +2534,64 @@ class GRAMMATICAL_WM_C(WM):
                 new_link.connect.port_from = port_corr['out_ports'][coop_link.connect.port_from]
             new_assemblage.add_link(new_link)
         
-        return new_assemblage
+        return (new_assemblage, new_cxn_inst, a2i_map)
     
+    
+#    @staticmethod
+#    def combine_schemas_old(inst_to, inst_from, connect):
+#        """
+#        Returns a new cxn_instance and the mapping between inst_to and inst_from ports to new_cxn_inst ports.
+#        
+#        NOTE: Only minor changes from the production method related to the difference in trace and mapping, phon_covers and covers.
+#        """
+#        inst_p = inst_to
+#        port_p = connect.port_to
+#        cxn_p = inst_p.content
+#        slot_p = port_p.data
+#        
+#        inst_c = inst_from
+#        cxn_c = inst_c.content        
+#        
+#        (new_cxn, c) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
+#        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0.0)
+#        
+#        # Define new_cxn trace
+#        new_trace = {"schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} 
+#        
+#        # Defines new_cxn mapping
+#        new_mapping = {} # TO DEFINE        
+#        
+#        new_cxn_inst = CXN_SCHEMA_INST_C(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False)
+#        new_cxn_inst.phon_cover = inst_p.phon_cover + inst_c.phon_cover
+#        new_cxn_inst.covers = inst_p.covers
+#        
+#        # Define port correspondence
+#        in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
+#        
+#        port_corr = {'in_ports':{}, 'out_ports':{}}
+#        for port in in_ports:
+#            for new_port in new_cxn_inst.in_ports:
+#                if c[port.data.name] == new_port.data.name:
+#                    port_corr['in_ports'][port] = new_port
+#                    break
+#        port_corr['out_ports'][inst_p.find_port('output')] = new_cxn_inst.find_port('output')
+#      
+#        return (new_cxn_inst, port_corr)
+        
+        
     @staticmethod
-    def combine_schemas(inst_to, inst_from, connect):
+    def combine_schemas(inst_to, inst_from, connect, a2i_map):
         """
         Returns a new cxn_instance and the mapping between inst_to and inst_from ports to new_cxn_inst ports.
         
-        NOTE: Only minor changes from the production method related to the difference in trace and mapping, phon_covers and covers.
+        Args:
+            - inst_to (CXN_SCHEMA_INST):
+            - inst_from (CXN_SCHEMA_INST):
+            - connect (CONNECT): A CONNECT object associated with a cooperation link between inst_to and inst_from.
+            - a2i_map (DICT): assemblage2instance name mapping to be updated.
+            
+        Notes:
+             NOTE: Only minor changes from the production method related to the difference in trace and mapping, phon_covers and covers.
         """
         inst_p = inst_to
         port_p = connect.port_to
@@ -2464,19 +2601,19 @@ class GRAMMATICAL_WM_C(WM):
         inst_c = inst_from
         cxn_c = inst_c.content        
         
-        (new_cxn, c) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
-        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0.0)
+        (new_cxn, c, u_map) = construction.CXN.unify(cxn_p, slot_p, cxn_c)
+        new_cxn_schema = CXN_SCHEMA(new_cxn, init_act=0)
         
         # Define new_cxn trace
         new_trace = {"schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} 
-        
+            
         # Defines new_cxn mapping
         new_mapping = {} # TO DEFINE        
         
         new_cxn_inst = CXN_SCHEMA_INST_C(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False)
         new_cxn_inst.phon_cover = inst_p.phon_cover + inst_c.phon_cover
         new_cxn_inst.covers = inst_p.covers
-        
+    
         # Define port correspondence
         in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
         
@@ -2488,7 +2625,25 @@ class GRAMMATICAL_WM_C(WM):
                     break
         port_corr['out_ports'][inst_p.find_port('output')] = new_cxn_inst.find_port('output')
       
-        return (new_cxn_inst, port_corr)
+        # Update a2i_map
+        for map_type in ['sem_map', 'syn_map']: # There must be a cleaner way to do that! Rethink the data structure used.
+            new = {} 
+            to_remove = set([])
+            my_map = u_map[map_type]
+            for k,v in a2i_map[map_type].iteritems():
+                new[k] = []
+                for i in v:
+                    if my_map.has_key(i):
+                        new[k].extend(my_map[i])
+                        to_remove.add(i)
+                    else:
+                        new[k].extend([i])
+            for i in to_remove:
+                my_map.pop(i)
+            new.update(my_map)
+            a2i_map[map_type] = new
+        
+        return (new_cxn_inst, port_corr, a2i_map)
     
     @staticmethod 
     def meaning_read_out(assemblage):
@@ -2517,7 +2672,6 @@ class GRAMMATICAL_WM_C(WM):
         
 class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
     """
-    THIS NEEDS TO ALLOW FOR THE IMPLEMENTATIN OF A FORM OF CHART PARSING.
     """
     def __init__(self, name="Cxn_retrieval_C"):
         SYSTEM_SCHEMA.__init__(self,name)
