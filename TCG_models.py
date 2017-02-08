@@ -136,7 +136,9 @@ def parameters(system_names):
         'C2.comp_asymmetry':0.0,
         'C2.max_capacity':None,
         'C2.sub_threshold_r':0.8,
-        'C2.deact_weight':0.0
+        'C2.deact_weight':0.0,
+        'parser.pred_init':['S'],
+        'parser.parser_type':'Earley'
         },
         
     'Visual_WM':{

@@ -2043,7 +2043,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('OUT', 'to_semantic_WM')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
-        self.params['parser'] = {'pred_init':['S']}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
+        self.params['parser'] = {'pred_init':['S'], 'parser_type':'Earley'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
     
@@ -2062,10 +2062,12 @@ class GRAMMATICAL_WM_C(WM):
             self.set_pred_init()
         phon_inst = self.inputs['from_phonological_WM_C']
         pred_cxn_insts = self.inputs['from_cxn_retrieval_C']
+        # Add new instances
         if pred_cxn_insts:
             for inst in pred_cxn_insts:
                 self.add_instance(inst, inst.activity)
         
+        # Update state using parser
         if self.params['parser']['parser_type'] == 'Earley':
             self.Earley_parser(phon_inst)
         elif self.params['parser']['parser_type'] == 'Left-Corner':
@@ -2073,15 +2075,13 @@ class GRAMMATICAL_WM_C(WM):
         else:
             error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %self.params['parser']['parser_type']
             raise ValueError(error_msg)
-            
-        
-                
+                  
         self.update_activations()
         self.prune()
         
+        # Define when meaning read-out should take place
         if not(self.comp_links):
             self.produce_meaning()
-    
     
     def Earley_parser(self, phon_inst):
         """
@@ -2207,23 +2207,25 @@ class GRAMMATICAL_WM_C(WM):
     ### COOPERATIVE COMPUTATION ###
     ###############################
     def cooperate(self, inst1, inst2):
-       """
-       NOTE:
-           - Check match between inst1 and inst2
-           - If there is a match: create a coop link
-           - Update inst1.covers[1] to self.state.
-           - Compare to production, here C2 operations cannot simply be applied only once to new instances. this is due to the fact that the state of the instances changes. 
-           The state change is required by the fact that production includes predictions, predictions which are absent from production.
-       """
-       match = GRAMMATICAL_WM_C.match(inst1, inst2)
-       if match["match_cat"] == 1:
-           for match_qual, link in match["links"]:
-               if match_qual > 0:
-                   self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
-                   link["inst_to"].next_state()
-                   link["inst_to"].covers[1] = self.state
-                   return True
-       return False
+        """
+        Notes:
+            - Check match between inst1 and inst2
+            - If there is a match: create a coop link
+            - Update inst1.covers[1] to self.state.
+            - Compare to production, here C2 operations cannot simply be applied only once to new instances. this is due to the fact that the state of the instances changes. 
+            The state change is required by the fact that production includes predictions, predictions which are absent from production.
+        """
+        match = GRAMMATICAL_WM_C.match(inst1, inst2)
+        if match["match_cat"] == 1:
+            for match_qual, link in match["links"]:
+                if match_qual > 0:
+                    self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
+                    link["inst_to"].next_state()
+                    link["inst_to"].covers[1] = self.state
+            return True
+        else:
+            print "cooperation impossible where it should happen, match cat value: %i" %match["match_cat"]
+        return False
     
     def compete(self, insts):
         """
@@ -2242,6 +2244,8 @@ class GRAMMATICAL_WM_C(WM):
                 match = GRAMMATICAL_WM_C.match(inst1, inst2)
                 if match['match_cat'] == -1:
                     self.add_comp_link(inst1, inst2)
+                else:
+                    print "competition impossible where it should happen, match cat value: %i" %match["match_cat"]
     
     @staticmethod
     def overlap(inst1, inst2):
