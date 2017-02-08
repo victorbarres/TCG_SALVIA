@@ -128,7 +128,7 @@ def parameters(system_names):
         'dyn.k':10.0, 
         'dyn.noise_mean':0.0,
         'dyn.noise_std':1.0, 
-        'C2.confidence_threshold':0.3, 
+        'C2.confidence_threshold':0.6, 
         'C2.prune_threshold':0.01, 
         'C2.coop_weight':1.0,
         'C2.comp_weight':-10.0, 
