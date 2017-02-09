@@ -1,31 +1,31 @@
 { 
 	"inputs":{
 		"test_naming": {
-			"utter_rate": 100,
+			"utter_rate": 1,
 			 "utterance" :["woman"],
 			 "timing":[],
 			 "comments": ""
 			},
 		"test_SVO": {
-			"utter_rate": 100,
+			"utter_rate": 1,
 			 "utterance" :[ "woman", "kick", "man"],
 			 "timing":[],
 			 "comments": ""
 			},
 		"test_in_blue": {
-			"utter_rate": 100,
+			"utter_rate": 1,
 			 "utterance" :["woman", "kick", "man", "in", "blue"],
 			 "timing":[],
 			 "comments": ""
 			},
 		"test_in_loc": {
-			"utter_rate": 100,
+			"utter_rate": 1,
 			 "utterance" :["woman", "kick", "man", "in", "blue", "boxing", "ring"],
 			 "timing":[],
 			 "comments": ""
 			},
 		"test_subj_rel": {
-			"utter_rate": 100,
+			"utter_rate": 1,
 			 "utterance" :["woman", "who", "is", "pretty", "kick", "man", "in", "blue"],
 			 "timing":[],
 			 "comments": ""

@@ -18,7 +18,9 @@ import matplotlib.pyplot as plt
 import re
 import os
 import json
+import random
 
+import numpy as np
 import networkx as nx
 import pyttsx
 
@@ -1110,7 +1112,7 @@ class GRAMMATICAL_WM_P(WM):
                 sem_WM_output['edges'].extend(expressed['edges'])
                 sem_WM_output['missing_info'] = missing_info
                 for inst in insts_used:
-                    inst.done = True
+                    inst.done = True # REMOVE NOT NECESSARY ANYMORE
 #                assemblages.remove(winner_assemblage)
                 
                 # Save winner assemblage to state
@@ -2098,10 +2100,10 @@ class GRAMMATICAL_WM_C(WM):
             - NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
             - Might be worth adding a refractory period here again?
         """
-        listen = self.inputs['from_control']
-        if listen and self.state==-1:
-            self.state = 0
-            self.set_pred_init()
+        ctrl_input = self.inputs['from_control']
+        if ctrl_input and ctrl_input['listen'] and self.state==-1:
+                self.state = 0
+                self.set_pred_init()
             
         phon_input = self.inputs['from_phonological_WM_C']
         if phon_input:
@@ -2130,7 +2132,8 @@ class GRAMMATICAL_WM_C(WM):
         self.prune()
         
         # Define when meaning read-out should take place
-        if not(self.comp_links):
+#        if ctrl_input and ctrl_input['produce'] == self.t:
+        if self.t == 800:
             output = self.produce_meaning()
             if output:
                 self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
@@ -2890,7 +2893,6 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                 lexical_retrieval = False # Only the first round retrieves lexical items
                 old_pred_classes = old_pred_classes.union(new_pred_classes)
                 pred_classes = new_pred_classes
-        
         else:
             error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %parser_type
             raise ValueError(error_msg)
@@ -2973,9 +2975,12 @@ class CONTROL(SYSTEM_SCHEMA):
                 
         # Communicating with grammatical_WM_C
         if self.state['mode'] == 'listen':
-            self.outputs['to_grammatical_WM_C'] =  True
+            gram_output = {'listen':True, 'produce':self.params['task']['start_produce']}
+            self.outputs['to_grammatical_WM_C'] = gram_output
+            
         else:
-            self.outputs['to_grammatical_WM_C'] =  False
+            gram_output = {'listen':False}
+            self.outputs['to_grammatical_WM_C'] =  gram_output
         
     ####################
     ### JSON METHODS ###
@@ -3118,18 +3123,20 @@ class SEM_GENERATOR(object):
     Notes: 
         - Does not allow for verbal guidance. Designed for purely serial update of semanticWM state.
     """
-    def __init__(self, sem_inputs, conceptLTM, speed_param=1, is_macro=False, ground_truths=None):
+    def __init__(self, sem_inputs, conceptLTM, speed_param=1, std=0, is_macro=False, ground_truths=None):
         """
         Args:
             - sem_inputs: a semantic input dict loaded using TCG_LOADER.load_sem_input()
             - conceptLTM (CONCEPT_LTM): Contains concept schemas.
             - speed_param (FLOAT): speed_param >0. Factor applied to the timing of the input.
+            - std (FLOAT): defines standard deviation of uniform distribution centered on a timing t0 around which the time of utterance is chosen (introduces stochasticity in the input timing)
             - is_macro (BOOL): True if the input is a sem_gen macro.
             - ground_truths (DICT): Dictionary associating sem_inputs to an array of utterances each providing a ground-truth linguistic expression of the semantic content.
         """ 
         self.sem_inputs = sem_inputs
         self.interpreter = ISRF_INTERPRETER(conceptLTM)
         self.speed_param = speed_param
+        self.std = std
         self.is_macro = is_macro
         self.ground_truths = ground_truths
         self.preprocess_inputs()
@@ -3142,8 +3149,12 @@ class SEM_GENERATOR(object):
             sem_rate = float(sem_input['sem_rate'])*self.speed_param
             sequence = sem_input['sequence']
             timing = [t*self.speed_param for t in sem_input['timing']]
+            get_time = lambda i, rate, std: max(random.uniform(i*sem_rate-std, i*sem_rate+std), 0)
             if sem_rate and not(timing):
-                sem_input['timing'] = [i*sem_rate for i in range(len(sequence))]
+                if sem_rate<2*self.std:
+                    error_msg = "Input sequence order compromised. Sem_Rate=%.2f < 2*std=%.2f. SemRate should be > 2*std" %(sem_rate, 2*self.std)
+                    raise ValueError(error_msg)
+                sem_input['timing'] = [get_time(i, sem_rate, self.std) for i in range(len(sequence))]
             if not(timing) and not(sem_rate):
                 print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
                 

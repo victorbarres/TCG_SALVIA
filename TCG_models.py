@@ -131,7 +131,7 @@ def parameters(system_names):
         'C2.confidence_threshold':0.6, 
         'C2.prune_threshold':0.01, 
         'C2.coop_weight':1.0,
-        'C2.comp_weight':-10.0, 
+        'C2.comp_weight':-1.0, 
         'C2.coop_asymmetry':1.0,
         'C2.comp_asymmetry':0.0,
         'C2.max_capacity':None,
