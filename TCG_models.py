@@ -138,7 +138,7 @@ def parameters(system_names):
         'C2.sub_threshold_r':0.8,
         'C2.deact_weight':0.0,
         'parser.pred_init':['S'],
-        'parser.parser_type':'Earley'
+        'parser.parser_type':'Left-Corner'
         },
         
     'Visual_WM':{

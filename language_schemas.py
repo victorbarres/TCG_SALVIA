@@ -2155,7 +2155,7 @@ class GRAMMATICAL_WM_C(WM):
                 inst_pred = inst.cxn_predictions()
                 pred_classes= pred_classes.union(inst_pred)
         if pred_classes:
-            predictions = {'covers':[self.state, self.state+1], 'cxn_classes':list(pred_classes)}
+            predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
         else:
             predictions = None
         return predictions
@@ -2212,13 +2212,10 @@ class GRAMMATICAL_WM_C(WM):
         while completed_insts:
             incomplete_insts = [inst for inst in self.schema_insts if inst.form_state]
             for inst1 in completed_insts:
-                print inst1.name
                 competing_insts = []
                 for inst2 in incomplete_insts:
-                    print inst2.name
                     coop = self.cooperate(inst2, inst1) # Attempt cooperation. If possible, both create coop_link AND update instance states.  
                     if coop:
-                        print "%s and %s are cooperating" %(inst1.name, inst2.name)
                         competing_insts.append(inst2)
                 # Sets up competition between incompleted cxn that try to map onto the same compeleted cxn.
                 self.compete(competing_insts)
@@ -2285,7 +2282,7 @@ class GRAMMATICAL_WM_C(WM):
        
        NOTES:
             - Overlap should define the set of constraints that are expressed by both constructions. It should allow to determine whether or not they
-            compete or not.
+            compete
             - I need to clean up the notion of trace and cover in both production and comprehension. In particular, it is important to note that a cxn can cover both semantic instances
             (SemRep) AND phon instances. The notion of trace changes also when cxn can be instantiated on the bases of predictions from other constructions. Should those constructions
             be part of the trace?
@@ -2342,13 +2339,14 @@ class GRAMMATICAL_WM_C(WM):
         if inst1 == inst2:
            match_cat = 0 # CHECK THAT (This should not be allowed to happen1)
            return {"match_cat":match_cat, "links":links}
+        
         overlap = GRAMMATICAL_WM_C.overlap(inst1, inst2)
         
         # Check competition
-        if overlap:
+        if overlap: 
             match_cat = -1
             return {"match_cat":match_cat, "links":links}
-        
+            
         # Check for cooperation
         flag1 = False
         flag2 = False
@@ -2825,6 +2823,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
             covers = predictions['covers']
             pred_classes = set(predictions['left_corner'])
             old_pred_classes = pred_classes
+            lexical_retrieval = True
             while pred_classes: # Recursively instantiate the constructions.
                 new_pred_classes = set([])
                 for cxn_schema in cxn_schemas:
@@ -2833,13 +2832,17 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                         trace = {'schemas':[cxn_schema]}
                         cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
                         cxn_inst.covers = covers[:] # That's not really a good "cover", cover should be a mapping between SynForm elements and PhonRep.
+                        if lexical_retrieval == True: # The instance already has received BU input for left corner.
+                            cxn_inst.covers[1] +=1
+                            cxn_inst.next_state()
                         self.cxn_instances.append(cxn_inst)
                         # Recursively add the instances predicted by the newly instantiated cxns.
                         pred = cxn_inst.content.clss
                         if pred not in old_pred_classes:
                             new_pred_classes.add(pred)
-                    old_pred_classes = old_pred_classes.union(new_pred_classes)
-                    pred_classes = new_pred_classes
+                lexical_retrieval = False # Only the first round retrieves lexical items
+                old_pred_classes = old_pred_classes.union(new_pred_classes)
+                pred_classes = new_pred_classes
         
         else:
             error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %parser_type
