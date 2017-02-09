@@ -81,11 +81,13 @@ class CXN_SCHEMA_INST(SCHEMA_INST):
             - inputs (DICT): At each time steps stores the inputs
             - outputs (DICT): At each time steps stores the ouputs
             - alive (bool): status flag
+            - done (bool): True if the instance is done with its function.
             - trace ({"SemRep":{"nodes":[], "edges"=[]}, "schemas":[CXN_SCHEMA]}): Pointer to the elements that triggered the instantiation.
         - covers ({"nodes":{}, "edges"={}}): maps CXN.SemFrame nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
     """
-    def __init__(self, cxn_schema, trace, mapping, copy=True):
+    def __init__(self, cxn_schema, trace, mapping={"nodes":{}, "edges":{}}, copy=True):
         SCHEMA_INST.__init__(self, schema=cxn_schema, trace=trace)
+        self.covers = {}
         if copy:
             (cxn_copy, c) = cxn_schema.content.copy()
             self.content = cxn_copy
@@ -135,15 +137,16 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
     Added:
         - form_sequence
         - form_state
-        - phon_cover
         - has_predicted
+    Notes:
+        - Here covers defines a mapping from SynForm to Phon_Inst
     """
-    def __init__(self, cxn_schema, trace, mapping=None, copy=True):
+    def __init__(self, cxn_schema, trace, mapping={}, copy=True):
         CXN_SCHEMA_INST.__init__(self, cxn_schema=cxn_schema, mapping=mapping, trace=trace, copy=copy)
         self.form_sequence = self.content.SynForm.form[:]
         self.form_sequence.reverse() # Simply so that the sequence can be used as stack in python.
         self.form_state = self.form_sequence.pop()
-        self.phon_cover = [] # Should be reorganized with covers. Mapping should also be introduced by reworking the relations with constructions instances used for production.
+        self.chart_pos = [] # Should be reorganized with covers. Mapping should also be introduced by reworking the relations with constructions instances used for production.
         self.has_predicted = False
     
     def cxn_predictions(self):
@@ -178,8 +181,7 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
             self.form_state = None
 #################################
 ### CONCEPT KNOWLEDGE SCHEMAS ###
-#################################
-            
+#################################      
 class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     Concept schema
@@ -513,7 +515,7 @@ class SEMANTIC_WM(WM):
         self.update_SemRep(cpt_insts)        
         self.prune()
         
-        if self.inputs['from_grammatical_WM_P']:
+        if self.inputs['from_grammatical_WM_P']: # This should be done on the instances directly...
             # Note nodes and edges as expressed
             for name in self.inputs['from_grammatical_WM_P']['nodes']:
                 self.SemRep.node[name]['expressed'] = True
@@ -521,7 +523,7 @@ class SEMANTIC_WM(WM):
                 d = self.SemRep.get_edge_data(name[0], name[1])
                 d['expressed'] = True
     
-        self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_ouput()
+        self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_output()
         
         # TD request for missing info
         self.outputs['to_visual_WM'] = self.vis_WM_output()
@@ -598,7 +600,7 @@ class SEMANTIC_WM(WM):
 #                self.SemRep.node[u]['cpt_inst'].content = self.SemRep.node[v]['cpt_inst'].content.copy()
 #                self.SemRep.node[u]['concept'] = self.SemRep.node[v]['concept']
             
-    def gram_WM_P_ouput(self):
+    def gram_WM_P_output(self):
         """
         Returns the output to send to gram_WM_P.
         The signal sent to gram_WM_P contains the activation levels of the node and edge instance that so far have not been expressed.
@@ -1996,8 +1998,7 @@ class UTTER(SYSTEM_SCHEMA):
             
 #####################
 ### COMPREHENSION ###
-#####################        
-            
+#####################                   
 class PHON_WM_C(WM):
     """
     Receives input one word at a time.
@@ -2005,6 +2006,7 @@ class PHON_WM_C(WM):
     def __init__(self, name='Phonological_WM_C'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_input')
+        self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_control')
@@ -2022,19 +2024,36 @@ class PHON_WM_C(WM):
         """
         """
         phon_form = self.inputs['from_input']
+        gram_input = self.inputs['from_grammatical_WM_C']
+        if gram_input: # Marked all expressed phon elements
+            for phon in [phon for phon in self.phon_sequence if phon['inst'].name in gram_input]:
+                phon['expressed'] = True
+
+        activations = self.gram_WM_C_output()
         if phon_form:
             phon_schema = PHON_SCHEMA(name=phon_form, word_form=phon_form, init_act=1.0)
             phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
             self.add_instance(phon_inst)
-            self.phon_sequence.append(phon_inst)
+            self.phon_sequence.append({'inst':phon_inst, 'expressed':False})
             self.outputs['to_cxn_retrieval_C'] = phon_inst
-            self.outputs['to_grammatical_WM_C'] =  phon_inst
+            self.outputs['to_grammatical_WM_C'] =  (phon_inst, activations)
             self.outputs['to_control'] =  True
         else:
             self.outputs['to_cxn_retrieval_C'] =  None
+            self.outputs['to_grammatical_WM_C'] =  (None, activations)
         
         self.update_activations()     
         self.prune()
+    
+    def gram_WM_C_output(self):
+        """
+        Returns the output to send to gram_WM_C.
+        The signal sent to gram_WM_C contains the activation levels of the phon instance that so far have not been expressed.
+        """
+        output = {}
+        for inst in [phon['inst'] for phon in self.phon_sequence if not(phon['expressed'])]:
+            output[inst.name] = inst.activity
+        return output
         
     ####################
     ### JSON METHODS ###
@@ -2043,7 +2062,7 @@ class PHON_WM_C(WM):
         """
         """
         data = super(PHON_WM_C, self).get_state()
-        data['phon_sequence'] = [phon_inst.content['word_form'] for phon_inst in self.phon_sequence]
+        data['phon_sequence'] = [[phon['inst'].content['word_form'], phon['expressed']] for phon in self.phon_sequence]
         return data
 
 class GRAMMATICAL_WM_C(WM):
@@ -2056,13 +2075,13 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('IN', 'from_cxn_retrieval_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
+        self.add_port('OUT', 'to_phonological_WM_C')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['parser'] = {'pred_init':['S'], 'parser_type':'Earley'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
-        
-    
+          
     def reset(self):
         """
         """
@@ -2084,7 +2103,13 @@ class GRAMMATICAL_WM_C(WM):
             self.state = 0
             self.set_pred_init()
             
-        phon_inst = self.inputs['from_phonological_WM_C']
+        phon_input = self.inputs['from_phonological_WM_C']
+        if phon_input:
+            (phon_inst, phon_activations) = phon_input
+        else:
+            phon_inst = None
+            phon_activations = {}
+
         pred_cxn_insts = self.inputs['from_cxn_retrieval_C']
         # Add new instances
         if pred_cxn_insts:
@@ -2100,24 +2125,27 @@ class GRAMMATICAL_WM_C(WM):
             error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %self.params['parser']['parser_type']
             raise ValueError(error_msg)
         
-        self.convey_phon_activations()
+        self.convey_phon_activations(phon_activations)
         self.update_activations()
         self.prune()
         
         # Define when meaning read-out should take place
         if not(self.comp_links):
-            self.produce_meaning()
-            
-    def convey_phon_activations(self):
+            output = self.produce_meaning()
+            if output:
+                self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
+                self.outputs['to_semantic_WM'] =  output['sem_WM_output']
+
+    def convey_phon_activations(self, phon_activations):
         """
-        Need to define the activation from PhonWM to GramWM.
+        Propagates activations from PhonWM to GramWM.
         """
         for inst in self.schema_insts:
             act = 0
-            for phon_inst in inst.phon_cover:
-                act += phon_inst.activity
-            # No normalization
-            inst.activation.E += act
+            for f,p in inst.covers.iteritems():
+                val = phon_activations.get(p, 0)
+                act += val
+            inst.activation.E += act # No normalization
         
     
     def Earley_parser(self, phon_inst):
@@ -2168,7 +2196,7 @@ class GRAMMATICAL_WM_C(WM):
                 inst_pred = inst.cxn_predictions()
                 pred_classes= pred_classes.union(inst_pred)
         if pred_classes:
-            predictions = {'covers':[self.state, self.state], 'cxn_classes':list(pred_classes)}
+            predictions = {'chart_pos':[self.state, self.state], 'cxn_classes':list(pred_classes)}
         else:
             predictions = None
         return predictions
@@ -2181,7 +2209,7 @@ class GRAMMATICAL_WM_C(WM):
             - The cxn_retrieval system will then send back the set of all possible predictions based instances.
         """
         if phon_inst:
-            predictions = {'covers':[self.state, self.state], 'left_corner':[phon_inst.content['word_form']], 'BU_trigger':phon_inst}
+            predictions = {'chart_pos':[self.state, self.state], 'left_corner':[phon_inst.content['word_form']], 'BU_trigger':phon_inst.name}
         else:
             predictions = None
         return predictions
@@ -2202,10 +2230,9 @@ class GRAMMATICAL_WM_C(WM):
             phon_prediction = inst.phon_prediction()
             if phon_prediction:
                 if phon_prediction == phon_inst.content['word_form']:
-                    inst.phon_cover.append(phon_inst)
+                    inst.covers[inst.form_state.name] = phon_inst.name
                     inst.next_state()
-                    inst.set_activation(phon_inst.activity) #IMPORTANT STEP.
-                    inst.covers[1] = self.state # Keep track of chart
+                    inst.chart_pos[1] = self.state # Keep track of chart
                     matching_insts.append(inst)
                 else:
                     inst.alive = False # Here a cxn whose form is directly disproved by the input is directly removed. Need to revisit this deisgn choice.
@@ -2250,7 +2277,7 @@ class GRAMMATICAL_WM_C(WM):
         Notes:
             - Check match between inst1 and inst2
             - If there is a match: create a coop link
-            - Update inst1.covers[1] to self.state.
+            - Update inst1.chart_pos[1] to self.state.
             - Compare to production, here C2 operations cannot simply be applied only once to new instances. this is due to the fact that the state of the instances changes. 
             The state change is required by the fact that production includes predictions, predictions which are absent from production.
         """
@@ -2260,8 +2287,8 @@ class GRAMMATICAL_WM_C(WM):
             for match_qual, link in match["links"]:
                 if match_qual > 0:
                     self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
+                    link["inst_to"].chart_pos[1] = self.state
                     link["inst_to"].next_state()
-                    link["inst_to"].covers[1] = self.state
                     flag = True
         return flag
     
@@ -2299,11 +2326,11 @@ class GRAMMATICAL_WM_C(WM):
             (SemRep) AND phon instances. The notion of trace changes also when cxn can be instantiated on the bases of predictions from other constructions. Should those constructions
             be part of the trace?
             - With respect to the previous point, in production, trace contains only pointers to what triggered the instantiation, covers contains a mappping!
-            - Since we are dealing with CFG, one way to define overal, given the notion of covers (as [state1, state2]) can just be the intersection of two such segments, and the competition
+            - Since we are dealing with CFG, one way to define overal, given the notion of chart_pos (as [state1, state2]) can just be the intersection of two such segments, and the competition
             would occur as soon as the overlap is not null (no crossing branches in CFGs).
         """
-        s1 = set(range(inst1.covers[0], inst1.covers[1]))
-        s2 = set(range(inst2.covers[0], inst2.covers[1]))
+        s1 = set(range(inst1.chart_pos[0], inst1.chart_pos[1]))
+        s2 = set(range(inst2.chart_pos[0], inst2.chart_pos[1]))
         overlap = list(s1.intersection(s2))
         return overlap
     
@@ -2363,14 +2390,14 @@ class GRAMMATICAL_WM_C(WM):
         flag1 = False
         flag2 = False
         if inst1.form_state and not(inst2.form_state):
-            if inst1.covers[1] == inst2.covers[0]: 
+            if inst1.chart_pos[1] == inst2.chart_pos[0]: 
                 link = GRAMMATICAL_WM_C.link(inst1, inst2)
                 if link:
                     links.append(link)
                     flag1 = True
                         
         if inst2.form_state and not(inst1.form_state):
-            if inst2.covers[1] == inst1.covers[0]:
+            if inst2.chart_pos[1] == inst1.chart_pos[0]:
                 link = GRAMMATICAL_WM_C.link(inst2, inst1)
                 if link:
                     links.append(link)
@@ -2394,15 +2421,17 @@ class GRAMMATICAL_WM_C(WM):
         """
         assemblages = self.assemble()
         if assemblages:
-            winner_assemblage = self.get_winner_assemblage(assemblages)
+            (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
-                sem_frame =  GRAMMATICAL_WM_C.meaning_read_out(winner_assemblage)
-                self.outputs['to_semantic_WM'] =  sem_frame
+                sem_WM_output = eq_inst.content.SemFrame
+                phon_WM_output = eq_inst.covers.values()
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
-                self.post_prod_state(winner_assemblage)
-    
-    
+#                self.post_prod_state(winner_assemblage) # Needed if cooperation links are symmetrical
+                
+                return {'phon_WM_output':phon_WM_output, 'sem_WM_output':sem_WM_output}
+        return None
+        
     def get_winner_assemblage(self, assemblages):
         """
         Args: assemblages ([ASSEMBLAGE])
@@ -2415,13 +2444,14 @@ class GRAMMATICAL_WM_C(WM):
         # Computing the equivalent instance for each assemblage.
         for assemblage in assemblages:
             (eq_inst, a2i_map) = self.assemblage2inst(assemblage)
+            assemblage_dat = (assemblage, eq_inst, a2i_map)
             score = eq_inst.activity
             if not(max_score):
                 max_score = score
-                winner = assemblage
+                winner = assemblage_dat
             if score>max_score:
                 max_score = score
-                winner = assemblage
+                winner = assemblage_dat
         return winner
     
     def post_prod_state(self, winner_assemblage):
@@ -2430,7 +2460,6 @@ class GRAMMATICAL_WM_C(WM):
         
         NOTE directly taken from the production model
         """
-        self.set_subthreshold(winner_assemblage.schema_insts)
         self.deactivate_coop_weigts()
     
     def set_subthreshold(self, insts):
@@ -2512,8 +2541,6 @@ class GRAMMATICAL_WM_C(WM):
             graph.add_edge(link.inst_from, link.connect.port_to, type="inst2port")
         
         return graph
-
-
 
     def get_trees(self, frontier, assemblage, graph, results):
         """
@@ -2648,7 +2675,7 @@ class GRAMMATICAL_WM_C(WM):
 #        """
 #        Returns a new cxn_instance and the mapping between inst_to and inst_from ports to new_cxn_inst ports.
 #        
-#        NOTE: Only minor changes from the production method related to the difference in trace and mapping, phon_covers and covers.
+#        NOTE: Only minor changes from the production method related to the difference in trace and mapping, and chart_pos.
 #        """
 #        inst_p = inst_to
 #        port_p = connect.port_to
@@ -2665,11 +2692,14 @@ class GRAMMATICAL_WM_C(WM):
 #        new_trace = {"schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} 
 #        
 #        # Defines new_cxn mapping
-#        new_mapping = {} # TO DEFINE        
+#        new_mapping = {} 
+#        for n,v in inst_p.covers.iteritems():
+#                new_mapping[c[n]] = v
+#        for n,v in inst_c.covers.iteritems():
+#            new_mapping[c[n]] = v       
 #        
 #        new_cxn_inst = CXN_SCHEMA_INST_C(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False)
-#        new_cxn_inst.phon_cover = inst_p.phon_cover + inst_c.phon_cover
-#        new_cxn_inst.covers = inst_p.covers
+#        new_cxn_inst.chart_pos = inst_p.chart_pos
 #        
 #        # Define port correspondence
 #        in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
@@ -2697,7 +2727,7 @@ class GRAMMATICAL_WM_C(WM):
             - a2i_map (DICT): assemblage2instance name mapping to be updated.
             
         Notes:
-             NOTE: Only minor changes from the production method related to the difference in trace and mapping, phon_covers and covers.
+             NOTE: Only minor changes from the production method related to the difference in trace and mapping, and chart_pos.
         """
         inst_p = inst_to
         port_p = connect.port_to
@@ -2714,11 +2744,14 @@ class GRAMMATICAL_WM_C(WM):
         new_trace = {"schemas":inst_p.trace["schemas"] + inst_c.trace["schemas"]} 
             
         # Defines new_cxn mapping
-        new_mapping = {} # TO DEFINE        
+        new_mapping = {} 
+        for n,v in inst_p.covers.iteritems():
+                new_mapping[c[n]] = v
+        for n,v in inst_c.covers.iteritems():
+            new_mapping[c[n]] = v
         
         new_cxn_inst = CXN_SCHEMA_INST_C(new_cxn_schema, trace=new_trace, mapping=new_mapping, copy=False)
-        new_cxn_inst.phon_cover = inst_p.phon_cover + inst_c.phon_cover
-        new_cxn_inst.covers = inst_p.covers
+        new_cxn_inst.chart_pos = inst_p.chart_pos[:]
     
         # Define port correspondence
         in_ports = [port for port in inst_p.in_ports if port.data != slot_p] + [port for port in inst_c.in_ports]
@@ -2814,7 +2847,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
             - parser_type: 'Earley' or 'Left-Corner'
         """
         if parser_type == 'Earley':
-            covers = predictions['covers']
+            chart_pos = predictions['chart_pos']
             pred_classes = set(predictions['cxn_classes'])
             old_pred_classes = pred_classes
             while pred_classes: # Recursively instantiate the constructions.
@@ -2823,7 +2856,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                     if cxn_schema.content.clss in pred_classes:
                         trace = {'schemas':[cxn_schema]}
                         cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
-                        cxn_inst.covers = covers[:] # That's not really a good "cover", cover should be a mapping between SynForm elements and PhonRep.
+                        cxn_inst.chart_pos = chart_pos[:]
                         self.cxn_instances.append(cxn_inst)
                         # Recursively add the instances predicted by the newly instantiated cxns.
                         pred = cxn_inst.cxn_predictions()
@@ -2832,8 +2865,9 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                 pred_classes = new_pred_classes
                 
         elif parser_type == 'Left-Corner':
-            covers = predictions['covers']
+            chart_pos = predictions['chart_pos']
             pred_classes = set(predictions['left_corner'])
+            BU_trigger = predictions['BU_trigger']
             old_pred_classes = pred_classes
             lexical_retrieval = True
             while pred_classes: # Recursively instantiate the constructions.
@@ -2843,11 +2877,11 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                     if not(left_corner.isdisjoint(pred_classes)): # Left corner matches a prediction.s
                         trace = {'schemas':[cxn_schema]}
                         cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
-                        cxn_inst.covers = covers[:] # That's not really a good "cover", cover should be a mapping between SynForm elements and PhonRep.
+                        cxn_inst.chart_pos = chart_pos[:]
                         if lexical_retrieval == True: # The instance already has received BU input for left corner.
-                            cxn_inst.covers[1] +=1
+                            cxn_inst.covers[cxn_inst.form_state.name] = BU_trigger
+                            cxn_inst.chart_pos[1] +=1
                             cxn_inst.next_state()
-                            cxn_inst.phon_cover.append(predictions['BU_trigger'])
                         self.cxn_instances.append(cxn_inst)
                         # Recursively add the instances predicted by the newly instantiated cxns.
                         pred = cxn_inst.content.clss

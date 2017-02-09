@@ -151,7 +151,7 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
 
 
 if __name__=='__main__':
-    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_mini', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=1, offset=10, prob_times=[], verbose=3, save=True, anim=False,  anim_step=10)
+    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_SVO', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=1, offset=10, prob_times=[], verbose=3, save=True, anim=False,  anim_step=10)
         
 
 

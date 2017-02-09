@@ -110,7 +110,7 @@ def parameters(system_names):
         'dyn.act_rest':0.001,
         'dyn.k':10.0,
         'dyn.noise_mean':0.0,
-        'dyn.noise_std':1.0,    
+        'dyn.noise_std':0.1,    
         'C2.confidence_threshold':0.0,
         'C2.prune_threshold':0.01,
         'C2.coop_weight':0.0,
@@ -127,7 +127,7 @@ def parameters(system_names):
         'dyn.act_rest':0.001,
         'dyn.k':10.0, 
         'dyn.noise_mean':0.0,
-        'dyn.noise_std':1.0, 
+        'dyn.noise_std':0.1, 
         'C2.confidence_threshold':0.6, 
         'C2.prune_threshold':0.01, 
         'C2.coop_weight':1.0,
@@ -292,6 +292,7 @@ def TCG_comprehension_system(name = 'language_system_C',
     model.add_schemas(language_schemas)
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
     model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C')
     model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
     model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
     model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
@@ -385,6 +386,7 @@ def TCG_language_system(name = 'language_system',
     
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
     model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C')
     model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
     model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
     model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_C')
