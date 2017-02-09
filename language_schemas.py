@@ -2023,7 +2023,7 @@ class PHON_WM_C(WM):
         """
         phon_form = self.inputs['from_input']
         if phon_form:
-            phon_schema = PHON_SCHEMA(name=phon_form, word_form=phon_form, init_act=0.6)
+            phon_schema = PHON_SCHEMA(name=phon_form, word_form=phon_form, init_act=1.0)
             phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
             self.add_instance(phon_inst)
             self.phon_sequence.append(phon_inst)
@@ -2099,13 +2099,26 @@ class GRAMMATICAL_WM_C(WM):
         else:
             error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %self.params['parser']['parser_type']
             raise ValueError(error_msg)
-                  
+        
+        self.convey_phon_activations()
         self.update_activations()
         self.prune()
         
         # Define when meaning read-out should take place
         if not(self.comp_links):
             self.produce_meaning()
+            
+    def convey_phon_activations(self):
+        """
+        Need to define the activation from PhonWM to GramWM.
+        """
+        for inst in self.schema_insts:
+            act = 0
+            for phon_inst in inst.phon_cover:
+                act += phon_inst.activity
+            # No normalization
+            inst.activation.E += act
+        
     
     def Earley_parser(self, phon_inst):
         """
@@ -2168,7 +2181,7 @@ class GRAMMATICAL_WM_C(WM):
             - The cxn_retrieval system will then send back the set of all possible predictions based instances.
         """
         if phon_inst:
-            predictions = {'covers':[self.state, self.state], 'left_corner':[phon_inst.content['word_form']]}
+            predictions = {'covers':[self.state, self.state], 'left_corner':[phon_inst.content['word_form']], 'BU_trigger':phon_inst}
         else:
             predictions = None
         return predictions
@@ -2189,7 +2202,6 @@ class GRAMMATICAL_WM_C(WM):
             phon_prediction = inst.phon_prediction()
             if phon_prediction:
                 if phon_prediction == phon_inst.content['word_form']:
-                    print "scanner selected: %s" %inst.name
                     inst.phon_cover.append(phon_inst)
                     inst.next_state()
                     inst.set_activation(phon_inst.activity) #IMPORTANT STEP.
@@ -2835,6 +2847,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                         if lexical_retrieval == True: # The instance already has received BU input for left corner.
                             cxn_inst.covers[1] +=1
                             cxn_inst.next_state()
+                            cxn_inst.phon_cover.append(predictions['BU_trigger'])
                         self.cxn_instances.append(cxn_inst)
                         # Recursively add the instances predicted by the newly instantiated cxns.
                         pred = cxn_inst.content.clss

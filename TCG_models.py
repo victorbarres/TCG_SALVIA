@@ -104,7 +104,7 @@ def parameters(system_names):
         },
     
     'Phonological_WM_C':{
-        'dyn.tau':100.0,
+        'dyn.tau':10000.0,
         'dyn.int_weight':1.0,
         'dyn.ext_weight':1.0,
         'dyn.act_rest':0.001,
@@ -132,7 +132,7 @@ def parameters(system_names):
         'C2.prune_threshold':0.01, 
         'C2.coop_weight':1.0,
         'C2.comp_weight':-10.0, 
-        'C2.coop_asymmetry':0.0,
+        'C2.coop_asymmetry':1.0,
         'C2.comp_asymmetry':0.0,
         'C2.max_capacity':None,
         'C2.sub_threshold_r':0.8,
