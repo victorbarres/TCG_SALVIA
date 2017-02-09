@@ -620,11 +620,11 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         """
         """
         super(SUBSCENE_RECOGNITION, self).reset()
+        self.scene = None
         self.subscene = None
         self.uncertainty = 0
         self.next_saccade = False 
-        # Initialize eye_pos to center of scene.
-        self.eye_pos = (self.scene.width/2, self.scene.height/2)
+        self.eye_pos = (0,0)
         self.focus_area = None
           
     
@@ -793,7 +793,8 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
         super(SCENE_PERCEPTION, self).reset()
         self.params = {'recognition_time':10}
         self.scene = None
-        self.current_subscene = None
+        self.uncertainty = 0
+        self.subscene = None
         self.next_saccade = False
         self.focus = None
     

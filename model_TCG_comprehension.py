@@ -37,7 +37,7 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     return model
     
     
-def set_inputs(model, ling_input_file='ling_inputs.json', speed_param=10):
+def set_inputs(model, ling_input_file='ling_inputs.json', speed_param=10, offset=10):
     """
     Sets up a TCG UTTER_GENERATOR inputs generator for TCG comprehension model.
     
@@ -52,7 +52,7 @@ def set_inputs(model, ling_input_file='ling_inputs.json', speed_param=10):
     LING_INPUT_PATH = './data/ling_inputs/'
     ling_inputs = TCG_LOADER.load_ling_input(ling_input_file, LING_INPUT_PATH)
     
-    utter_gen = ls.UTTER_GENERATOR(ling_inputs)
+    utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset)
     
     return utter_gen
     
@@ -134,7 +134,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     return outputs
     
-def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -142,7 +142,7 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
         - out (ARRAY): Array of model's outputs (single output if not macro, series of output if macro.)
     """
     model = set_model(semantics_name, grammar_name, model_params=model_params)
-    utter_gen = set_inputs(model, ling_input_file, speed_param)
+    utter_gen = set_inputs(model, ling_input_file, speed_param, offset)
     
     out = {}
     out[input_name] = run(model, utter_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
@@ -151,7 +151,7 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
 
 
 if __name__=='__main__':
-    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_SVO', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=100, prob_times=[], verbose=2, save=True, anim=False,  anim_step=10)
+    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_mini', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_SVO', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=1, offset=10, prob_times=[], verbose=3, save=True, anim=False,  anim_step=10)
         
 
 

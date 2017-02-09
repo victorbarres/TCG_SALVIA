@@ -55,8 +55,8 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
         This is similar to getting the Left-Corner of the rule in the case of CFG.
         """
         init_preds = []
-        init_form = self.content.SynForm[0]
-        if isinstance(construction.TP_SLOT):
+        init_form = self.content.SynForm.form[0]
+        if isinstance(init_form, construction.TP_SLOT):
             init_preds = init_form.cxn_classes
         else:
             init_preds = [init_form.cxn_phonetics]
@@ -739,6 +739,14 @@ class GRAMMATICAL_WM_P(WM):
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
         self.refractory_period = 10
         self.time_to_next_prod = 0
+        
+    def reset(self):
+        """
+        """
+        super(GRAMMATICAL_WM_P, self).reset()
+        self.refractory_period = 10
+        self.time_to_next_prod = 0    
+        
     #####################
     ### STATE UPDATE  ###
     #####################   
@@ -1896,6 +1904,8 @@ class PHON_WM_P(WM):
         """
         super(PHON_WM_P, self).reset()
         self.phon_sequence = []
+        self.needs_filler = False
+        self.filler = '....'
         
     def process(self):
         """
@@ -2002,6 +2012,11 @@ class PHON_WM_C(WM):
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.phon_sequence = []
 
+    def reset(self):
+        """
+        """
+        super(PHON_WM_C, self).reset()
+        self.phon_sequence = []
     
     def process(self):
         """
@@ -2046,6 +2061,14 @@ class GRAMMATICAL_WM_C(WM):
         self.params['parser'] = {'pred_init':['S'], 'parser_type':'Earley'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
+        
+    
+    def reset(self):
+        """
+        """
+        super(GRAMMATICAL_WM_C, self).reset()
+        self.state = -1
+        self.pred_init = None
     
     #####################
     ### STATE UPDATE  ###
@@ -2060,6 +2083,7 @@ class GRAMMATICAL_WM_C(WM):
         if listen and self.state==-1:
             self.state = 0
             self.set_pred_init()
+            
         phon_inst = self.inputs['from_phonological_WM_C']
         pred_cxn_insts = self.inputs['from_cxn_retrieval_C']
         # Add new instances
@@ -2071,7 +2095,7 @@ class GRAMMATICAL_WM_C(WM):
         if self.params['parser']['parser_type'] == 'Earley':
             self.Earley_parser(phon_inst)
         elif self.params['parser']['parser_type'] == 'Left-Corner':
-            self.Left_Corner_parser( phon_inst, pred_cxn_insts)
+            self.Left_Corner_parser(phon_inst, pred_cxn_insts)
         else:
             error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %self.params['parser']['parser_type']
             raise ValueError(error_msg)
@@ -2108,6 +2132,8 @@ class GRAMMATICAL_WM_C(WM):
             self.outputs['to_cxn_retrieval_C'] =  (predictions, 'Left-Corner')
             self.state += 1
             self.scanner(phon_inst)
+        else:
+            self.outputs['to_cxn_retrieval_C'] =  (None, 'Left-Corner')
         if pred_cxn_insts:
             self.completer()
         
@@ -2163,6 +2189,7 @@ class GRAMMATICAL_WM_C(WM):
             phon_prediction = inst.phon_prediction()
             if phon_prediction:
                 if phon_prediction == phon_inst.content['word_form']:
+                    print "scanner selected: %s" %inst.name
                     inst.phon_cover.append(phon_inst)
                     inst.next_state()
                     inst.set_activation(phon_inst.activity) #IMPORTANT STEP.
@@ -2185,10 +2212,13 @@ class GRAMMATICAL_WM_C(WM):
         while completed_insts:
             incomplete_insts = [inst for inst in self.schema_insts if inst.form_state]
             for inst1 in completed_insts:
+                print inst1.name
                 competing_insts = []
                 for inst2 in incomplete_insts:
-                    coop = self.cooperate(inst2, inst1)   
+                    print inst2.name
+                    coop = self.cooperate(inst2, inst1) # Attempt cooperation. If possible, both create coop_link AND update instance states.  
                     if coop:
+                        print "%s and %s are cooperating" %(inst1.name, inst2.name)
                         competing_insts.append(inst2)
                 # Sets up competition between incompleted cxn that try to map onto the same compeleted cxn.
                 self.compete(competing_insts)
@@ -2216,16 +2246,15 @@ class GRAMMATICAL_WM_C(WM):
             The state change is required by the fact that production includes predictions, predictions which are absent from production.
         """
         match = GRAMMATICAL_WM_C.match(inst1, inst2)
+        flag = False
         if match["match_cat"] == 1:
             for match_qual, link in match["links"]:
                 if match_qual > 0:
                     self.add_coop_link(inst_from=link["inst_from"], port_from=link["port_from"], inst_to=link["inst_to"], port_to=link["port_to"], qual=match_qual)
                     link["inst_to"].next_state()
                     link["inst_to"].covers[1] = self.state
-            return True
-        else:
-            print "cooperation impossible where it should happen, match cat value: %i" %match["match_cat"]
-        return False
+                    flag = True
+        return flag
     
     def compete(self, insts):
         """
@@ -2244,8 +2273,6 @@ class GRAMMATICAL_WM_C(WM):
                 match = GRAMMATICAL_WM_C.match(inst1, inst2)
                 if match['match_cat'] == -1:
                     self.add_comp_link(inst1, inst2)
-                else:
-                    print "competition impossible where it should happen, match cat value: %i" %match["match_cat"]
     
     @staticmethod
     def overlap(inst1, inst2):
@@ -2748,15 +2775,24 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
         self.add_port('IN', 'from_phonological_WM_C')
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('OUT', 'to_grammatical_WM_C')
+        self.cxn_instances = []
+
+    def reset(self):
+        """
+        """
+        super(CXN_RETRIEVAL_C, self).reset()
+        self.cxn_instances = []
     
     def process(self):
         """
         """
         cxn_schemas = self.inputs['from_grammatical_LTM']
-        (predictions, parser_type) = self.inputs['from_grammatical_WM_C']
-        if predictions and cxn_schemas:
-            cxn_instances = self.instantiate_cxns(predictions, cxn_schemas, parser_type)
-            self.outputs['to_grammatical_WM_C'] =  cxn_instances
+        pred_input = self.inputs['from_grammatical_WM_C']      
+        if pred_input and pred_input[0] and cxn_schemas:
+            (predictions, parser_type) = pred_input
+            self.instantiate_cxns(predictions, cxn_schemas, parser_type)
+            self.outputs['to_grammatical_WM_C'] = self.cxn_instances
+        self.cxn_instances = []
                     
     def instantiate_cxns(self, predictions, cxn_schemas, parser_type='Earley'):
         """
@@ -2771,7 +2807,6 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
             covers = predictions['covers']
             pred_classes = set(predictions['cxn_classes'])
             old_pred_classes = pred_classes
-            cxn_instances = []
             while pred_classes: # Recursively instantiate the constructions.
                 new_pred_classes = set([])
                 for cxn_schema in cxn_schemas:
@@ -2779,19 +2814,17 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                         trace = {'schemas':[cxn_schema]}
                         cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
                         cxn_inst.covers = covers[:] # That's not really a good "cover", cover should be a mapping between SynForm elements and PhonRep.
-                        cxn_instances.append(cxn_inst)
+                        self.cxn_instances.append(cxn_inst)
                         # Recursively add the instances predicted by the newly instantiated cxns.
                         pred = cxn_inst.cxn_predictions()
                         new_pred_classes = new_pred_classes.union(set([c for c in pred if c not in old_pred_classes]))
                 old_pred_classes = old_pred_classes.union(new_pred_classes)
                 pred_classes = new_pred_classes
-            return cxn_instances
                 
         elif parser_type == 'Left-Corner':
             covers = predictions['covers']
             pred_classes = set(predictions['left_corner'])
             old_pred_classes = pred_classes
-            cxn_instances = []
             while pred_classes: # Recursively instantiate the constructions.
                 new_pred_classes = set([])
                 for cxn_schema in cxn_schemas:
@@ -2800,14 +2833,13 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                         trace = {'schemas':[cxn_schema]}
                         cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
                         cxn_inst.covers = covers[:] # That's not really a good "cover", cover should be a mapping between SynForm elements and PhonRep.
-                        cxn_instances.append(cxn_inst)
+                        self.cxn_instances.append(cxn_inst)
                         # Recursively add the instances predicted by the newly instantiated cxns.
                         pred = cxn_inst.content.clss
                         if pred not in old_pred_classes:
                             new_pred_classes.add(pred)
                     old_pred_classes = old_pred_classes.union(new_pred_classes)
                     pred_classes = new_pred_classes
-            return cxn_instances
         
         else:
             error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %parser_type
@@ -3140,9 +3172,10 @@ class SEM_GENERATOR(object):
 class UTTER_GENERATOR(object):
     """
     """
-    def __init__(self, ling_inputs, speed_param=1):
+    def __init__(self, ling_inputs, speed_param=1, offset=10):
         self.ling_inputs = ling_inputs
         self.speed_param = speed_param
+        self.offset = offset
         self.preprocess_inputs()
     
     def preprocess_inputs(self):
@@ -3153,7 +3186,7 @@ class UTTER_GENERATOR(object):
             utterance = ling_input['utterance']
             timing = [t*self.speed_param for t in ling_input['timing']]
             if utter_rate and not(timing):
-                ling_input['timing'] = [i*utter_rate for i in range(len(utterance))]
+                ling_input['timing'] = [i*utter_rate + self.offset for i in range(len(utterance))]
             if not(timing) and not(utter_rate):
                 print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
     
