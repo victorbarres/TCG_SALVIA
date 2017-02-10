@@ -1114,9 +1114,9 @@ class WM(SYSTEM_SCHEMA):
         """
         """
         data = super(WM, self).get_state()
-        data['schema_insts'] = [s.name for s in self.schema_insts]
+        data['schema_insts'] = dict([(s.name, s.activity) for s in self.schema_insts])
         data['coop_links'] = [l.get_info() for l in self.coop_links]
-        data['comp_links'] = [l.get_info() for l in self.coop_links]
+        data['comp_links'] = [l.get_info() for l in self.comp_links]
         return data
         
     #######################
@@ -1711,7 +1711,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         self.dt = MODEL.TIME_STEP
         self.set_up_time = MODEL.SET_UP_TIME
         self.verbose = False
-        self.sim_data = {'model':{}, 'system_states':{}}
+        self.sim_data = {'model':{}, 'system_states':{}, 'time':[]}
         
     def reset(self):
         """
@@ -1720,7 +1720,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         self.input = None
         self.outputs = {}
         self.t = MODEL.T0
-        self.sim_data = {'model':{}, 'system_states':{}}
+        self.sim_data = {'model':{}, 'system_states':{}, 'time':[]}
         for schema_name in self.schemas:
             schema = self.schemas[schema_name]
             schema.t = self.t
@@ -1805,7 +1805,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         
     def get_output(self):
         """
-        Returns sysetm output
+        Returns system output
         """
         if self.t in self.outputs:
             return self.outputs[self.t]
@@ -1870,7 +1870,8 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         # Save simulation data
         if not(self.sim_data['model']):
             self.sim_data['model'] = self.get_info()
-        self.sim_data[self.t] = self.get_state()    
+        self.sim_data['system_states'][self.t] = self.get_state() 
+        self.sim_data['time'].append(self.t)
     
     def set_default_params(self, params=None):
         """
