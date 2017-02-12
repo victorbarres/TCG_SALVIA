@@ -121,6 +121,7 @@ def run_diagnostics(verbose=2, prob_times=[]):
     """
     DIAGNOSTIC_NAME = "act_kick_woman_man"
     SPEED_PARAM = 70
+    ANIM = True
     MODEL_PARAMS = {'Scene_perception.recognition_time':SPEED_PARAM, 
                     'Control.task.start_produce':0.0, 
                     'Control.task.time_pressure':10, 

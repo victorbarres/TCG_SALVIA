@@ -87,7 +87,10 @@
 				"SPLASH" : {},
 				"PUNCH" : {},
 				"KISS" : {},
-				"WATCH" : {}
+				"WATCH" : {},
+				"MEET" : {},
+				"CHASE" : {},
+				"FLEE" : {}
 			},
 			
 			"SYMMETRIC":
@@ -98,7 +101,9 @@
 			
 			"INTRANSITIVE" :
 			{
-				"LAUGH" : {}
+				"LAUGH" : {},
+				"TALK" : {},
+				"FLEE" : {}
 			},
 			
 			"DITRANSITIVE" :
@@ -233,7 +238,9 @@
 			"MEET",
 			"PUNCH",
 			"KISS",
-			"SHAKE_HANDS"
+			"SHAKE_HANDS",
+			"CHASE",
+			"FLEE"
 		],
 		
 		"QUALITY":
@@ -295,7 +302,11 @@
 				"MEET_REL",
 				"SHAKE_HANDS_REL",
 				"KISSER",
-				"KISSEE"
+				"KISSEE",
+				"CHASER", 
+				"CHASEE", 
+				"FLEEER", 
+				"FLEEEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -362,6 +373,8 @@
 		"PUNCH" : ["PUNCH"],
 		"KISS" : ["KISS"],
 		"SHAKE_HANDS" : ["SHAKE_HANDS"],
+		"CHASE" : ["CHASE"],
+		"FLEE" : ["FLEE"],
 		
 		"RED" : ["RED"],
 		"BLUE" : ["BLUE"],
@@ -383,8 +396,8 @@
 		"SUCCESSIVE" : ["SUCCESSIVE"],
 		"CONCURRENT" : ["CONCURRENT"],
 
-		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER"],
-		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE"],
+		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER"],
+		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE"],
 		"AGT+PT" :["MEET_REL", "SHAKE_HANDS_REL"],
 		"THEME": ["GIVEN", "SENT"],
 		"RECIPIENT" : ["GIVEE", "SENDEE"]

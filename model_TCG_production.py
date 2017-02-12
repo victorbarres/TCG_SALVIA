@@ -302,8 +302,8 @@ def run_diagnostics(verbose=2, prob_times=[]):
     SEM_MACRO = False
     SPEED_PARAM = 100
     STD = 0
-    MODEL_PARAMS = {'Control.task.start_produce':0.0, 
-                    'Control.task.time_pressure':400, 
+    MODEL_PARAMS = {'Control.task.start_produce':500, 
+                    'Control.task.time_pressure':100, 
                     'Grammatical_WM_P.dyn.ext_weight':1.0, 
                     'Grammatical_WM_P.C2.prune_threshold': 0.01, 
                     'Grammatical_WM_P.C2.coop_weight':1.0, 
@@ -322,9 +322,9 @@ def run_diagnostics(verbose=2, prob_times=[]):
     grammar_name='TCG_grammar_VB_main'  
     max_time =1000
     seed=None
-    save = True
-    anim = False
-    anim_step = 10
+    save = False
+    anim = True
+    anim_step = 1
     ###    
     
     model = set_model(semantics_name, grammar_name, model_params = MODEL_PARAMS)
@@ -350,8 +350,8 @@ def run_diagnostics(verbose=2, prob_times=[]):
         print "\nINPUT NAME: %s\n" %input_name
         print "\nSIMULATION RUN:\n"
         res = run(model, my_inputs, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
-        print "\nRESULTS:\n"
-        print res
+#        print "\nRESULTS:\n"
+#        print res
 
 ############################
 #### PARAMTER SPACE ANALYSIS      
@@ -697,11 +697,11 @@ def tell_me(utterance):
     TTS.utter()
     
 if __name__=='__main__':
-#    run_diagnostics(verbose=4, prob_times=[])
+    run_diagnostics(verbose=1, prob_times=[])
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
-    out, out2str = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_punch_man_dyn", sem_input_file='TCG_AAAI_input.json', sem_input_macro=False, max_time=1000, seed=None, speed_param=100, prob_times=[], verbose=4, save=True, anim=False, anim_step=1)
-    file_name = './%s/output.txt' %TMP_FOLDER
-    with open(file_name, 'w') as f:
-        f.write(out2str)
+#    out, out2str = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_punch_man_dyn", sem_input_file='TCG_AAAI_input.json', sem_input_macro=False, max_time=1000, seed=None, speed_param=100, prob_times=[], verbose=4, save=True, anim=False, anim_step=1)
+#    file_name = './%s/output.txt' %TMP_FOLDER
+#    with open(file_name, 'w') as f:
+#        f.write(out2str)
