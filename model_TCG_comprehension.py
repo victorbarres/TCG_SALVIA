@@ -85,12 +85,12 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         st_save(utter_gen, 'utter_gen', FOLDER)
     
     # initializing generator for the model.
-    generator = utter_gen.utter_generator(input_name, verbose = (verbose>2))
+    generator = utter_gen.utter_generator(input_name, verbose = (verbose>0))
     (word_form, next_time) = generator.next()
 
     model.initialize_states() # initializing model
     
-    if verbose>3:
+    if verbose>1:
         prob_times.append(max_time-10)# Will save the state 10 steps before max_time
     
     outputs = {}
@@ -100,7 +100,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         if next_time != None and t>=next_time:
             (word_form, next_time) = generator.next()
             model.set_input(word_form)
-            if verbose > 3:
+            if verbose>1:
                 prob_times.append(t + 10) #Will save the state 10 step after introduction of new inputs.
         model.update()
         # Store output
@@ -117,10 +117,10 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
            
     # Display end states
     if verbose>2:
-        model.schemas['Grammatical_WM_C'].show_dynamics(folder=FOLDER)
-        model.schemas['Phonological_WM_C'].show_dynamics(folder=FOLDER)
-        model.schemas['Semantic_WM'].show_dynamics(folder=FOLDER)
-        
+        model.schemas['Grammatical_WM_C'].show_dynamics()
+        model.schemas['Phonological_WM_C'].show_dynamics()
+        model.schemas['Semantic_WM'].show_dynamics()
+       
     if anim:
         if save:
             print "saving animation (might take some time!)"
@@ -130,7 +130,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(step=anim_step)
 #            model.schemas['Phonological_WM_C'].show_dynamics_anim(step=anim_step)
       
-    model.schemas['Semantic_WM'].show_SemRep()
+#    model.schemas['Semantic_WM'].show_SemRep()
     model.reset() # Gets model ready for next use.
     
     return outputs
@@ -149,11 +149,33 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     out[input_name] = run(model, utter_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
     return out
     
+    
+def run_diagnostic():
+    """
+    """
+    verbose = 1
+    input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
+    print "\nInput list:\n %s" %'\n '.join(input_names)
+    input_name = raw_input('\nEnter input name: ')
+    yes_no = raw_input('\nSave? (y/n): ')
+    save = yes_no == 'y'
+    print "#### Processing -> %s\n" % input_name
+    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=30, offset=10, prob_times=[], verbose=verbose, save=save, anim=True,  anim_step=1)
+    
 
 
 if __name__=='__main__':
-    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_SVO', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=4, save=True, anim=True,  anim_step=1)
-        
+#    input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
+#    num = len(input_names)
+#    for input_name in input_names:
+#        print "#### Processing -> %s" % input_name
+#        print "%i more to go!" % num
+#        num -=1
+#        run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=4, save=True, anim=True,  anim_step=1)
+    run_diagnostic()
+
+#    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_SVO', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=4, save=True, anim=True,  anim_step=1)
+
 
 
 

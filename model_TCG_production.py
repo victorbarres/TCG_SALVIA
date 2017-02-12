@@ -68,7 +68,7 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
             sem_gen.ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
         else:
             sem_input = {input_name:sem_inputs[input_name]}
-            sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=speed_param std=std, is_macro=sem_input_macro)
+            sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=speed_param, std=std, is_macro=sem_input_macro)
             ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
             sem_gen.ground_truths = ground_truths.get(input_name, None)
     if sem_input_macro:
@@ -107,11 +107,11 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
         st_save(sem_gen, 'sem_gen', FOLDER)
     
     # initializing generator for the model.
-    generator = sem_gen.sem_generator(input_name, verbose = (verbose>2))
+    generator = sem_gen.sem_generator(input_name, verbose = (verbose>0))
     (sem_insts, next_time, prop) = generator.next()
     model.initialize_states() # initializing model
     
-    if verbose>3:
+    if verbose > 1:
         prob_times.append(max_time-10)# Will save the state 10 steps before max_time
     
     outputs = {}
@@ -132,7 +132,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
         if output['Grammatical_WM_P'] and output['Grammatical_WM_P'][0]['phon_form']:
             if verbose > 2:
                 print "t:%i, '%s'" %(t, ' '.join(output['Grammatical_WM_P'][0]['phon_form']))
-            if verbose >3:
+            if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
         if t in prob_times: # Saving figures for prob times.
             TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
@@ -141,12 +141,12 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
         model.save_sim(file_path = FOLDER, file_name = 'output')
         
     # Prints utterance in verbose mode.
-    if verbose > 1:                
+    if verbose>1:                
         print get_produced_utterances(outputs)
            
     # Display end states
     if verbose>2:
-        model.schemas['Grammatical_WM_P'].show_dynamics(folder=FOLDER)
+        model.schemas['Grammatical_WM_P'].show_dynamics()
         
     if anim:
         if save:

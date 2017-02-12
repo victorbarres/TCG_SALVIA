@@ -1,0 +1,37 @@
+digraph Grammatical_WM_C_concise {
+rankdir=LR;
+style=rounded;
+labeljust=l;
+compound=true;
+subgraph cluster_C2_cluster {
+color=white;
+label="";
+fill=white;
+WOMAN_170 [shape=box, fontname=consolas, fontsize=14, fillcolor="#af2c36", color="#af2c36", style="filled, rounded", label=<<FONT FACE="consolas">WOMAN_170 (0.4)</FONT>>];
+SVO_172 [shape=box, fontname=consolas, fontsize=14, fillcolor="#b58075", color="#b58075", style="filled, rounded", label=<<FONT FACE="consolas">SVO_172 (0.3)</FONT>>];
+DOUBLE_OBJ_174 [shape=box, fontname=consolas, fontsize=14, fillcolor="#09c08a", color="#09c08a", style="filled, rounded", label=<<FONT FACE="consolas">DOUBLE_OBJ_174 (0.3)</FONT>>];
+OBLIQUE_DATIVE_175 [shape=box, fontname=consolas, fontsize=14, fillcolor="#7006e0", color="#7006e0", style="filled, rounded", label=<<FONT FACE="consolas">OBLIQUE_DATIVE_175 (0.3)</FONT>>];
+SV_177 [shape=box, fontname=consolas, fontsize=14, fillcolor="#82de87", color="#82de87", style="filled, rounded", label=<<FONT FACE="consolas">SV_177 (0.3)</FONT>>];
+IN_COLOR_184 [shape=box, fontname=consolas, fontsize=14, fillcolor="#e91be4", color="#e91be4", style="filled, rounded", label=<<FONT FACE="consolas">IN_COLOR_184 (0.3)</FONT>>];
+CNJ_AND_185 [shape=box, fontname=consolas, fontsize=14, fillcolor="#df86e2", color="#df86e2", style="filled, rounded", label=<<FONT FACE="consolas">CNJ_AND_185 (0.3)</FONT>>];
+CNJ_THEN_186 [shape=box, fontname=consolas, fontsize=14, fillcolor="#10436d", color="#10436d", style="filled, rounded", label=<<FONT FACE="consolas">CNJ_THEN_186 (0.3)</FONT>>];
+CNJ_WHILE_187 [shape=box, fontname=consolas, fontsize=14, fillcolor="#93c77f", color="#93c77f", style="filled, rounded", label=<<FONT FACE="consolas">CNJ_WHILE_187 (0.3)</FONT>>];
+PP_IN_188 [shape=box, fontname=consolas, fontsize=14, fillcolor="#57bd88", color="#57bd88", style="filled, rounded", label=<<FONT FACE="consolas">PP_IN_188 (0.3)</FONT>>];
+S_PP_189 [shape=box, fontname=consolas, fontsize=14, fillcolor="#4b0d3e", color="#4b0d3e", style="filled, rounded", label=<<FONT FACE="consolas">S_PP_189 (0.3)</FONT>>];
+KICK_192 [shape=box, fontname=consolas, fontsize=14, fillcolor="#73fef6", color="#73fef6", style="filled, rounded", label=<<FONT FACE="consolas">KICK_192 (0.3)</FONT>>];
+WOMAN_170 -> SVO_172  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN_170 -> DOUBLE_OBJ_174  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN_170 -> OBLIQUE_DATIVE_175  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+WOMAN_170 -> SV_177  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+KICK_192 -> SVO_172  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+KICK_192 -> DOUBLE_OBJ_174  [arrowhead=box, splines=spline, color=green, arrowtail=box, dir=both, penwidth=3];
+SVO_172 -> DOUBLE_OBJ_174  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+SVO_172 -> OBLIQUE_DATIVE_175  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+SVO_172 -> SV_177  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+DOUBLE_OBJ_174 -> OBLIQUE_DATIVE_175  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+DOUBLE_OBJ_174 -> SV_177  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+OBLIQUE_DATIVE_175 -> SV_177  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+SVO_172 -> DOUBLE_OBJ_174  [arrowhead=dot, splines=spline, color=red, arrowtail=dot, dir=both, penwidth=3];
+}
+
+}

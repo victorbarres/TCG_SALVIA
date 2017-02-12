@@ -1,0 +1,27 @@
+digraph semanticWM {
+rankdir=LR;
+style=rounded;
+compound=true;
+labeljust=l;
+penwidth=2;
+subgraph cluster_SemRep {
+color=white;
+fillcolor=white;
+label="";
+MAN_306 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">MAN_306 (1.0)</FONT>>];
+KICK_304 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">KICK_304 (1.0)</FONT>>];
+EVENT_302 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">EVENT_302 (1.0)</FONT>>];
+EVENT_301 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">EVENT_301 (1.0)</FONT>>];
+ACTION_303 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">ACTION_303 (1.0)</FONT>>];
+ENTITY_305 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">ENTITY_305 (1.0)</FONT>>];
+ENTITY_307 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">ENTITY_307 (1.0)</FONT>>];
+WOMAN_308 [shape=oval, fontname=consolas, fontsize=14, fillcolor=lightgrey, color=lightgrey, style=filled, label=<<FONT FACE="consolas">WOMAN_308 (1.0)</FONT>>];
+EVENT_302 -> ACTION_303  [fontname=consolas, label=<<FONT FACE="consolas">IS_309 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ACTION_303 -> ENTITY_305  [fontname=consolas, label=<<FONT FACE="consolas">AGENT_310 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ACTION_303 -> ENTITY_307  [fontname=consolas, label=<<FONT FACE="consolas">PATIENT_311 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ACTION_303 -> KICK_304  [fontname=consolas, label=<<FONT FACE="consolas">IS_312 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ENTITY_305 -> MAN_306  [fontname=consolas, label=<<FONT FACE="consolas">IS_313 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+ENTITY_307 -> WOMAN_308  [fontname=consolas, label=<<FONT FACE="consolas">IS_314 (1.0)</FONT>>, fontsize=12, style=filled, penwidth=2];
+}
+
+}

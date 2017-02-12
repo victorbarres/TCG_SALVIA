@@ -255,6 +255,22 @@
 	},
 	
 	{
+		"name" : "N_PP",
+		"class": "N",
+		"preference" : 1,
+		"group" : 2,
+		"SemFrame":
+		{
+			"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : true},
+						{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false}],
+			"edges" : [{"name" : "MOD", "concept" : "MODIFY", "from" : "ENT", "to" : "EVT"}]
+		},
+		"SynForm" :[{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["PP"]}],
+		"SymLinks" :{"ENT" : "S1", "EVT": "S2"}
+	},
+	
+	{
 		"name" : "SUBJ_REL_SVO",
 		"class" : "N",
 		"preference" : 1,
@@ -1107,6 +1123,20 @@
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "tree"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "BALL",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "BALL", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "ball"}],
 		"SymLinks" : {"N1" : "S1"}
 	}
 ],

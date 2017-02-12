@@ -39,7 +39,8 @@
 					"WATERING_CAN" : {}, 
 					"HOOK" : {},
 					"BOOKSHELF" :{},
-					"WAGON" : {}
+					"WAGON" : {}, 
+					"BALL" :{}
 				},
 				"ANIMAL" : 
 				{
@@ -209,7 +210,8 @@
 			"DOG",
 			"HOOK",
 			"BOOKSHELF",
-			"WAGON"
+			"WAGON", 
+			"BALL"
 		],
 		
 		"PLACE":
@@ -346,6 +348,7 @@
 		"HOOK" : ["HOOK"],
 		"BOOKSHELF" : ["BOOKSHELF"],
 		"WAGON" : ["WAGON"],
+		"BALL" : ["BALL"],
 		
 		"SQUIRT" : ["SQUIRT"],
 		"TALK" : ["TALK"],

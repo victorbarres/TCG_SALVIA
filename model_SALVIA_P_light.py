@@ -90,7 +90,7 @@ def run(model, sim_name, max_time=900, seed=None, verbose=0, prob_times=[]):
                 if verbose > 1:
                     print "t:%i, '%s'" %(t, output['Utter'])
                 out_utterance.append(output['Utter'])
-            if output['Scene_perception'] and verbose >3:
+            if output['Scene_perception'] and verbose >1:
                 vals = [(u,v) for u,v in output['Scene_perception'].iteritems() if v]
                 if vals:
                     print "t:%i, '%s'" %(t, vals)
@@ -98,7 +98,7 @@ def run(model, sim_name, max_time=900, seed=None, verbose=0, prob_times=[]):
                 TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True)
                 TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True)
     
-    if verbose >2:
+    if verbose>2:
 #        model.schemas['Visual_WM'].show_dynamics()
         model.schemas['Semantic_WM'].show_SemRep()
 #        model.schemas['Semantic_WM'].show_dynamics()
@@ -151,4 +151,4 @@ def run_diagnostics(verbose=2, prob_times=[]):
     run(model, sim_name=input_name, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times)
 
 if __name__ == '__main__':
-   run_diagnostics(verbose=3, prob_times=[])
+   run_diagnostics(verbose=2, prob_times=[])
