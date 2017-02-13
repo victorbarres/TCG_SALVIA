@@ -2161,9 +2161,9 @@ class GRAMMATICAL_WM_C(WM):
         """
         for inst in pred_cxn_insts:
             inst.chart_pos = [self.state, self.state]
-            self.state += 1
-            self.scanner(phon_inst)
-            self.completer()
+        self.state += 1
+        self.scanner(phon_inst)
+        self.completer()
         
     def TD_predictor(self):
         """
@@ -2821,11 +2821,12 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
         phon_inst = self.inputs['from_phonological_WM_C']
         if cxn_schemas and phon_inst:
             (lexical_cxn_instances, BU_predictions) = self.instantiate_lexical_cxns(phon_inst, cxn_schemas)
+            self.cxn_instances.extend(lexical_cxn_instances)
             self.instantiate_cxns(BU_predictions, cxn_schemas)
             self.outputs['to_grammatical_WM_C'] = (self.cxn_instances, phon_inst)
         self.cxn_instances = []
     
-    def instantiate_lexical_cxns(phon_inst, cxn_schemas, chart_pos):
+    def instantiate_lexical_cxns(self, phon_inst, cxn_schemas):
         """
         """
         lexical_cxn_instances = []
@@ -2838,7 +2839,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                 cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
                 lexical_cxn_instances.append(cxn_inst)
                 pred = cxn_inst.content.clss
-                BU_predictions.append(pred)
+                BU_predictions.add(pred)
         return (lexical_cxn_instances, BU_predictions)
                     
     def instantiate_cxns(self, predictions, cxn_schemas):
