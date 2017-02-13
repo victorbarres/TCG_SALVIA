@@ -2876,7 +2876,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                 new_pred_classes = set([])
                 for cxn_schema in cxn_schemas:
                     left_corner = set(cxn_schema.get_initial_predictions())
-                    if not(left_corner.isdisjoint(pred_classes)): # Left corner matches a prediction.s
+                    if not(left_corner.isdisjoint(pred_classes)): # Left corner matches a prediction.
                         trace = {'schemas':[cxn_schema]}
                         cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
                         cxn_inst.chart_pos = chart_pos[:]
