@@ -2030,18 +2030,16 @@ class PHON_WM_C(WM):
             for phon in [phon for phon in self.phon_sequence if phon['inst'].name in gram_input]:
                 phon['expressed'] = True
 
-        activations = self.gram_WM_C_output()
+        self.outputs['to_grammatical_WM_C'] =  self.gram_WM_C_output()
         if phon_form:
             phon_schema = PHON_SCHEMA(name=phon_form, word_form=phon_form, init_act=1.0)
             phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
             self.add_instance(phon_inst)
             self.phon_sequence.append({'inst':phon_inst, 'expressed':False})
             self.outputs['to_cxn_retrieval_C'] = phon_inst
-            self.outputs['to_grammatical_WM_C'] =  (phon_inst, activations)
             self.outputs['to_control'] =  True
         else:
             self.outputs['to_cxn_retrieval_C'] =  None
-            self.outputs['to_grammatical_WM_C'] =  (None, activations)
         
         self.update_activations()     
         self.prune()
@@ -2104,27 +2102,16 @@ class GRAMMATICAL_WM_C(WM):
                 self.state = 0
                 self.set_pred_init()
             
-        phon_input = self.inputs['from_phonological_WM_C']
-        if phon_input:
-            (phon_inst, phon_activations) = phon_input
-        else:
-            phon_inst = None
-            phon_activations = {}
+        phon_activations = self.inputs['from_phonological_WM_C']
 
-        pred_cxn_insts = self.inputs['from_cxn_retrieval_C']
-        # Add new instances
-        if pred_cxn_insts:
+        inst_inputs = self.inputs['from_cxn_retrieval_C']
+        if inst_inputs:
+            (pred_cxn_insts, phon_inst) = inst_inputs
+            # Add new instances
             for inst in pred_cxn_insts:
                 self.add_instance(inst, inst.activity)
-        
-        # Update state using parser
-        if self.params['parser']['parser_type'] == 'Earley':
-            self.Earley_parser(phon_inst)
-        elif self.params['parser']['parser_type'] == 'Left-Corner':
+            # Update Grammatical WM C2 and instance state
             self.Left_Corner_parser(phon_inst, pred_cxn_insts)
-        else:
-            error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %self.params['parser']['parser_type']
-            raise ValueError(error_msg)
         
         self.convey_phon_activations(phon_activations)
         self.update_activations()
@@ -2142,6 +2129,8 @@ class GRAMMATICAL_WM_C(WM):
         """
         Propagates activations from PhonWM to GramWM.
         """
+        if not(phon_activations):
+            return
         for inst in self.schema_insts:
             act = 0
             for f,p in inst.covers.iteritems():
@@ -2170,9 +2159,9 @@ class GRAMMATICAL_WM_C(WM):
             - Dont' forget that constructions do not define only slots but also word forms. 
             This requires checking that a phon_inst can match onto an existing construction (scanner)..
         """
-        if phon_inst:
-            predictions = self.BU_predictor(phon_inst)
-            self.outputs['to_cxn_retrieval_C'] =  (predictions, 'Left-Corner')
+        for inst in pred_cxn_insts:
+            inst.chart_pos = [self.state, self.state]
+            inst.covers[inst.form_state.name] = phon_inst.name
             self.state += 1
             self.scanner(phon_inst)
         else:
@@ -2832,70 +2821,54 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
         """
         """
         cxn_schemas = self.inputs['from_grammatical_LTM']
-        pred_input = self.inputs['from_grammatical_WM_C']      
-        if pred_input and pred_input[0] and cxn_schemas:
-            (predictions, parser_type) = pred_input
-            self.instantiate_cxns(predictions, cxn_schemas, parser_type)
-            self.outputs['to_grammatical_WM_C'] = self.cxn_instances
+        TD_pred_input = self.inputs['from_grammatical_WM_C'] # unused here since I have removed Earley parser for now.
+        phon_inst = self.inputs['from_phonological_WM_C']
+        if cxn_schemas and phon_inst:
+            (lexical_cxn_instances, BU_predictions) = self.instantiate_lexical_cxns(phon_inst, cxn_schemas)
+            self.instantiate_cxns(BU_predictions, cxn_schemas)
+            self.outputs['to_grammatical_WM_C'] = (self.cxn_instances, phon_inst)
         self.cxn_instances = []
+    
+    def instantiate_lexical_cxns(phon_inst, cxn_schemas, chart_pos):
+        """
+        """
+        lexical_cxn_instances = []
+        BU_predictions = set([])
+        BU_data = set([phon_inst.content['word_form']])
+        for cxn_schema in cxn_schemas:
+            left_corner = set(cxn_schema.get_initial_predictions())
+            if not(left_corner.isdisjoint(BU_data)): # Left corner matches lexical bottom-up data.
+                trace = {'schemas':[cxn_schema]}
+                cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
+                lexical_cxn_instances.append(cxn_inst)
+                pred = cxn_inst.content.clss
+                BU_predictions.append(pred)
+        return (lexical_cxn_instances, BU_predictions)
                     
-    def instantiate_cxns(self, predictions, cxn_schemas, parser_type='Earley'):
+    def instantiate_cxns(self, predictions, cxn_schemas):
         """
         Generate the set of construction instances to be invoked in GrammaticalWM.
         
         Args:
             - Predictions: List of syntactic classes on which the instantiation should be based.
             - cxn_schemas: Direct access to the GrammaticalLTM knowledge.
-            - parser_type: 'Earley' or 'Left-Corner'
         """
-        if parser_type == 'Earley':
-            chart_pos = predictions['chart_pos']
-            pred_classes = set(predictions['cxn_classes'])
-            old_pred_classes = pred_classes
-            while pred_classes: # Recursively instantiate the constructions.
-                new_pred_classes = set([])
-                for cxn_schema in cxn_schemas:
-                    if cxn_schema.content.clss in pred_classes:
-                        trace = {'schemas':[cxn_schema]}
-                        cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
-                        cxn_inst.chart_pos = chart_pos[:]
-                        self.cxn_instances.append(cxn_inst)
-                        # Recursively add the instances predicted by the newly instantiated cxns.
-                        pred = cxn_inst.cxn_predictions()
-                        new_pred_classes = new_pred_classes.union(set([c for c in pred if c not in old_pred_classes]))
-                old_pred_classes = old_pred_classes.union(new_pred_classes)
-                pred_classes = new_pred_classes
-                
-        elif parser_type == 'Left-Corner':
-            chart_pos = predictions['chart_pos']
-            pred_classes = set(predictions['left_corner'])
-            BU_trigger = predictions['BU_trigger']
-            old_pred_classes = pred_classes
-            lexical_retrieval = True
-            while pred_classes: # Recursively instantiate the constructions.
-                new_pred_classes = set([])
-                for cxn_schema in cxn_schemas:
-                    left_corner = set(cxn_schema.get_initial_predictions())
-                    if not(left_corner.isdisjoint(pred_classes)): # Left corner matches a prediction.
-                        trace = {'schemas':[cxn_schema]}
-                        cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
-                        cxn_inst.chart_pos = chart_pos[:]
-                        if lexical_retrieval == True: # The instance already has received BU input for left corner.
-                            cxn_inst.covers[cxn_inst.form_state.name] = BU_trigger
-                            cxn_inst.chart_pos[1] +=1
-                            cxn_inst.next_state()
-                        self.cxn_instances.append(cxn_inst)
-                        # Recursively add the instances predicted by the newly instantiated cxns.
-                        pred = cxn_inst.content.clss
-                        if pred not in old_pred_classes:
-                            new_pred_classes.add(pred)
-                lexical_retrieval = False # Only the first round retrieves lexical items
-                old_pred_classes = old_pred_classes.union(new_pred_classes)
-                pred_classes = new_pred_classes
-        else:
-            error_msg = 'Invalid parser type %s. (choose "Earley" or "Left-Corner")' %parser_type
-            raise ValueError(error_msg)
-                        
+        pred_classes = predictions
+        old_pred_classes = pred_classes
+        while pred_classes: # Recursively instantiate the constructions.
+            new_pred_classes = set([])
+            for cxn_schema in cxn_schemas:
+                left_corner = set(cxn_schema.get_initial_predictions())
+                if not(left_corner.isdisjoint(pred_classes)): # Left corner matches a prediction.
+                    trace = {'schemas':[cxn_schema]}
+                    cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
+                    self.cxn_instances.append(cxn_inst)
+                    # Recursively add the instances predicted by the newly instantiated cxns.
+                    pred = cxn_inst.content.clss
+                    if pred not in old_pred_classes:
+                        new_pred_classes.add(pred)
+            old_pred_classes = old_pred_classes.union(new_pred_classes)
+            pred_classes = new_pred_classes
     ####################
     ### JSON METHODS ###
     ####################
