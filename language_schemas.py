@@ -2161,12 +2161,8 @@ class GRAMMATICAL_WM_C(WM):
         """
         for inst in pred_cxn_insts:
             inst.chart_pos = [self.state, self.state]
-            inst.covers[inst.form_state.name] = phon_inst.name
             self.state += 1
             self.scanner(phon_inst)
-        else:
-            self.outputs['to_cxn_retrieval_C'] =  (None, 'Left-Corner')
-        if pred_cxn_insts:
             self.completer()
         
     def TD_predictor(self):
