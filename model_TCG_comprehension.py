@@ -135,7 +135,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     return outputs
     
-def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_dev', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -160,7 +160,7 @@ def run_diagnostic():
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_dev', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=30, offset=10, prob_times=[], verbose=verbose, save=save, anim=True,  anim_step=1)
+    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=30, offset=10, prob_times=[], verbose=verbose, save=save, anim=True,  anim_step=1)
     
 
 
