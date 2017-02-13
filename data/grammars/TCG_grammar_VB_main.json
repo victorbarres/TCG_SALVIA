@@ -58,7 +58,7 @@
 		"SemFrame" :
 		{
 			"nodes" : [	{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "SYMMETRIC", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "ACTOR_1", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "ACTOR_2", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -81,7 +81,7 @@
 		"SemFrame" :
 		{
 			"nodes" : [	{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -102,7 +102,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true, "focus" : false, "head" : false },
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false },
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false }],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -126,7 +126,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "DITRANSITIVE", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "THEME", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "RCPT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
@@ -150,7 +150,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "DITRANSITIVE", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "THEME", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false },
 						{"name" : "RCPT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false }],
@@ -195,7 +195,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "INTRANSITIVE", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false}],
 			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"}]
@@ -278,7 +278,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -301,7 +301,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "INTRANSITIVE", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
@@ -321,7 +321,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -347,7 +347,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -370,7 +370,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true,  "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "ACTION", "frame" : true,  "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -416,14 +416,16 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "WEAR", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "WEAR", "concept" : "WEAR", "frame" : false, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "HUMAN", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "PT", "concept" : "CLOTHING", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "COLOR", "concept" : "COLOR", "frame" : false, "focus" : true, "head" : false}],
-			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
+			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
+						{"name" : "IS2", "concept" : "IS", "from" : "ACT", "to" : "WEAR"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "PT"},
-						{"name" : "PT_COLOR", "concept" : "MODIFY", "from" : "PT", "to" : "COLOR"}]
+						{"name" : "PT_COLOR", "concept" : "MODIFY", "from" : "COLOR", "to" : "PT"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
 					{"name" : "S2", "type" : "PHON", "phon" : "in"},

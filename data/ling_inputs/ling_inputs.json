@@ -64,7 +64,7 @@
 			
 		"test_in_blue": {
 			"utter_rate": 1,
-			 "utterance" :["woman", "kick", "man", "in", "blue"],
+			 "utterance" :["woman", "in", "blue"],
 			 "timing":[],
 			 "comments": ""
 			},
@@ -103,8 +103,15 @@
 			 "timing":[],
 			 "comments": ""
 			},
-			
+		
 		"test_complex1": {
+			"utter_rate": 1,
+			 "utterance" :["man", "kick", "ball", "woman", "in", "blue"],
+			 "timing":[],
+			 "comments": ""
+			},
+			
+		"test_complex2": {
 			"utter_rate": 1,
 			 "utterance" :["woman", "kick", "man", "in", "blue", "boxing", "ring"],
 			 "timing":[],
