@@ -298,7 +298,7 @@ def run_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'diagnostic.json'
+    DIAGNOSTIC_FILE = 'dev/diagnostic.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
     STD = 0
@@ -319,7 +319,7 @@ def run_diagnostics(verbose=2, prob_times=[]):
 
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
-    grammar_name='TCG_grammar_VB_main'  
+    grammar_name='TCG_grammar_VB_dev'  
     max_time =1000
     seed=None
     save = False

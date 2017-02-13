@@ -3056,7 +3056,7 @@ class ISRF_INTERPRETER(object):
         func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation does without activation
         
         instances = []
-        for term in proposition:  
+        for term in proposition:
             # Case1:
             match1 = re.search(func_pattern_cpt, term)
             match2 = re.search(func_pattern_rel, term)

@@ -1,0 +1,134 @@
+{ 
+	"input_macros":{
+		"agent_patient_action":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["GIRL_AREA", "MAN_AREA", "ACTION_AREA"],
+				"timing":[],
+				"comments":""
+			},
+			"substitutions":{
+			}
+		},
+		
+		"patient_agent_action":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["MAN_AREA", "GIRL_AREA", "ACTION_AREA"],
+				"timing":[],
+				"comments":""
+			},
+			"substitutions":{
+			}
+		},
+		
+		"action_agent_patient":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["ACTION_AREA", "GIRL_AREA", "MAN_AREA"],
+				"timing":[],
+				"comments":""
+			},
+			"substitutions":{
+			}
+		},
+		
+		"action_patient_agent":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["ACTION_AREA", "MAN_AREA", "GIRL_AREA"],
+				"timing":[],
+				"comments":""
+			},
+			"substitutions":{
+			}
+		},
+		
+		"agent_action_patient":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["GIRL_AREA", "ACTION_AREA", "MAN_AREA"],
+				"timing":[],
+				"comments":""
+			},
+			"substitutions":{
+			}
+		},
+		
+		"patient_action_agent":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"GIRL_AREA":["ENTITY(e2,F)", "GIRL(girl)", "IS(is2)", "is2(e2, girl)"],
+					"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence" :["MAN_AREA", "ACTION_AREA", "GIRL_AREA"],
+				"timing":[],
+				"comments":""
+			},
+			"substitutions":{
+			}
+		},
+		
+		"scene_incremental":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"WOMAN_AREA_CUED":["ENTITY(cued,F)", "WOMAN(woman)", "IS(is1)", "is1(cued, woman)"],
+					"PEOPLE_AREA":["ENTITY(uncued,F)", "PEOPLE(people)", "IS(is2)", "is2(uncued, people)"],
+					"TALK_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "TALK(talk)", "IS(is4)", "is4(a1, talk)", "ENTITY(cued,F)", "ENTITY(uncued,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, cued)", "pt(a1, uncued)"]
+				},
+				"sequence" :["WOMAN_AREA_CUED", "TALK_AREA", "PEOPLE_AREA"],
+				"timing":[],
+				"comments":"Kuchinsky's example of difficult event and easy objects. TCG Scene: incremental strategy."
+			},
+			"substitutions":{
+			}
+		},
+		
+		"scene_structural":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions"  : {
+					"MOUSE_AREA":["ENTITY(uncued,F)", "MOUSE(mouse)", "IS(is1)", "is1(uncued, mouse)"],
+					"TURTLE_AREA_CUED":["ENTITY(cued,F)", "TURTLE(turtle)", "IS(is2)", "is2(cued, turtle)"],
+					"SQUIRT_AREA":["TRANS_ACT(a1,F)", "SQUIRT(squirt)", "IS(is4)", "is4(a1, squirt)"],
+					"GIST":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(cued,F)", "ENTITY(uncued,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, uncued)", "pt(a1, cued)"]
+				},
+				"sequence" :["GIST", "TURTLE_AREA_CUED", "SQUIRT_AREA", "MOUSE_AREA"],
+				"timing":[],
+				"comments":"Kuchinsky's example of easy event with difficult objects. TCG Scene: structural strategy."
+			},
+			"substitutions":{
+			}
+		}
+		
+	}
+}
+		

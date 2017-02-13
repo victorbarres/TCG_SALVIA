@@ -4,7 +4,7 @@
 			"sem_input_frame":{
 				"sem_rate": 1,
 				 "propositions"  : {
-					"GIST":["EVENT(evt1, F)","ACTION(a1, F)", "ENTITY(e1, F),", "ENTITY(e2, F)",  "IS(is4)", "is4(evt1, a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e1)", "pt(a1, e2)"],
+					"GIST":["EVENT(evt1, F)","TRANS_ACT(a1, F)", "ENTITY(e1, F),", "ENTITY(e2, F)",  "IS(is4)", "is4(evt1, a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e1)", "pt(a1, e2)"],
 					"MAN_AREA":["IS(is1)", "MAN(man1)", "is1(e2, man1)"],
 					"HIT_AREA":["IS(is2)", "HIT(hit1)", "is2(a1, hit1)"],
 					"WOMAN_AREA":["IS(is3)", "WOMAN(woman1)", "is3(e1,woman1)"],
@@ -22,10 +22,10 @@
 			"sem_input_frame":{
 				"sem_rate": 1,
 				 "propositions"  : {
-					 "LEFT_WOMAN_AREA":["EVENT(evt1, F)", "ACTION(a1, F)", "ENTITY(e1, F)", "ENTITY(e2, F)", "WOMAN(woman1)", "DRESS(dress1)", "WEAR(wear1)", "IS(is1)", "IS(is2)", "IS(is3)", "IS(is31)", "is1(evt1, a1)", "is2(e1, woman1)", "is3(e2, dress1)", "is31(a1, wear1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+					 "LEFT_WOMAN_AREA":["EVENT(evt1, F)", "TRANS_ACT(a1, F)", "ENTITY(e1, F)", "ENTITY(e2, F)", "WOMAN(woman1)", "DRESS(dress1)", "WEAR(wear1)", "IS(is1)", "IS(is2)", "IS(is3)", "IS(is31)", "is1(evt1, a1)", "is2(e1, woman1)", "is3(e2, dress1)", "is31(a1, wear1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
 					 "LEFT_DRESS_AREA": ["MODIFY(mod1)", "GREEN(green1)", "mod1(dress1, green1)"],
-					 "KICK_AREA": ["EVENT(evt2, F)", "ENTITY(e3, F)", "HUMAN(h1, F)", "ACTION(a2, F)", "KICK(kick1)", "AGENT(agt2)", "PATIENT(pt2)", "IS(is4)", "IS(is41)", "is4(evt2, a2)", "is41(a2, kick1)", "agt2(a2,e1)", "pt2(a2,h1)"],
-					 "RIGHT_WOMAN_AREA": ["EVENT(evt3, F)", "ACTION(a3, F)", "ENTITY(e4, F)", "WOMAN(woman2)", "DRESS(dress2)", "WEAR(wear2)", "IS(is5)", "IS(is6)", "IS(is7)", "IS(is71)", "is5(evt2, a3)", "is6(h1, woman2)", "is7(e4, dress2)", "is71(a3, wear2)", "AGENT(agt3)", "PATIENT(pt3)", "agt3(a3, h1)", "pt3(a3, e4)"],
+					 "KICK_AREA": ["EVENT(evt2, F)", "ENTITY(e3, F)", "HUMAN(h1, F)", "TRANS_ACT(a2, F)", "KICK(kick1)", "AGENT(agt2)", "PATIENT(pt2)", "IS(is4)", "IS(is41)", "is4(evt2, a2)", "is41(a2, kick1)", "agt2(a2,e1)", "pt2(a2,h1)"],
+					 "RIGHT_WOMAN_AREA": ["EVENT(evt3, F)", "TRANS_ACT(a3, F)", "ENTITY(e4, F)", "WOMAN(woman2)", "DRESS(dress2)", "WEAR(wear2)", "IS(is5)", "IS(is6)", "IS(is7)", "IS(is71)", "is5(evt2, a3)", "is6(h1, woman2)", "is7(e4, dress2)", "is71(a3, wear2)", "AGENT(agt3)", "PATIENT(pt3)", "agt3(a3, h1)", "pt3(a3, e4)"],
 					 "RIGHT_DRESS_AREA": ["MODIFY(mod2)", "BLUE(blue1)", "mod2(dress2, blue1)"]
 				  },
 				  "sequence" :["LEFT_WOMAN_AREA", "LEFT_DRESS_AREA", "KICK_AREA", "RIGHT_WOMAN_AREA", "RIGHT_DRESS_AREA"],
@@ -41,9 +41,9 @@
 				"sem_rate": 1,
 				 "propositions"  : {
 					 "BOY_AREA": ["ENTITY(e1, F)", "BOY(boy1)", "IS(is1)", "is1(e1, boy1)"],
-					 "KICK_AREA": ["EVENT(evt1, F)", "ACTION(a1, F)", "KICK(kick1)","HUMAN(h1, F)", "IS(is2)", "IS(is3)", "is2(evt1, a1)", "is3(a1, kick1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, h1)", "pt1(a1, e1)"],
+					 "KICK_AREA": ["EVENT(evt1, F)", "TRANS_ACT(a1, F)", "KICK(kick1)","HUMAN(h1, F)", "IS(is2)", "IS(is3)", "is2(evt1, a1)", "is3(a1, kick1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, h1)", "pt1(a1, e1)"],
 					 "GIRL_AREA": ["IS(is4)", "GIRL(girl1)", "is4(h1, girl1)"],
-					 "GIRL_FACE_AREA": ["EVENT(evt2, F)", "INACTION(a2, F)", "IS(is5)", "is5(evt2, a2)", "LAUGH(laugh1)", "IS(is6)", "is6(a2, laugh1)", "AGENT(agt2)", "agt2(a2, h1)", "MODIFY(mod1)", "mod1(h1, evt2)"]
+					 "GIRL_FACE_AREA": ["EVENT(evt2, F)", "INTRANS_ACT(a2, F)", "IS(is5)", "is5(evt2, a2)", "LAUGH(laugh1)", "IS(is6)", "is6(a2, laugh1)", "AGENT(agt2)", "agt2(a2, h1)", "MODIFY(mod1)", "mod1(h1, evt2)"]
 				  },
 				  "sequence" :["BOY_AREA", "KICK_AREA", "GIRL_AREA", "GIRL_FACE_AREA"],
 				  "timing":[],
@@ -58,7 +58,7 @@
 				"sem_rate": 1,
 				 "propositions"  : {
 					"WOMAN_AREA_CUED": ["ENTITY(e1, F)", "WOMAN(woman1)", "IS(is1)", "is1(e1, woman1)"],
-					"TALK_AREA": ["EVENT(evt1, F)", "ACTION(a1, F)", "TALK(talk1)", "IS(is2)", "IS(is3)", "is2(evt1, a1)", "is3(a1, talk1)", "HUMAN(h1, F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, h1)"],
+					"TALK_AREA": ["EVENT(evt1, F)", "TRANS_ACT(a1, F)", "TALK(talk1)", "IS(is2)", "IS(is3)", "is2(evt1, a1)", "is3(a1, talk1)", "HUMAN(h1, F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, h1)"],
 					"PEOPLE_AREA": ["IS(is4)", "PEOPLE(people1)", "is4(h1, people1)"]
 				  },
 				  "sequence" :["WOMAN_AREA_CUED", "TALK_AREA", "PEOPLE_AREA"],
@@ -73,7 +73,7 @@
 			"sem_input_frame":{
 				"sem_rate": 1,
 				 "propositions"  : {
-					"GIST": ["EVENT(evt1, F)", "ENTITY(e1, F)", "ENTITY(e2, F)", "ACTION(a1, F)", "IS(is1)", "is1(evt1, a1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"], 
+					"GIST": ["EVENT(evt1, F)", "ENTITY(e1, F)", "ENTITY(e2, F)", "TRANS_ACT(a1, F)", "IS(is1)", "is1(evt1, a1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"], 
 					"TURTLE_AREA_CUED": ["TURTLE(turtle1)","IS(is2)", "is2(e2, turtle1)"],
 					"SQUIRT_AREA" : ["SQUIRT(squirt1)", "IS(is3)", "is3(a1, squirt1)"],
 					"MOUSE_AREA" : ["MOUSE(mouse1)", "IS(is4)", "is4(e1, mouse1)"]
@@ -92,9 +92,9 @@
 				"sem_rate": 1,
 				 "propositions"  : {
 					"WOMAN_AREA":["ENTITY(e1, F)","WOMAN(woman1)","IS(is2)", "is2(e1, woman1)"],
-					"HIT_AREA": ["EVENT(evt1, F)", "ACTION(a1, F)", "ENTITY(e2, F)", "MAN(man1)", "HIT(hit1)", "IS(is1)", "IS(is3)", "is1(evt1, a1)", "is3(e2, man1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+					"HIT_AREA": ["EVENT(evt1, F)", "TRANS_ACT(a1, F)", "ENTITY(e2, F)", "MAN(man1)", "HIT(hit1)", "IS(is1)", "IS(is3)", "is1(evt1, a1)", "is3(e2, man1)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
 					"WOMAN_FACE_AREA": ["PRETTY(pretty1)", "MODIFY(mod3)", "mod3(woman1, pretty1)"],
-					"DRESS_AREA": ["EVENT(evt2, F)", "ACTION(a2, F)", "ENTITY(e3, F)", "DRESS(dress1)", "WEAR(wear1)", "IS(is4)", "IS(is5)", "IS(is6)", "is4(evt2, a2)", "is5(a2, wear1)", "is6(e3, dress1)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a1, e3)", "MODIFY(mod2)", "mod2(e1, evt2)"],
+					"DRESS_AREA": ["EVENT(evt2, F)", "TRANS_ACT(a2, F)", "ENTITY(e3, F)", "DRESS(dress1)", "WEAR(wear1)", "IS(is4)", "IS(is5)", "IS(is6)", "is4(evt2, a2)", "is5(a2, wear1)", "is6(e3, dress1)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a1, e3)", "MODIFY(mod2)", "mod2(e1, evt2)"],
 					"DRESS_FOCUS_AREA": ["MODIFY(mod1)", "GREEN(green1)", "mod1(dress1, green1)"]
 				  },
 				  "sequence" :["WOMAN_AREA", "HIT_AREA", "WOMAN_FACE_AREA", "DRESS_AREA", "DRESS_FOCUS_AREA"],

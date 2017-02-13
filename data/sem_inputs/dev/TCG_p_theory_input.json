@@ -1,0 +1,88 @@
+{ 
+	"inputs":{
+		"young_woman_punch_man_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)", "YOUNG(young)", "MODIFY(mod)", "mod(e2, young)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+					"PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
+		},
+			
+		"young_woman_punch_man_dyn":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P2":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+					"ENTITY(e2,F)","PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "ENTITY(e1,F)", "pt(a1, e1)"],
+				"P3":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P4":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
+			},
+			"sequence":["P1", "P2", "P3", "P4"],
+			"timing":[],
+			"comments":"Actions + property modifier dynamic."
+		}
+	},
+	
+	"outputs":{
+		"test_naming":["man"],
+		"test_naming_ambiguous":["woman", "lady"],
+		"test_naming_2":["woman man", "man woman", "lady man", "man lady"],
+		"young_woman_static":["young woman", "young lady"],
+		"young_woman_dyn":["young woman", "young lady"],
+		"woman_kick_man_static":["woman kick man", "man is kick -ed by woman", "lady kick man", "man is kick -ed by lady"],
+		"woman_kick_man_dyn":["woman kick man", "man is kicked by woman", "lady kick man", "man is kicked by lady"],
+		"young_woman_punch_man_static":["young woman punch man", "man is punch -ed by woman who is young", "woman who is young punch man", "man is punch -ed by young woman", "young lady punch man", "man is punch -ed by lady who is young", "lady who is young punch man", "man is punch -ed by young lady"],
+		"young_woman_punch_man_dyn":["young woman punch man", "man is punch -ed by woman who is young", "woman who is young punch man", "man is punch -ed by young woman","young lady punch man", "man is punch -ed by lady who is young", "lady who is young punch man", "man is punch -ed by young lady"],
+		"woman_punch_man_kick_can_static":["woman punch man who kick can", "man who kick can is punch -ed by woman", "woman punch man can is punch -ed by", "man can is punch -ed by is punch -ed by woman", "lady punch man who kick can", "man who kick can is punch -ed by lady", "lady punch man can is punch -ed by", "man can is kick -ed by is punch -ed by lady"],
+		"woman_punch_man_kick_can_dyn":["woman punch man who kick can", "man who kick can is punch -ed by woman", "woman punch man can is punch -ed by", "man can is punch -ed by is punch -ed by woman", "lady punch man who kick can", "man who kick can is punch -ed by lady", "lady punch man can is punch -ed by", "man can is kick -ed by is punch -ed by lady"],
+		"woman_in_blue_static":["woman wear blue dress", "woman in blue", "lady wear blue dress", "lady in blue"]
+	},
+	
+	"input_macros":{
+		"young_woman_punch_man_static":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions": {
+					"P1":["ENTITY(e1,F, a_pt)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+						"ENTITY(e2,F, a_act)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)", "YOUNG(young)", "MODIFY(mod)", "mod(e2, young)",
+						"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+						"PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
+						"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+				},
+				"sequence":["P1"],
+				"timing":[],
+				"comments":"Actions + property modifier static."
+			},
+			"substitutions":{
+				"a_act":["0.7", "1.0"],
+				"a_pt":["0.7", "1.0"]
+			}
+		},
+		"young_woman_punch_man_dyn":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions": {
+					"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+					"P2":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+						"ENTITY(e2,F)","PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
+						"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "ENTITY(e1,F)", "pt(a1, e1)"],
+					"P3":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+					"P4":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
+				},
+				"sequence":["P1", "P2", "P3", "P4"],
+				"timing":[],
+				"comments":"Actions + property modifier dynamic."
+			},
+			"substitutions":{
+			}
+		}
+	}
+		
+}	

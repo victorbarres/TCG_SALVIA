@@ -1,0 +1,379 @@
+{ 
+	"inputs":{
+		"test_naming": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1": ["ENTITY(e,F)", "MAN(man)", "IS(is)", "is(e, man)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": "test naming without lexical competition."
+		},
+			
+		"test_naming_ambiguous": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1": ["ENTITY(e,F)", "WOMAN(woman)", "IS(is)", "is(e, woman)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": "Test naming with lexical competition."
+		},
+			
+		"test_naming_2": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1": ["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", "ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": "test naming for two entities."
+			},
+			
+		"young_woman_static": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1":["ENTITY(e,F,0.9)", "WOMAN(woman)", "IS(is)", "is(e, woman)", "YOUNG(young, 0.8)", "MODIFY(mod, 0.7)", "mod(e, young)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": "test property-modifier static."
+		},
+			
+		"young_woman_dyn": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1":["ENTITY(e,F,0.9)"],
+				"P2":["WOMAN(woman)", "IS(is)", "is(e, woman)"],
+				"P3":["YOUNG(young, 0.8)", "MODIFY(mod, 0.7)", "mod(e, young)"]
+			  },
+			  "sequence" :["P1", "P2", "P3"],
+			  "timing":[],
+			  "comments": "test property-modifier dynamic."
+		},
+		
+		"young_woman_young_man_dyn": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1":["ENTITY(e1,F)", "WOMAN(woman)", "IS(is1)", "is1(e1, woman)", "YOUNG(young1)", "MODIFY(mod1)", "mod1(e1, young1)"],
+				"P2":["ENTITY(e2,F)", "MAN(man)", "IS(is2)", "is2(e2, man)", "YOUNG(young2)", "MODIFY(mod2)", "mod2(e2, young2)"]
+			  },
+			  "sequence" :["P1", "P2"],
+			  "timing":[],
+			  "comments": "test property-modifier static but two in sequence."
+		},
+		
+		"man_kick_ball_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+					"ENTITY(e2,F)", "BALL(ball)", "IS(is2)", "is2(e2, ball)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)",
+					"KICK(kick)", "IS(is4)", "is4(a1, kick)", 
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive static (no competition)."
+		},
+		
+		"woman_kick_man_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)",
+					"KICK(kick)", "IS(is4)", "is4(a1, kick)", 
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive static."
+		},
+		
+		"woman_kick_man_dyn":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P3":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)"], 
+				"P4":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+			},
+			"sequence" :["P1", "P2", "P3", "P4"],
+			"timing":[],
+			"comments":"test transitive dynamic."
+		},
+		
+		"man_laugh_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)",
+					"EVENT(evt1,F)", "INTRANS_ACT(a1,F)", "IS(is2)", "is2(evt1,a1)",
+					"LAUGH(laugh)", "IS(is3)", "is3(a1, laugh)", 
+					"AGENT(agt)", "agt(a1, e1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test intransitive static."
+		},
+		
+		"man_laugh_dyn":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P2":["EVENT(evt1,F)", "INTRANS_ACT(a1,F)", "IS(is2)", "is2(evt1,a1)"], 
+				"P3":["LAUGH(laugh)", "IS(is3)", "is3(a1, laugh)", "AGENT(agt)", "agt(a1, e1)"]
+			},
+			"sequence" :["P1", "P2", "P3"],
+			"timing":[],
+			"comments":"test intransitive dynamic."
+		},
+		
+		
+		"woman_give_man_ball_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+					"ENTITY(e3,F)", "BALL(ball)", "IS(is3)", "is3(e3, ball)",
+					"EVENT(evt1,F)", "DITRANS_ACT(a1,F)", "IS(is4)", "is4(evt1,a1)",
+					"GIVE(give)", "IS(is5)", "is5(a1, give)", 
+					"AGENT(agt)", "THEME(theme)", "RECIPIENT(rcpt)", "agt(a1, e2)", "theme(a1, e1)", "rcpt(a1, e3)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test ditransitive static."
+		},
+		
+		"woman_give_man_ball_dyn":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P3":["ENTITY(e3,F)", "BALL(ball)", "IS(is3)", "is3(e3, ball)"],
+				"P4":["EVENT(evt1,F)", "DITRANS_ACT(a1,F)", "IS(is4)", "is4(evt1,a1)"], 
+				"P5":["GIVE(give)", "IS(is4)", "is5(a1, give)", "AGENT(agt)", "THEME(theme)", "RECIPIENT(rcpt)", "agt(a1, e2)", "theme(a1, e1)", "rcpt(a1, e3)"]
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P5"],
+			"timing":[],
+			"comments":"test ditransitive dynamic."
+		},
+		
+		"young_woman_punch_man_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)", "YOUNG(young)", "MODIFY(mod)", "mod(e2, young)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+					"PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
+		},
+			
+		"young_woman_punch_man_dyn":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+					"PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"P3":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
+			},
+			"sequence":["P1", "P2", "P3"],
+			"timing":[],
+			"comments":"Actions + property modifier dynamic."
+		},
+		
+		"man_who_kick_can_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)",
+					"ENTITY(e2,F)", "WATERING_CAN(can)", "IS(is2)", "is2(e2, can)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "KICK(kick)", "IS(is4)", "is4(a1, kick)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)",
+					"MODIFY(mod1)", "mod1(e1, evt1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
+		},
+		
+		"woman_punch_man_kick_can_static":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "PUNCH(punch)", "IS(is4)", "is4(a1, punch)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e2)", "pt1(a1, e1)",
+					"ENTITY(e3,F)", "WATERING_CAN(can)", "IS(is5)", "is5(e3, can)",
+					"EVENT(evt2,F)", "TRANS_ACT(a2,F)", "IS(is6)", "is6(evt2,a2)", "KICK(kick)", "IS(is7)", "is7(a2, kick)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a2, e3)",
+					"MODIFY(mod1)", "mod1(e1, evt2)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"Actions + property modifier static."
+		},
+		
+		"woman_punch_man_kick_can_dyn":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
+					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "PUNCH(punch)", "IS(is4)", "is4(a1, punch)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e2)", "pt1(a1, e1)"],
+				"P2":["ENTITY(e3,F)", "WATERING_CAN(can)", "IS(is5)", "is5(e3, can)",
+					"EVENT(evt2,F)", "TRANS_ACT(a2,F)", "IS(is6)", "is6(evt2,a2)", "KICK(kick)", "IS(is7)", "is7(a2, kick)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a2, e3)",
+					"MODIFY(mod1)", "mod1(e1, evt2)"]
+			},
+			"sequence":["P1", "P2"],
+			"timing":[],
+			"comments":"Actions + property modifier dynamic."
+		},
+			
+		"woman_in_blue_static":{
+			"sem_rate":1,
+			"propositions":{
+				"P1":["WOMAN(w1)", "WEAR(a1)", "DRESS(d1)", "BLUE(b1)", "AGENT(r1)", "PATIENT(r2)", "MODIFY(r3)", "r1(a1, w1)", "r2(a1,d1)", "r3(b1, d1)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test for the IN_COLOR construction."
+		},
+		
+		"evt_act_static":{
+			"sem_rate":1,
+			"propositions"  : {
+				"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e2)", "pt1(a1, e1)"]
+			},
+			"sequence" :["ACTION_AREA"],
+			"timing":[],
+			"comments":"Only transitive action event frame, no content."
+		},
+			
+		"evt_act_man":{
+			"sem_rate":1,
+			"propositions"  : {
+				"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+				"WOMAN_AREA":["MAN(man)", "IS(is2)", "is2(e1, man)"]
+			},
+			"sequence" :["ACTION_AREA", "WOMAN_AREA"],
+			"timing":[],
+			"comments":"Transitive action event frame. Then agent 'man' (no lexical competition)"
+		},
+			
+		"evt_act_man_kick":{
+			"sem_rate":1,
+			"propositions"  : {
+				"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+				"MAN_AREA":["MAN(man)", "IS(is2)", "is2(e1, man)"],
+				"KICK_AREA":["KICK(kick)", "IS(is3)", "is3(a1, kick)"]
+			},
+			"sequence" :["ACTION_AREA", "MAN_AREA", "KICK_AREA"],
+			"timing":[],
+			"comments":"Transitive action event frame. Then agent 'man' (no lexical competition), then 'kick'."
+		},
+		
+		"evt_act_woman_kick":{
+			"sem_rate":1,
+			"propositions"  : {
+				"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is1)", "is1(evt1,a1)", "ENTITY(e1,F)", "ENTITY(e2,F)", "AGENT(agt1)", "PATIENT(pt1)", "agt1(a1, e1)", "pt1(a1, e2)"],
+				"WOMAN_AREA":["WOMAN(woman)", "IS(is2)", "is2(e1, woman)"],
+				"KICK_AREA":["KICK(kick)", "IS(is3)", "is3(a1, kick)"]
+			},
+			"sequence" :["ACTION_AREA", "WOMAN_AREA", "KICK_AREA"],
+			"timing":[],
+			"comments":"Transitive action event frame. Then agent 'woman' (lexical competition), then 'kick'."
+		},
+		
+		"man_woman_kick_act":{
+			"sem_rate":1,
+			"propositions"  : {
+				"MAN_AREA":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"WOMAN_AREA":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"KICK_AREA":["TRANS_ACT(a1,F)", "KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+				"ACTION_AREA":["EVENT(evt1,F)", "IS(is3)", "is3(evt1,a1)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+			},
+			"sequence" :["MAN_AREA", "WOMAN_AREA", "KICK_AREA", "ACTION_AREA"],
+			"timing":[],
+			"comments":"Easy objects, hard action"
+		},
+		
+		"act_kick_woman_man":{
+			"sem_rate":1,
+			"propositions"  : {
+				"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+				"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"WOMAN_AREA":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"MAN_AREA":["MAN(man)", "IS(is1)", "is1(e1, man)"]
+				
+			},
+			"sequence" :["ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "MAN_AREA"],
+			"timing":[],
+			"comments":"Easy action, hard objects"
+		},
+		
+		"act_kick_woman_man_young":{
+			"sem_rate":1,
+			"propositions"  : {
+				"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+				"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"WOMAN":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"MAN_AREA":["MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"WOMAN_FACE_AREA":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
+			},
+			"sequence" :["ACTION_AREA", "KICK_AREA", "WOMAN_AREA", "MAN_AREA", "WOMAN_FACE_AREA"],
+			"timing":[],
+			"comments":"Easy action, hard objects + modifier"
+		},
+			
+		"woman_punch_man_kick_can":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)"],
+				"P2":["PUNCH(punch)", "IS(is4)", "is4(a1, punch)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"P3":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P5":["ENTITY(e3,F)", "WATERING_CAN(can)", "IS(is5)", "is5(e3, can)"],
+				"P6":["EVENT(evt2,F)", "TRANS_ACT(a2,F)", "IS(is6)", "is6(evt2,a2)", "KICK(kick)", "IS(is7)", "is7(a2, kick)", "AGENT(agt2)", "PATIENT(pt2)", "agt2(a2, e1)", "pt2(a2, e3)",
+					"MODIFY(mod1)", "mod1(e1, evt2)"]
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6"],
+			"timing":[],
+			"comments":"Two actions, modifier"
+		},
+			
+		"Jin_ex":{
+			"sem_rate":1,
+			"propositions"  : {
+				"P1":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
+				"P2":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"P3":["KICK(kick)", "IS(is4)", "is4(a1, kick)"],
+				"P4":["MAN(man)", "IS(is1)", "is1(e1, man)"],
+				"P5":["EVENT(evt2, F)", "IS(is5)", "is5(evt2, e1)", "YOUNG(young)", "MODIFY(mod1)", "mod1(evt2, young)"]
+				
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P5"],
+			"timing":[],
+			"comments":"Example presented by Jin in his modeling paper. Different treatment of relative clause in my case."
+		}
+		
+		
+	},
+	
+	"outputs":{
+		"test_naming":["man"],
+		"test_naming_ambiguous":["woman", "lady"],
+		"test_naming_2":["woman man", "man woman", "lady man", "man lady"],
+		"young_woman_static":["young woman", "young lady"],
+		"young_woman_dyn":["young woman", "young lady"],
+		"woman_kick_man_static":["woman kick man", "man is kick -ed by woman", "lady kick man", "man is kick -ed by lady"],
+		"woman_kick_man_dyn":["woman kick man", "man is kicked by woman", "lady kick man", "man is kicked by lady"],
+		"young_woman_punch_man_static":["young woman punch man", "man is punch -ed by woman who is young", "woman who is young punch man", "man is punch -ed by young woman", "young lady punch man", "man is punch -ed by lady who is young", "lady who is young punch man", "man is punch -ed by young lady"],
+		"young_woman_punch_man_dyn":["young woman punch man", "man is punch -ed by woman who is young", "woman who is young punch man", "man is punch -ed by young woman","young lady punch man", "man is punch -ed by lady who is young", "lady who is young punch man", "man is punch -ed by young lady"],
+		"woman_punch_man_kick_can_static":["woman punch man who kick can", "man who kick can is punch -ed by woman", "woman punch man can is punch -ed by", "man can is punch -ed by is punch -ed by woman", "lady punch man who kick can", "man who kick can is punch -ed by lady", "lady punch man can is punch -ed by", "man can is kick -ed by is punch -ed by lady"],
+		"woman_punch_man_kick_can_dyn":["woman punch man who kick can", "man who kick can is punch -ed by woman", "woman punch man can is punch -ed by", "man can is punch -ed by is punch -ed by woman", "lady punch man who kick can", "man who kick can is punch -ed by lady", "lady punch man can is punch -ed by", "man can is kick -ed by is punch -ed by lady"],
+		"woman_in_blue_static":["woman wear blue dress", "woman in blue", "lady wear blue dress", "lady in blue"]
+	}
+		
+}	

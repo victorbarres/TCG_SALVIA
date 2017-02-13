@@ -77,7 +77,7 @@
 		
 		"ACTION" : 
 		{
-			"TRANSITIVE" :
+			"TRANS_ACT" :
 			{
 				"SQUIRT" : {},
 				"TALK" : {},
@@ -93,20 +93,20 @@
 				"FLEE" : {}
 			},
 			
-			"SYMMETRIC":
+			"SYM_ACT":
 			{
 				"MEET" : {},
 				"SHAKE_HANDS" : {}
 			},
 			
-			"INTRANSITIVE" :
+			"INTRANS_ACT" :
 			{
 				"LAUGH" : {},
 				"TALK" : {},
 				"FLEE" : {}
 			},
 			
-			"DITRANSITIVE" :
+			"DITRANS_ACT" :
 			{
 				"GIVE": {},
 				"SEND": {}
