@@ -2077,7 +2077,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('OUT', 'to_phonological_WM_C')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
-        self.params['parser'] = {'pred_init':['S'], 'parser_type':'Earley'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
+        self.params['parser'] = {'pred_init':['S'], 'parser_type':'Left-Corner'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
           
@@ -2097,6 +2097,9 @@ class GRAMMATICAL_WM_C(WM):
             - NEED TO BE CAREFUL ABOUT THE TIME DELAY BETWEEN WM AND CXN RETRIEVAL.
             - Might be worth adding a refractory period here again?
         """
+        if  self.params['parser']['parser_type'] == 'Earley':
+            print "Sorry! Earley parser has been removed in this version. Use Left-Corner. But top-down filtering will come back soon!"
+            
         ctrl_input = self.inputs['from_control']
         if ctrl_input and ctrl_input['listen'] and self.state==-1:
                 self.state = 0
@@ -2116,6 +2119,7 @@ class GRAMMATICAL_WM_C(WM):
         self.convey_phon_activations(phon_activations)
         self.update_activations()
         self.prune()
+        self.outputs['to_cxn_retrieval_C'] = self.TD_predictor()
         
         # Define when meaning read-out should take place
 #        if ctrl_input and ctrl_input['produce'] == self.t:
@@ -2139,21 +2143,10 @@ class GRAMMATICAL_WM_C(WM):
             inst.activation.E += act # No normalization
         
     
-    def Earley_parser(self, phon_inst):
-        """
-        TCG version of the Earley parser.
-        """
-        predictions = self.TD_predictor()
-        self.outputs['to_cxn_retrieval_C'] =  (predictions, 'Earley')
-        if phon_inst:
-            self.state += 1
-            self.scanner(phon_inst)
-            self.completer()
-            self.set_pred_init()
-    
     def Left_Corner_parser(self, phon_inst, pred_cxn_insts):
         """
         TCG version of Left-Corner chart parser.
+        Note that the work of the parser is spread on both the grammatical WM and the cxn_retrieval sub_system.
         
         Notes:
             - Dont' forget that constructions do not define only slots but also word forms. 
@@ -2178,6 +2171,8 @@ class GRAMMATICAL_WM_C(WM):
              pred_classes = set(self.pred_init)
              self.pred_init = []
         else:
+            if not(self.pred_init):
+                self.set_pred_init() # Reset initial predictions.
             pred_classes = set([])
             for inst in [i for i in self.schema_insts if not(i.has_predicted)]:
                 inst_pred = inst.cxn_predictions()
