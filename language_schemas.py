@@ -2165,9 +2165,11 @@ class GRAMMATICAL_WM_C(WM):
         Top-Down grammatical predictions.
         Returns the classes of constructions expected based on the current status of the GrammaticalWM.
         
+        Return:
+            - predictions (DICT) : {syn_class:[activities of cxn_inst that predict this syn_class]}
+        
         Notes: 
-            - All the predictions should be modulated by instance activations
-            - I need to incorporate better class and head semantic features (construction category = sem_cat and syn_cat)
+            - I need to incorporate better class and head semantic features (construction signature = sem_feat and syn_feat)
         """
 
         if self.state==0 and self.pred_init:

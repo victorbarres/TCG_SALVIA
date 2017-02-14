@@ -384,18 +384,18 @@ class CXN:
         self.SynForm = TP_SYNFORM() # Syntactic form
         self.SymLinks = TP_SYMLINKS() # Symbolic links
     
-    def cxn_category(self):
+    def cxn_signature(self):
         """
-        Returns a construction category that consists of:
+        Returns a construction signature that consists of:
             - its syntactic class
             - the semantic features of its head node.
-        The category combine syntactic and semantic features.
+        The signature combine syntactic and semantic features.
         """
         head_node = self.SemFrame.get_head()
-        sem_cat = head_node.concept if head_node else None
-        syn_cat = self.clss
-        cxn_cat = {'syn_cat':syn_cat, 'sem_cat':sem_cat}
-        return cxn_cat
+        sem_feat = head_node.concept if head_node else None
+        syn_feat = self.clss
+        signature = {'syn_feat':syn_feat, 'sem_feat':sem_feat}
+        return signature
         
     def class_match(self, slot):
         """
