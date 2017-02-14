@@ -137,7 +137,7 @@ def parameters(system_names):
         'C2.max_capacity':None,
         'C2.sub_threshold_r':0.8,
         'C2.deact_weight':0.0,
-        'parser.pred_init':['S'],
+        'parser.pred_init':{'S':[1]},
         'parser.parser_type':'Left-Corner'
         },
         

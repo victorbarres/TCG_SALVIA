@@ -2079,7 +2079,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('OUT', 'to_phonological_WM_C')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
-        self.params['parser'] = {'pred_init':['S'], 'parser_type':'Left-Corner'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
+        self.params['parser'] = {'pred_init':{'S':[1]}, 'parser_type':'Left-Corner'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
         self.state = -1
         self.pred_init = None
           
@@ -2125,7 +2125,7 @@ class GRAMMATICAL_WM_C(WM):
         
         # Define when meaning read-out should take place
 #        if ctrl_input and ctrl_input['produce'] == self.t:
-        if self.t == 800:
+        if self.t == 500:
             output = self.produce_meaning()
             if output:
                 self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
@@ -2173,8 +2173,8 @@ class GRAMMATICAL_WM_C(WM):
         """
 
         if self.state==0 and self.pred_init:
-             pred_classes = set(self.pred_init)
-             self.pred_init = []
+             pred_classes = self.pred_init
+             self.pred_init = {}
         else:
             if not(self.pred_init):
                 self.set_pred_init() # Reset initial predictions.
@@ -2245,7 +2245,7 @@ class GRAMMATICAL_WM_C(WM):
         The stacks is refilled as soon a state != 0.
         Reinitialize state to state == 0 will then trigger the init predictions.
         """
-        self.pred_init = self.params['parser']['pred_init'][:]
+        self.pred_init = self.params['parser']['pred_init'].copy()
 
     ###############################
     ### COOPERATIVE COMPUTATION ###
@@ -2400,6 +2400,7 @@ class GRAMMATICAL_WM_C(WM):
         assemblages = self.assemble()
         if assemblages:
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
+            print a2i_map
             if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
                 sem_WM_output = eq_inst.content.SemFrame
                 phon_WM_output = eq_inst.covers.values()
@@ -2770,7 +2771,8 @@ class GRAMMATICAL_WM_C(WM):
             - sem_frame = the SemFrame of the equivalent instance.
         """
         (eq_inst, a2i_map) = GRAMMATICAL_WM_C.assemblage2inst(assemblage)
-        sem_frame = eq_inst.content.SemFrame      
+        sem_frame = eq_inst.content.SemFrame     
+        print "HERE"
         return sem_frame
     
     #######################
