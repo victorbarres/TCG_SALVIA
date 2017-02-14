@@ -27,6 +27,7 @@ import pyttsx
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, SYSTEM_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
 import TCG_graph
+from viewer import TCG_VIEWER
 
 #######################################
 ##### LANGUAGE KNOWLEDGE SCHEMAS ######
@@ -665,18 +666,134 @@ class SEMANTIC_WM(WM):
     #######################
     ### DISPLAY METHODS ###
     #######################
-    def show_SemRep(self):
-        node_labels = dict((n, '%s(%.1f)' %(n, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
-        edge_labels = dict(((u,v), '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
-        pos = nx.spring_layout(self.SemRep)  
-        plt.figure(facecolor='white')
-        plt.axis('off')
-        title = '%s state (t=%i)' %(self.name,self.t)
-        plt.title(title)
-        nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
-        nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
-        nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
-        plt.show()
+    def show_state(self):
+        TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
+#        node_labels = dict((n, '%s(%.1f)' %(n, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
+#        edge_labels = dict(((u,v), '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
+#        pos = nx.spring_layout(self.SemRep)  
+#        plt.figure(facecolor='white')
+#        plt.axis('off')
+#        title = '%s state (t=%i)' %(self.name,self.t)
+#        plt.title(title)
+#        nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
+#        nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
+#        nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
+#        plt.show()
+        
+class SEMANTIC_WM_C(WM):
+    """
+    Comprehension version of the Semantic_WM.
+    Testing some comprehension specific issues.
+    Notes:
+        - Testing the SemRep being a MutliDiGraph instead of simply a DiGraph.
+        Might need to support multi-edges (competing edges).
+    """
+    def __init__(self, name='Semantic_WM'):
+        WM.__init__(self, name)
+        self.add_port('IN', 'from_concept_LTM')
+        self.add_port('IN', 'from_grammatical_WM_C')
+        self.add_port('IN', 'from_control')
+        self.add_port('OUT', 'to_control')
+        self.add_port('OUT', 'to_output')
+        self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.SemRep = nx.MultiDiGraph() # Uses networkx to easily handle graph structure.
+    
+    def reset(self):
+        """
+        """
+        super(SEMANTIC_WM, self).reset()
+        self.SemRep = nx.MultiDiGraph()
+    
+    def process(self):
+        """
+        """        
+        sem_frame = self.inputs['from_grammatical_WM_C']
+        cpt_schemas = self.inputs['from_concept_LTM']
+        if cpt_schemas and sem_frame:
+            cpt_insts  = self.instantiate_cpts(sem_frame, cpt_schemas)
+        else:
+            cpt_insts = None
+            
+        if cpt_insts:
+            for inst in cpt_insts:
+                self.add_instance(inst)
+                    
+        
+        self.update_activations()
+        self.update_SemRep(cpt_insts)        
+        self.prune()
+    
+    def instantiate_cpts(self, SemFrame, cpt_schemas):
+        """
+        Builds SemRep based on the received SemFrame.
+        
+        Args:
+            - SemFrame (TP_SEMFRAME)
+            - cpt_schemas ([CPT_SCHEMAS])
+        
+        NOTE: 
+            - Because I only used the SemFrame, there is 1: no notion of how to set the initial activity of the SemRep based on the constructions.
+            - Also, because the SemFrame is derived from the eq_inst, it is not clear how I can define the SemRep covers of cxn_instances (or, the cxn_inst cover of the SemRep).
+            - This, later on, should evolve into a function that should possibly find already existing nodes and, rather than creating new instances, generate the proper bindings.
+        """
+        cpt_insts = []
+        name_table = {}
+        for node in SemFrame.nodes:
+            cpt_schema = [schema for schema in cpt_schemas if schema.name == node.concept.name][0]
+            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
+            cpt_insts.append(cpt_inst)
+            name_table[node] = cpt_inst
+        
+        for edge in SemFrame.edges:
+            cpt_schema = [schema for schema in cpt_schemas if schema.name == edge.concept.name][0]
+            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
+            cpt_inst.content['pFrom'] = name_table[edge.pFrom]
+            cpt_inst.content['pTo'] = name_table[edge.pTo]
+            cpt_insts.append(cpt_inst)
+        return cpt_insts
+            
+    
+    def update_SemRep(self, cpt_insts):
+        """
+        Updates the SemRep: Adds the nodes and edges needed based on the receivd concept instances.
+        
+        NOTE:
+            - Does not handle the case of concept instance updating. Concepts cannot be updated (Monotonous growth of the SemRep)
+            - SemRep carries the instance and the concept. The concept field is redundant, but is useful in order to be able to define
+            SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
+        """
+        if cpt_insts:
+            # First process all the instances that are not relations.
+            for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
+                if self.SemRep.has_node(inst.name):
+                    continue
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, expressed=False)
+            
+            # Then add the relations
+            for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
+                node_from = rel_inst.content['pFrom'].name
+                node_to = rel_inst.content['pTo'].name
+                if self.SemRep.has_edge(node_from, node_to):
+                    continue
+                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
+        
+    #######################
+    ### DISPLAY METHODS ###
+    #######################
+    def show_state(self):
+        TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
+#        node_labels = dict((n, '%s(%.1f)' %(n, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
+#        edge_labels = dict(((u,v), '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
+#        pos = nx.spring_layout(self.SemRep)  
+#        plt.figure(facecolor='white')
+#        plt.axis('off')
+#        title = '%s state (t=%i)' %(self.name,self.t)
+#        plt.title(title)
+#        nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
+#        nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
+#        nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
+#        plt.show()
 
 ###################
 ### GRAMMAR LTM ###
@@ -1924,9 +2041,9 @@ class PHON_WM_P(WM):
                 self.add_instance(phon_inst)
                 new_phon_sequence.append(phon_inst)
             self.phon_sequence.extend(new_phon_sequence)
-            self.outputs['to_utter'] = [phon_inst.content['word_form'] for phon_inst in new_phon_sequence]
+            self.outputs['to_utter'] = [inst.content['word_form'] for inst in new_phon_sequence]
             self.outputs['to_control'] = True
-            self.outputs['to_output'] = [phon_inst.content['word_form'] for phon_inst in new_phon_sequence]
+            self.outputs['to_output'] = [inst.content['word_form'] for inst in new_phon_sequence]
         else:
             self.outputs['to_utter'] =  None
         
@@ -1935,7 +2052,7 @@ class PHON_WM_P(WM):
         
         self.update_activations()
         self.prune()
-        self.outputs['to_grammatical_WM_P'] =  [phon_inst.content['word_form'] for phon_inst in self.phon_sequence]
+        self.outputs['to_grammatical_WM_P'] =  [inst.content['word_form'] for inst in self.phon_sequence]
         
     def add_fillers(self, phon_sequence):
         """
@@ -2402,7 +2519,7 @@ class GRAMMATICAL_WM_C(WM):
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
             print a2i_map
             if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
-                sem_WM_output = eq_inst.content.SemFrame
+                sem_WM_output = (eq_inst.content.SemFrame, a2i_map)
                 phon_WM_output = eq_inst.covers.values()
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.

@@ -324,6 +324,79 @@ def TCG_comprehension_system(name = 'language_system_C',
     conceptLTM.initialize(my_conceptual_knowledge)
     
     return model
+    
+def TCG_comprehension_system_dev(name = 'language_system_C',
+                             grammar_name = GRAMMAR_NAME, 
+                             semantics_name = SEMANTICS_NAME,
+                             grammar_path = GRAMMAR_PATH,
+                             semantics_path = SEMANTICS_PATH):
+    """
+    Creates and returns the TCG comprehension model.
+    """
+    # Instantiating all the necessary system schemas
+    grammaticalLTM = ls.GRAMMATICAL_LTM()
+    cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
+    phonWM_C = ls.PHON_WM_C()
+    grammaticalWM_C = ls.GRAMMATICAL_WM_C()
+    semanticWM_C = ls.SEMANTIC_WM()
+    conceptLTM = ls.CONCEPT_LTM()
+    control = ls.CONTROL()
+    
+    # Defining schema to brain mappings.
+    language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
+                    'Cxn_retrieval_C':[], 
+                    'Phonological_WM_C':['Wernicke'],
+                    'Grammatical_WM_C':['lBA44, lBA45'],
+                    'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'],
+                    'Concept_LTM':[''],
+                    'Control':['DLPFC']}
+    
+    # Initializing model
+    model = st.MODEL(name)
+    
+    # Setting up schema to brain mappings
+    language_brain_mapping = st.BRAIN_MAPPING()
+    language_brain_mapping.schema_mapping = language_mapping
+    model.brain_mapping = language_brain_mapping
+    
+    # Setting up language model.
+    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control]
+
+    model.add_schemas(language_schemas)
+    model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
+    model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
+    model.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
+    model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
+    model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C')
+    model.add_connection(conceptLTM, 'to_semantic_WM', semanticWM_C, 'from_concept_LTM')
+    model.add_connection(control, 'to_semantic_WM', semanticWM_C, 'from_control')
+    model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
+    
+    model.set_input_ports([phonWM_C.find_port('from_input')])
+    model.set_output_ports([semanticWM_C.find_port('to_output')])
+    
+    # Parameters
+    system_names = model.schemas.keys()
+    model_params = parameters(system_names)
+    model.update_params(model_params)
+    
+    control.set_mode('listen')
+    
+    # Loading data
+    semantics_file = "%s.json" % semantics_name
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
+    grammar_file = "%s.json" %grammar_name
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
+    
+    # Initialize grammatical LTM content
+    grammaticalLTM.initialize(my_grammar)
+    
+    # Initialize conceptual LTM content
+    conceptLTM.initialize(my_conceptual_knowledge)
+    
+    return model
 
 def TCG_language_system(name = 'language_system',
                         grammar_name = GRAMMAR_NAME, 

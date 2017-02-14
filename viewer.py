@@ -574,7 +574,7 @@ class TCG_VIEWER:
         """
         Returns a DOT cluster containing all the SemRep information.
         Args:
-            - SemRep (Networkx.DiGraph): State of visWM.
+            - SemRep (Networkx.DiGraph): State of semWM.
         """
         node_font_size = '14'
         edge_font_size = '12'
@@ -719,7 +719,7 @@ class TCG_VIEWER:
         return WMs_cluster
         
     @staticmethod
-    def display_cxn(cxn, folder='./tmp/'):
+    def display_cxn(cxn, folder='./tmp/', file_type='png', show=True):
         """
         Create graph images for the construction 'cxn'.
         Uses graphviz with pydot implementation.
@@ -732,7 +732,6 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
 
         prog = 'dot'
-        file_type = 'png'
 
         font_name = 'consolas'
         labeljust='l'
@@ -751,17 +750,17 @@ class TCG_VIEWER:
             
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
-        img_name = '%s.%s' %(file_name,file_type)
-        
-        plt.figure(facecolor='white')
-        plt.axis('off')
-        title = cxn.name  + '\n class:' + cxn.clss
-        plt.title(title)
-        img = plt.imread(img_name)
-        plt.imshow(img)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)          
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = cxn.name  + '\n class:' + cxn.clss
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
         
     @staticmethod
-    def display_cxn_instance(cxn_inst, name='', folder='./tmp/'):
+    def display_cxn_instance(cxn_inst, name='', folder='./tmp/', file_type='png', show=True):
         """
         Display a construction instance.
         """
@@ -770,7 +769,6 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
             
         prog = 'dot'
-        file_type = 'png'
         
         font_name ='consolas'
 
@@ -785,15 +783,17 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
-        img_name = '%s.%s' %(file_name,file_type)
-        
-        plt.figure(facecolor='white')
-        plt.axis('off')
-        img = plt.imread(img_name)
-        plt.imshow(img)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = name
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
         
     @staticmethod
-    def display_cxn_assemblage(cxn_assemblage, name='cxn_assembalge', concise=False, folder='./tmp/'):
+    def display_cxn_assemblage(cxn_assemblage, name='cxn_assembalge', concise=False, folder='./tmp/', file_type='svg', show=False):
         """
         Nicer display for assemblage.
         Should have a concise=True/False option (concise does not show the inside of cxn. Ideally, clicking on a cxn would expand it)
@@ -803,7 +803,6 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
             
         prog = 'dot'
-        file_type = 'svg'
         
         if not(concise):
             C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(cxn_assemblage.schema_insts, cxn_assemblage.coop_links,[])
@@ -822,15 +821,18 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
-#        img_name = '%s.%s' %(file_name,file_type)
         
-#        plt.figure(facecolor='white')
-#        plt.axis('off')
-#        img = plt.imread(img_name)
-#        plt.imshow(img)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = name
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
     
     @staticmethod
-    def display_gramWM_state(WM, concise=False, folder='./tmp/'):
+    def display_gramWM_state(WM, concise=False, folder='./tmp/', file_type='svg', show=False):
         """
         Nicer display for wm state.
         """
@@ -839,7 +841,6 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
             
         prog = 'dot'
-        file_type = 'svg'
         
         if not(concise):
             C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(WM.schema_insts, WM.coop_links,WM.comp_links)
@@ -857,9 +858,18 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
+        
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = name
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
     
     @staticmethod
-    def display_semWM_state(semWM, folder='./tmp/'):
+    def display_semWM_state(semWM, folder='./tmp/', file_type='svg', show=False):
         """
         Create graph images for the semanic working memory
         Uses graphviz with pydot implementation.
@@ -869,7 +879,6 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
         
         prog = 'dot'
-        file_type = 'svg'
     
         name = 'semanticWM'
         
@@ -883,17 +892,17 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
-#        img_name = '%s.%s' %(file_name,file_type)
-#        
-#        plt.figure(facecolor='white')
-#        plt.axis('off')
-#        title = name
-#        plt.title(title)
-#        img = plt.imread(img_name)
-#        plt.imshow(img)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = name
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
         
     @staticmethod
-    def display_lingWM_state(semWM, gramWM, concise=False, folder='./tmp/'):
+    def display_lingWM_state(semWM, gramWM, concise=False, folder='./tmp/', file_type='pdf', show=False):
         """
         Create graph images for the ling working memory (semantic WM + grammatical WM)
         Uses graphviz with pydot implementation.
@@ -903,7 +912,7 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
         
         prog = 'dot'
-        file_type = 'pdf'
+        
         if not(concise):
             name='LinguisticWM'
         else:
@@ -919,17 +928,17 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
-#        img_name = '%s.%s' %(file_name,file_type)
-#        
-#        plt.figure(facecolor='white')
-#        plt.axis('off')
-#        title = name
-#        plt.title(title)
-#        img = plt.imread(img_name)
-#        plt.imshow(img)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = name
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
         
     @staticmethod
-    def display_visWM_state(visWM, folder='./tmp/'):
+    def display_visWM_state(visWM, folder='./tmp/', file_type='svg', show=False):
         """
         Create graph images for the visual working memory.
         Uses graphviz with pydot implementation.
@@ -939,7 +948,6 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
         
         prog = 'neato' # Need to use neato or fdp to make use of node positions in rendering
-        file_type = 'svg'
         
         name = 'visualWM'
         
@@ -952,9 +960,17 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s -n2 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
         subprocess.call(cmd, shell=True)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = name
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
     
     @staticmethod
-    def display_WMs_state(visWM, semWM, gramWM, concise=True, folder='./tmp/'):
+    def display_WMs_state(visWM, semWM, gramWM, concise=True, folder='./tmp/', file_type='svg', show=False):
         """
         Create graph images for including both visual and linguisitc working memory.
         """
@@ -964,7 +980,6 @@ class TCG_VIEWER:
         
         
         prog = 'dot' # Need to use neato or fdp to make use of node positions in rendering
-        file_type = 'svg'
 
         if not(concise):
             name='WMs '
@@ -981,6 +996,14 @@ class TCG_VIEWER:
         
         cmd = "%s -T%s -s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
         subprocess.call(cmd, shell=True)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = name
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
     
     @staticmethod
     def display_scene(scene, img_file):
