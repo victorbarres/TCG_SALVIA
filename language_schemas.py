@@ -155,6 +155,8 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
         Return the set of cxn classes that are predicted by this construction given its current form_state. 
         Classes that are predicted are those that fit the constraints of next(state) if it is a slot.
         No predictions are issued if instance is in COMPLETE state or if next(state) is not a slot.
+        Notes:
+            - This should include the semantic features of the node the slot is symbolically linked to.
         """
         predictions = []
         if self.form_state and (isinstance(self.form_state, construction.TP_SLOT)):
@@ -2160,11 +2162,12 @@ class GRAMMATICAL_WM_C(WM):
         
     def TD_predictor(self):
         """
-        TCG version of the Earley chart parsing predictor.
+        Top-Down grammatical predictions.
+        Returns the classes of constructions expected based on the current status of the GrammaticalWM.
         
         Notes: 
-            - It will define all the classes of constructions expected to cxn_retrieval. 
-            - The cxn_retrieval system will then send back the set of all possible predictions based instances.
+            - All the predictions should be modulated by instance activations
+            - I need to incorporate better class and head semantic features (construction category = sem_cat and syn_cat)
         """
 
         if self.state==0 and self.pred_init:
@@ -2173,25 +2176,16 @@ class GRAMMATICAL_WM_C(WM):
         else:
             if not(self.pred_init):
                 self.set_pred_init() # Reset initial predictions.
-            pred_classes = set([])
+            pred_classes = {}
             for inst in [i for i in self.schema_insts if not(i.has_predicted)]:
                 inst_pred = inst.cxn_predictions()
-                pred_classes= pred_classes.union(inst_pred)
+                for clss in inst_pred:
+                    if pred_classes.has_key(clss):
+                        pred_classes[clss].append(inst.activity)
+                    else:
+                        pred_classes[clss] = [inst.activity]
         if pred_classes:
-            predictions = {'chart_pos':[self.state, self.state], 'cxn_classes':list(pred_classes)}
-        else:
-            predictions = None
-        return predictions
-        
-    def BU_predictor(self, phon_inst):
-        """
-        Bottom-up predictor for bottom-up filtered predictions (Left-Corner)
-        Notes: 
-            - It will define all the classes of constructions just recognized. 
-            - The cxn_retrieval system will then send back the set of all possible predictions based instances.
-        """
-        if phon_inst:
-            predictions = {'chart_pos':[self.state, self.state], 'left_corner':[phon_inst.content['word_form']], 'BU_trigger':phon_inst.name}
+            predictions = {'chart_pos':[self.state, self.state], 'cxn_classes':pred_classes}
         else:
             predictions = None
         return predictions
@@ -2823,6 +2817,9 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
     
     def instantiate_lexical_cxns(self, phon_inst, cxn_schemas):
         """
+        Instantiates the construcitons whose left-corner matches phon_inst content.
+        Returns instances and the set of their classes that form the basis of Bottom-up grammatial predictions
+        used in left-corner instantiation in instantiate_cxns()
         """
         lexical_cxn_instances = []
         BU_predictions = set([])
@@ -2840,6 +2837,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
     def instantiate_cxns(self, predictions, cxn_schemas):
         """
         Generate the set of construction instances to be invoked in GrammaticalWM.
+        Left-Corner based instantiation.
         
         Args:
             - Predictions: List of syntactic classes on which the instantiation should be based.

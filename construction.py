@@ -384,6 +384,19 @@ class CXN:
         self.SynForm = TP_SYNFORM() # Syntactic form
         self.SymLinks = TP_SYMLINKS() # Symbolic links
     
+    def cxn_category(self):
+        """
+        Returns a construction category that consists of:
+            - its syntactic class
+            - the semantic features of its head node.
+        The category combine syntactic and semantic features.
+        """
+        head_node = self.SemFrame.get_head()
+        sem_cat = head_node.concept if head_node else None
+        syn_cat = self.clss
+        cxn_cat = {'syn_cat':syn_cat, 'sem_cat':sem_cat}
+        return cxn_cat
+        
     def class_match(self, slot):
         """
         Returns true iff the class of the construction matches the class requirements set up by slot.
@@ -398,6 +411,16 @@ class CXN:
             match = self.clss in slot.cxn_classes
         
         return match
+        
+    def get_slot_constraints(self, slot):
+        """
+        Returns all the constraints associated with a slot:
+            - syntactic constraints (cxn_classes)
+            - semantic constraints (concepts associated with the slot)
+        """
+        node = self.form2node(slot)
+        slot_constraints = {'syn_constraints':slot.cxn_classes, 'sem_constraints':[node.concept]}
+        return slot_constraints
     
     def find_elem(self, name):
         """
