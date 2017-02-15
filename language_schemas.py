@@ -821,6 +821,9 @@ class SEMANTIC_WM_C(WM):
                 if self.SemRep.has_edge(node_from, node_to):
                     continue
                 self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
+            
+            #Send the new state to output.
+            self.outputs['to_output'] = True
         
     #######################
     ### DISPLAY METHODS ###
@@ -2570,7 +2573,6 @@ class GRAMMATICAL_WM_C(WM):
             sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
-                print "%i: FOUND WINNER!" % self.t
                 sem_WM_output['SemFrame'] = eq_inst.content.SemFrame
                 sem_WM_output['sem_map'] = a2i_map['sem_map']
                 phon_WM_output = eq_inst.covers.values()
@@ -3243,7 +3245,58 @@ class ISRF_INTERPRETER(object):
         Returns the instance associated with the variable name var_name.
         """
         return self.name_table[var_name]
+
+
+class ISRF_WRITER(object):
+    """ Translates SemanticWM state into ISRF format
+    """
+    def __init__(self, SemanticWM): 
+        self.SemanticWM = SemanticWM
+        self.var_table = {}
+        self.data = {}
+        self.var_id = 0
+    def reset(self):
+        """ Resets writer.
+        """
+        self.var_table = {}
+        self.data = {}
+        self.var_id = 0
     
+    def cpt_2_ISRF(self, cpt_inst):
+        """
+        """
+        var_name = self.var_table.get(cpt_inst.name, None)
+        cpt_name = str(cpt_inst.trace['cpt_schema'].name)
+        if not var_name:        
+            var_name = "%s_%i" %(str.lower(cpt_name), self.var_id)
+            self.var_table[cpt_inst.name] = var_name
+            self.var_id +=1
+        cpt_ISRF = "%s(%s, " %(cpt_name, var_name)
+        if cpt_inst.frame:
+            cpt_ISRF += "F, "
+        cpt_ISRF += ".%2f)" %cpt_inst.activity
+        return (cpt_ISRF, var_name)
+        
+    def write_ISRF(self):
+        """ Defines stores, and returns the ISRF format associated with the
+        current state of the associated, self.SemanticWM.
+        """
+        t = self.SemanticWM.t
+        dat = []
+        cpt_insts = self.SemanticWM.schema_insts
+        for cpt_inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]: # Start with nodes.
+            (cpt_ISRF, var_name) = self.cpt_2_ISRF(cpt_inst)
+            dat.append(cpt_ISRF)
+        for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]: # Then move on to relations
+            (cpt_ISRF, var_name) = self.cpt_2_ISRF(rel_inst)
+            dat.append(cpt_ISRF)
+            p_from = rel_inst.content['pFrom']
+            p_to = rel_inst.content['pTo']
+            cpt_ISRF_rel = "%s(%s, %s)" %(var_name, self.var_table[p_from.name], self.var_table[p_to.name])
+            dat.append(cpt_ISRF_rel)
+            self.data[t] = dat
+        
+        return (t,dat)
 
 class SEM_GENERATOR(object):
     """

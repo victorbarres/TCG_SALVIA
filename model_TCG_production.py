@@ -130,7 +130,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
             outputs[t] = output
         # Display methods
         if output['Grammatical_WM_P'] and output['Grammatical_WM_P'][0]['phon_form']:
-            if verbose > 2:
+            if verbose > 1:
                 print "t:%i, '%s'" %(t, ' '.join(output['Grammatical_WM_P'][0]['phon_form']))
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance

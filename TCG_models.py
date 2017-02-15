@@ -302,7 +302,7 @@ def TCG_comprehension_system(name = 'language_system_C',
     model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     
     model.set_input_ports([phonWM_C.find_port('from_input')])
-    model.set_output_ports([semanticWM.find_port('to_visual_WM')])
+    model.set_output_ports([semanticWM.find_port('to_output')])
     
     # Parameters
     system_names = model.schemas.keys()
