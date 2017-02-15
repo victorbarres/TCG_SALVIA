@@ -1173,7 +1173,7 @@ class WM(SYSTEM_SCHEMA):
             f2.show()
                 
         # Plot C2  network data
-        plt.subplots(nrows=3, ncols=1, facecolor='white')
+        f3, ax = plt.subplots(nrows=3, ncols=1, facecolor='white')
         
         plt.subplot(3,1,1)      
         plt.tight_layout()
@@ -1215,7 +1215,7 @@ class WM(SYSTEM_SCHEMA):
             file_name = '%s/%s_%s' %(folder, self.name, 'C2_analysis.pdf')
             plt.savefig(file_name, bbox_inches='tight')
         else:
-            plt.show()
+            f3.show()
             
     def show_dynamics_anim(self, folder=None, step=10):
         """

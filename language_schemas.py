@@ -140,6 +140,7 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
         - form_sequence
         - form_state
         - has_predicted
+        - expressed
     Notes:
         - Here covers defines a mapping from SynForm to Phon_Inst
     """
@@ -150,6 +151,7 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
         self.form_state = self.form_sequence.pop()
         self.chart_pos = [] # Should be reorganized with covers. Mapping should also be introduced by reworking the relations with constructions instances used for production.
         self.has_predicted = False
+        self.expressed = False
     
     def cxn_predictions(self):
         """
@@ -708,19 +710,24 @@ class SEMANTIC_WM_C(WM):
     def process(self):
         """
         """   
-        cpt_insts = None
+        cpt_insts = None        
+        gram_activations = {}
         gram_input = self.inputs['from_grammatical_WM_C']
         if gram_input:
-            SemFrame = gram_input['SemFrame']
-            sem_map = gram_input['sem_map']
-            cpt_schemas = self.inputs['from_concept_LTM']
-            if cpt_schemas and SemFrame and sem_map:
-                cpt_insts  = self.instantiate_cpts(SemFrame, sem_map, cpt_schemas)
+            gram_activations = gram_input['activations']
+            instance_data  = gram_input.get('instances', None)
+            if instance_data:
+                SemFrame = instance_data['SemFrame']
+                sem_map = instance_data['sem_map']
+                cpt_schemas = self.inputs['from_concept_LTM']
+                if cpt_schemas and SemFrame and sem_map:
+                    cpt_insts  = self.instantiate_cpts(SemFrame, sem_map, cpt_schemas)
    
         if cpt_insts:
             for inst in cpt_insts:
-                self.add_instance(inst)   
+                self.add_instance(inst, 0.2)   
         
+        self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
@@ -732,11 +739,6 @@ class SEMANTIC_WM_C(WM):
         Args:
             - SemFrame (TP_SEMFRAME)
             - cpt_schemas ([CPT_SCHEMAS])
-        
-        NOTE: 
-            - Because I only used the SemFrame, there is 1: no notion of how to set the initial activity of the SemRep based on the constructions.
-            - Also, because the SemFrame is derived from the eq_inst, it is not clear how I can define the SemRep covers of cxn_instances (or, the cxn_inst cover of the SemRep).
-            - This, later on, should evolve into a function that should possibly find already existing nodes and, rather than creating new instances, generate the proper bindings.
         """
         def find_cpt_schema(cpt_schemas, cpt_name):
             """Returns, if it exists, the cpt_schema whose name matches cpt_name
@@ -795,9 +797,17 @@ class SEMANTIC_WM_C(WM):
         """
         SemRep instances receives external activations from the construction instances they are linked to.
         Notes:
-            - This would require changing the scheme of grammaticalWM_C so that the instances are not deactivated once they are expressed.
+            - This imposes that (1) the cpt_inst start with low activations. (2) the cxn instances are not deactivated once they are expressed (symmetric coop_links.)
         """
-    
+        if not(gram_activations):
+            return
+        for inst in self.schema_insts:
+            for k, val in gram_activations.iteritems():
+                act = 0
+                if k in inst.trace['sem_frame_insts']:
+                    act += val
+                inst.activation.E += act # No normalization
+
     def update_SemRep(self, cpt_insts):
         """
         Updates the SemRep: Adds the nodes and edges needed based on the receivd concept instances.
@@ -2216,7 +2226,7 @@ class PHON_WM_C(WM):
         The signal sent to gram_WM_C contains the activation levels of the phon instance that so far have not been expressed.
         """
         output = {}
-        for inst in [phon['inst'] for phon in self.phon_sequence if not(phon['expressed'])]:
+        for inst in [phon['inst'] for phon in self.phon_sequence]:
             output[inst.name] = inst.activity
         return output
         
@@ -2286,6 +2296,8 @@ class GRAMMATICAL_WM_C(WM):
         self.update_activations()
         self.prune()
         self.outputs['to_cxn_retrieval_C'] = self.TD_predictor()
+        activations = self.sem_WM_output()
+        self.outputs['to_semantic_WM'] = {'activations':activations}
         
         # Define when meaning read-out should take place
 #        if ctrl_input and ctrl_input['produce'] == self.t:
@@ -2293,7 +2305,7 @@ class GRAMMATICAL_WM_C(WM):
             output = self.produce_meaning()
             if output:
                 self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
-                self.outputs['to_semantic_WM'] =  output['sem_WM_output']
+                self.outputs['to_semantic_WM']['instances'] = output['sem_WM_output']
 
     def convey_phon_activations(self, phon_activations):
         """
@@ -2310,10 +2322,17 @@ class GRAMMATICAL_WM_C(WM):
             
     def sem_WM_output(self):
         """ Defines the activation output to semantic_WM.
-        I need to mark as expressed the constructions that have sent their SemFrame into SemWM.
-        Then I need to send a dict of {sem_frame_elem_name:activity}
+        Returns a dictionary mapping SemFrame elements names of expressed constructions instances onto the respective constrution's activity.
         """
-        pass
+        output = {}
+        insts = [i for i in self.schema_insts if i.expressed] # only look at expressed insts
+        for cxn_inst in insts:
+            activity = cxn_inst.activity
+            sem_frame_names = [s.name for s in cxn_inst.content.SemFrame.nodes + cxn_inst.content.SemFrame.edges]
+            for name in sem_frame_names:
+                output[name] = activity
+        return output
+            
         
     
     def Left_Corner_parser(self, phon_inst, pred_cxn_insts):
@@ -2567,6 +2586,9 @@ class GRAMMATICAL_WM_C(WM):
     ##########################                       
     def produce_meaning(self):
         """
+        Notes:
+            - I might want to revisit the expressed tag used in cxn_inst_c.
+            In particular the mapping between constructions and SemRep might need to be going both ways.
         """
         assemblages = self.assemble()
         if assemblages:
@@ -2576,6 +2598,8 @@ class GRAMMATICAL_WM_C(WM):
                 sem_WM_output['SemFrame'] = eq_inst.content.SemFrame
                 sem_WM_output['sem_map'] = a2i_map['sem_map']
                 phon_WM_output = eq_inst.covers.values()
+                for cxn_inst in winner_assemblage.schema_insts:
+                    cxn_inst.expressed = True # For now I mark all the cxn_insts that have sent their SemFrame to SemanticWM as done 
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
 #                self.post_prod_state(winner_assemblage) # Needed if cooperation links are symmetrical
@@ -3278,7 +3302,7 @@ class ISRF_WRITER(object):
         return (cpt_ISRF, var_name)
         
     def write_ISRF(self):
-        """ Defines stores, and returns the ISRF format associated with the
+        """ Defines, stores, and returns the ISRF format associated with the
         current state of the associated, self.SemanticWM.
         """
         t = self.SemanticWM.t

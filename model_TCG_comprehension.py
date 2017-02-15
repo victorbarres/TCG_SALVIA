@@ -131,13 +131,17 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         if save:
             print "saving animation (might take some time!)"
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
-#            model.schemas['Phonological_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
+            model.schemas['Semantic_WM'].show_dynamics_anim(folder=FOLDER, step=anim_step)
+            model.schemas['Phonological_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
         else:
+            model.schemas['Phonological_WM_C'].show_dynamics_anim(step=anim_step)
+            model.schemas['Grammatical_WM_C'].show_dynamics_anim(step=anim_step)
             model.schemas['Semantic_WM'].show_dynamics_anim(step=anim_step)
-#            model.schemas['Phonological_WM_C'].show_dynamics_anim(step=anim_step)
+            
       
 #    model.schemas['Semantic_WM'].show_SemRep()
     model.reset() # Gets model ready for next use.
+    isrf_writer.reset()
     
     return outputs
     
