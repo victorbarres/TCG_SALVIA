@@ -128,7 +128,7 @@ def parameters(system_names):
         'dyn.k':10.0, 
         'dyn.noise_mean':0.0,
         'dyn.noise_std':0.1, 
-        'C2.confidence_threshold':0.6, 
+        'C2.confidence_threshold':0.3, 
         'C2.prune_threshold':0.01, 
         'C2.coop_weight':1.0,
         'C2.comp_weight':-1.0, 
@@ -338,7 +338,7 @@ def TCG_comprehension_system_dev(name = 'language_system_C',
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
     phonWM_C = ls.PHON_WM_C()
     grammaticalWM_C = ls.GRAMMATICAL_WM_C()
-    semanticWM_C = ls.SEMANTIC_WM()
+    semanticWM_C = ls.SEMANTIC_WM_C()
     conceptLTM = ls.CONCEPT_LTM()
     control = ls.CONTROL()
     

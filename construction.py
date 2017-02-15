@@ -10,7 +10,7 @@ Uses NetworkX module to represent construction SemFrame graph and SynForm graph.
 from __future__ import division
 import matplotlib.pyplot as plt
 import networkx as nx
-import viewer
+from viewer import TCG_VIEWER
 
 ########################
 ### Template Classes ###
@@ -567,7 +567,7 @@ class CXN:
         Display the construction.
         Uses the display method defined in TCG_VIEWER class
         """
-        viewer.TCG_VIEWER.display_cxn(self)
+        TCG_VIEWER.display_cxn(self)
         
 ####################################
 ### Grammar: set of construtions ###

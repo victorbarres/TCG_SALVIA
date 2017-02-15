@@ -702,29 +702,30 @@ class SEMANTIC_WM_C(WM):
     def reset(self):
         """
         """
-        super(SEMANTIC_WM, self).reset()
+        super(SEMANTIC_WM_C, self).reset()
         self.SemRep = nx.MultiDiGraph()
     
     def process(self):
         """
-        """        
-        sem_frame = self.inputs['from_grammatical_WM_C']
-        cpt_schemas = self.inputs['from_concept_LTM']
-        if cpt_schemas and sem_frame:
-            cpt_insts  = self.instantiate_cpts(sem_frame, cpt_schemas)
-        else:
-            cpt_insts = None
-            
+        """   
+        cpt_insts = None
+        gram_input = self.inputs['from_grammatical_WM_C']
+        if gram_input:
+            SemFrame = gram_input['SemFrame']
+            sem_map = gram_input['sem_map']
+            cpt_schemas = self.inputs['from_concept_LTM']
+            if cpt_schemas and SemFrame and sem_map:
+                cpt_insts  = self.instantiate_cpts(SemFrame, sem_map, cpt_schemas)
+   
         if cpt_insts:
             for inst in cpt_insts:
-                self.add_instance(inst)
-                    
+                self.add_instance(inst)   
         
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
     
-    def instantiate_cpts(self, SemFrame, cpt_schemas):
+    def instantiate_cpts(self, SemFrame, sem_map, cpt_schemas):
         """
         Builds SemRep based on the received SemFrame.
         
@@ -737,22 +738,65 @@ class SEMANTIC_WM_C(WM):
             - Also, because the SemFrame is derived from the eq_inst, it is not clear how I can define the SemRep covers of cxn_instances (or, the cxn_inst cover of the SemRep).
             - This, later on, should evolve into a function that should possibly find already existing nodes and, rather than creating new instances, generate the proper bindings.
         """
+        def find_cpt_schema(cpt_schemas, cpt_name):
+            """Returns, if it exists, the cpt_schema whose name matches cpt_name
+            """
+            output = [schema for schema in cpt_schemas if schema.name == cpt_name]
+            if len(output)>1:
+                error_msg = 'There is more than one cpt_schema matches the concept name %s' %cpt_name
+                raise ValueError(error_msg)
+            elif not(output):
+                error_msg = 'There are is cpt_schema that matches the concept name %s' %cpt_name
+                raise ValueError(error_msg)
+            else:
+                return output[0]
+            
+        def find_cpt_inst(sem_frame_insts):
+            """ Returns, if it exists, the cpt_inst whose sem_frame trace already contains one of the sem_frame_insts.
+            """
+            output = [inst for inst in self.schema_insts if not(inst.trace['sem_frame_insts'].isdisjoint(sem_frame_insts))]
+            if len(output)>1:
+                print self.t
+                error_msg = 'There is more than one cpt_inst that map onto the same SemFrame element! %s' %str([o.name for o in output])
+                raise ValueError(error_msg)
+            elif len(output)==1:
+                return output[0]
+            else:
+                return None
         cpt_insts = []
         name_table = {}
+        
         for node in SemFrame.nodes:
-            cpt_schema = [schema for schema in cpt_schemas if schema.name == node.concept.name][0]
-            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
-            cpt_insts.append(cpt_inst)
-            name_table[node] = cpt_inst
+            cpt_schema = find_cpt_schema(cpt_schemas, node.concept.name)
+            sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+            old_cpt_inst = find_cpt_inst(sem_frame_insts)
+            if old_cpt_inst:
+                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+                name_table[node] = old_cpt_inst
+            else:
+                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+                name_table[node] = new_cpt_inst
+                cpt_insts.append(new_cpt_inst)
         
         for edge in SemFrame.edges:
-            cpt_schema = [schema for schema in cpt_schemas if schema.name == edge.concept.name][0]
-            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
-            cpt_inst.content['pFrom'] = name_table[edge.pFrom]
-            cpt_inst.content['pTo'] = name_table[edge.pTo]
-            cpt_insts.append(cpt_inst)
+            cpt_schema = find_cpt_schema(cpt_schemas, edge.concept.name)
+            sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
+            old_cpt_inst = find_cpt_inst(sem_frame_insts)
+            if old_cpt_inst:
+                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+            else:
+                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
+                new_cpt_inst.content['pTo'] = name_table[edge.pTo]
+                cpt_insts.append(new_cpt_inst)
         return cpt_insts
-            
+    
+    def convey_gram_activations(self, gram_activations):
+        """
+        SemRep instances receives external activations from the construction instances they are linked to.
+        Notes:
+            - This would require changing the scheme of grammaticalWM_C so that the instances are not deactivated once they are expressed.
+        """
     
     def update_SemRep(self, cpt_insts):
         """
@@ -1629,7 +1673,7 @@ class GRAMMATICAL_WM_P(WM):
             a2i_map['sem_map'] = dict([(sem_elem.name, sem_elem.name) for sem_elem in inst.content.SemFrame.nodes + inst.content.SemFrame.edges])
             a2i_map['syn_map'] = dict([(syn_elem.name, syn_elem.name) for syn_elem in inst.content.SynForm.form])
             eq_inst = inst
-        eq_inst.activity = new_assemblage.activation
+        eq_inst.activity = assemblage.activation
         return (eq_inst, a2i_map)
       
     @staticmethod      
@@ -2242,7 +2286,7 @@ class GRAMMATICAL_WM_C(WM):
         
         # Define when meaning read-out should take place
 #        if ctrl_input and ctrl_input['produce'] == self.t:
-        if self.t == 500:
+        if self.t in [100*t for t in range(1, 10)]:
             output = self.produce_meaning()
             if output:
                 self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
@@ -2260,6 +2304,13 @@ class GRAMMATICAL_WM_C(WM):
                 val = phon_activations.get(p, 0)
                 act += val
             inst.activation.E += act # No normalization
+            
+    def sem_WM_output(self):
+        """ Defines the activation output to semantic_WM.
+        I need to mark as expressed the constructions that have sent their SemFrame into SemWM.
+        Then I need to send a dict of {sem_frame_elem_name:activity}
+        """
+        pass
         
     
     def Left_Corner_parser(self, phon_inst, pred_cxn_insts):
@@ -2516,10 +2567,12 @@ class GRAMMATICAL_WM_C(WM):
         """
         assemblages = self.assemble()
         if assemblages:
+            sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
-            print a2i_map
             if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
-                sem_WM_output = (eq_inst.content.SemFrame, a2i_map)
+                print "%i: FOUND WINNER!" % self.t
+                sem_WM_output['SemFrame'] = eq_inst.content.SemFrame
+                sem_WM_output['sem_map'] = a2i_map['sem_map']
                 phon_WM_output = eq_inst.covers.values()
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
@@ -2541,7 +2594,7 @@ class GRAMMATICAL_WM_C(WM):
         for assemblage in assemblages:
             (eq_inst, a2i_map) = self.assemblage2inst(assemblage)
             assemblage_dat = (assemblage, eq_inst, a2i_map)
-            score = eq_inst.activity
+            score = assemblage.activation
             if not(max_score):
                 max_score = score
                 winner = assemblage_dat

@@ -7,7 +7,7 @@ from __future__ import division
 import random
 import time
 
-from TCG_models import TCG_comprehension_system
+from TCG_models import TCG_comprehension_system_dev
 import language_schemas as ls
 from loader import TCG_LOADER
 from viewer import TCG_VIEWER
@@ -30,7 +30,7 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
         - comprehension model
     """
     
-    model = TCG_comprehension_system(grammar_name=grammar_name, semantics_name=semantics_name)
+    model = TCG_comprehension_system_dev(grammar_name=grammar_name, semantics_name=semantics_name)
     if model_params:
         model.update_params(model_params)
     
@@ -127,7 +127,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
 #            model.schemas['Phonological_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
         else:
-            model.schemas['Grammatical_WM_C'].show_dynamics_anim(step=anim_step)
+            model.schemas['Semantic_WM'].show_dynamics_anim(step=anim_step)
 #            model.schemas['Phonological_WM_C'].show_dynamics_anim(step=anim_step)
       
 #    model.schemas['Semantic_WM'].show_SemRep()
@@ -153,14 +153,19 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
 def run_diagnostic():
     """
     """
-    verbose = 1
+    VERBOSE = 2
+    SEED = None
+    ANIM = True
+    MAX_TIME = 900
+    SPEED_PARAM = 30
+    OFFSET = 10
     input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_complex2', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
     print "\nInput list:\n %s" %'\n '.join(input_names)
     input_name = raw_input('\nEnter input name: ')
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_dev', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=30, offset=10, prob_times=[], verbose=verbose, save=save, anim=True,  anim_step=1)
+    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_dev', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=[550], verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
     
 
 
