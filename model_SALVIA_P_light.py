@@ -96,12 +96,12 @@ def run(model, sim_name, max_time=900, seed=None, verbose=0, prob_times=[]):
                     print "t:%i, '%s'" %(t, vals)
         if t in prob_times:
                 TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True)
-                TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True)
+                TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True)
     
     if verbose>2:
 #        model.schemas['Visual_WM'].show_dynamics()
-        model.schemas['Semantic_WM'].show_SemRep()
-#        model.schemas['Semantic_WM'].show_dynamics()
+        model.schemas['Semantic_WM_P'].show_SemRep()
+#        model.schemas['Semantic_WM_P'].show_dynamics()
         model.schemas['Grammatical_WM_P'].show_dynamics()
 #        model.schemas['Grammatical_WM_P'].show_state()
     

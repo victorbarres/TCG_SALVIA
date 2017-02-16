@@ -524,7 +524,7 @@ def SALVIA_P(name='SALVIA_P',
     conceptualizer = ls.CONCEPTUALIZER()
     conceptLTM = ls.CONCEPT_LTM()
     
-    semanticWM = ls.SEMANTIC_WM()
+    semanticWM_P = ls.SEMANTIC_WM_P()
     grammaticalWM_P = ls.GRAMMATICAL_WM_P()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval_P = ls.CXN_RETRIEVAL_P()
@@ -546,7 +546,7 @@ def SALVIA_P(name='SALVIA_P',
                         'Utter':[''],
                         'Control':['DLPFC']}
                         
-    schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
+    schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM_P, grammaticalWM_P, phonWM_P, utter, control] 
    
    # Creating model and adding system schemas
     model = st.MODEL(name)
@@ -557,20 +557,20 @@ def SALVIA_P(name='SALVIA_P',
     
     model.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM')
     model.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM')
-    model.add_connection(conceptualizer, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
+    model.add_connection(conceptualizer, 'to_semantic_WM', semanticWM_P, 'from_conceptualizer')
     
-    model.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
+    model.add_connection(semanticWM_P,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
     model.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
-    model.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
-    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
+    model.add_connection(semanticWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
+    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P')
     model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
     model.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
-    model.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM')
     model.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
     model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     model.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
-    model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    model.add_connection(control, 'to_semantic_WM', semanticWM_P, 'from_control')
     
 
     model.set_input_ports([subscene_rec.find_port('from_input')])
@@ -622,10 +622,10 @@ def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
     """
     
     model = SALVIA_P(name, grammar_name, semantics_name, grammar_path, semantics_path)
-    semanticWM = model.schemas['Semantic_WM']
+    semanticWM_P = model.schemas['Semantic_WM_P']
     visualWM = model.schemas['Visual_WM']
     subscene_rec = model.schemas['Subscene_recognition']
-    model.add_connection(semanticWM, 'to_visual_WM', visualWM, 'from_semantic_WM')
+    model.add_connection(semanticWM_P, 'to_visual_WM', visualWM, 'from_semantic_WM')
     model.add_connection(visualWM, 'to_subscene_rec', subscene_rec, 'from_visual_WM')
     
     return model
@@ -644,7 +644,7 @@ def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
 
     conceptLTM = ls.CONCEPT_LTM()
     
-    semanticWM = ls.SEMANTIC_WM()
+    semanticWM_P = ls.SEMANTIC_WM()
     grammaticalWM_P = ls.GRAMMATICAL_WM_P()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
     cxn_retrieval_P = ls.CXN_RETRIEVAL_P()
@@ -663,28 +663,28 @@ def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
                         'Utter':[''],
                         'Control':['DLPFC']}
                         
-    schemas = [scene_perception, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM, grammaticalWM_P, phonWM_P, utter, control] 
+    schemas = [scene_perception, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM_P, grammaticalWM_P, phonWM_P, utter, control] 
    
    # Creating model and adding system schemas
     model = st.MODEL(name)
     model.add_schemas(schemas)
     
     # Defining connections
-    model.add_connection(scene_perception, 'to_semantic_WM', semanticWM, 'from_conceptualizer')
-    model.add_connection(semanticWM, 'to_visual_WM', scene_perception, 'from_semantic_WM')
+    model.add_connection(scene_perception, 'to_semantic_WM', semanticWM_P, 'from_conceptualizer')
+    model.add_connection(semanticWM_P, 'to_visual_WM', scene_perception, 'from_semantic_WM')
     
-    model.add_connection(semanticWM,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
+    model.add_connection(semanticWM_P,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM')
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM')
     model.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P')
-    model.add_connection(semanticWM, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
-    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM, 'from_grammatical_WM_P')
+    model.add_connection(semanticWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM')
+    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P')
     model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P')
     model.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P')
-    model.add_connection(semanticWM, 'to_control', control, 'from_semantic_WM')
+    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM')
     model.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P')
     model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P')
     model.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control')
-    model.add_connection(control, 'to_semantic_WM', semanticWM, 'from_control')
+    model.add_connection(control, 'to_semantic_WM', semanticWM_P, 'from_control')
     
 
     model.set_input_ports([scene_perception.find_port('from_input')])
