@@ -21,7 +21,7 @@ def run_model():
     if model_type == model_types[0]:
         TCG_comp.run_diagnostic()
     elif model_type == model_types[1]:
-        TCG_prod.run_diagnostics(verbose=1, prob_times=[])
+        TCG_prod.run_diagnostics(verbose=2, prob_times=[])
     else:
         print help_message
         

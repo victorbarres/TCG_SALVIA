@@ -1228,11 +1228,11 @@ class GRAMMATICAL_WM_P(WM):
         for n in overlap["nodes"]:
             link = GRAMMATICAL_WM_P.coop_link(inst1, inst2, n)
             if link:
-                flag1 = True
+                flag1 = link[0]==1
                 links.append(link)
             link = GRAMMATICAL_WM_P.coop_link(inst2, inst1, n)
             if link:
-                flag2 = True
+                flag2  = link[0]==1
                 links.append(link)
         
         if flag1 and flag2:

@@ -133,6 +133,9 @@ class TCG_LOADER(object):
         new_node.name = '%s_%i' %(name, new_node.id)
         
         concept = cpt_knowledge.find_meaning(aNode['concept'])
+        if not concept:
+            error_msg = "Cannot find concept %s in conceptual knowledge" %aNode['concept']
+            raise ValueError(error_msg)
         new_node.concept = concept
         
         new_node.head = aNode['head']

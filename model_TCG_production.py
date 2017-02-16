@@ -121,7 +121,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
         if  next_time != None and t>=next_time:
             (sem_insts, next_time, prop) = generator.next()
             model.set_input(sem_insts)
-            if verbose > 3:
+            if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 step after introduction of new inputs.
         model.update()
         # Store output
@@ -294,11 +294,11 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
 ###############
 #### DIAGNOSTIC 
-def run_diagnostics(verbose=2, prob_times=[]):
+def run_diagnostics(verbose=3, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'dev/diagnostic.json'
+    DIAGNOSTIC_FILE = 'aug/diagnostic.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
     STD = 0
@@ -319,11 +319,11 @@ def run_diagnostics(verbose=2, prob_times=[]):
 
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
-    grammar_name='TCG_grammar_VB_dev'  
+    grammar_name='TCG_grammar_VB_aug'  
     max_time =1000
     seed=None
-    save = False
-    anim = True
+    save = True
+    anim = False
     anim_step = 1
     ###    
     
@@ -697,7 +697,7 @@ def tell_me(utterance):
     TTS.utter()
     
 if __name__=='__main__':
-    run_diagnostics(verbose=1, prob_times=[])
+    run_diagnostics(verbose=3, prob_times=[])
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()

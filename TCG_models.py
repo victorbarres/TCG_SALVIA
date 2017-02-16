@@ -36,7 +36,7 @@ def parameters(system_names):
         },
         
     'Semantic_WM':{
-        'dyn.tau':100.0,
+        'dyn.tau':10000.0,
         'dyn.int_weight':1.0,
         'dyn.ext_weight':1.0,
         'dyn.act_rest':0.001,
@@ -389,6 +389,7 @@ def TCG_comprehension_system_dev(name = 'language_system_C',
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
     grammar_file = "%s.json" %grammar_name
     my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
+    
     
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)

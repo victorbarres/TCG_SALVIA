@@ -115,24 +115,31 @@
 		
 		"PROPERTY" :
 		{
-			"COLOR" :
-			{
-				"BLACK" : {},
-				"WHITE" : {},
-				"BLUE" : {},
-				"GREEN" : {},
-				"RED" : {}
+			"QUALITY":{
+				"COLOR" :
+				{
+					"BLACK" : {},
+					"WHITE" : {},
+					"BLUE" : {},
+					"GREEN" : {},
+					"RED" : {}
+				},
+				"SIZE" :
+				{
+					"SMALL" : {},
+					"BIG" : {}
+				},		
+				"APPEARANCE" :
+				{
+					"PRETTY" : {},
+					"HANDSOME" : {},
+					"YOUNG" : {}
+				}
 			},
-			"SIZE" :
+			"DISCOURSE_PROPERTY":
 			{
-				"SMALL" : {},
-				"BIG" : {}
-			},		
-			"APPEARANCE" :
-			{
-				"PRETTY" : {},
-				"HANDSOME" : {},
-				"YOUNG" : {}
+				"DEFINITE" : {},
+				"INDEFINITE" : {}
 			}
 		},
 		

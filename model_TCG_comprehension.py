@@ -115,7 +115,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
         if t in prob_times: # Saving figures for prob times.
-            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=True, folder = FOLDER)
+            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=False, folder = FOLDER)
             TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM'], folder = FOLDER)
     
     if save:
@@ -163,19 +163,25 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
 def run_diagnostic():
     """
     """
+    import json
+    LING_INPUT_FILE = 'ling_inputs_aug.json'
+    SEMANTICS_NAME = 'TCG_semantics_main'
+    GRAMMAR_NAME = 'TCG_grammar_VB_aug'
     VERBOSE = 2
     SEED = None
     ANIM = True
     MAX_TIME = 900
     SPEED_PARAM = 30
     OFFSET = 10
-    input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_complex2', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
+    with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
+        json_data = json.load(f)
+    input_names = json_data['inputs'].keys()
     print "\nInput list:\n %s" %'\n '.join(input_names)
     input_name = raw_input('\nEnter input name: ')
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_dev', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=[550], verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
+    run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=[550], verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
     
 
 
