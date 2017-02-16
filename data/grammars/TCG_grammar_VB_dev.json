@@ -176,7 +176,7 @@
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
-						{"name" : "ATTR", "concept" : "PROPERTY", "frame" : false, "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "QUALITY", "frame" : false, "focus" : false, "head" : false}],
 			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ENT"},
 						{"name" : "EVT_ATTR", "concept" : "MODIFY", "from" : "EVT", "to" : "ATTR"}]
 		},
@@ -238,6 +238,36 @@
 		"SymLinks" :{"EVT1" : "S1", "EVT2": "S2"}
 	},
 	
+	{ "name" : "DEFINITE_NP",
+		"class": "NP",
+		"preference": 1,
+		"group": 2,
+		"SemFrame":
+		{
+			"nodes":[{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+					{"name" : "DEF", "concept" : "DEFINITE", "frame" : false, "focus" : false, "head" : false}],
+			"edges":[{"name" : "ENT_DEF", "concept" : "MODIFY", "frame" : true, "from" : "ENT", "to" : "DEF"}]
+		},
+		"SynForm":[{"name" : "S1", "type" : "PHON", "phon" : "the"},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" :{"DEF":"S1", "ENT":"S2"}
+	},
+	
+	{ "name" : "INDEFINITE_NP",
+		"class": "NP",
+		"preference": 1,
+		"group": 2,
+		"SemFrame":
+		{
+			"nodes":[{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+					{"name" : "INDEF", "concept" : "INDEFINITE", "frame" : false, "focus" : false, "head" : false}],
+			"edges":[{"name" : "ENT_DEF", "concept" : "MODIFY", "frame" : true, "from" : "ENT", "to" : "INDEF"}]
+		},
+		"SynForm":[{"name" : "S1", "type" : "PHON", "phon" : "a"},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" :{"INDEF":"S1", "ENT":"S2"}
+	},
+	
 	{
 		"name" : "ADJUNCT_N",
 		"class" : "N",
@@ -246,7 +276,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ATTR", "concept" : "PROPERTY", "frame" : false, "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "QUALITY", "frame" : false, "focus" : false, "head" : false}],
 			"edges" : [{"name" : "ENT_ATTR", "concept" : "MODIFY", "frame" : true, "from" : "ENT", "to" : "ATTR"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["A"]},
@@ -397,7 +427,7 @@
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : true},
-						{"name" : "ATTR", "concept" : "PROPERTY", "frame" : false, "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "QUALITY", "frame" : false, "focus" : false, "head" : false}],
 			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ENT"},
 						{"name" : "EVT_ATTR", "concept" : "MODIFY", "from" : "EVT", "to" : "ATTR"}]
 		},
@@ -1173,5 +1203,5 @@
 	}
 ],
 
-"comments": "Full grammar. Does not contain semantically empty constructions (e.g. det_a etc...). There are no construction of class 'NP'. Does contain the specify_cxn. Preferences are roughly set up to allow the system to use preferentially classic arg struct constructions."
+"comments": ""
 }

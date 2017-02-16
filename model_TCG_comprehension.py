@@ -109,7 +109,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             outputs[t] = output
         # Display methods
         if output['Semantic_WM_C']:
-            if verbose > 1:
+            if verbose > 2:
                 state_ISRF = isrf_writer.write_ISRF()
                 print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
             if verbose > 1:
@@ -131,12 +131,12 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         if save:
             print "saving animation (might take some time!)"
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
-            model.schemas['Semantic_WM'].show_dynamics_anim(folder=FOLDER, step=anim_step)
+            model.schemas['Semantic_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
             model.schemas['Phonological_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
         else:
             model.schemas['Phonological_WM_C'].show_dynamics_anim(step=anim_step)
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(step=anim_step)
-            model.schemas['Semantic_WM'].show_dynamics_anim(step=anim_step)
+            model.schemas['Semantic_WM_C'].show_dynamics_anim(step=anim_step)
             
       
 #    model.schemas['Semantic_WM'].show_SemRep()
@@ -164,9 +164,9 @@ def run_diagnostic():
     """
     """
     import json
-    LING_INPUT_FILE = 'ling_inputs_aug.json'
+    LING_INPUT_FILE = 'ling_inputs.json'
     SEMANTICS_NAME = 'TCG_semantics_main'
-    GRAMMAR_NAME = 'TCG_grammar_VB_aug'
+    GRAMMAR_NAME = 'TCG_grammar_VB_dev'
     VERBOSE = 2
     SEED = None
     ANIM = True

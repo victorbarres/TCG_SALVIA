@@ -12,6 +12,18 @@
 			 "timing":[],
 			 "comments": ""
 			},
+		"test_naming_indef": {
+			"utter_rate": 1,
+			 "utterance" :["a", "woman"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"test_SVO_defindef": {
+			"utter_rate": 1,
+			 "utterance" :[ "the", "woman", "kick", "a", "ball"],
+			 "timing":[],
+			 "comments": ""
+			},
 		"test_PAS_SVO": {
 			"utter_rate": 1,
 			 "utterance" :[ "ball", "is", "kick", "-ed", "by", "woman"],
