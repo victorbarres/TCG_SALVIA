@@ -44,7 +44,9 @@
 					"HOOK" : {},
 					"BOOKSHELF" :{},
 					"WAGON" : {}, 
-					"BALL" :{}
+					"BALL" :{},
+					"MOTORCYCLE" : {},
+					"MERRY_GO_ROUND" : {}
 				},
 				"ANIMAL" : 
 				{
@@ -95,7 +97,8 @@
 				"MEET" : {},
 				"CHASE" : {},
 				"FLEE" : {},
-				"EAT" : {}
+				"EAT" : {},
+				"RIDE": {}
 			},
 			
 			"SYM_ACT":
@@ -230,7 +233,9 @@
 			"BOOKSHELF",
 			"WAGON", 
 			"BALL",
-			"BREAD"
+			"BREAD",
+			"MOTORCYCLE",
+			"MERRY_GO_ROUND"
 		],
 		
 		"PLACE":
@@ -255,7 +260,8 @@
 			"SHAKE_HANDS",
 			"CHASE",
 			"FLEE",
-			"EAT"
+			"EAT",
+			"RIDE"
 		],
 		
 		"QUALITY":
@@ -323,7 +329,9 @@
 				"FLEEER", 
 				"FLEEEE", 
 				"EATER", 
-				"EATEE"
+				"EATEE", 
+				"RIDER", 
+				"RIDEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -378,6 +386,8 @@
 		"WAGON" : ["WAGON"],
 		"BALL" : ["BALL"],
 		"BREAD" : ["BREAD"],
+		"MOTORCYCLE" : ["MOTORCYCLE"],
+		"MERRY_GO_ROUND" : ["MERRY_GO_ROUND"]
 		
 		"SQUIRT" : ["SQUIRT"],
 		"TALK" : ["TALK"],
@@ -393,7 +403,8 @@
 		"SHAKE_HANDS" : ["SHAKE_HANDS"],
 		"CHASE" : ["CHASE"],
 		"FLEE" : ["FLEE"],
-		"EAT" : ["EAT"]
+		"EAT" : ["EAT"], 
+		"RIDE" : ["RIDE"],
 		
 		"RED" : ["RED"],
 		"BLUE" : ["BLUE"],
@@ -415,8 +426,8 @@
 		"SUCCESSIVE" : ["SUCCESSIVE"],
 		"CONCURRENT" : ["CONCURRENT"],
 
-		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER"],
-		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE"],
+		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER", "RIDER"],
+		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE", "RIDEE"],
 		"AGT+PT" :["MEET_REL", "SHAKE_HANDS_REL"],
 		"THEME": ["GIVEN", "SENT"],
 		"RECIPIENT" : ["GIVEE", "SENDEE"]
