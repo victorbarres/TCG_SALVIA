@@ -33,6 +33,10 @@
 						"SHIRT" : {},
 						"SUIT" : {}
 					},
+					"FOOD":
+					{
+						"BREAD": {}
+					},
 					"CELLO" : {},
 					"TREE" : {},
 					"BAG" :{},
@@ -90,7 +94,8 @@
 				"WATCH" : {},
 				"MEET" : {},
 				"CHASE" : {},
-				"FLEE" : {}
+				"FLEE" : {},
+				"EAT" : {}
 			},
 			
 			"SYM_ACT":
@@ -103,7 +108,8 @@
 			{
 				"LAUGH" : {},
 				"TALK" : {},
-				"FLEE" : {}
+				"FLEE" : {},
+				"EAT" : {}
 			},
 			
 			"DITRANS_ACT" :
@@ -223,7 +229,8 @@
 			"HOOK",
 			"BOOKSHELF",
 			"WAGON", 
-			"BALL"
+			"BALL",
+			"BREAD"
 		],
 		
 		"PLACE":
@@ -247,7 +254,8 @@
 			"KISS",
 			"SHAKE_HANDS",
 			"CHASE",
-			"FLEE"
+			"FLEE",
+			"EAT"
 		],
 		
 		"QUALITY":
@@ -313,7 +321,9 @@
 				"CHASER", 
 				"CHASEE", 
 				"FLEEER", 
-				"FLEEEE"
+				"FLEEEE", 
+				"EATER", 
+				"EATEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -367,6 +377,7 @@
 		"BOOKSHELF" : ["BOOKSHELF"],
 		"WAGON" : ["WAGON"],
 		"BALL" : ["BALL"],
+		"BREAD" : ["BREAD"],
 		
 		"SQUIRT" : ["SQUIRT"],
 		"TALK" : ["TALK"],
@@ -382,6 +393,7 @@
 		"SHAKE_HANDS" : ["SHAKE_HANDS"],
 		"CHASE" : ["CHASE"],
 		"FLEE" : ["FLEE"],
+		"EAT" : ["EAT"]
 		
 		"RED" : ["RED"],
 		"BLUE" : ["BLUE"],
@@ -403,8 +415,8 @@
 		"SUCCESSIVE" : ["SUCCESSIVE"],
 		"CONCURRENT" : ["CONCURRENT"],
 
-		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER"],
-		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE"],
+		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER"],
+		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE"],
 		"AGT+PT" :["MEET_REL", "SHAKE_HANDS_REL"],
 		"THEME": ["GIVEN", "SENT"],
 		"RECIPIENT" : ["GIVEE", "SENDEE"]
