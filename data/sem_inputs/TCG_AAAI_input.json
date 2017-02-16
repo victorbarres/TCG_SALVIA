@@ -5,7 +5,7 @@
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
 					"ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
-					"EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
 					"PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
 					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
 			},
@@ -18,7 +18,7 @@
 			"sem_rate":1,
 			"propositions": {
 				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
-				"P2":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+				"P2":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
 					"ENTITY(e2,F)","PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
 					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "ENTITY(e1,F)", "pt(a1, e1)"],
 				"P3":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"]
@@ -51,7 +51,7 @@
 				"propositions": {
 					"P1":["ENTITY(e1,F, a_pt)", "MAN(man)", "IS(is1)", "is1(e1, man)", 
 						"ENTITY(e2,F, a_act)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)",
-						"EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+						"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
 						"PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
 						"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
 				},
@@ -69,7 +69,7 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)"],
-					"P2":["EVENT(evt1,F)", "ACTION(a1,F)", "IS(is3)", "is3(evt1,a1)", 
+					"P2":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)", 
 						"ENTITY(e2,F)","PUNCH(punch)", "IS(is4)", "is4(a1, punch)", 
 						"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "ENTITY(e1,F)", "pt(a1, e1)"],
 					"P3":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"]

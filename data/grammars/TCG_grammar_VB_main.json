@@ -58,7 +58,7 @@
 		"SemFrame" :
 		{
 			"nodes" : [	{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "SYM_ACT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "ACTOR_1", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "ACTOR_2", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -81,7 +81,7 @@
 		"SemFrame" :
 		{
 			"nodes" : [	{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -102,7 +102,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false },
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : false },
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false }],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -126,7 +126,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "DITRANS_ACT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "THEME", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "RCPT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
@@ -150,7 +150,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "DITRANS_ACT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "THEME", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false },
 						{"name" : "RCPT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false }],
@@ -176,7 +176,7 @@
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false},
-						{"name" : "ATTR", "concept" : "PROPERTY", "frame" : false, "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "QUALITY", "frame" : false, "focus" : false, "head" : false}],
 			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ENT"},
 						{"name" : "EVT_ATTR", "concept" : "MODIFY", "from" : "EVT", "to" : "ATTR"}]
 		},
@@ -195,7 +195,7 @@
 		"SemFrame" : 
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "INTRANS_ACT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : false}],
 			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"}]
@@ -238,6 +238,36 @@
 		"SymLinks" :{"EVT1" : "S1", "EVT2": "S2"}
 	},
 	
+	{ "name" : "DEFINITE_NP",
+		"class": "NP",
+		"preference": 1,
+		"group": 2,
+		"SemFrame":
+		{
+			"nodes":[{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+					{"name" : "DEF", "concept" : "DEFINITE", "frame" : false, "focus" : false, "head" : false}],
+			"edges":[{"name" : "ENT_DEF", "concept" : "MODIFY", "frame" : true, "from" : "ENT", "to" : "DEF"}]
+		},
+		"SynForm":[{"name" : "S1", "type" : "PHON", "phon" : "the"},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" :{"DEF":"S1", "ENT":"S2"}
+	},
+	
+	{ "name" : "INDEFINITE_NP",
+		"class": "NP",
+		"preference": 1,
+		"group": 2,
+		"SemFrame":
+		{
+			"nodes":[{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+					{"name" : "INDEF", "concept" : "INDEFINITE", "frame" : false, "focus" : false, "head" : false}],
+			"edges":[{"name" : "ENT_DEF", "concept" : "MODIFY", "frame" : true, "from" : "ENT", "to" : "INDEF"}]
+		},
+		"SynForm":[{"name" : "S1", "type" : "PHON", "phon" : "a"},
+					{"name" : "S2", "type" : "SLOT", "classes" : ["N"]}],
+		"SymLinks" :{"INDEF":"S1", "ENT":"S2"}
+	},
+	
 	{
 		"name" : "ADJUNCT_N",
 		"class" : "N",
@@ -246,7 +276,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
-						{"name" : "ATTR", "concept" : "PROPERTY", "frame" : false, "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "QUALITY", "frame" : false, "focus" : false, "head" : false}],
 			"edges" : [{"name" : "ENT_ATTR", "concept" : "MODIFY", "frame" : true, "from" : "ENT", "to" : "ATTR"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["A"]},
@@ -278,7 +308,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -301,7 +331,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "INTRANS_ACT", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "AGT"},
@@ -321,7 +351,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -347,7 +377,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -370,7 +400,7 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "ACTION", "frame" : true,  "focus" : true, "head" : false},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true,  "focus" : true, "head" : false},
 						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "PT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -397,7 +427,7 @@
 		{
 			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : true},
-						{"name" : "ATTR", "concept" : "PROPERTY", "frame" : false, "focus" : false, "head" : false}],
+						{"name" : "ATTR", "concept" : "QUALITY", "frame" : false, "focus" : false, "head" : false}],
 			"edges" : [{"name" : "IS", "concept" : "IS", "from" : "EVT", "to" : "ENT"},
 						{"name" : "EVT_ATTR", "concept" : "MODIFY", "from" : "EVT", "to" : "ATTR"}]
 		},
@@ -416,9 +446,9 @@
 		"SemFrame" : 
 		{
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false},
-						{"name" : "ACT", "concept" : "TRANSITIVE", "frame" : true, "focus" : false, "head" : false},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "WEAR", "concept" : "WEAR", "frame" : false, "focus" : false, "head" : false},
-						{"name" : "AGT", "concept" : "HUMAN", "frame" : true, "focus" : false, "head" : true},
+						{"name" : "AGT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
 						{"name" : "PT", "concept" : "CLOTHING", "frame" : true, "focus" : false, "head" : false},
 						{"name" : "COLOR", "concept" : "COLOR", "frame" : false, "focus" : true, "head" : false}],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
@@ -439,7 +469,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "HIT", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -453,7 +483,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "KICK", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -467,7 +497,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "CHASE", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -482,7 +512,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "FLEE", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -497,7 +527,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "PUNCH", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -511,7 +541,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "WEAR", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -525,7 +555,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "INTRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "LAUGH", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -539,7 +569,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "WATCH", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -553,7 +583,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "TALK", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -568,7 +598,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "SQUIRT", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -583,7 +613,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "SPLASH", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -597,7 +627,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "DITRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "GIVE", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -611,7 +641,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "DITRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "SEND", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -625,7 +655,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "SYM_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "MEET", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -639,7 +669,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "KISS", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -653,7 +683,7 @@
 		"preference" : 1,
 		"group": 1,
 		"SemFrame" : {
-					"nodes" : [{"name" : "ACT", "concept" : "ACTION", "frame" : true, "focus" : false, "head" : true},
+					"nodes" : [{"name" : "ACT", "concept" : "SYM_ACT", "frame" : true, "focus" : false, "head" : true},
 								{"name" : "N1", "concept" : "SHAKE_HANDS", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
 					},
@@ -1173,5 +1203,5 @@
 	}
 ],
 
-"comments": "Full grammar. Does not contain semantically empty constructions (e.g. det_a etc...). There are no construction of class 'NP'. Does contain the specify_cxn. Preferences are roughly set up to allow the system to use preferentially classic arg struct constructions."
+"comments": ""
 }
