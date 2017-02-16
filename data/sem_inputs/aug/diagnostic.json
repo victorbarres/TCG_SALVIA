@@ -1,0 +1,58 @@
+{ 
+	"inputs":{
+		"test_naming_def": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1": ["ENTITY(e,F)", "MAN(man)", "IS(is)", "is(e, man)", "DEFINITE(def)", "MODIFY(mod)", "mod(e,def)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": "test definite naming"
+		},
+		
+		"test_naming_indef": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1": ["ENTITY(e,F)", "MAN(man)", "IS(is)", "is(e, man)", "INDEFINITE(indef)", "MODIFY(mod)", "mod(e,indef)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": "test indefinite naming"
+		},
+
+		"test_adj_N_def": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1":["ENTITY(e,F,0.9)", "WOMAN(woman)", "IS(is)", "is(e, woman)", "YOUNG(young, 0.8)", "MODIFY(mod1, 0.7)", "mod1(e, young)", "DEFINITE(def)", "MODIFY(mod2)", "mod2(e,def)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": ""
+		},
+		
+		"test_adj_N_indef": {
+			"sem_rate": 1,
+			 "propositions"  : {
+				"P1":["ENTITY(e,F,0.9)", "WOMAN(woman)", "IS(is)", "is(e, woman)", "YOUNG(young, 0.8)", "MODIFY(mod1, 0.7)", "mod1(e, young)", "INDEFINITE(indef)", "MODIFY(mod2)", "mod2(e,indef)"]
+			  },
+			  "sequence" :["P1"],
+			  "timing":[],
+			  "comments": ""
+		},
+		
+		"test_NVN_defindef":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":["ENTITY(e1,F)", "MAN(man)", "IS(is1)", "is1(e1, man)", "DEFINITE(def)", "MODIFY(mod1)", "mod1(e1,def)",
+					"ENTITY(e2,F)", "BALL(ball)", "IS(is2)", "is2(e2, ball)", "INDEFINITE(indef)", "MODIFY(mod2)", "mod2(e2,indef)",
+					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)",
+					"KICK(kick)", "IS(is4)", "is4(a1, kick)", 
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e1)", "pt(a1, e2)"]
+			},
+			"sequence":["P1"],
+			"timing":[],
+			"comments":"test transitive static (no competition)."
+		}
+	}
+		
+}	
