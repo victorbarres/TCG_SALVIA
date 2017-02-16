@@ -466,9 +466,12 @@ class CONCEPT_LTM(LTM):
         data = super(CONCEPT_LTM, self).get_info()
         data['params'] = self.params
         return data
-        
+                
 class SEMANTIC_WM(WM):
     """
+    Notes:
+        - to_output is defined differently for production and comprehension. Need to unify that.
+        - Not sure that it is best for C2 in comprehension to have a single SemanticWM. to see.
     """
     def __init__(self, name='Semantic_WM'):
         WM.__init__(self, name)
@@ -484,7 +487,7 @@ class SEMANTIC_WM(WM):
         self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
-        self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
+        self.SemRep = nx.MultiDiGraph() # Uses networkx to easily handle graph structure.
     
     def reset(self):
         """
@@ -496,31 +499,48 @@ class SEMANTIC_WM(WM):
         """
         """
         mode = self.inputs['from_control']
-        cpt_insts = None
-        
-        cpt_insts1 = self.inputs['from_conceptualizer']
-
-        sem_frame = self.inputs['from_grammatical_WM_C']
-        cpt_schemas = self.inputs['from_concept_LTM']
-        if cpt_schemas and sem_frame:
-            cpt_insts2  = self.instantiate_cpts(sem_frame, cpt_schemas)
-        else:
-            cpt_insts2 = None
         
         if mode == 'produce':
-            cpt_insts = cpt_insts1
+            self.subprocess_prod()
         if mode == 'listen':
-            cpt_insts = cpt_insts2
-            
+            self.subprocess_comp()
+                            
+        self.update_activations()       
+        self.prune()
+    
+    def subprocess_comp(self, init_val = 0.2):
+        """Comprehension subprocess
+        """
+        cpt_insts = None        
+        gram_activations = {}
+        gram_input = self.inputs['from_grammatical_WM_C']
+        if gram_input:
+            gram_activations = gram_input['activations']
+            instance_data  = gram_input.get('instances', None)
+            if instance_data:
+                SemFrame = instance_data['SemFrame']
+                sem_map = instance_data['sem_map']
+                cpt_schemas = self.inputs['from_concept_LTM']
+                if cpt_schemas and SemFrame and sem_map:
+                    cpt_insts  = self.instantiate_cpts(SemFrame, sem_map, cpt_schemas)
+   
+        if cpt_insts:
+            for inst in cpt_insts:
+                self.add_instance(inst, init_val)   
+        
+        self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
+        self.update_SemRep(cpt_insts)
+        
+    def subprocess_prod(self):
+        """ Production subprocess
+        """
+        cpt_insts = self.inputs['from_conceptualizer']            
         if cpt_insts:
             for inst in cpt_insts:
                 self.add_instance(inst)
-                    
         
-        self.update_activations()
-        self.update_SemRep(cpt_insts)        
-        self.prune()
-        
+        self.update_SemRep(cpt_insts) 
+                
         if self.inputs['from_grammatical_WM_P']: # This should be done on the instances directly...
             # Note nodes and edges as expressed
             for name in self.inputs['from_grammatical_WM_P']['nodes']:
@@ -528,50 +548,255 @@ class SEMANTIC_WM(WM):
             for name in self.inputs['from_grammatical_WM_P']['edges']:
                 d = self.SemRep.get_edge_data(name[0], name[1])
                 d['expressed'] = True
-    
+        
         self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_output()
         
         # TD request for missing info
         self.outputs['to_visual_WM'] = self.vis_WM_output()
         
-        if mode=='produce' and self.has_new_sem():
+        if self.has_new_sem():
             self.outputs['to_cxn_retrieval_P'] = self.SemRep
-        if mode=='produce':
-            self.outputs['to_control'] = self.has_unexpressed_sem()
+        
+        self.outputs['to_control'] = self.has_unexpressed_sem()
+        
     
-    def instantiate_cpts(self, SemFrame, cpt_schemas):
+    def update_SemRep(self, cpt_insts):
+        """
+        Updates the SemRep: Adds the nodes and edges needed based on the receivd concept instances.
+        
+        NOTE:
+            - Does not handle the case of concept instance updating. Concepts cannot be updated (Monotonous growth of the SemRep)
+            - SemRep carries the instance and the concept. The concept field is redundant, but is useful in order to be able to define
+            SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
+        """
+        if cpt_insts:
+            # First process all the instances that are not relations.
+            for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
+                if self.SemRep.has_node(inst.name):
+                    continue
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, expressed=False)
+            
+            # Then add the relations
+            for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
+                node_from = rel_inst.content['pFrom'].name
+                node_to = rel_inst.content['pTo'].name
+                if self.SemRep.has_edge(node_from, node_to):
+                    continue
+                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
+            
+#            # Update concept frames
+#            self.update_cpt_frames()
+    
+#    def update_cpt_frames(self):
+#        """
+#        For all the concept frames instances. If they have an 'IS' relation, propagate is_concept to frame.
+#        """
+#        cpt_rel_name = 'IS'
+#        for u,v,d in [edge for edge in self.SemRep.edges(data=True)]:
+#            if d['concept'].name == cpt_rel_name:
+#                self.SemRep.node[u]['cpt_inst'].content = self.SemRep.node[v]['cpt_inst'].content.copy()
+#                self.SemRep.node[u]['concept'] = self.SemRep.node[v]['concept']
+    
+    #########################
+    ### COMPREHENSION METHODS
+    def instantiate_cpts(self, SemFrame, sem_map, cpt_schemas):
         """
         Builds SemRep based on the received SemFrame.
         
         Args:
             - SemFrame (TP_SEMFRAME)
             - cpt_schemas ([CPT_SCHEMAS])
-        
-        NOTE: 
-            - Because I only used the SemFrame, there is 1: no notion of how to set the initial activity of the SemRep based on the constructions.
-            - Also, because the SemFrame is derived from the eq_inst, it is not clear how I can define the SemRep covers of cxn_instances (or, the cxn_inst cover of the SemRep).
-            - This, later on, should evolve into a function that should possibly find already existing nodes and, rather than creating new instances, generate the proper bindings.
         """
+        def find_cpt_schema(cpt_schemas, cpt_name):
+            """Returns, if it exists, the cpt_schema whose name matches cpt_name
+            """
+            output = [schema for schema in cpt_schemas if schema.name == cpt_name]
+            if len(output)>1:
+                error_msg = 'There is more than one cpt_schema matches the concept name %s' %cpt_name
+                raise ValueError(error_msg)
+            elif not(output):
+                error_msg = 'There are is cpt_schema that matches the concept name %s' %cpt_name
+                raise ValueError(error_msg)
+            else:
+                return output[0]
+            
+        def find_cpt_inst(sem_frame_insts):
+            """ Returns, if it exists, the cpt_inst whose sem_frame trace already contains one of the sem_frame_insts.
+            """
+            output = [inst for inst in self.schema_insts if not(inst.trace['sem_frame_insts'].isdisjoint(sem_frame_insts))]
+            if len(output)>1:
+                print self.t
+                error_msg = 'There is more than one cpt_inst that map onto the same SemFrame element! %s' %str([o.name for o in output])
+                raise ValueError(error_msg)
+            elif len(output)==1:
+                return output[0]
+            else:
+                return None
         cpt_insts = []
         name_table = {}
+        
         for node in SemFrame.nodes:
-            cpt_schema = [schema for schema in cpt_schemas if schema.name == node.concept.name][0]
-            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
-            cpt_insts.append(cpt_inst)
-            name_table[node] = cpt_inst
+            cpt_schema = find_cpt_schema(cpt_schemas, node.concept.name)
+            sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+            old_cpt_inst = find_cpt_inst(sem_frame_insts)
+            if old_cpt_inst:
+                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+                name_table[node] = old_cpt_inst
+            else:
+                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+                name_table[node] = new_cpt_inst
+                cpt_insts.append(new_cpt_inst)
         
         for edge in SemFrame.edges:
-            cpt_schema = [schema for schema in cpt_schemas if schema.name == edge.concept.name][0]
-            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema})
-            cpt_inst.content['pFrom'] = name_table[edge.pFrom]
-            cpt_inst.content['pTo'] = name_table[edge.pTo]
-            cpt_insts.append(cpt_inst)
+            cpt_schema = find_cpt_schema(cpt_schemas, edge.concept.name)
+            sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
+            old_cpt_inst = find_cpt_inst(sem_frame_insts)
+            if old_cpt_inst:
+                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+            else:
+                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
+                new_cpt_inst.content['pTo'] = name_table[edge.pTo]
+                cpt_insts.append(new_cpt_inst)
         return cpt_insts
-            
     
+    def convey_gram_activations(self, gram_activations):
+        """
+        SemRep instances receives external activations from the construction instances they are linked to.
+        Notes:
+            - This imposes that (1) the cpt_inst start with low activations. (2) the cxn instances are not deactivated once they are expressed (symmetric coop_links.)
+        """
+        if not(gram_activations):
+            return
+        for inst in self.schema_insts:
+            for k, val in gram_activations.iteritems():
+                act = 0
+                if k in inst.trace['sem_frame_insts']:
+                    act += val
+                inst.activation.E += act # No normalization
+    
+    ######################
+    ### PRODUCTION METHODS       
+    def gram_WM_P_output(self):
+        """
+        Returns the output to send to gram_WM_P.
+        The signal sent to gram_WM_P contains the activation levels of the node and edge instance that so far have not been expressed.
+        """
+        output = {'nodes':{}, 'edges':{}}
+        for n,d in self.SemRep.nodes(data=True):
+            if not(d['expressed']):
+                output['nodes'][n] = d['cpt_inst'].activity
+        for u,v,d in self.SemRep.edges(data=True):
+            if not(d['expressed']):
+                output['edges'][(u,v)] = d['cpt_inst'].activity
+        return output
+    
+    def vis_WM_output(self):
+        """
+        Returns the output to send to vis_WM. This output contains the TD attentional signal that can bias the 
+        BU saliency.
+        """
+        output = None
+        if not(self.inputs['from_grammatical_WM_P']) or not(self.inputs['from_grammatical_WM_P']['missing_info']):
+            return output
+        
+        missing_info = self.inputs['from_grammatical_WM_P']['missing_info']
+        
+        cpt_schema_inst = self.find_instance(missing_info)
+        var_name = cpt_schema_inst.trace.get('ref', '')
+        self.outputs['to_output'] = {'missing_info':missing_info, 'var_name':var_name}
+        output = cpt_schema_inst.trace['per_inst']
+        return output
+        
+    def has_new_sem(self):
+        """
+        Returns true if there is at least 1 new element in the SemRep. False otherwise.
+        """
+        for n,d in self.SemRep.nodes(data=True):
+            if d['new']:
+                return True
+        
+        for u,v,d in self.SemRep.edges(data=True):
+            if d['new']:
+                return True
+        return False
+    
+    def has_unexpressed_sem(self):
+        """
+        Returns true if there is at least 1 unexpresed node or relation in the SemRep. False otherwise. 
+        """
+        for n,d in self.SemRep.nodes(data=True):
+            if not(d['expressed']):
+                return True
+        return False
+        
+        for u,v,d in self.SemRep.edges(data=True):
+            if d['expressed']:
+                return True
+        return False
+        
+    ###################
+    ### DISPLAY METHODS 
+    def show_state(self):
+        TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
+
+class SEMANTIC_WM_P(WM):
+    """
+    """
+    def __init__(self, name='Semantic_WM_P'):
+        WM.__init__(self, name)
+        self.add_port('IN', 'from_conceptualizer')
+        self.add_port('IN', 'from_concept_LTM')
+        self.add_port('IN', 'from_grammatical_WM_P')
+        self.add_port('IN', 'from_control')
+        self.add_port('OUT', 'to_grammatical_WM_P')
+        self.add_port('OUT', 'to_cxn_retrieval_P')
+        self.add_port('OUT', 'to_control')
+        self.add_port('OUT', 'to_visual_WM')
+        self.add_port('OUT', 'to_output')
+        self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
+        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.SemRep = nx.DiGraph() # Uses networkx to easily handle graph structure.
+    
+    def reset(self):
+        """
+        """
+        super(SEMANTIC_WM_P, self).reset()
+        self.SemRep = nx.MultiDiGraph()
+    
+    def process(self):
+        """
+        """
+        cpt_insts = self.inputs['from_conceptualizer']            
+        if cpt_insts:
+            for inst in cpt_insts:
+                self.add_instance(inst)
+        
+        self.update_SemRep(cpt_insts) 
+                
+        if self.inputs['from_grammatical_WM_P']: # This should be done on the instances directly...
+            # Note nodes and edges as expressed
+            for name in self.inputs['from_grammatical_WM_P']['nodes']:
+                self.SemRep.node[name]['expressed'] = True
+            for name in self.inputs['from_grammatical_WM_P']['edges']:
+                d = self.SemRep.get_edge_data(name[0], name[1])
+                d['expressed'] = True
+        
+        self.outputs['to_grammatical_WM_P'] = self.gram_WM_P_output()
+        
+        # TD request for missing info
+        self.outputs['to_visual_WM'] = self.vis_WM_output()
+        if self.has_new_sem():
+            self.outputs['to_cxn_retrieval_P'] = self.SemRep
+        
+        self.outputs['to_control'] = self.has_unexpressed_sem()
+        
+        self.update_activations()      
+        self.prune()                    
+            
     def update_SemRep(self, cpt_insts):
         """
-        Updates the SemRep: Adds the nodes and edges needed based on the receivd concept instances.
+        Updates the SemRep: Adds the nodes and edges needed based on the received concept instances.
         
         NOTE:
             - Does not handle the case of concept instance updating. Concepts cannot be updated (Monotonous growth of the SemRep)
@@ -670,17 +895,6 @@ class SEMANTIC_WM(WM):
     #######################
     def show_state(self):
         TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
-#        node_labels = dict((n, '%s(%.1f)' %(n, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
-#        edge_labels = dict(((u,v), '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
-#        pos = nx.spring_layout(self.SemRep)  
-#        plt.figure(facecolor='white')
-#        plt.axis('off')
-#        title = '%s state (t=%i)' %(self.name,self.t)
-#        plt.title(title)
-#        nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
-#        nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
-#        nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
-#        plt.show()
         
 class SEMANTIC_WM_C(WM):
     """
@@ -690,7 +904,7 @@ class SEMANTIC_WM_C(WM):
         - Testing the SemRep being a MutliDiGraph instead of simply a DiGraph.
         Might need to support multi-edges (competing edges).
     """
-    def __init__(self, name='Semantic_WM'):
+    def __init__(self, name='Semantic_WM_C'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('IN', 'from_grammatical_WM_C')
@@ -840,17 +1054,6 @@ class SEMANTIC_WM_C(WM):
     #######################
     def show_state(self):
         TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
-#        node_labels = dict((n, '%s(%.1f)' %(n, d['cpt_inst'].activity)) for n,d in self.SemRep.nodes(data=True))
-#        edge_labels = dict(((u,v), '%s(%.1f)' %(d['concept'].meaning, d['cpt_inst'].activity)) for u,v,d in self.SemRep.edges(data=True))
-#        pos = nx.spring_layout(self.SemRep)  
-#        plt.figure(facecolor='white')
-#        plt.axis('off')
-#        title = '%s state (t=%i)' %(self.name,self.t)
-#        plt.title(title)
-#        nx.draw_networkx(self.SemRep, pos=pos, with_labels= False)
-#        nx.draw_networkx_labels(self.SemRep, pos=pos, labels= node_labels)
-#        nx.draw_networkx_edge_labels(self.SemRep, pos=pos, edge_labels=edge_labels)
-#        plt.show()
 
 ###################
 ### GRAMMAR LTM ###
@@ -1975,10 +2178,9 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             self.instantiate_cxns(SemRep, cxn_schemas)
             self.outputs['to_grammatical_WM_P'] = self.cxn_instances
             # Set all SemRep elements to new=False
-            for n in SemRep.nodes_iter():
-                SemRep.node[n]['new'] = False
-            for e in SemRep.edges_iter():
-                d = SemRep.get_edge_data(e[0], e[1])
+            for n, d in SemRep.nodes(data=True):
+                d['new'] = False
+            for u,v,d in SemRep.edges(data=True):
                 d['new'] = False
         self.cxn_instances = []
     

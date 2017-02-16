@@ -138,7 +138,7 @@
 					"ENTITY(e3,F)", "BALL(ball)", "IS(is3)", "is3(e3, ball)",
 					"EVENT(evt1,F)", "DITRANS_ACT(a1,F)", "IS(is4)", "is4(evt1,a1)",
 					"GIVE(give)", "IS(is5)", "is5(a1, give)", 
-					"AGENT(agt)", "THEME(theme)", "RECIPIENT(rcpt)", "agt(a1, e2)", "theme(a1, e1)", "rcpt(a1, e3)"]
+					"AGENT(agt)", "THEME(theme)", "RECIPIENT(rcpt)", "agt(a1, e2)", "theme(a1, e3)", "rcpt(a1, e1)"]
 			},
 			"sequence":["P1"],
 			"timing":[],
@@ -152,7 +152,7 @@
 				"P2":["ENTITY(e2,F)", "WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
 				"P3":["ENTITY(e3,F)", "BALL(ball)", "IS(is3)", "is3(e3, ball)"],
 				"P4":["EVENT(evt1,F)", "DITRANS_ACT(a1,F)", "IS(is4)", "is4(evt1,a1)"], 
-				"P5":["GIVE(give)", "IS(is4)", "is5(a1, give)", "AGENT(agt)", "THEME(theme)", "RECIPIENT(rcpt)", "agt(a1, e2)", "theme(a1, e1)", "rcpt(a1, e3)"]
+				"P5":["GIVE(give)", "IS(is5)", "is5(a1, give)", "AGENT(agt)", "THEME(theme)", "RECIPIENT(rcpt)", "agt(a1, e2)", "theme(a1, e3)", "rcpt(a1, e1)"]
 			},
 			"sequence" :["P1", "P2", "P3", "P4", "P5"],
 			"timing":[],

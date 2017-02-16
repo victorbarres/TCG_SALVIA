@@ -135,7 +135,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
         if t in prob_times: # Saving figures for prob times.
-            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
+            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
     
     if save:
         model.save_sim(file_path = FOLDER, file_name = 'output')
@@ -298,7 +298,7 @@ def run_diagnostics(verbose=3, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'aug/diagnostic.json'
+    DIAGNOSTIC_FILE = 'dev/diagnostic.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
     STD = 0
@@ -319,7 +319,7 @@ def run_diagnostics(verbose=3, prob_times=[]):
 
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
-    grammar_name='TCG_grammar_VB_aug'  
+    grammar_name='TCG_grammar_VB_dev'  
     max_time =1000
     seed=None
     save = True

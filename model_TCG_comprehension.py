@@ -7,7 +7,7 @@ from __future__ import division
 import random
 import time
 
-from TCG_models import TCG_comprehension_system_dev
+from TCG_models import TCG_comprehension_system
 import language_schemas as ls
 from loader import TCG_LOADER
 from viewer import TCG_VIEWER
@@ -30,7 +30,7 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
         - comprehension model
     """
     
-    model = TCG_comprehension_system_dev(grammar_name=grammar_name, semantics_name=semantics_name)
+    model = TCG_comprehension_system(grammar_name=grammar_name, semantics_name=semantics_name)
     if model_params:
         model.update_params(model_params)
     
@@ -95,7 +95,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     outputs = {}
     test_not_empty = lambda l: [x for x in l.values() if x!= None] != []
-    isrf_writer = ls.ISRF_WRITER(model.schemas['Semantic_WM'])
+    isrf_writer = ls.ISRF_WRITER(model.schemas['Semantic_WM_C'])
     for t in range(max_time):
         if next_time != None and t>=next_time:
             (word_form, next_time) = generator.next()
@@ -108,15 +108,15 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         if test_not_empty(output): # filter out ouputs with all valyues == None
             outputs[t] = output
         # Display methods
-        if output['Semantic_WM']:
+        if output['Semantic_WM_C']:
             if verbose > 1:
                 state_ISRF = isrf_writer.write_ISRF()
                 print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
         if t in prob_times: # Saving figures for prob times.
-            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=False, folder = FOLDER)
-            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM'], folder = FOLDER)
+            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=True, folder = FOLDER)
+            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_C'], folder = FOLDER)
     
     if save:
         model.save_sim(file_path = FOLDER, file_name = 'output')
