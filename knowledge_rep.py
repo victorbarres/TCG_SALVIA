@@ -19,9 +19,6 @@ class K_ENT(object):
     Data:
         - id (INT): Unique identifier of the knowlege entity.
         - meaning: meaning associated with the knowledge entity.
-    
-    Note:
-        - '==' has to be defined for meaning.
     """
     ID_NEXT = 1 # Global knowledge entity counter    
     def __init__(self, name='',  meaning=''):
