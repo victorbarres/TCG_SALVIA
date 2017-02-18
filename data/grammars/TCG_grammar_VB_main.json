@@ -7,8 +7,8 @@
 		"group": 3,
 		"SemFrame" :
 		{
-			"nodes" : [	{"name" : "EVT1", "concept" : "EVENT", "focus" : true, "head" : false}, 
-						{"name" : "EVT2", "concept" : "EVENT", "focus" : false, "head" : false}],
+			"nodes" : [	{"name" : "EVT1", "concept" : "EVENT", "frame" : true, "focus" : true, "head" : false}, 
+						{"name" : "EVT2", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},
@@ -24,8 +24,8 @@
 		"group": 3,
 		"SemFrame" :
 		{
-			"nodes" : [	{"name" : "EVT1", "concept" : "EVENT", "focus" : false, "head" : false}, 
-						{"name" : "EVT2", "concept" : "EVENT", "focus" : false, "head" : false}],
+			"nodes" : [	{"name" : "EVT1", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false}, 
+						{"name" : "EVT2", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "EVT1_EVT2", "concept" : "SUCCESSIVE", "from" : "EVT1", "to" : "EVT2"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},
@@ -41,8 +41,8 @@
 		"group": 3,
 		"SemFrame" :
 		{
-			"nodes" : [	{"name" : "EVT1", "concept" : "EVENT", "focus" : true, "head" : false}, 
-						{"name" : "EVT2", "concept" : "EVENT", "focus" : false, "head" : false}],
+			"nodes" : [	{"name" : "EVT1", "concept" : "EVENT", "frame" : true, "focus" : true, "head" : false}, 
+						{"name" : "EVT2", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false}],
 			"edges" : [	{"name" : "EVT1_EVT2", "concept" : "CONCURRENT", "from" : "EVT1", "to" : "EVT2"}]
 		},
 		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},

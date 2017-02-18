@@ -15,7 +15,7 @@ from viewer import TCG_VIEWER
 ########################
 ### Template Classes ###
 ########################
-class TP_ELEM:
+class TP_ELEM(object):
     """
     Template element (base class).
     """
@@ -360,7 +360,7 @@ class TP_SYMLINKS(TP_ELEM):
 ############################    
 ### Construction classes ###
 ############################     
-class CXN:
+class CXN(object):
     """
     Grammatical construction.
     

@@ -185,6 +185,7 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
             self.has_predicted = False
         else:
             self.form_state = None
+            
 #################################
 ### CONCEPT KNOWLEDGE SCHEMAS ###
 #################################      
@@ -196,7 +197,7 @@ class CPT_SCHEMA(KNOWLEDGE_SCHEMA):
         - id (int): Unique id
         - name (str): schema name
         - LTM (LTM): Associated long term memory.
-        - content ({'concept':CONCEPT): concept is a CONCEPT in SEMANTIC_NETWOR
+        - content ({'concept':CONCEPT): concept is a CONCEPT in SEMANTIC_NETWORK
         - init_act (float): Initial activation value.
     """
     def __init__(self, name, concept, init_act):
@@ -213,35 +214,35 @@ class CPT_ENTITY_SCHEMA(CPT_SCHEMA):
     Conceptual entity schema
     """
     def __init__(self, name, concept, init_act):
-        CPT_SCHEMA.__init__(self ,name, concept, init_act)
+        CPT_SCHEMA.__init__(self, name, concept, init_act)
 
 class CPT_ACTION_SCHEMA(CPT_SCHEMA):
     """
     Conceptual action schema
     """
     def __init__(self, name, concept, init_act):
-        CPT_SCHEMA.__init__(self ,name, concept, init_act)
+        CPT_SCHEMA.__init__(self, name, concept, init_act)
 
 class CPT_PROPERTY_SCHEMA(CPT_SCHEMA):
     """
     Conceptual property schema
     """
     def __init__(self, name, concept, init_act):
-        CPT_SCHEMA.__init__(self ,name, concept, init_act)
+        CPT_SCHEMA.__init__(self, name, concept, init_act)
 
 class CPT_EVENT_SCHEMA(CPT_SCHEMA):
     """
     Conceptual event schema
     """
     def __init__(self, name, concept, init_act):
-        CPT_SCHEMA.__init__(self ,name, concept, init_act)
+        CPT_SCHEMA.__init__(self, name, concept, init_act)
 
 class CPT_RELATION_SCHEMA(CPT_SCHEMA):
     """
     Conceptual relation schema
     """
     def __init__(self, name, concept, init_act):
-        CPT_SCHEMA.__init__(self ,name, concept, init_act)
+        CPT_SCHEMA.__init__(self, name, concept, init_act)
         self.content['pFrom'] = None 
         self.content['pTo'] = None
 
@@ -271,7 +272,7 @@ class CPT_SCHEMA_INST(SCHEMA_INST):
         Uses CONCEPTUAL_KNOWLEDGE.similarity() method.
         """
         return self.content['concept'].similarity(cpt_inst.content['concept'])
-
+        
 #############################
 ### PHON KNOWLEDGE SCHEMA ###
 #############################
@@ -414,7 +415,7 @@ class CONCEPT_LTM(LTM):
         
     def initialize(self, cpt_knowledge):
         """
-        Initilize the state of the CONCEPTUAL LTM with cpt_schema based on the content of cpt_knowledge
+        Initilize the state of the CONCEPTUAL LTM with cpt_schemas based on the content of cpt_knowledge
        
         Args:
             - cpt_knowledge (CONCEPTUAL_KNOWLEDGE):

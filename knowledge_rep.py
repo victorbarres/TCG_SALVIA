@@ -2,9 +2,9 @@
 """
 @author: Victor Barres
 Define knowledge representations for TCG.
-For now only implements semantic net.
+For now only implements: semantic net and simple knowledge frames.
 
-Uses NetworkX module to represent the semantic net.
+Uses NetworkX module to represent the semantic net and the frames' content.
 """
 from __future__ import division
 import matplotlib.pyplot as plt
@@ -292,4 +292,156 @@ class K_NET(object):
             if n.name == ent_name:
                 return n
         return None
+
+################
+### FRAME ###
+################
+class FRAME_ELEM:
+    """
+    Frame element (base class).
+    """
+    
+    ID_NEXT = 1 # GLOBAL FRAME_ELEM ID COUNTER
+    
+    def __init__(self):
+        self.id = FRAME_ELEM.ID_NEXT
+        FRAME_ELEM.ID_NEXT += 1
+        self.name = ''
+        self.concept = None # Representing concept
         
+class FRAME_NODE(FRAME_ELEM):
+    """
+    Frame node.
+    
+    Data(inherited):
+    """
+    def __init__(self):
+        FRAME_ELEM.__init__(self)
+    
+    def copy(self):
+        new_node = FRAME_NODE()
+        new_node.name = '%s_%i' %(self.name, new_node.id)
+        name_corr = (self.name, new_node.name)
+        new_node.concept = self.concept
+        return (new_node, name_corr)
+
+class FRAME_REL(FRAME_ELEM):
+    """
+    Frame relation.
+    
+    Data(inherited):
+    Data:
+        - pFrom (TP_NODE): 
+        - pTo (TP_NODE):
+    """
+    def __init__(self):
+        FRAME_ELEM.__init__(self)
+        self.pFrom = None
+        self.pTo = None
+    
+    def copy(self):
+        new_rel = FRAME_REL()
+        new_rel.name = '%s_%i' %(self.name, new_rel.id)
+        name_corr = (self.name, new_rel.name)
+        new_rel.concept = self.concept
+        new_rel.pfrom = self.pFrom
+        new_rel.pTo = self.pTo
+        return (new_rel, name_corr)
+
+class FRAME(object):
+    """
+    Knowledge Frame
+
+    Data:
+        - name (STR): rame name
+        - nodes ([FRAME_NODES]): Set of FRAME nodes.
+        - edges ([FRAME_REL]): Set of FRAME relations.
+        - graph (networkx.DiGraph): A NetworkX implementation of the graph.
+            Each node and edge have the additional 'concept' attribute derived from their respective node.concept and edge.concept
+    
+    The use of NetworkX graph allows the system to rely on NetworkX efficient python implementation of graph algorithms (in particular
+    subgraph isomorphisms search).
+    """
+    def __init__(self, name=''):
+        self.name =  name
+        self.nodes = []
+        self.edges = []
+        self.graph = None
+    
+    def find_elem(self, name):
+        """
+        Returns the element with name "name". Returns None if name is not found.
+        """
+        for elem in self.nodes + self.edges:
+            if elem.name == name:
+                return elem
+        return None
+    
+    def add_FRAME_elem(self, frame_elem):
+        """
+        Add frame_elem (FRAME_ELEM) to the Frame.
+        If frame_elem is a NODE, it is added to nodes.
+        If frame_elem is a RELATION, it is added to edges.
+        
+        OPTION: MAKE SURE THAT THE CONCEPTS DO BELONG TO THE CONCEPTUAL KNOWLEDGE, ELSE RETURN AN ERROR.
+        """
+        # Check for duplicate
+        if self.find_elem(frame_elem.name):
+            return False
+        
+        # Add a new frame_elem to either node or edge list.
+        if isinstance(frame_elem, FRAME_NODE):
+            self.nodes.append(frame_elem)
+        elif isinstance(frame_elem, FRAME_REL):
+            self.edges.append(frame_elem)
+        else:
+            return False
+        
+        # Update NetworkX graph
+        self._create_NX_graph()
+    
+    def _create_NX_graph(self):
+        graph = nx.DiGraph()
+        for node in self.nodes:
+            graph.add_node(node, concept=node.concept)
+        for edge in self.edges:
+            graph.add_edge(edge.pFrom, edge.pTo, concept=edge.concept)
+        
+        self.graph = graph
+    
+    def copy(self):
+        """
+        """
+        new_frame = FRAME()
+        new_frame.name = self.name
+        node_corr = {}
+        name_corr = {}
+        for node in self.nodes:
+            (new_node, c) = node.copy()
+            node_corr[node] = new_node
+            name_corr[c[0]] = c[1]
+            new_frame.nodes.append(new_node)
+        for edge in self.edges:
+            (new_edge, c) = edge.copy()
+            name_corr[c[0]] = c[1]
+            new_edge.pFrom = node_corr[edge.pFrom]
+            new_edge.pTo = node_corr[edge.pTo]
+            new_frame.edges.append(new_edge)
+        new_frame._create_NX_graph()
+        
+        return (new_frame, name_corr)
+    
+    def show(self):
+        """
+        """
+        self._create_NX_graph()
+        plt.figure(facecolor='white')
+        plt.axis('off')
+        title = 'Frame'
+        plt.title(title)
+        node_labels = dict((n, d['concept'].meaning) for n,d in self.graph.nodes(data=True))
+        edge_labels = dict(((u,v), d['concept'].meaning) for u,v,d in self.graph.edges(data=True))
+        pos = nx.spring_layout(self.graph)        
+        nx.draw_networkx(self.graph, pos=pos, with_labels= False, node_color='g')
+        nx.draw_networkx_labels(self.graph, pos=pos, labels= node_labels)
+        nx.draw_networkx_edge_labels(self.graph, pos=pos, edge_labels=edge_labels)

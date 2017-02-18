@@ -5,7 +5,7 @@
 Define semantic network related classes for TCG.
 """
 from __future__ import division
-from knowledge_rep import K_ENT, K_REL, K_NET
+from knowledge_rep import K_ENT, K_REL, K_NET, FRAME
 
 class CONCEPT(K_ENT):
     """
@@ -57,6 +57,7 @@ class SEM_REL(K_REL):
     """    
     def __init__(self, aType = 'UNDEFINED', from_cpt = None, to_cpt = None):
         K_REL.__init__(self,aType = aType, from_ent=from_cpt, to_ent = to_cpt)
+
 
 class CONCEPTUAL_KNOWLEDGE(K_NET):
     """
