@@ -141,6 +141,7 @@ class TCG_LOADER(object):
         # Create new frame  
         new_frame = FRM.WK_FRAME()
         new_frame.name = aFrame['name']
+        aFrame =  aFrame['WK_frame']
         if 'preference' in aFrame:
             new_frame.preference = aFrame['preference']
         

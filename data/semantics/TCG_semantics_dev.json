@@ -198,49 +198,77 @@
 		"preference" : 1,
 		"WK_Frame" : {
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
+						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
+						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : false},
+						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
+						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
+						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]}
-			
-		["EVENT(evt, F) &  TRANS_ACT(a, F) & ENTITY(e1,F) & ANIMATE(animate) & ENTITY(e2, F) & IS(is1) & IS(is2) & is1(evt, a) & is2(e1, animate)"]
 		},
 		
 		{"name" : "EAT_EVENT",
 		"preference" : 1,
-		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT(a, F) & EAT(eat) & ANIMATE(animate, F) & FOOD(food, F) & IS(is1) & is1(evt, a) & IS(is2) & is2(a, eat) & AGENT(agt) & agt(a, animate) & PATIENT(pt) & pt(a, food)"]
+		"WK_Frame" : {
+			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
+						{"name" : "EAT", "concept" : "EAT", "frame" : false},	
+						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
+						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : false},
+						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
+						{"name" : "FOOD", "concept" : "FOOD", "frame" : false}
+						],
+			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
+						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
+						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "FOOD"},
+						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
+						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
+					]}
 		},
 		
 		{"name" : "RIDE_EVENT1",
 		"preference" : 1,
-		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & MAN(man) & MOTORCYCLE(motorcycle) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, man) & IS(is4) & is4(e2, motorcycle) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
+		"WK_Frame" : {
+			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
+						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
+						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
+						{"name" : "MAN", "concept" : "MAN", "frame" : false},
+						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
+						{"name" : "MOTORCYCLE", "concept" : "MOTORCYCLE", "frame" : false}
+						],
+			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
+						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "MAN"},
+						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "MOTORCYCLE"},
+						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
+						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
+					]}
 		},
 		
 		{"name" : "RIDE_EVENT2",
 		"preference" : 1,
-		"WKFrame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & GIRL(girl) & MERRY_GO_ROUND(mgr) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, girl) & IS(is4) & is4(e2, mgr) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
+		"WK_Frame" : {
+			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
+						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
+						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
+						{"name" : "GIRL", "concept" : "GIRL", "frame" : false},
+						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
+						{"name" : "MGR", "concept" : "MERRY_GO_ROUND", "frame" : false}
+						],
+			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
+						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "GIRL"},
+						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "MGR"},
+						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
+						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
+						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
+					]}
 		}
-		
-		
-		{"name" : "ANIMATE_AGENT",
-		"preference" : 1,
-		"WK_Frame" : ["EVENT(evt, F) &  TRANS_ACT(a, F) & ENTITY(e1,F) & ANIMATE(animate) & ENTITY(e2, F) & IS(is1) & IS(is2) & is1(evt, a) & is2(e1, animate)"]
-		},
-		
-		{"name" : "EAT_EVENT",
-		"preference" : 1,
-		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT(a, F) & EAT(eat) & ANIMATE(animate, F) & FOOD(food, F) & IS(is1) & is1(evt, a) & IS(is2) & is2(a, eat) & AGENT(agt) & agt(a, animate) & PATIENT(pt) & pt(a, food)"]
-		},
-		
-		{"name" : "RIDE_EVENT1",
-		"preference" : 1,
-		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & MAN(man) & MOTORCYCLE(motorcycle) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, man) & IS(is4) & is4(e2, motorcycle) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
-		},
-		
-		{"name" : "RIDE_EVENT2",
-		"preference" : 1,
-		"WKFrame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & GIRL(girl) & MERRY_GO_ROUND(mgr) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, girl) & IS(is4) & is4(e2, mgr) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
-		}
-	
 	],
 
 	"PERCEPTUAL_KNOWLEDGE" :
