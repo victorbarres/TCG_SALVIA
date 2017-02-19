@@ -14,10 +14,10 @@ Dependencies:
     - Uses scene
 """
 from __future__ import division
-import numpy as np
-import matplotlib.pyplot as plt
 import random
 
+import numpy as np
+import matplotlib.pyplot as plt
 import networkx as nx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, SYSTEM_SCHEMA, LTM, WM

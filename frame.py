@@ -2,7 +2,7 @@
 """
 @author: Victor Barres
 
-Define semantic network related classes for TCG.
+Defines semantic network related classes for TCG.
 """
 from __future__ import division
 from knowledge_rep import FRAME, FRAME_NODE, FRAME_REL

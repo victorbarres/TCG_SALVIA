@@ -2,7 +2,7 @@
 """
 @author: Victor Barres
 
-Test TCG description
+SALVIA production model
 """
 import random
 

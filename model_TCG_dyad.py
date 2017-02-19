@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author: Victor Barres
-Test cases for a system that incoporates production and comprehension
+TCG dyad model
 """
 import random
 

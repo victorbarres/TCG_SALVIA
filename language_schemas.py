@@ -14,12 +14,12 @@ Dependencies:
     - Uses TCG_graph
 """
 from __future__ import division
-import matplotlib.pyplot as plt
 import re
 import os
 import json
 import random
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import pyttsx
 

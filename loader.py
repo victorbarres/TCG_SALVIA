@@ -26,7 +26,7 @@ import concept as CPT
 import frame as FRM
 import percept as PER
 import construction as CXN
-import perceptual_schemas as PER_SCHEMAS
+import perceptual_schemas as ps
 import language_schemas  as ls
 import saliency_matlab as SMAT  
 
@@ -600,8 +600,8 @@ class TCG_LOADER(object):
         for i in  [s for s in scene_input['schemas'].keys() if scene_input['schemas'][s]['type'] != 'RELATION']: # First instantiate all the schemas that are not relations.
             dat = scene_input['schemas'][i]
             schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
-            inst = PER_SCHEMAS.PERCEPT_SCHEMA_INST(schema, trace=schema)
-            area = PER_SCHEMAS.AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1])
+            inst = ps.PERCEPT_SCHEMA_INST(schema, trace=schema)
+            area = ps.AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1])
             area.set_BU_saliency(BU_saliency_map=None) # THIS NEEDS TO BE CHANGED (for now random)    
             inst.set_area(area)
             if dat['saliency'] == 'auto':
@@ -614,10 +614,10 @@ class TCG_LOADER(object):
         for i in  [s for s in scene_input['schemas'].keys() if scene_input['schemas'][s]['type'] == 'RELATION']: # Now dealing with relations
             dat = scene_input['schemas'][i]
             schema = [schema for schema in per_schemas if schema.content['percept'].name == dat['schema']][0]
-            inst = PER_SCHEMAS.PERCEPT_SCHEMA_INST(schema, trace=schema)
+            inst = ps.PERCEPT_SCHEMA_INST(schema, trace=schema)
             inst.content['pFrom'] = name_table[dat['from']]
             inst.content['pTo'] = name_table[dat['to']]
-            area = PER_SCHEMAS.AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1]) # This means that the area is gonna be of size 0
+            area = ps.AREA(x=dat['location'][0], y=dat['location'][1], w=dat['size'][0], h=dat['size'][1]) # This means that the area is gonna be of size 0
             area.set_BU_saliency(BU_saliency_map=None) # THIS NEEDS TO BE CHANGED (for now random)            
             inst.set_area(area)
             if dat['saliency'] == 'auto':

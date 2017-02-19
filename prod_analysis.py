@@ -5,6 +5,7 @@ Created on Thu Jun 16 15:33:26 2016
 @author: victor
 """
 from __future__ import division
+
 import numpy as np
 
 #########################################

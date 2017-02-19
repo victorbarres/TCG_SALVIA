@@ -9,6 +9,7 @@ Uses scipy.io to read .mat files.
 The matlab saliency toolbox should have already generated the .mat files containing bottom-up saliency information.
 """
 from __future__ import division
+
 import scipy.io as sio
 
 class SALIENCY_PARAMS:

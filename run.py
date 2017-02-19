@@ -5,10 +5,10 @@ Created on Mon Feb 13 10:42:04 2017
 @author: victor barres
 Run models
 """
-import model_TCG_production as TCG_prod
-import model_TCG_comprehension as TCG_comp
 import sys
 
+import model_TCG_production as TCG_prod
+import model_TCG_comprehension as TCG_comp
 def run_model():
     """
     """

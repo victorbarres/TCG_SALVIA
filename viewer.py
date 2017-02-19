@@ -15,10 +15,13 @@ import SocketServer
 import webbrowser
 import subprocess
 import pydot
+
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
 from PIL import Image
+
 import construction
 import percept
 import perceptual_schemas

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author: Victor Barres
-Test cases for the comprehension language schemas defined in language_schemas.py
+TCG comprehension model
 """
 from __future__ import division
 import random

@@ -3,6 +3,7 @@
 @author: Victor Barres
 """
 import random
+
 from TCG_models import TCG_full_system
 
 def test(seed=None):
