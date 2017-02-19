@@ -1,10 +1,7 @@
 *.py[cod]
-tmp/*
 output/*
-viewer/tmp/*
-data/scenes/*.mat
+tcg_salvia/tcg_salvia/tmp/*
+tcg_salvia/tcg_salvia/viewer/tmp/*
+*/tmp/*
 *.mat
-to_fix/
 TOADD.txt
-data_analysis/
-simulation_analyses/analyses/
