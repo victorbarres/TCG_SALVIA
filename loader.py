@@ -23,11 +23,12 @@ import re
 
 import scene as SCN
 import concept as CPT
+import frame as FRM
 import percept as PER
 import construction as CXN
 import perceptual_schemas as PER_SCHEMAS
 import language_schemas  as ls
-import saliency_matlab as SMAT
+import saliency_matlab as SMAT  
 
 class TCG_LOADER(object):
 
@@ -61,7 +62,8 @@ class TCG_LOADER(object):
     ### CONCEPT ###
     @staticmethod
     def read_concept(atype, sup_cpt, cpt_knowledge, cpt_data):
-        
+        """
+        """
         for concept in cpt_data:
             # Create new concept entity
             sub_cpt = cpt_knowledge.find_meaning(concept)
@@ -82,12 +84,94 @@ class TCG_LOADER(object):
                 return False
         
         return True
+        
+    #############
+    ### FRAME ###
+    @staticmethod
+    def read_frame_node(new_frame, aNode, name_table, cpt_knowledge):
+        """
+        """
+        # Create new node
+        new_node = FRM.WK_FRAME_NODE()
+        name = aNode['name']
+        new_node.name = '%s_%i' %(name, new_node.id)
+        
+        concept = cpt_knowledge.find_meaning(aNode['concept'])
+        if not concept:
+            error_msg = "Cannot find concept %s in conceptual knowledge" %aNode['concept']
+            raise ValueError(error_msg)
+        new_node.concept = concept
+        
+        if 'frame' in aNode:
+            new_node.frame = aNode['frame']
+        
+        # Update construction and name_table    
+        new_frame.add_frame_elem(new_node)
+        name_table['names'][name] = new_node
+        
+    @staticmethod
+    def read_frame_rel(new_frame, aRel, name_table, cpt_knowledge):
+        """
+        """    
+        # Create new relation
+        new_rel = FRM.WK_FRAME_REL
+        name = aRel['name']
+        new_rel.name = '%s_%i' %(name, new_rel.id)
+        
+        
+        concept = cpt_knowledge.find_meaning(aRel['concept'])
+        new_rel.concept = concept
     
+        pFrom = aRel['from']
+        pTo = aRel['to']
+        
+        # Check that both to and from are defined for the edge
+        if not(pFrom and pTo):
+            return False
+        
+        # Update construction and name table
+        new_frame.add_frame_elem(new_rel)
+        name_table['names'][name] = new_rel
+        name_table['rels'][name] = (pFrom, pTo)
+
+    @staticmethod           
+    def read_wk_frame(frame_knowledge, aFrame, cpt_knowledge):
+        """
+        """
+        # Create new frame  
+        new_frame = FRM.WK_FRAME()
+        new_frame.name = aFrame['name']
+        if 'preference' in aFrame:
+            new_frame.preference = aFrame['preference']
+        
+        # Name table
+        name_table = {'names':{}, 'rels':{}}
+        for node in aFrame['nodes']:
+            TCG_LOADER.read_frame_node(new_frame, node, name_table, cpt_knowledge)
+        for rel in aFrame['edges']:
+            TCG_LOADER.read_rel(new_frame, rel, name_table, cpt_knowledge)
+        
+        for rel_name, node_pair in name_table['rels'].iteritems(): # Creating Frame relations
+            from_name = node_pair[0]
+            to_name = node_pair[1]
+            if(not(name_table['names'].has_key(rel_name) and 
+                name_table['names'].has_key(from_name) and 
+                name_table['names'].has_key(to_name))):
+                error_msg = "Unknown FrameRel bounding."
+                raise ValueError(error_msg)
+           
+            frame_elem = name_table['names'][rel_name]
+            frame_elem.pFrom = name_table['names'][from_name]
+            frame_elem.pTo = name_table['names'][to_name]
+        
+        new_frame._create_NX_graph() # Creating NetworkX implementation of Frame
+   
     ###############
     ### PERCEPT ###
     @staticmethod
     def read_percept(atype, sup_per, per_knowledge, per_data):
-        
+        """
+        """
         for percept in per_data:
             # Create new percept entity
             sub_per = PER.PERCEPT_CAT(name=percept, meaning=percept)
@@ -162,7 +246,6 @@ class TCG_LOADER(object):
         concept = cpt_knowledge.find_meaning(aRel['concept'])
         new_rel.concept = concept
     
-        
         pFrom = aRel['from']
         pTo = aRel['to']
         
@@ -409,6 +492,25 @@ class TCG_LOADER(object):
             return None
     
         return my_conceptual_knowledge
+        
+    @staticmethod
+    def load_frame_knowledge(file_name='', file_path='./', cpt_knowledge = None):
+        """
+        Loads and returns the frame knowledge defined in file_path\file_name. Return None if error.
+        Requires a cpt_knowledge (CONCEPTUAL_KNOWLEDGE)
+        """
+        # Open and read file
+        json_data = TCG_LOADER.json_read(file_name, path=file_path)
+        frame_data = json_data['WK_FRAMES']
+        
+        # Create frame knowledge object
+        my_frame_knowledge = FRM.FRAME_KNOWLEDGE()
+        
+        for frame in frame_data:
+            wk_frame = TCG_LOADER.read_wk_frame(frame, cpt_knowledge)
+            my_frame_knowledge.add_ent(wk_frame)
+    
+        return my_frame_knowledge
         
     @staticmethod       
     def load_perceptual_knowledge(file_name='', file_path='./'):

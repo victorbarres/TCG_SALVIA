@@ -377,7 +377,7 @@ class FRAME(object):
                 return elem
         return None
     
-    def add_FRAME_elem(self, frame_elem):
+    def add_frame_elem(self, frame_elem):
         """
         Add frame_elem (FRAME_ELEM) to the Frame.
         If frame_elem is a NODE, it is added to nodes.

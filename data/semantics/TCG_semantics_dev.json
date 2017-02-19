@@ -193,27 +193,52 @@
 	},
 	
 	"WK_FRAMES":[
+		
 		{"name" : "ANIMATE_AGENT",
 		"preference" : 1,
-		"WK_Frame" : ["EVENT(evt, F)", "TRANS_ACT(a, F)", "ENTITY(e1,F)", "ANIMATE(animate)", "ENTITY(e2, F)", "IS(is1)", "IS(is2)", "is1(evt, a)", "is2(e1, animate)"]
+		"WK_Frame" : {
+			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
+						],
+			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
+					]}
+			
+		["EVENT(evt, F) &  TRANS_ACT(a, F) & ENTITY(e1,F) & ANIMATE(animate) & ENTITY(e2, F) & IS(is1) & IS(is2) & is1(evt, a) & is2(e1, animate)"]
 		},
 		
 		{"name" : "EAT_EVENT",
 		"preference" : 1,
-		"WK_Frame": ["EVENT(evt, F)", "TRANS_ACT(a, F)", "EAT(eat)", "ANIMATE(animate, F)", "FOOD(food, F)",
-				"IS(is1)", "is1(evt, a)",  "IS(is2)", "is2(a, eat)", "AGENT(agt)", "agt(a, animate)", "PATIENT(pt)", "pt(a, food)"]
+		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT(a, F) & EAT(eat) & ANIMATE(animate, F) & FOOD(food, F) & IS(is1) & is1(evt, a) & IS(is2) & is2(a, eat) & AGENT(agt) & agt(a, animate) & PATIENT(pt) & pt(a, food)"]
 		},
 		
 		{"name" : "RIDE_EVENT1",
 		"preference" : 1,
-		"WK_Frame": ["EVENT(evt, F)", "TRANS_ACT"(a, F)", "RIDE(ride)", "ENTITY(e1, F)", "ENTITY(e2, F)", "MAN(man)", "MOTORCYCLE(motorcycle)",
-				"IS(is1)", "is1(evt, a)",  "IS(is2)", "is2(a, ride)", "IS(is3)", "is3(e1, man)", "IS(is4)", "is4(e2, motorcycle)", "AGENT(agt)", "agt(a, e1)", "PATIENT(pt)", "pt(a, e2)"]
+		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & MAN(man) & MOTORCYCLE(motorcycle) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, man) & IS(is4) & is4(e2, motorcycle) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
 		},
 		
 		{"name" : "RIDE_EVENT2",
 		"preference" : 1,
-		"WKFrame": ["EVENT(evt, F)", "TRANS_ACT"(a, F)", "RIDE(ride)", "ENTITY(e1, F)", "ENTITY(e2, F)", "GIRL(girl)", "MERRY_GO_ROUND(mgr)",
-				"IS(is1)", "is1(evt, a)",  "IS(is2)", "is2(a, ride)", "IS(is3)", "is3(e1, girl)", "IS(is4)", "is4(e2, mgr)", "AGENT(agt)", "agt(a, e1)", "PATIENT(pt)", "pt(a, e2)"]
+		"WKFrame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & GIRL(girl) & MERRY_GO_ROUND(mgr) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, girl) & IS(is4) & is4(e2, mgr) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
+		}
+		
+		
+		{"name" : "ANIMATE_AGENT",
+		"preference" : 1,
+		"WK_Frame" : ["EVENT(evt, F) &  TRANS_ACT(a, F) & ENTITY(e1,F) & ANIMATE(animate) & ENTITY(e2, F) & IS(is1) & IS(is2) & is1(evt, a) & is2(e1, animate)"]
+		},
+		
+		{"name" : "EAT_EVENT",
+		"preference" : 1,
+		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT(a, F) & EAT(eat) & ANIMATE(animate, F) & FOOD(food, F) & IS(is1) & is1(evt, a) & IS(is2) & is2(a, eat) & AGENT(agt) & agt(a, animate) & PATIENT(pt) & pt(a, food)"]
+		},
+		
+		{"name" : "RIDE_EVENT1",
+		"preference" : 1,
+		"WK_Frame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & MAN(man) & MOTORCYCLE(motorcycle) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, man) & IS(is4) & is4(e2, motorcycle) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
+		},
+		
+		{"name" : "RIDE_EVENT2",
+		"preference" : 1,
+		"WKFrame": ["EVENT(evt, F) & TRANS_ACT"(a, F) & RIDE(ride) & ENTITY(e1, F) & ENTITY(e2, F) & GIRL(girl) & MERRY_GO_ROUND(mgr) & IS(is1) & is1(evt, a)",  "IS(is2) & is2(a, ride) & IS(is3) & is3(e1, girl) & IS(is4) & is4(e2, mgr) & AGENT(agt) & agt(a, e1) & PATIENT(pt) & pt(a, e2)"]
 		}
 	
 	],

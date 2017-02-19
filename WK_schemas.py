@@ -6,7 +6,7 @@ Defines World knowledge schemas for TCG.
 """
 from __future__ import division
 
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, SYSTEM_SCHEMA, LTM, WM, ASSEMBLAGE
+from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, LTM, WM
 from viewer import TCG_VIEWER
 
 ####################################

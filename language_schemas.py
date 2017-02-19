@@ -3404,11 +3404,15 @@ class ISRF_INTERPRETER(object):
         returns the associated set of concept schema instances
         
         Args:
-            - propositions ([STR]): An array of ISRF defined terms.
+            - proposition ([STR]) or (STR): An array of ISRF defined terms (or string with terms separated by '&'))
 
         Notes:
             - A concept is only interpreted into an instance once. Following interpretations are skipped.
         """
+        connector = '&'
+        if isinstance(proposition, str):
+            proposition = [s.strip() for s in proposition.split(connector)]
+                           
         # For reference.
 #        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
 #        cpt_name_pattern = r"[A-Z0-9_]+"
@@ -3419,51 +3423,59 @@ class ISRF_INTERPRETER(object):
         
         # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var, F, act) - act and F optional -  or var1(var2, var3) (and ?CONCEPT(var))
         func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
-        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation does without activation
+        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation activation is defined alongside the relation concept.
         
         instances = []
+        
+        cpts_match = []
+        rels_match = []
         for term in proposition:
-            # Case1:
             match1 = re.search(func_pattern_cpt, term)
             match2 = re.search(func_pattern_rel, term)
             if match1:
-                dat = match1.groupdict()
-                cpt_var = dat['cpt_var'] == '?'
-                concept = dat['operator']
-                var = dat['var']
-                if self.name_table.has_key(var): # Do not reinterpret a schema inst that has already been interpreted.
-                    cpt_inst = self.name_table[var]
-                    instances.append(cpt_inst)
-                    continue
-                cpt_schema = self.conceptLTM.find_schema(name=concept)
-                cpt_frame = dat.get('frame', None)
-                cpt_act = dat.get('act', None)
-                    
-                cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
-                cpt_inst.trace['per_inst'] = cpt_inst.name # Trick to facilitate bypassing visualWM when necessary.
-                if cpt_frame:
-                    cpt_inst.frame = True
-                if cpt_act:
-                    cpt_inst.set_activation(float(cpt_act))
-                if cpt_var:
-                    cpt_inst.unbound = True
-                self.name_table[var] = cpt_inst
-                instances.append(cpt_inst)
-            
+                cpts_match.append(match1)
             elif match2:
-                dat = match2.groupdict()
-                rel = dat['operator']
-                arg1 = dat['var1']
-                arg2 = dat['var2']
-                if not((rel in self.name_table) and (arg1 in self.name_table) and (arg2 in self.name_table)):
-                    print "ERROR: variable used before it is defined."
-                else:
-                    rel_inst = self.name_table[rel]
-                    rel_inst.content['pFrom'] = self.name_table[arg1]
-                    rel_inst.content['pTo'] = self.name_table[arg2]
+                rels_match.append(match2)
             else:
-                print "ERROR, unknown formula"
-                print term
+                error_msg = "Unknown formula %s" %term
+                raise ValueError(error_msg)
+                
+        for match in cpts_match: #First process define concept schemas
+            dat = match.groupdict()
+            cpt_var = dat['cpt_var'] == '?'
+            concept = dat['operator']
+            var = dat['var']
+            if self.name_table.has_key(var): # Do not reinterpret a schema inst that has already been interpreted.
+                cpt_inst = self.name_table[var]
+                instances.append(cpt_inst)
+                continue
+            cpt_schema = self.conceptLTM.find_schema(name=concept)
+            cpt_frame = dat.get('frame', None)
+            cpt_act = dat.get('act', None)
+                
+            cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'per_inst':None, 'cpt_schema':cpt_schema, 'ref':var}) # 'ref' is used to track referent.
+            cpt_inst.trace['per_inst'] = cpt_inst.name # Trick to facilitate bypassing visualWM when necessary.
+            if cpt_frame:
+                cpt_inst.frame = True
+            if cpt_act:
+                cpt_inst.set_activation(float(cpt_act))
+            if cpt_var:
+                cpt_inst.unbound = True
+            self.name_table[var] = cpt_inst
+            instances.append(cpt_inst)
+        
+        for match in rels_match: # Then build the relations
+            dat = match.groupdict()
+            rel = dat['operator']
+            arg1 = dat['var1']
+            arg2 = dat['var2']
+            if not((rel in self.name_table) and (arg1 in self.name_table) and (arg2 in self.name_table)):
+                error_msg = "ISRF variable used before it is defined."
+                raise ValueError(error_msg)
+            else:
+                rel_inst = self.name_table[rel]
+                rel_inst.content['pFrom'] = self.name_table[arg1]
+                rel_inst.content['pTo'] = self.name_table[arg2]
                     
         return instances
     
@@ -3482,6 +3494,7 @@ class ISRF_WRITER(object):
         self.var_table = {}
         self.data = {}
         self.var_id = 0
+        self.connector = '&'
     def reset(self):
         """ Resets writer.
         """

@@ -5,8 +5,22 @@
 Define semantic network related classes for TCG.
 """
 from __future__ import division
-from knowledge_rep import FRAME
+from knowledge_rep import FRAME, FRAME_NODE, FRAME_REL
 
+class WK_FRAME_NODE(FRAME_NODE):
+    """
+    For now doesn't add anythong to the FRAME_NODE class
+    """
+    def __init__(self):
+        FRAME_NODE.__init__(self)
+    
+class WK_FRAME_REL(FRAME_REL):
+    """
+    For now doesn't add anythong to the FRAME_REL class
+    """
+    def __init__(self):
+        FRAME_REL.__init__(self)
+    
 class WK_FRAME(FRAME):
     """ Defines a WK_Frame object  
     Data (inherited):
