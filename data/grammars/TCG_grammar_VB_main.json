@@ -1256,6 +1256,32 @@
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "merry-go-round"}],
 		"SymLinks" : {"N1" : "S1"}
+	},
+	{
+		"name" : "CAKE",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "CAKE", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "cake"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	{
+		"name" : "APPLE",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "MERRY_GO_ROUND", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "apple"}],
+		"SymLinks" : {"N1" : "S1"}
 	}
 ],
 

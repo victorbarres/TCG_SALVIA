@@ -12,17 +12,24 @@
 			{
 				"HUMAN" :
 				{
-					"MAN" : {},
-					"BOY" : {}, 
-					"WOMAN" : {}, 
-					"GIRL" : {},
 					"PEOPLE" : {},
 					"BALLERINA" : {},
 					"CELLIST" :{},
 					"FENCER" : {},
 					"ROBBER" : {},
 					"POLICEMAN" : {},
-					"HUNTER" : {}
+					"HUNTER" : {},
+					"ADULT" : 
+					{
+						"MAN" : {},
+						"WOMAN" " {}
+					},
+					"CHILD" :
+					{
+						"BOY": {},
+						"GIRL" :{}
+					}
+					
 				},
 				"ITEM" : 
 				{
@@ -35,7 +42,9 @@
 					},
 					"FOOD":
 					{
-						"BREAD": {}
+						"BREAD": {},
+						"CAKE" : {},
+						"APPLE" : {}
 					},
 					"CELLO" : {},
 					"TREE" : {},
@@ -45,8 +54,14 @@
 					"BOOKSHELF" :{},
 					"WAGON" : {}, 
 					"BALL" :{},
-					"MOTORCYCLE" : {},
-					"MERRY_GO_ROUND" : {}
+					"TOY" :
+					{
+						"MERRY_GO_ROUND" : {}
+					},
+					"VEHICLE" :
+					{
+						"MOTORCYCLE" : {},
+					}
 				},
 				"ANIMAL" : 
 				{
@@ -237,13 +252,13 @@
 						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
 						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "MAN", "concept" : "MAN", "frame" : false},
+						{"name" : "ADULT", "concept" : "ADULT", "frame" : false},
 						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "MOTORCYCLE", "concept" : "MOTORCYCLE", "frame" : false}
+						{"name" : "VEHICLE", "concept" : "VEHICLE", "frame" : false}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
-						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "MAN"},
-						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "MOTORCYCLE"},
+						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ADULT"},
+						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "VEHICLE"},
 						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
@@ -257,13 +272,13 @@
 						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
 						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "GIRL", "concept" : "GIRL", "frame" : false},
+						{"name" : "CHILD", "concept" : "CHILD", "frame" : false},
 						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "MGR", "concept" : "MERRY_GO_ROUND", "frame" : false}
+						{"name" : "TOY", "concept" : "TOY", "frame" : false}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
-						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "GIRL"},
-						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "MGR"},
+						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "CHILD"},
+						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "TOY"},
 						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
@@ -314,7 +329,9 @@
 			"BALL",
 			"BREAD",
 			"MOTORCYCLE",
-			"MERRY_GO_ROUND"
+			"MERRY_GO_ROUND",
+			"CAKE",
+			"APPLE"
 		],
 		
 		"PLACE":
@@ -466,7 +483,9 @@
 		"BALL" : ["BALL"],
 		"BREAD" : ["BREAD"],
 		"MOTORCYCLE" : ["MOTORCYCLE"],
-		"MERRY_GO_ROUND" : ["MERRY_GO_ROUND"]
+		"MERRY_GO_ROUND" : ["MERRY_GO_ROUND"],
+		"CAKE" : ["CAKE"],
+		"APPLE" : ["APPLE"],
 		
 		"SQUIRT" : ["SQUIRT"],
 		"TALK" : ["TALK"],
