@@ -1,4 +1,4 @@
-TCG Tutorial
+TCG-SALVIA Tutorial
 ===============================
 
 Coming soon!

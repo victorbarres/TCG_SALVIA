@@ -15,7 +15,7 @@ import json
 from model_def import TCG_production_system
 from ..schemas.viewer import VIEWER
 from ..schemas.loader import LOADER
-from ..neuro_ST.schema_theory import st_save
+from ..neuro_st.schema_theory import st_save
 from ..sim_analysis.prod_analysis import prod_summary, BLEU
 from ..schemas import language_schemas as ls
 

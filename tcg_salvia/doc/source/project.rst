@@ -1,4 +1,4 @@
-TCG project description
+TCG-SALVIA project description
 ===============================
 
 Coming soon!

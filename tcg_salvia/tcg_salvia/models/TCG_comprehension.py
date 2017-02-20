@@ -49,7 +49,7 @@ def set_inputs(model, ling_input_file='ling_inputs.json', speed_param=10, offset
     Returns:
         - input UTTER_GENERATOR object.
     """
-    LING_INPUT_PATH = './data/ling_inputs/'
+    LING_INPUT_PATH = '../data/ling_inputs/'
     ling_inputs = LOADER.load_ling_input(ling_input_file, LING_INPUT_PATH)
     
     utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset)
@@ -173,7 +173,7 @@ def run_diagnostic():
     MAX_TIME = 900
     SPEED_PARAM = 30
     OFFSET = 10
-    with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
+    with open('../data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
     input_names = json_data['inputs'].keys()
     print "\nInput list:\n %s" %'\n '.join(input_names)
