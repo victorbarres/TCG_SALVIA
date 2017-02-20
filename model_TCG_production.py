@@ -322,8 +322,8 @@ def run_diagnostics(verbose=3, prob_times=[]):
     grammar_name='TCG_grammar_VB_main'  
     max_time =1000
     seed=None
-    save = True
-    anim = False
+    save = False
+    anim = True
     anim_step = 1
     ###    
     
