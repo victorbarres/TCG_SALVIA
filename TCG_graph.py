@@ -71,9 +71,10 @@ def find_sub_multi_iso(G, G_subgraphs, G_pat, node_match=None, edge_match=None):
             u2 = iso["nodes"][u1]
             v2 = iso["nodes"][v1]
             target_edges = G[u2][v2]
+            iso["edges"][(k1, u1,v1)] = []
             for k2,attr2 in target_edges.iteritems():
                 if attr1['val'] == attr2['val']:
-                    iso["edges"][(k1, u1,v1)] = (k2,u2, v2)
+                    iso["edges"][(k1, u1,v1)].append((k2,u2, v2))
         sub_iso.append(iso)
         
     return sub_iso
@@ -135,6 +136,8 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
     
     # Filtering
     subgraphs = [subG for subG in subgraphs if subgraph_filter(subG)]
+                 
+    return subgraphs
         
 def list_powerset(lst):
     """
@@ -252,7 +255,7 @@ def test2():
     
     G.add_node(0, attr_dict={'val':1})
     G.add_node(1, attr_dict={'val':2})
-    G.add_node(2, attr_dict={'val':0})
+    G.add_node(2, attr_dict={'val':3})
     G.add_node(3, attr_dict={'val':0})
     
     G.add_edge(0,1, attr_dict={'val':1})
@@ -262,7 +265,6 @@ def test2():
     G.add_edge(1,2, attr_dict={'val':2})
     G.add_edge(2,0, attr_dict={'val':1})
 
-    print G[1][2]
     
     # Graph pattern
     G_pat= nx.MultiDiGraph()
@@ -274,39 +276,16 @@ def test2():
     G_pat.add_edge("a","b", attr_dict={'val':1})
     G_pat.add_edge("b","c", attr_dict={'val':1})
     
-    print G_pat.edges(data=True, keys=True)
     G_subgraphs = build_submultigraphs(G, induced='edge') # In this example, if induced = 'nodes' it won't find any isomorphisms.
     
     # Generic match functions
-    op = lambda x,y: True
+    op = lambda x,y: x == y
+    nm_gen = node_iso_match("val", 0, op)
+    em_gen = multi_edge_iso_match("val", 0, op)
+    sub_iso = find_sub_multi_iso(G, G_subgraphs, G_pat, node_match = nm_gen, edge_match=em_gen)
     
-    node_match = isomorphism.generic_node_match("val", 0, op)
-    edge_match = isomorphism.generic_multiedge_match("val", 0, op)
-    sub_iso = []
-    mappings = []
-    for subgraph in G_subgraphs:
-            MultDiGM = isomorphism.MultiDiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
-            if MultDiGM.is_isomorphic():
-                mappings.append(MultDiGM.mapping)
-    for mapping in mappings:
-        iso = {"nodes":{}, "edges":{}}
-        for key in mapping:
-            iso["nodes"][mapping[key]] = key # reverse mapping for convenience (SemFrame -> SemRep)        
-        for u1,v1,k1,attr1 in G_pat.edges(data=True, keys=True): # Add mapping between edges
-            u2 = iso["nodes"][u1]
-            v2 = iso["nodes"][v1]
-            target_edges = G[u2][v2]
-            print target_edges
-            for k2,attr2 in target_edges.iteritems():
-                if attr1['val'] == attr2['val']:
-                    iso["edges"][(k1, u1,v1)] = (k2,u2, v2)
-        sub_iso.append(iso)
-    
-    print sub_iso
-    
-    print mappings
-    
-    
+    if sub_iso:
+        print sub_iso
     
 ###############################################################################
 if __name__=="__main__":
