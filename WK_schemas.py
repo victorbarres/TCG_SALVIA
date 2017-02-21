@@ -7,6 +7,7 @@ Defines World knowledge schemas for TCG.
 from __future__ import division
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, LTM, WM
+import TCG_graph
 
 ####################################
 ##### WORLD KNOWLEDGE SCHEMAS ######
@@ -42,16 +43,16 @@ class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
 ##########################################
 ##### WORLD KNOWLEDGE SYSTEM SCHEMAS #####
 ##########################################
-class FRAME_LTM(LTM):
+class WK_FRAME_LTM(LTM):
     """
      Initilize the state of the FRAME LTM with WK_frame_schemas based on the content of frame_knowledge
        
     Args:
         - frame_knowledge (FRAME_KNOWLEDGE):
     """
-    def __init__(self, name='Frame_LTM'):
+    def __init__(self, name='WK_frame_LTM'):
         LTM.__init__(self, name)
-        self.add_port('OUT', 'to_frame_WM')
+        self.add_port('OUT', 'to_wk_frame_WM')
         self.frame_knowledge = None
         self.params['init_act'] = 1
         
@@ -64,13 +65,12 @@ class FRAME_LTM(LTM):
         """
         self.frame_knowledge = frame_knowledge
         
-        
         for frame in frame_knowledge.frames:
             new_schema = WK_FRAME_SCHEMA(name=frame.name, frame=frame, init_act=self.params['init_act'])
             self.add_schema(new_schema)
     
     def process(self):
-        self.outputs['to_frame_WM'] =  self.schemas
+        self.outputs['to_wk_frame_WM'] = self.schemas
         
     ####################
     ### JSON METHODS ###
@@ -78,23 +78,23 @@ class FRAME_LTM(LTM):
     def get_info(self):
         """
         """
-        data = super(FRAME_LTM, self).get_info()
+        data = super(WK_FRAME_LTM, self).get_info()
         data['params'] = self.params
         return data
 
-class FRAME_WM(WM):
+class WK_FRAME_WM(WM):
     """
     """
-    def __init__(self, name='Frame_WM'):
+    def __init__(self, name='WK_frame_WM'):
         WM.__init__(self, name)
-        self.add_port('IN', 'from_frame_LTM')
+        self.add_port('IN', 'from_wk_frame_LTM')
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('IN', 'from_semantic_WM')
         
     def reset(self):
         """
         """
-        super(FRAME_WM, self).reset()
+        super(WK_FRAME_WM, self).reset()
         
     def process(self):
         """

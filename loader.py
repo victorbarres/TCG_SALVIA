@@ -769,7 +769,9 @@ def test():
     """ Loader test function
     """
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics_dev.json", "./data/semantics/")
-    my_frame_knowledge = TCG_LOADER.load_frame_knowledge("TCG_semantics_dev.json", "./data/semantics/", my_conceptual_knowledge)      
+    my_frame_knowledge = TCG_LOADER.load_frame_knowledge("TCG_semantics_dev.json", "./data/semantics/", my_conceptual_knowledge)   
+    for f in my_frame_knowledge.frames:
+        f.show()
 #    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics_main.json", "./data/semantics/")
 #    my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics_main.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
 #    my_grammar = TCG_LOADER.load_grammar("TCG_grammar_VB_main.json", "./data/grammars/", my_conceptual_knowledge)
@@ -777,12 +779,9 @@ def test():
 #    
 #    my_cxn = my_grammar.find_construction('WOMAN')
 #    my_cxn.show()
-    return my_frame_knowledge
 ###############################################################################
 if __name__=='__main__':
-    my_frame_knowledge = test()
-    for f in my_frame_knowledge.frames:
-        f.show()
+    test()
     
 
     
