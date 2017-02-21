@@ -2206,7 +2206,7 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             return False
         
         # Build SemRep subgraphs
-        SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='vertex', subgraph_filter=subgraph_filter)
+        SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='edges', subgraph_filter=subgraph_filter)
         
         for cxn_schema in cxn_schemas:
             sub_iso = self.SemMatch_cat(SemRep_subgraphs, cxn_schema)

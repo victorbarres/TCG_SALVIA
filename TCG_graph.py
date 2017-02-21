@@ -7,8 +7,7 @@ TCG graph operations
 Uses networkx
 """
 from __future__ import division
-import networkx as nx
-from networkx import DiGraph
+from networkx import DiGraph, MultiDiGraph
 from networkx.algorithms import isomorphism
 
 ## Find subgraph isomorphisms ###
@@ -42,28 +41,38 @@ def find_sub_iso(G_subgraphs, G_pat, node_match=None, edge_match=None):
     
     return sub_iso
     
-def build_subgraphs(G, induced='vertex', subgraph_filter=lambda x:True):
+def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True, graph_type='DiGraph'):
     """
     Returns the list of subgraphs of G filtered by subgraph_filter
     induced:
-        -> 'vertex': vertex induced subgraphs + single nodes
+        -> 'edges': edge induced subgraphs + single nodes
         -> 'node': node induced subgraphs.
     """
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
         subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set] # Builds all the node induced subgraphs.
-    if induced == 'vertex':
-        vertex_powerset = list_powerset(G.edges(data=True))
+    if induced == 'edge':
+        edge_powerset = list_powerset(G.edges(data=True))
+        print len(edge_powerset)
         subgraphs = []
-        for v_list in vertex_powerset:
-            subG = DiGraph(v_list) # Creating subraph from vertices
+        for v_list in edge_powerset:
+            if graph_type=='DiGraph': # Creating subraph from edges
+                subG = DiGraph(v_list)
+            elif graph_type=='MultiDiGraph':
+                subG = MultiDiGraph(v_list)
             for n in subG.node.keys():
                 subG.node[n] = G.node[n] # Transfering node attributes
             subgraphs.append(subG)
             
         # Adding single nodes
         for n, d in G.nodes(data=True):
-            subG = DiGraph()
+            if graph_type=='DiGraph':
+                subG = DiGraph()
+            elif graph_type=='MultiDiGraph':
+                subG = MultiDiGraph()
+            else:
+                error_msg = "Unknown graph type %s\nUse 'DiGraph' or 'MultiDiGraph'" %graph_type
+                raise ValueError(error_msg)
             subG.add_node(n,d)
             subgraphs.append(subG)
     
@@ -108,9 +117,14 @@ def edge_iso_match(attr, attr_default, op):
     """
     em = isomorphism.generic_edge_match(attr, attr_default, op)
     return em
-###############################################################################
-if __name__=="__main__":
-    import networkx as nx    
+    
+    
+def test1():
+    """Test Digraph isomorphisms
+    """
+    import networkx as nx   
+    import matplotlib.pyplot as plt
+    
     # Main graph
     G = nx.DiGraph()
     
@@ -124,6 +138,7 @@ if __name__=="__main__":
     G.add_edge(2,0, attr=-1)
     
     nx.draw(G)
+    plt.show()
     
     # Graph pattern
     G_pat= nx.DiGraph()
@@ -136,8 +151,9 @@ if __name__=="__main__":
     G_pat.add_edge("b","c", attr=-1)
     
     nx.draw(G_pat)
+    plt.show()
     
-    G_subgraphs = build_subgraphs(G, induced='vertex') # In this example, if induced = 'nodes' it won't find any isomorphisms.
+    G_subgraphs = build_subgraphs(G, induced='node') # In this example, if induced = 'nodes' it won't find any isomorphisms.
     
     # Categorical match functions
     nm_cat = isomorphism.categorical_node_match("attr", 1)
@@ -156,3 +172,73 @@ if __name__=="__main__":
     
     if sub_iso:
         print sub_iso[0]["nodes"].values()
+        
+def test2():
+    """Test extension to MultiDiGraphs
+    """
+    import networkx as nx    
+    
+    # Main graph
+    G = nx.MultiDiGraph()
+    
+    G.add_node(0, attr_dict={'val':1})
+    G.add_node(1, attr_dict={'val':2})
+    G.add_node(2, attr_dict={'val':0})
+    G.add_node(3, attr_dict={'val':0})
+    
+    G.add_edge(0,1, attr_dict={'val':1})
+    G.add_edge(0,1, attr_dict={'val':2})
+    G.add_edge(0,1, attr_dict={'val':3})
+    G.add_edge(1,2, attr_dict={'val':1})
+    G.add_edge(1,2, attr_dict={'val':2})
+    G.add_edge(2,0, attr_dict={'val':1})
+
+    print G[1][2]
+    
+    # Graph pattern
+    G_pat= nx.MultiDiGraph()
+    
+    G_pat.add_node("a", attr_dict={'val':1})
+    G_pat.add_node("b", attr_dict={'val':2})
+    G_pat.add_node("c", attr_dict={'val':3})
+    
+    G_pat.add_edge("a","b", attr_dict={'val':1})
+    G_pat.add_edge("b","c", attr_dict={'val':1})
+    
+    print G_pat.edges(data=True, keys=True)
+    G_subgraphs = build_subgraphs(G, induced='edge', graph_type='MultiDiGraph') # In this example, if induced = 'nodes' it won't find any isomorphisms.
+    
+    # Generic match functions
+    op = lambda x,y: True
+    
+    node_match = isomorphism.generic_node_match("val", 0, op)
+    edge_match = isomorphism.generic_multiedge_match("val", 0, op)
+    sub_iso = []
+    mappings = []
+    for subgraph in G_subgraphs:
+            MultDiGM = isomorphism.MultiDiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
+            if MultDiGM.is_isomorphic():
+                mappings.append(MultDiGM.mapping)
+    for mapping in mappings:
+        iso = {"nodes":{}, "edges":{}}
+        for key in mapping:
+            iso["nodes"][mapping[key]] = key # reverse mapping for convenience (SemFrame -> SemRep)        
+        for u1,v1,k1,attr1 in G_pat.edges(data=True, keys=True): # Add mapping between edges
+            u2 = iso["nodes"][u1]
+            v2 = iso["nodes"][v1]
+            target_edges = G[u2][v2]
+            print target_edges
+            for k2,attr2 in target_edges.iteritems():
+                if attr1['val'] == attr2['val']:
+                    iso["edges"][(k1, u1,v1)] = (k2,u2, v2)
+        sub_iso.append(iso)
+    
+    print sub_iso
+    
+    print mappings
+    
+    
+    
+###############################################################################
+if __name__=="__main__":
+    test2()
