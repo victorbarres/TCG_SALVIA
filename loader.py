@@ -114,7 +114,7 @@ class TCG_LOADER(object):
         """
         """    
         # Create new relation
-        new_rel = FRM.WK_FRAME_REL
+        new_rel = FRM.WK_FRAME_REL()
         name = aRel['name']
         new_rel.name = '%s_%i' %(name, new_rel.id)
         
@@ -135,13 +135,13 @@ class TCG_LOADER(object):
         name_table['rels'][name] = (pFrom, pTo)
 
     @staticmethod           
-    def read_wk_frame(frame_knowledge, aFrame, cpt_knowledge):
+    def read_wk_frame(aFrame, cpt_knowledge):
         """
         """
         # Create new frame  
         new_frame = FRM.WK_FRAME()
         new_frame.name = aFrame['name']
-        aFrame =  aFrame['WK_frame']
+        aFrame =  aFrame['WK_Frame']
         if 'preference' in aFrame:
             new_frame.preference = aFrame['preference']
         
@@ -150,7 +150,7 @@ class TCG_LOADER(object):
         for node in aFrame['nodes']:
             TCG_LOADER.read_frame_node(new_frame, node, name_table, cpt_knowledge)
         for rel in aFrame['edges']:
-            TCG_LOADER.read_rel(new_frame, rel, name_table, cpt_knowledge)
+            TCG_LOADER.read_frame_rel(new_frame, rel, name_table, cpt_knowledge)
         
         for rel_name, node_pair in name_table['rels'].iteritems(): # Creating Frame relations
             from_name = node_pair[0]
@@ -166,6 +166,7 @@ class TCG_LOADER(object):
             frame_elem.pTo = name_table['names'][to_name]
         
         new_frame._create_NX_graph() # Creating NetworkX implementation of Frame
+        return new_frame
    
     ###############
     ### PERCEPT ###
@@ -509,7 +510,7 @@ class TCG_LOADER(object):
         
         for frame in frame_data:
             wk_frame = TCG_LOADER.read_wk_frame(frame, cpt_knowledge)
-            my_frame_knowledge.add_ent(wk_frame)
+            my_frame_knowledge.add_frame(wk_frame)
     
         return my_frame_knowledge
         
@@ -762,18 +763,21 @@ class TCG_LOADER(object):
         json_data = TCG_LOADER.json_read(file_name, path = file_path)
         ground_truths = json_data.get('ground_truths', {})
         return ground_truths
-            
-        
+  
+def test():
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics_dev.json", "./data/semantics/")
+    my_frame_knowledge = TCG_LOADER.load_frame_knowledge("TCG_semantics_dev.json", "./data/semantics/", my_conceptual_knowledge)      
+#    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics_main.json", "./data/semantics/")
+#    my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics_main.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
+#    my_grammar = TCG_LOADER.load_grammar("TCG_grammar_VB_main.json", "./data/grammars/", my_conceptual_knowledge)
+#    my_scene = TCG_LOADER.load_scene("TCG_scene.json", "./data/scenes/TCG_cholitas/")
+#    
+#    my_cxn = my_grammar.find_construction('WOMAN')
+#    my_cxn.show()
+    return my_frame_knowledge
 ###############################################################################
 if __name__=='__main__':
-    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics.json", "./data/semantics/")
-    my_conceptualization = TCG_LOADER.load_conceptualization("TCG_semantics.json", "./data/semantics/", my_conceptual_knowledge, my_perceptual_knowledge)
-    my_grammar = TCG_LOADER.load_grammar("TCG_grammar_VB.json", "./data/grammars/", my_conceptual_knowledge)
-    my_scene = TCG_LOADER.load_scene("TCG_scene.json", "./data/scenes/TCG_cholitas/")
-    
-    my_cxn = my_grammar.find_construction('WOMAN')
-    my_cxn.show()
+    test()
 
     
     

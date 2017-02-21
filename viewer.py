@@ -22,10 +22,9 @@ import matplotlib.patches as patches
 import numpy as np
 from PIL import Image
 
-import construction
-import percept
-import perceptual_schemas
-from loader import TCG_LOADER
+from construction import TP_PHON, TP_SLOT
+from percept import PERCEPT_CAT
+from perceptual_schemas import PERCEPT_SCHEMA_REL
 
 class TCG_VIEWER:
     """
@@ -52,8 +51,7 @@ class TCG_VIEWER:
         self.grammar = None
         self.scene = None
     ######################
-    ### Server methods ### 
-        
+    ### Server methods ###   
     def start_viewer(self):
         """
         Starts the viewer.
@@ -82,6 +80,7 @@ class TCG_VIEWER:
         """
         Copies and creates all the required data in viewer/tmp directory.
         """
+        from loader import TCG_LOADER
         if os.path.exists(self.VIEWER_TMP):
             shutil.rmtree(self.VIEWER_TMP)
         print os.getcwd()
@@ -100,7 +99,6 @@ class TCG_VIEWER:
 
     #####################################
     ### LTM knowledge display methods ###   
-    
     def _create_concept_img(self):
         """
         Create graph image for the conceptual knowledge.
@@ -337,7 +335,7 @@ class TCG_VIEWER:
         
         for per in per_knowledge.nodes:
             label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, per.name)
-            if isinstance(per, percept.PERCEPT_CAT):
+            if isinstance(per, PERCEPT_CAT):
                 node_shape=node_shape1
             else:
                 node_shape=node_shape2
@@ -467,10 +465,10 @@ class TCG_VIEWER:
         cluster_SynForm.set_bgcolor(SynForm_bg_color)
         pre_form = None
         for form in cxn.SynForm.form:
-            if isinstance(form, construction.TP_SLOT):
+            if isinstance(form, TP_SLOT):
                 new_node = pydot.Node(str(form), label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
                 cluster_SynForm.add_node(new_node)
-            elif isinstance(form, construction.TP_PHON):
+            elif isinstance(form, TP_PHON):
                 new_node = pydot.Node(str(form), label = form.cxn_phonetics, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
                 cluster_SynForm.add_node(new_node)
             if not(pre_form):
@@ -713,7 +711,7 @@ class TCG_VIEWER:
         
         #Add conceptualization links
         for per_inst in visWM.schema_insts:
-            if not(isinstance(per_inst.content, perceptual_schemas.PERCEPT_SCHEMA_REL)):
+            if not(isinstance(per_inst.content, PERCEPT_SCHEMA_REL)):
                 cpt_inst = per_inst.covers['cpt_inst'] # I am only going to show the node covers for simplicity
                 if cpt_inst:
                     new_edge = pydot.Edge(cpt_inst.name, per_inst.name, dir='both', color=cover_color, style=cover_style, splines='spline')
@@ -1030,7 +1028,7 @@ class TCG_VIEWER:
         
         # Display perceptual schemas and area
         for per_schema in scene.schemas:
-            if not(isinstance(per_schema.trace, perceptual_schemas.PERCEPT_SCHEMA_REL)):
+            if not(isinstance(per_schema.trace, PERCEPT_SCHEMA_REL)):
                 area = per_schema.content['area']
                 pos = (area.y, area.x)
                 rectangle = patches.Rectangle((pos[0], pos[1]), width=area.w, height=area.h, alpha=0.2,color=color_dict[per_schema.trace.type])

@@ -22,11 +22,11 @@
 					"ADULT" : 
 					{
 						"MAN" : {},
-						"WOMAN" " {}
+						"WOMAN" : {}
 					},
 					"CHILD" :
 					{
-						"BOY": {},
+						"BOY" : {},
 						"GIRL" :{}
 					}
 					
@@ -60,7 +60,7 @@
 					},
 					"VEHICLE" :
 					{
-						"MOTORCYCLE" : {},
+						"MOTORCYCLE" : {}
 					}
 				},
 				"ANIMAL" : 
@@ -259,7 +259,7 @@
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ADULT"},
 						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "VEHICLE"},
-						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
+						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "RIDE"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]}
@@ -279,7 +279,7 @@
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "CHILD"},
 						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "TOY"},
-						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
+						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "RIDE"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]}

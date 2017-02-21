@@ -27,7 +27,6 @@ import pyttsx
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, SYSTEM_SCHEMA, LTM, WM, ASSEMBLAGE
 import construction
 import TCG_graph
-from viewer import TCG_VIEWER
 
 #######################################
 ##### LANGUAGE KNOWLEDGE SCHEMAS ######
@@ -739,6 +738,7 @@ class SEMANTIC_WM(WM):
     ###################
     ### DISPLAY METHODS 
     def show_state(self):
+        from viewer import TCG_VIEWER
         TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
 
 class SEMANTIC_WM_P(WM):
@@ -895,6 +895,7 @@ class SEMANTIC_WM_P(WM):
     ### DISPLAY METHODS ###
     #######################
     def show_state(self):
+        from viewer import TCG_VIEWER
         TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
         
 class SEMANTIC_WM_C(WM):
@@ -1054,6 +1055,7 @@ class SEMANTIC_WM_C(WM):
     ### DISPLAY METHODS ###
     #######################
     def show_state(self):
+        from viewer import TCG_VIEWER
         TCG_VIEWER.display_semWM_state(self, file_type='png', show=True)
 
 ###################

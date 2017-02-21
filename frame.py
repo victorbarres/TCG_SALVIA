@@ -8,15 +8,13 @@ from __future__ import division
 from knowledge_rep import FRAME, FRAME_NODE, FRAME_REL
 
 class WK_FRAME_NODE(FRAME_NODE):
-    """
-    For now doesn't add anythong to the FRAME_NODE class
+    """For now doesn't add anythong to the FRAME_NODE class
     """
     def __init__(self):
         FRAME_NODE.__init__(self)
     
 class WK_FRAME_REL(FRAME_REL):
-    """
-    For now doesn't add anythong to the FRAME_REL class
+    """ now doesn't add anythong to the FRAME_REL class
     """
     def __init__(self):
         FRAME_REL.__init__(self)
@@ -48,7 +46,7 @@ class FRAME_KNOWLEDGE(object):
         if frame.name in [f.name for f in self.frames]:
             error_msg = "Frame %s already defined in frame knowledge" % frame.name
             raise ValueError(error_msg)
-        self.frames.add(frame)
+        self.frames.append(frame)
         frame.frame_knowledge = self
 
 ###############################################################################
