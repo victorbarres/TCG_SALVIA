@@ -399,6 +399,47 @@ class TCG_VIEWER:
             cluster_czer.add_edge(new_edge)
        
         return cluster_czer
+    
+    @staticmethod
+    def _create_wk_frame_cluster(wk_frame, name=None):
+        """Returns a DOT cluster containing all the information regarding the wk_frame.
+        """
+        font_size = '16'
+        font_name = 'consolas'
+
+        node_style = 'filled'
+        edge_style = 'solid'
+        
+        frame_color = 'white'
+        frame_bg_color = 'lightgrey'
+        
+        WK_frame_color = 'black'
+        WK_frame_bg_color = 'white'
+        WK_frame_node_shape = 'circle'
+        WK_frame_node_color = 'grey'
+        WK_frame_node_fill_color = 'grey'
+        
+        if not(name):
+            name = wk_frame.name
+            
+        label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">preference: %s</TD></TR></TABLE></FONT>>' %(font_name, wk_frame.name, wk_frame.preference)
+        cluster_name = name
+        cluster_frame = pydot.Cluster(cluster_name, label=label, color=frame_color)
+        cluster_frame.set_bgcolor(frame_bg_color)
+        
+        label = '<<FONT FACE="%s">WK_Frame</FONT>>' %font_name
+        cluster_WK_frame = pydot.Cluster(name + '_WK_frame', label=label, color=WK_frame_color)
+        cluster_WK_frame.set_bgcolor(WK_frame_bg_color)
+        for node in wk_frame.nodes:
+            label = "%s"%node.concept.meaning
+            new_node = pydot.Node(node.name, label=label, color=WK_frame_node_color, fillcolor=WK_frame_node_fill_color, shape=WK_frame_node_shape, style=node_style, fontsize=font_size, fontname=font_name)
+            cluster_WK_frame.add_node(new_node)
+        for edge in wk_frame.edges:
+            new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, style=edge_style, label=edge.concept.meaning)
+            cluster_WK_frame.add_edge(new_edge)
+        
+        cluster_frame.add_subgraph(cluster_WK_frame)
+        return cluster_frame
         
     @staticmethod
     def _create_cxn_cluster(cxn, name=None):
@@ -718,6 +759,47 @@ class TCG_VIEWER:
                     WMs_cluster.add_edge(new_edge)
         
         return WMs_cluster
+    
+    @staticmethod
+    def display_wk_frame(frame, folder='./tmp/', file_type='png', show=True):
+        """Create graph images for the wk_frame 'frame'.
+        Uses graphviz with pydot implementation.
+        
+        Args:
+            - frame (WK_FRAME): the frame object to be displayed.
+        """
+        tmp_folder = folder   
+        if not(os.path.exists(tmp_folder)):
+            os.mkdir(tmp_folder)
+
+        prog = 'dot'
+        
+        font_name = 'consolas'
+        labeljust='l'
+        penwidth = '2'
+        rankdir = 'LR'
+        
+        dot_frame = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth)
+        dot_frame.set_rankdir(rankdir)
+        dot_frame.set_fontname(font_name)
+        
+        cluster_frame = TCG_VIEWER._create_wk_frame_cluster(frame)
+        dot_frame.add_subgraph(cluster_frame)
+        
+        file_name = tmp_folder + frame.name + ".gv"
+        dot_frame.write(file_name)
+            
+        cmd = "%s -T%s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        subprocess.call(cmd, shell=True)
+        if show:
+            img_name = '%s.%s' %(file_name,file_type)          
+            plt.figure(facecolor='white')
+            plt.axis('off')
+            title = "%s\n pref: %.2f"%(frame.name, frame.preference)
+            plt.title(title)
+            img = plt.imread(img_name)
+            plt.imshow(img)
+            plt.show()
         
     @staticmethod
     def display_cxn(cxn, folder='./tmp/', file_type='png', show=True):
@@ -759,7 +841,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-        
+            plt.show()
+            
     @staticmethod
     def display_cxn_instance(cxn_inst, name='', folder='./tmp/', file_type='png', show=True):
         """
@@ -792,7 +875,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-        
+            plt.show()
+            
     @staticmethod
     def display_cxn_assemblage(cxn_assemblage, name='cxn_assembalge', concise=False, folder='./tmp/', file_type='svg', show=False):
         """
@@ -831,7 +915,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-    
+            plt.show()
+            
     @staticmethod
     def display_gramWM_state(WM, concise=False, folder='./tmp/', file_type='svg', show=False):
         """
@@ -868,7 +953,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-    
+            plt.show()
+            
     @staticmethod
     def display_semWM_state(semWM, folder='./tmp/', file_type='svg', show=False):
         """
@@ -901,7 +987,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-        
+            plt.show()
+            
     @staticmethod
     def display_lingWM_state(semWM, gramWM, concise=False, folder='./tmp/', file_type='pdf', show=False):
         """
@@ -937,7 +1024,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-        
+            plt.show()
+            
     @staticmethod
     def display_visWM_state(visWM, folder='./tmp/', file_type='svg', show=False):
         """
@@ -969,7 +1057,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-    
+            plt.show()
+            
     @staticmethod
     def display_WMs_state(visWM, semWM, gramWM, concise=True, folder='./tmp/', file_type='svg', show=False):
         """
@@ -1005,7 +1094,8 @@ class TCG_VIEWER:
             plt.title(title)
             img = plt.imread(img_name)
             plt.imshow(img)
-    
+            plt.show()
+            
     @staticmethod
     def display_scene(scene, img_file):
         """
@@ -1114,8 +1204,6 @@ class TCG_VIEWER:
         plt.title('saliency map')
         plt.plot(saliency_map)
         plt.show()
-        
-        
 
 ###############################################################################
 if __name__ == '__main__':

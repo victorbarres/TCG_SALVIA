@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, SYSTEM_SCHEMA, LTM, WM
-import viewer
 
 seed = None
 random.seed(seed)
@@ -738,8 +737,9 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
     def show_scene(self, img_file):
         """
         """
+        from viewer import TCG_VIEWER
         if self.scene:
-            viewer.TCG_VIEWER.display_scene(self.scene, img_file)
+            TCG_VIEWER.display_scene(self.scene, img_file)
     
     ####################
     ### JSON METHODS ###

@@ -567,7 +567,7 @@ class CXN(object):
         Uses the display method defined in TCG_VIEWER class
         """
         from viewer import TCG_VIEWER
-        TCG_VIEWER.display_cxn(self)
+        TCG_VIEWER.display_cxn(self, file_type='png', show=True)
         
 ####################################
 ### Grammar: set of construtions ###

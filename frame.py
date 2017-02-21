@@ -34,6 +34,14 @@ class WK_FRAME(FRAME):
         FRAME.__init__(self, name=name)
         self.frame_knowledge = frame_knowledge
         
+    def show(self):
+        """
+        Display the WK_FRAME.
+        Uses the display method defined in TCG_VIEWER class
+        """
+        from viewer import TCG_VIEWER
+        TCG_VIEWER.display_wk_frame(self, file_type='png', show=True)
+        
 class FRAME_KNOWLEDGE(object):
     """Frame knowledge. Simply defined as a set of WK_Frames.
     """

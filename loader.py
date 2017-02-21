@@ -141,15 +141,16 @@ class TCG_LOADER(object):
         # Create new frame  
         new_frame = FRM.WK_FRAME()
         new_frame.name = aFrame['name']
-        aFrame =  aFrame['WK_Frame']
         if 'preference' in aFrame:
             new_frame.preference = aFrame['preference']
         
+        wk_frame =  aFrame['WK_Frame']
+
         # Name table
         name_table = {'names':{}, 'rels':{}}
-        for node in aFrame['nodes']:
+        for node in wk_frame['nodes']:
             TCG_LOADER.read_frame_node(new_frame, node, name_table, cpt_knowledge)
-        for rel in aFrame['edges']:
+        for rel in wk_frame['edges']:
             TCG_LOADER.read_frame_rel(new_frame, rel, name_table, cpt_knowledge)
         
         for rel_name, node_pair in name_table['rels'].iteritems(): # Creating Frame relations
@@ -765,6 +766,8 @@ class TCG_LOADER(object):
         return ground_truths
   
 def test():
+    """ Loader test function
+    """
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics_dev.json", "./data/semantics/")
     my_frame_knowledge = TCG_LOADER.load_frame_knowledge("TCG_semantics_dev.json", "./data/semantics/", my_conceptual_knowledge)      
 #    my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge("TCG_semantics_main.json", "./data/semantics/")
@@ -777,7 +780,10 @@ def test():
     return my_frame_knowledge
 ###############################################################################
 if __name__=='__main__':
-    test()
+    my_frame_knowledge = test()
+    for f in my_frame_knowledge.frames:
+        f.show()
+    
 
     
     
