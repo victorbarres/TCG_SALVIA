@@ -911,6 +911,8 @@ class SEMANTIC_WM_C(WM):
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('IN', 'from_control')
+        self.add_port('OUT', 'to_WK_frame_WM')
+        self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
@@ -937,18 +939,19 @@ class SEMANTIC_WM_C(WM):
                 sem_map = instance_data['sem_map']
                 cpt_schemas = self.inputs['from_concept_LTM']
                 if cpt_schemas and SemFrame and sem_map:
-                    cpt_insts  = self.instantiate_cpts(SemFrame, sem_map, cpt_schemas)
+                    cpt_insts  = self.instantiate_gram_cpts(SemFrame, sem_map, cpt_schemas)
    
         if cpt_insts:
             for inst in cpt_insts:
                 self.add_instance(inst, 0.2)   
         
         self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
+#        self.convey_WK_activations(WK_activations)
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
     
-    def instantiate_cpts(self, SemFrame, sem_map, cpt_schemas):
+    def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """
         Builds SemRep based on the received SemFrame.
         
@@ -1013,7 +1016,7 @@ class SEMANTIC_WM_C(WM):
         """
         SemRep instances receives external activations from the construction instances they are linked to.
         Notes:
-            - This imposes that (1) the cpt_inst start with low activations. (2) the cxn instances are not deactivated once they are expressed (symmetric coop_links.)
+            - This imposes that (1) the cpt_insts start with low activations. (2) the cxn instances are not deactivated once they are expressed (symmetric coop_links.)
         """
         if not(gram_activations):
             return
@@ -1023,6 +1026,13 @@ class SEMANTIC_WM_C(WM):
                 if k in inst.trace['sem_frame_insts']:
                     act += val
                 inst.activation.E += act # No normalization
+    
+    def convey_WK_activation(self, WK_activations):
+        """SemRep instances receive external activations from the WK_frames instances they are linked to.
+        Notes:
+            - This imposes that (1) the cpt_insts start with low activations. (2) the Wk_frame are not deactivated once they are expressed.
+        """
+        pass
 
     def update_SemRep(self, cpt_insts):
         """
@@ -1038,7 +1048,7 @@ class SEMANTIC_WM_C(WM):
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
                 if self.SemRep.has_node(inst.name):
                     continue
-                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, expressed=False)
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, processed=[], expressed=False)
             
             # Then add the relations
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
@@ -1046,7 +1056,7 @@ class SEMANTIC_WM_C(WM):
                 node_to = rel_inst.content['pTo'].name
                 if self.SemRep.has_edge(node_from, node_to):
                     continue
-                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
+                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False)
             
             #Send the new state to output.
             self.outputs['to_output'] = True
@@ -2180,14 +2190,14 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
         if cxn_schemas and SemRep:
             self.instantiate_cxns(SemRep, cxn_schemas)
             self.outputs['to_grammatical_WM_P'] = self.cxn_instances
-            # Set all SemRep elements to new=False
+            # Marked all SemRep elements as processed by gram_WM_C
             for n, d in SemRep.nodes(data=True):
-                d['new'] = False
+                d['processed'].append('gram_WM_C')
             for u,v,d in SemRep.edges(data=True):
-                d['new'] = False
+                d['processed'].append('gram_WM_C')
         self.cxn_instances = []
     
-    def instantiate_cxns(self, SemRep, cxn_schemas, WK=None):
+    def instantiate_cxns(self, SemRep, cxn_schemas):
         """
         """
         if not cxn_schemas:
@@ -2198,10 +2208,10 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             Returns True only if at least one node or edge is tagged as new.
             """
             for n,d in subgraph.nodes(data=True):
-                if d['new']:
+                if 'gram_WM_C' not in d['processed']:
                     return True
             for n1,n2,d in subgraph.edges(data=True):
-                if d['new']:
+                if 'gram_WM_C' not in d['processed']:
                     return True
             return False
         

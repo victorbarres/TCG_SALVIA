@@ -17,6 +17,12 @@ class WK_FRAME_NODE(FRAME_NODE):
         FRAME_NODE.__init__(self)
         self.trigger = False
     
+    def copy(self):
+        (new_node, name_corr) = FRAME_NODE.copy(self)
+        new_node.trigger = self.trigger
+        return (new_node, name_corr)
+        
+    
 class WK_FRAME_REL(FRAME_REL):
     """ now doesn't add anythong to the FRAME_REL class
     """
@@ -39,6 +45,12 @@ class WK_FRAME(FRAME):
         FRAME.__init__(self, name=name)
         self.frame_knowledge = frame_knowledge
         self.trigger = None
+    
+    def copy(self):
+        (new_frame, name_corr) = FRAME.copy(self)
+        new_frame.frame_knowedge = self.frame_knowledge
+        new_frame.trigger = new_frame.find_elem(name_corr(self.trigger))
+        return (new_frame, name_corr)
         
     def show(self):
         """

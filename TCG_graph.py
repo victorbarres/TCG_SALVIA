@@ -91,15 +91,18 @@ def find_max_partial_iso(G, G_subgraphs, G_pat, G_pat_subgraphs, node_match=None
     """
     sub_isos = {}
     for G_pat_sub in G_pat_subgraphs:
-        sub_iso = find_sub_multi_iso(G, G_subgraphs, node_match, edge_match)
-        if sub_iso:
-            flag = False
-            for g in sub_isos:
-                if is_subgraph(g, G_pat_sub):
-                    sub_isos.pop(g)
-                    flag = True
-            if flag:
+        sub_iso = find_sub_multi_iso(G, G_subgraphs, G_pat_sub, node_match, edge_match)
+        if sub_iso: # none empty sub_isos
+            if not(sub_isos):
                 sub_isos[G_pat_sub] = sub_iso
+            else:
+                flag = False
+                for g in sub_isos:
+                    if is_subgraph(g, G_pat_sub):
+                        sub_isos.pop(g)
+                        flag = True
+                if flag:
+                    sub_isos[G_pat_sub] = sub_iso
     return sub_isos
     
                     
@@ -111,7 +114,7 @@ def is_subgraph(G1, G2):
     edges1 = set(G1.edges())
     nodes2 = set(G2.nodes())
     edges2 = set(G2.edges())
-    return nodes2.issubset(nodes1) and edges2.issubset(edges1)
+    return nodes1.issubset(nodes2) and edges1.issubset(edges2)
             
     
     
@@ -127,12 +130,12 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
     """
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
-        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set] # Builds all the node induced subgraphs.
+        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for v_list in edge_powerset: 
-            subG = DiGraph(v_list) # Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
+            subG = DiGraph(e_list) # Creating subraph from edges
             for n in subG.node.keys():
                 subG.node[n] = G.node[n] # Transfering node attributes
             subgraphs.append(subG)
@@ -144,7 +147,7 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
             subgraphs.append(subG)
     
     # Filtering
-    subgraphs = [subG for subG in subgraphs if subgraph_filter(subG)]
+    subgraphs = [sG for sG in subgraphs if subgraph_filter(sG)]
 
     return subgraphs
     
@@ -157,12 +160,12 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
     """
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
-        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set] # Builds all the node induced subgraphs.
+        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for v_list in edge_powerset:
-            subG = MultiDiGraph(v_list)# Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
+            subG = MultiDiGraph(e_list)# Creating subraph from edges
             for n in subG.node.keys():
                 subG.node[n] = G.node[n] # Transfering node attributes
             subgraphs.append(subG)
@@ -174,7 +177,7 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
             subgraphs.append(subG)
     
     # Filtering
-    subgraphs = [subG for subG in subgraphs if subgraph_filter(subG)]
+    subgraphs = [sG for sG in subgraphs if subgraph_filter(sG)]
                  
     return subgraphs
         
@@ -248,8 +251,8 @@ def test1():
     G.add_edge(1,2, attr=-1)
     G.add_edge(2,0, attr=-1)
     
-    nx.draw(G)
-    plt.show()
+#    nx.draw(G)
+#    plt.show()
     
     # Graph pattern
     G_pat= nx.DiGraph()
@@ -260,11 +263,11 @@ def test1():
     
     G_pat.add_edge("a","b", attr=-1)
     G_pat.add_edge("b","c", attr=-1)
+#    
+#    nx.draw(G_pat)
+#    plt.show()
     
-    nx.draw(G_pat)
-    plt.show()
-    
-    G_subgraphs = build_subgraphs(G, induced='node') # In this example, if induced = 'nodes' it won't find any isomorphisms.
+    G_subgraphs = build_subgraphs(G, induced='e') # In this example, if induced = 'nodes' it won't find any isomorphisms.
     
     # Categorical match functions
     nm_cat = isomorphism.categorical_node_match("attr", 1)
@@ -329,7 +332,45 @@ def test2():
 def test3():
     """Test extension to max partial isomorphism
     """
+    import networkx as nx    
+    
+    # Main graph
+    G = nx.MultiDiGraph()
+    
+    G.add_node(0, attr_dict={'val':1})
+    G.add_node(1, attr_dict={'val':2})
+#    G.add_node(2, attr_dict={'val':3})
+#    G.add_node(3, attr_dict={'val':0})
+    
+    G.add_edge(0,1, attr_dict={'val':1})
+#    G.add_edge(0,1, attr_dict={'val':2})
+#    G.add_edge(0,1, attr_dict={'val':3})
+#    G.add_edge(1,2, attr_dict={'val':1})
+#    G.add_edge(1,2, attr_dict={'val':2})
+#    G.add_edge(2,0, attr_dict={'val':1})
+
+    G_subgraphs = build_submultigraphs(G, induced='edge') # In this example, if induced = 'nodes' it won't find any isomorphisms.
+    
+    # Graph pattern
+    G_pat= nx.MultiDiGraph()
+    G_pat.add_node("a", attr_dict={'val':1})
+    G_pat.add_node("b", attr_dict={'val':2})
+    G_pat.add_node("c", attr_dict={'val':3})
+    
+    G_pat.add_edge("a","b", attr_dict={'val':1})
+    G_pat.add_edge("b","c", attr_dict={'val':1})
+    
+    G_pat_subgraphs = build_submultigraphs(G_pat, induced='edge')
+    
+    # Generic match functions
+    op = lambda x,y: x == y
+    nm_gen = node_iso_match("val", 0, op)
+    em_gen = multi_edge_iso_match("val", 0, op)
+    sub_iso = find_max_partial_iso(G, G_subgraphs, G_pat, G_pat_subgraphs, node_match = nm_gen, edge_match=em_gen)
+    
+    if sub_iso:
+        print sub_iso
     
 ###############################################################################
 if __name__=="__main__":
-    test2()
+    test3()

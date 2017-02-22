@@ -6,7 +6,7 @@ Defines World knowledge schemas for TCG.
 """
 from __future__ import division
 
-from schema_theory import KNOWLEDGE_SCHEMA, SCHEMA_INST, LTM, WM
+from schema_theory import SYSTEM_SCHEMA, KNOWLEDGE_SCHEMA, SCHEMA_INST, LTM, WM
 import TCG_graph
 
 ####################################
@@ -22,6 +22,7 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
         - LTM (LTM): Associated long term memory.
         - content (WK_FRAME): WK_FRAME object
         - init_act (float): Initial activation value.
+    - trigger = (CPT))
     """
     def __init__(self, name, frame, init_act):
         """
@@ -30,15 +31,27 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
             - frame (WK_FRAME):
         """
         KNOWLEDGE_SCHEMA.__init__(self, name=frame.name, content=frame, init_act=init_act)
+        self.trigger = frame.trigger
 
 class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
     """
     World knowledge frame schema instance. 
+     - covers ({"nodes":{}, "edges"={}}): maps WK_FRAME nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
     """
-    def __init__(self, frame_schema, trace):
-        SCHEMA_INST.__init__(self, schema=frame_schema, trace=trace)
-        content_copy = frame_schema.content.copy()
-        self.content = content_copy    
+    def __init__(self, wk_frame_schema, trace, mapping={"nodes":{}, "edges":{}}, copy=True):
+        SCHEMA_INST.__init__(self, schema=wk_frame_schema, trace=trace)
+        self.covers = {}
+        if copy:
+            (wk_frame_copy, c) = wk_frame_schema.content.copy()
+            self.content = wk_frame_copy
+            if mapping:
+                new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
+                new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
+                new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
+                self.covers = new_mapping
+        
+        else:
+             self.covers = mapping
         
 ##########################################
 ##### WORLD KNOWLEDGE SYSTEM SCHEMAS #####
@@ -49,11 +62,13 @@ class WK_FRAME_LTM(LTM):
        
     Args:
         - frame_knowledge (FRAME_KNOWLEDGE):
+        - trigger_dict ({trigger_cpt:[FRAME_SCHEMA]})
     """
     def __init__(self, name='WK_frame_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_wk_frame_WM')
         self.frame_knowledge = None
+        self.trigger_dict = {}
         self.params['init_act'] = 1
         
     def initialize(self, frame_knowledge):
@@ -68,10 +83,19 @@ class WK_FRAME_LTM(LTM):
         for frame in frame_knowledge.frames:
             new_schema = WK_FRAME_SCHEMA(name=frame.name, frame=frame, init_act=self.params['init_act'])
             self.add_schema(new_schema)
+        self.set_trigger_dict()
     
     def process(self):
-        self.outputs['to_wk_frame_WM'] = self.schemas
-        
+        self.outputs['to_wk_frame_WM'] = self.trigger_dict
+    
+    def set_trigger_dict(self):
+        for wk_frame_schema in self.schemas:
+            trig = wk_frame_schema.trigger.concept
+            if trig not in self.trigger_dict:
+                self.trigger_dict[trig] = [wk_frame_schema]
+            else:
+                self.trigger_dict[trig].append(wk_frame_schema)
+       
     ####################
     ### JSON METHODS ###
     ####################
@@ -100,6 +124,18 @@ class WK_FRAME_WM(WM):
         """
         """
         sem_input = self.inputs['from_semantic_WM']
+        new_wk_frame_insts= self.inputs['from_cxn_retrieval_P']
+        if new_wk_frame_insts:
+            self.add_new_insts(new_wk_frame_insts) 
+            output = self.apply_WK(new_wk_frame_insts,sem_input)
+            if output:
+                self.outputs['to_semantic_WM'] =  output['sem_WM_output']
+                self.outputs['to_output'] = output['to_output']
+            
+        self.convey_sem_activations(sem_input)
+        self.update_activations()
+        self.prune()
+        
         """
         TO DO:
             - find the WK_FRAME that should be instantiated.
@@ -119,6 +155,125 @@ class WK_FRAME_WM(WM):
             which means graph iso matching from Sem to GramWM
         """
         pass
+    
+    def apply_WK(self, sem_input):
+        """
+        """
+        wk_frame_insts = [i for i in self.schema_insts if not i.done]
+        for inst in wk_frame_insts:
+            #Send their wk_frame to SemWM.
+            pass
+        pass
+    
+    def convey_sem_activations(self, sem_input):
+        """
+        """
+        pass
+            
+    
+class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
+    """
+    """
+    def __init__(self, name="WK_frame_retrieval"):
+        SYSTEM_SCHEMA.__init__(self,name)
+        self.add_port('IN', 'from_wk_frame_LTM')
+        self.add_port('IN', 'from_semantic_WM')
+        self.add_port('OUT', 'to_wk_frame_WM')
+        self.wk_frame_instances = []
+    
+    def reset(self):
+        """
+        """
+        super(WK_FRAME_RETRIEVAL, self).reset()
+        self.wk_frame_instances = []
+    
+    def process(self):
+        """
+        """
+        SemRep = self.inputs['from_semantic_WM']
+          
+        wk_frame_dict = self.inputs['from_wk_frame_LTM']
+        if wk_frame_dict and SemRep:
+            self.instantiate_wk_frames(SemRep, wk_frame_dict)
+            self.outputs['to_wk_frame_WM'] = self.wk_frame_instances
+            # Marked all SemRep elements as processed by WK_WM
+            for n, d in SemRep.nodes(data=True):
+                d['processed'].append('wk_WM')
+            for u,v,d in SemRep.edges(data=True):
+                d['processed'].append('wk_WM')
+        self.wk_frame_instances = []
+    
+    def instantiate_wk_frame(self, SemRep, wk_frame_dict):
+        """
+        """
+        if not wk_frame_dict:
+            return
+            
+        # Build SemRep subgraphs
+        def subgraph_filter(subgraph): # I NEED TO FIX THAT TO HANDLE MULTIGRAPHS!
+            """
+            Returns True only if at least one node or edge is tagged as new.
+            """
+            for n,d in subgraph.nodes(data=True):
+                if 'wk_WM' not in d['processed']:
+                    return True
+            for n1,n2,d in subgraph.edges(data=True):
+                if 'wk_WM' not in d['processed']:
+                    return True
+            return False
+        SemRep_subgraphs = TCG_graph.build_submultigraphs(SemRep, induced='edges', subgraph_filter=subgraph_filter)
+        
+        # Find triggers:
+        for node in [n for n in SemRep.nodes() if (n.concept in wk_frame_dict) and ('wk_WM' not in n.processed)]:
+            wk_frame_schemas = wk_frame_dict[node.concept]
+            for wk_frame_schema in wk_frame_schemas:
+                sub_iso = self.FrameMatch_cat(SemRep_subgraphs, wk_frame_schema)
+                for a_sub_iso in sub_iso:
+                    trace = trace = {"trigger":node, "semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[wk_frame_schema]}
+                    node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
+                    edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
+                    mapping = {'nodes':node_mapping, 'edges':edge_mapping}    
+                    new_instance= WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, mapping)
+                self.wk_frame_instances.append({"wk_frame_inst":new_instance, "match_qual":1.0})
+                    
+    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema):
+        """
+        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
+        """
+        wk_frame_graph = wk_frame_schema.content.graph 
+        # Build wk_frame_graph subgraphs. 
+        def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
+            contains_trigger = [n for n in subgraph.nodes() if n.trigger]
+            if contains_trigger:
+                return True
+            else:
+                return False
+        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edges', subgraph_filter=subgraph_filter)
+        
+        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+#        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+       
+        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+
+        sub_iso = TCG_graph.find_max_partial_iso(SemRep, SemRep_subgraphs, wk_frame_graph, wk_frame_subgraphs, node_match=nm, edge_match=em)
+        return sub_iso
+    
+    def FrameMatch_qual(): 
+        """
+        """
+        pass
+    
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def get_state(self):
+        """
+        """
+        data = super(WK_FRAME_RETRIEVAL, self).get_state()
+        data['wk_frame_instances'] = [inst.name for inst in self.wk_frame_instances]
+        return data
             
 ###############################################################################
 if __name__=='__main__':
