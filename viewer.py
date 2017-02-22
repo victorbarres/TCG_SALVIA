@@ -417,6 +417,7 @@ class TCG_VIEWER:
         WK_frame_bg_color = 'white'
         WK_frame_node_shape = 'circle'
         WK_frame_node_color = 'grey'
+        WK_frame_trigger_shape = 'doublecircle'
         WK_frame_node_fill_color = 'grey'
         
         if not(name):

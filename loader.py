@@ -141,6 +141,7 @@ class TCG_LOADER(object):
         # Create new frame  
         new_frame = FRM.WK_FRAME()
         new_frame.name = aFrame['name']
+        trigger = aFrame['trigger']
         if 'preference' in aFrame:
             new_frame.preference = aFrame['preference']
         
@@ -165,6 +166,11 @@ class TCG_LOADER(object):
             frame_elem = name_table['names'][rel_name]
             frame_elem.pFrom = name_table['names'][from_name]
             frame_elem.pTo = name_table['names'][to_name]
+        
+        trigger_node = name_table['names'][trigger]
+        trigger_node.trigger = True
+        frame_elem.trigger = name_table['names'][trigger]
+        
         
         new_frame._create_NX_graph() # Creating NetworkX implementation of Frame
         return new_frame

@@ -8,10 +8,14 @@ from __future__ import division
 from knowledge_rep import FRAME, FRAME_NODE, FRAME_REL
 
 class WK_FRAME_NODE(FRAME_NODE):
-    """For now doesn't add anythong to the FRAME_NODE class
+    """Define WK_FRAME_NODE
+    
+    Data:
+        - trigger (BOOL) = True if the node is the WK_FRAME trigger
     """
     def __init__(self):
         FRAME_NODE.__init__(self)
+        self.trigger = False
     
 class WK_FRAME_REL(FRAME_REL):
     """ now doesn't add anythong to the FRAME_REL class
@@ -28,11 +32,13 @@ class WK_FRAME(FRAME):
         - edges ([FRAME_REL]): Set of WK FRAME relations.
         - graph (networkx.DiGraph): A NetworkX implementation of the graph.
             Each node and edge have the additional 'concept' attribute derived from their respective node.concept and edge.concept
-     - conceptual_knowledge (CONCEPTUAL_KNOWLEDGE): The conceptual knowledge instance the WK frame is part of.
+     - frame_knowledge (FRAME_KNOWLEDGE): The frame knowledge instance the WK frame is part of.
+     - trigger (FRAME_NODE): The frame node whose concept serve as a trigger for the WK_FRAME
     """
     def __init__(self, name='',  frame_knowledge=None):
         FRAME.__init__(self, name=name)
         self.frame_knowledge = frame_knowledge
+        self.trigger = None
         
     def show(self):
         """

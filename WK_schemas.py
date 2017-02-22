@@ -88,8 +88,8 @@ class WK_FRAME_WM(WM):
     def __init__(self, name='WK_frame_WM'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_wk_frame_LTM')
-        self.add_port('OUT', 'to_semantic_WM')
         self.add_port('IN', 'from_semantic_WM')
+        self.add_port('OUT', 'to_semantic_WM')
         
     def reset(self):
         """
@@ -98,6 +98,25 @@ class WK_FRAME_WM(WM):
         
     def process(self):
         """
+        """
+        sem_input = self.inputs['from_semantic_WM']
+        """
+        TO DO:
+            - find the WK_FRAME that should be instantiated.
+            - For this I need to allow for partial match
+            - So I need largest subgraphs of SemRep that partially map onto frames.
+            - Then I instantiate the Frames and link it to SemRep + send info to SemRep that is
+            can be updated if it is a partial match.
+            - The activation of the Frames supports some aspects of the SemRep.
+            - In SemRep, edges between same nodes in multigraph compete.
+            - Question: Are the frames triggered by the SemRep or by the lexical items?
+            - I can simply force the posting of the lexical item content onto SemWM directly as they are 
+            recovered (any element construction marked as done might need to be automatically expressed in SemRep.)
+            - On the other hand, it might be worth it considering the fact that lexical items directly tie to WK.
+            - They could trigger the recovery of any frames that matches them. (simple).
+            - Then those would project onto the SemRep where the lexical content should serve as the way to link the two (hinges).
+            - The difficult part is that now, the GrammaticalWM needs to check whether or not the information it wants to post is already there,
+            which means graph iso matching from Sem to GramWM
         """
         pass
             

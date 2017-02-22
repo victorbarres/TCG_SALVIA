@@ -222,7 +222,8 @@
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]}
+					]},
+			"trigger": "ANIM"
 		},
 		
 		{"name" : "EAT_EVENT",
@@ -242,7 +243,8 @@
 						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]}
+					]},
+			"trigger": "EAT"
 		},
 		
 		{"name" : "RIDE_EVENT1",
@@ -262,7 +264,8 @@
 						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "RIDE"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]}
+					]},
+			"trigger": "RIDE"
 		},
 		
 		{"name" : "RIDE_EVENT2",
@@ -282,7 +285,8 @@
 						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "RIDE"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]}
+					]},
+			"trigger": "RIDE"
 		}
 	],
 
