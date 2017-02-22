@@ -36,10 +36,12 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
 class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
     """
     World knowledge frame schema instance. 
+     - expressed
      - covers ({"nodes":{}, "edges"={}}): maps WK_FRAME nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
     """
     def __init__(self, wk_frame_schema, trace, mapping={"nodes":{}, "edges":{}}, copy=True):
         SCHEMA_INST.__init__(self, schema=wk_frame_schema, trace=trace)
+        self.expressed = False
         self.covers = {}
         if copy:
             (wk_frame_copy, c) = wk_frame_schema.content.copy()
@@ -125,12 +127,15 @@ class WK_FRAME_WM(WM):
         """
         sem_input = self.inputs['from_semantic_WM']
         new_wk_frame_insts= self.inputs['from_cxn_retrieval_P']
+        self.outputs['to_semantic_WM'] = {}
         if new_wk_frame_insts:
             self.add_new_insts(new_wk_frame_insts) 
             output = self.apply_WK(new_wk_frame_insts,sem_input)
             if output:
-                self.outputs['to_semantic_WM'] =  output['sem_WM_output']
-                self.outputs['to_output'] = output['to_output']
+                self.outputs['to_semantic_WM']['instances'] =  output['sem_WM_output']
+        
+        activations = self.sem_WM_output()
+        self.outputs['to_semantic_WM']['activations'] = activations
             
         self.convey_sem_activations(sem_input)
         self.update_activations()
@@ -154,23 +159,37 @@ class WK_FRAME_WM(WM):
             - The difficult part is that now, the GrammaticalWM needs to check whether or not the information it wants to post is already there,
             which means graph iso matching from Sem to GramWM
         """
-        pass
     
     def apply_WK(self, sem_input):
         """
         """
-        wk_frame_insts = [i for i in self.schema_insts if not i.done]
+        wk_frame_insts = [i for i in self.schema_insts if not i.expressed]
+        sem_WM_output = []
         for inst in wk_frame_insts:
             #Send their wk_frame to SemWM.
-            pass
-        pass
+            sem_WM_output.append = inst.content
+            inst.expressed = True
+        
+        return sem_WM_output
+        
+    def sem_WM_output(self):
+        """ Defines the activation output to semantic_WM.
+        Returns a dictionary mapping wk_frame elements names of used wk_frame instances onto the respective frame activity.
+        """
+        output = {}
+        insts = [i for i in self.schema_insts if i.expressed] # only look at expressed insts
+        for wk_frame_inst in insts:
+            activity = wk_frame_inst.activity
+            wk_frame_names = [s.name for s in wk_frame_inst.content.nodes + wk_frame_inst.content.edges]
+            for name in wk_frame_names:
+                output[name] = activity
+        return output
     
     def convey_sem_activations(self, sem_input):
         """
         """
         pass
             
-    
 class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
     """
     """
