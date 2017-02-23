@@ -980,6 +980,12 @@ class SEMANTIC_WM_C(WM):
         Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
         If so, expand mapping, move on with adding concept schemas.
         """
+        def build_mapping(SemFrame, sem_map):
+            """
+            Find ways in wich the SemFrame can map onto the SemRep.
+            For each ways, it adds to the SemRep the portion of its graph that is not contained in the SemRep.
+            """
+            pass
         
         for node in SemFrame.nodes:
             cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
@@ -1071,11 +1077,13 @@ class SEMANTIC_WM_C(WM):
             #Send the new state to output.
             self.outputs['to_output'] = True
 
-    def update_mapping(self, sem_input):
+    def update_mapping(self, sem_input_frame, sem_input_mapping):
         """
         Updates the mapping of a sem_input to take into account the possible change of state
         that took place in Semantic_WM.
         """
+        pass
+        
 
     def _find_cpt_schema(self, cpt_schemas, cpt_name):
             """Returns, if it exists, the cpt_schema whose name matches cpt_name

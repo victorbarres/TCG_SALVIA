@@ -114,6 +114,13 @@ def find_max_partial_iso(G, G_subgraphs, G_pat, G_pat_subgraphs, node_match=None
     output = [s for s in output if iso_filter(s)]
     return output
     
+def update_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, old_mappings, node_match=None, edge_match=None, iso_filter=lambda x:True):
+    """For each partial iso mapping in old_mappings, checks if they can be expanded on newG.
+    """
+    sub_iso = find_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, node_match, edge_match, iso_filter)
+    for a_sub_iso in sub_iso:
+        
+    
                     
 def is_subgraph(G1, G2):
     """

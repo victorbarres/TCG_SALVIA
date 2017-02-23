@@ -164,12 +164,12 @@ class WK_FRAME_WM(WM):
         """
         """
         wk_frame_insts = [i for i in self.schema_insts if not i.expressed]
-        sem_WM_output = []
+        wk_output = []
         for inst in wk_frame_insts:
             #Send their wk_frame to SemWM.
-            sem_WM_output.append((inst.content, inst.covers))
+            wk_output.append((inst.content, inst.covers))
             inst.expressed = True
-        return sem_WM_output
+        return wk_output
         
     def sem_WM_output(self):
         """ Defines the activation output to semantic_WM.
@@ -253,7 +253,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
                     edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
                     mapping = {'nodes':node_mapping, 'edges':edge_mapping}    
                     new_instance= WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, mapping)
-                self.wk_frame_instances.append(new_instance)
+                    self.wk_frame_instances.append(new_instance)
                     
     def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
         """
@@ -285,10 +285,6 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         
         return sub_iso
     
-    def FrameMatch_qual(): 
-        """
-        """
-        pass
     
     ####################
     ### JSON METHODS ###
