@@ -957,21 +957,8 @@ class SEMANTIC_WM_C(WM):
         
         Args:
             - SemFrame (TP_SEMFRAME)
-            - cpt_schemas ([CPT_SCHEMAS])
-        """
-        def find_cpt_schema(cpt_schemas, cpt_name):
-            """Returns, if it exists, the cpt_schema whose name matches cpt_name
-            """
-            output = [schema for schema in cpt_schemas if schema.name == cpt_name]
-            if len(output)>1:
-                error_msg = 'There is more than one cpt_schema matches the concept name %s' %cpt_name
-                raise ValueError(error_msg)
-            elif not(output):
-                error_msg = 'There are is cpt_schema that matches the concept name %s' %cpt_name
-                raise ValueError(error_msg)
-            else:
-                return output[0]
-            
+            - cpt_schemas ([CPT_SCHEMA])
+        """            
         def find_cpt_inst(sem_frame_insts):
             """ Returns, if it exists, the cpt_inst whose sem_frame trace already contains one of the sem_frame_insts.
             """
@@ -986,9 +973,16 @@ class SEMANTIC_WM_C(WM):
                 return None
         cpt_insts = []
         name_table = {}
+
+        """
+        I need to recheck the mapping (here there is no mapping) since this is not production. So mapping is None. But
+        there will be a mapping if I had feebback
+        Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
+        If so, expand mapping, move on with adding concept schemas.
+        """
         
         for node in SemFrame.nodes:
-            cpt_schema = find_cpt_schema(cpt_schemas, node.concept.name)
+            cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
             sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
             old_cpt_inst = find_cpt_inst(sem_frame_insts)
             if old_cpt_inst:
@@ -1000,7 +994,7 @@ class SEMANTIC_WM_C(WM):
                 cpt_insts.append(new_cpt_inst)
         
         for edge in SemFrame.edges:
-            cpt_schema = find_cpt_schema(cpt_schemas, edge.concept.name)
+            cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
             sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
             old_cpt_inst = find_cpt_inst(sem_frame_insts)
             if old_cpt_inst:
@@ -1011,6 +1005,22 @@ class SEMANTIC_WM_C(WM):
                 new_cpt_inst.content['pTo'] = name_table[edge.pTo]
                 cpt_insts.append(new_cpt_inst)
         return cpt_insts
+        
+    def instantiate_wk_cpts(self, wk_inputs, cpt_schemas):
+        """
+        Builds SemRep based on a wk_inputs.
+        
+        Args:
+            - wk_inputs ([(WK_FRAME, mapping)])
+            - cpt_schemas ([CPT_SCHEMA])
+        """
+        
+        """
+        I need to recheck the mapping. 
+        Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
+        If so, expand mapping, move on with adding concept schemas.
+        """
+       pass
     
     def convey_gram_activations(self, gram_activations):
         """
@@ -1060,6 +1070,25 @@ class SEMANTIC_WM_C(WM):
             
             #Send the new state to output.
             self.outputs['to_output'] = True
+
+    def update_mapping(self, sem_input):
+        """
+        Updates the mapping of a sem_input to take into account the possible change of state
+        that took place in Semantic_WM.
+        """
+
+    def _find_cpt_schema(self, cpt_schemas, cpt_name):
+            """Returns, if it exists, the cpt_schema whose name matches cpt_name
+            """
+            output = [schema for schema in cpt_schemas if schema.name == cpt_name]
+            if len(output)>1:
+                error_msg = 'There is more than one cpt_schema matches the concept name %s' %cpt_name
+                raise ValueError(error_msg)
+            elif not(output):
+                error_msg = 'There are is cpt_schema that matches the concept name %s' %cpt_name
+                raise ValueError(error_msg)
+            else:
+                return output[0]
         
     #######################
     ### DISPLAY METHODS ###
