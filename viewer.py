@@ -507,10 +507,10 @@ class TCG_VIEWER:
         cluster_SynForm.set_bgcolor(SynForm_bg_color)
         pre_form = None
         for form in cxn.SynForm.form:
-            if form.type == 'TP_SLOT':
+            if isinstance(form, TP_SLOT):
                 new_node = pydot.Node(str(form), label ="[" +  ", ".join(form.cxn_classes) +"]", shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
                 cluster_SynForm.add_node(new_node)
-            elif form.type == 'TP_PHON':
+            elif isinstance(form, TP_PHON):
                 new_node = pydot.Node(str(form), label = form.cxn_phonetics, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
                 cluster_SynForm.add_node(new_node)
             if not(pre_form):
