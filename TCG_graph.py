@@ -34,7 +34,7 @@ def find_sub_iso(G_subgraphs, G_pat, node_match=None, edge_match=None):
     for mapping in mappings:
         iso = {"nodes":{}, "edges":{}}
         for key in mapping:
-            iso["nodes"][mapping[key]] = key # reverse mapping for convenience (SemFrame -> SemRep)        
+            iso["nodes"][mapping[key]] = key # reverse mapping for convenience      
         for edge in G_pat.edges(): # Add mapping between edges
             iso["edges"][edge] = (iso["nodes"][edge[0]], iso["nodes"][edge[1]])
         sub_iso.append(iso)

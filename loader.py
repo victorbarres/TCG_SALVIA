@@ -231,7 +231,7 @@ class TCG_LOADER(object):
             sem_elem.pFrom = name_table['SemNodes'][from_name]
             sem_elem.pTo = name_table['SemNodes'][to_name]
         
-        new_cxn.SemFrame._create_NX_graph() # Creating NetworkX implementation of SemFrame
+        new_cxn.SemFrame._create_graph() # Creating SemFrame graph
         
     @staticmethod   
     def read_synform(new_cxn, SynForm, name_table):
