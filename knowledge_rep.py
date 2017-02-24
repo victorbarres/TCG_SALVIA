@@ -66,7 +66,7 @@ class K_NET(object):
     Data:
         - nodes ([K_ENT]): List of knowledge entity.
         - edges ([K_REL]): List of knowledge relations.
-        - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.
+        - graph (networkx.DiGraph): A NetworkX graph implementation of the semantic net.
             Each node has an additional attribute meaning = k_ent.meaning
             Each edge has an additional attribute type = k_rel.type
     """
@@ -81,7 +81,7 @@ class K_NET(object):
         """
         self.nodes = []
         self.edges = []
-        self._create_NX_graph()
+        self._create_graph()
     
     def add_ent(self, k_ent):
         """
@@ -100,7 +100,7 @@ class K_NET(object):
         
         # Add new semantic entity
         self.nodes.append(k_ent)
-        self._create_NX_graph()
+        self._create_graph()
         return True
         
     def add_relation(self, k_rel):
@@ -128,7 +128,7 @@ class K_NET(object):
         
         # Add new relation
         self.edges.append(k_rel)
-        self._create_NX_graph()
+        self._create_graph()
         return True
     
     def shortest_path(self, from_ent, to_ent, rel_types=['is_a']):
@@ -271,7 +271,7 @@ class K_NET(object):
         nx.draw_networkx_labels(self.graph, pos=pos, labels= node_labels)
 
 
-    def _create_NX_graph(self):
+    def _create_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
             graph.add_node(node.id, meaning=node.meaning)

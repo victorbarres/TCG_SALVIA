@@ -318,7 +318,7 @@
 			"propositions"  : {
 				"ACTION_AREA":["EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)"],
 				"KICK_AREA":["KICK(kick)", "IS(is4)", "is4(a1, kick)", "ENTITY(e2,F)", "ENTITY(e1,F)", "AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"],
-				"WOMAN":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
+				"WOMAN_AREA":["WOMAN(woman)", "IS(is2)", "is2(e2, woman)"],
 				"MAN_AREA":["MAN(man)", "IS(is1)", "is1(e1, man)"],
 				"WOMAN_FACE_AREA":["YOUNG(young)", "MODIFY(mod)", "mod(e2, young)"]
 			},

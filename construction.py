@@ -186,7 +186,7 @@ class TP_SEMFRAME(TP_ELEM):
         
         return None
     
-    def _create_NX_graph(self):
+    def _create_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
             graph.add_node(node, concept=node.concept, frame=node.frame)
@@ -212,12 +212,12 @@ class TP_SEMFRAME(TP_ELEM):
             new_edge.pFrom = node_corr[edge.pFrom]
             new_edge.pTo = node_corr[edge.pTo]
             new_semframe.edges.append(new_edge)
-        new_semframe._create_NX_graph()
+        new_semframe._create_graph()
         
         return (new_semframe, name_corr)
     
     def draw(self):
-        self._create_NX_graph()
+        self._create_graph()
         plt.figure(facecolor='white')
         plt.axis('off')
         title = 'SemFrame'
@@ -251,7 +251,7 @@ class TP_SEMFRAME(TP_ELEM):
                 rel.pTo = node_c
         
         SF_p_copy.edges += SF_c_copy.edges
-        SF_p_copy._create_NX_graph()
+        SF_p_copy._create_graph()
         
         new_SF = SF_p_copy
         
@@ -450,8 +450,8 @@ class CXN(object):
         else:
             return False
         
-        # Update NetworkX graph
-        self.SemFrame._create_NX_graph()
+        # Update graph
+        self.SemFrame._create_graph()
         return True
         
     def add_syn_elem(self, syn_elem):

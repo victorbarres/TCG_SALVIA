@@ -77,7 +77,7 @@ class PERCEPTUAL_KNOWLEDGE(K_NET):
     Data:
         - nodes ([PERCEPT]): List of percepts.
         - edges ([SEM_REL]): List of semantic relations.
-        - graph (networkx.DiGraph): A NetworkX implementation of the semantic net.
+        - graph (networkx.DiGraph): A NetworkX graph implementation of the semantic net.
             Each node has an additional attributes meaning = percept.meaning
             Each edge has an additional attribute type = sem_rel.type
     """
