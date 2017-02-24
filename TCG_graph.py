@@ -69,11 +69,13 @@ def find_sub_multi_iso(G, G_subgraphs, G_pat, node_match=None, edge_match=None, 
         for u1,v1,k1,attr1 in G_pat.edges(data=True, keys=True): # Add mapping between edges, I need to find all the edges that match.
             u2 = iso["nodes"][u1]
             v2 = iso["nodes"][v1]
-            target_edges = G[u2][v2]
-            iso["edges"][(k1, u1, v1)] = []
-            for k2,attr2 in target_edges.iteritems():
-                if attr1['val'] == attr2['val']:
-                    iso["edges"][(k1, u1,v1)].append((k2,u2, v2))
+            target_edges_dat = G.get_edge_data(u2,v2)
+            name1 = attr1.get('name', None)
+            iso["edges"][(u1, v1, k1, name1)] = []
+            for k2,attr2 in target_edges_dat.iteritems():
+                if edge_match({'attr':attr1}, {'attr':attr2}): # not completely sure about that. I wish I could figure out how to have nx return directly the edge mapping...
+                    name2 = attr2.get('name', None)
+                    iso["edges"][(u1, v1, k1, name1)].append((u2, v2, k2, name2))
         sub_iso.append(iso)
       
     output = [s for s in sub_iso if iso_filter(s)]

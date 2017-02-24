@@ -879,7 +879,7 @@ class SEMANTIC_WM_P(WM):
                 node_to = rel_inst.content['pTo'].name
                 if self.SemRep.has_edge(node_from, node_to):
                     continue
-                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False)
+                self.SemRep.add_edge(node_from, node_to, name=rel_inst.name, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False)
             
 #            # Update concept frames
 #            self.update_cpt_frames()
@@ -1082,18 +1082,19 @@ class SEMANTIC_WM_C(WM):
                 name_table[node] = new_cpt_inst
                 cpt_insts.append(new_cpt_inst)
             
-            mapped_edges = [(k,u,v,d) for k,u,v,d in SemFrame.graph.edges(data=True) if (k,u,v) in mapping['edges']]
-            for (k,u,v,d) in mapped_edges:
-                cpt_schema = self._find_cpt_schema(cpt_schemas, d['concept'].name)
-                sem_frame_insts = set([i for i,j in sem_map.iteritems() if d['name'] in j])
+            #### THIS IS WRONG!!! TO FIX!!! I need an easy conversion from mapping to edge.
+            mapped_edges = [e for e in SemFrame.edges if e.name in [SemFrame.graph.get_edge_data(u,v,k)['name'] for u,v,k in mapping['edges']]]
+            for edge in mapped_edges:
+                cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
+                sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
                 old_cpt_inst = find_cpt_inst(sem_frame_insts)
                 if old_cpt_inst:
                     old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
                 else:
-                    
-                    cpt_inst = self.find_instance(mapping['edges'][d['name']])
-                    cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-                    name_table[node] = cpt_inst
+                    for key_edge in mapping[edge]:
+                        cpt_inst = self.find_instance(mapping['edges'][d['name']])
+                        cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+                        name_table[node] = cpt_inst
                     
             unmapped_edges = []
             for edge in unmapped_edges:
@@ -1189,7 +1190,7 @@ class SEMANTIC_WM_C(WM):
                 node_to = rel_inst.content['pTo'].name
                 if self.SemRep.has_edge(node_from, node_to):
                     continue
-                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False)
+                self.SemRep.add_edge(node_from, node_to, name=rel_inst.name, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False)
             
             #Send the new state to output.
             self.outputs['to_output'] = True

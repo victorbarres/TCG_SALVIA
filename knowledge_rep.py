@@ -403,9 +403,9 @@ class FRAME(object):
     def _create_NX_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
-            graph.add_node(node, concept=node.concept)
+            graph.add_node(node.name, concept=node.concept)
         for edge in self.edges:
-            graph.add_edge(edge.pFrom, edge.pTo, concept=edge.concept)
+            graph.add_edge(edge.pFrom, edge.pTo, name=edge.name, concept=edge.concept)
         
         self.graph = graph
     
