@@ -32,6 +32,46 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
         """
         KNOWLEDGE_SCHEMA.__init__(self, name=frame.name, content=frame, init_act=init_act)
         self.trigger = frame.trigger
+    
+    def FrameMatch(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
+        """
+        Defines the condition of instantiation of the WK_FRAME_SCHEMA based on the state of Semantic Representation (SemRep).
+        
+        Notes:
+            - Here the trigger is given. This is is mostly for running efficiency.
+        """
+        sub_iso = self.FrameMatch_cat(SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name)
+        return sub_iso
+    
+    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
+        """
+        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
+        """
+        wk_frame_graph = self.content.graph 
+        trigger_name = self.trigger.name
+        # Build wk_frame_graph subgraphs. 
+        def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
+            return trigger_name in subgraph.nodes()
+                
+        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edge', subgraph_filter=subgraph_filter)
+        
+        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+    #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+       
+        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+    
+        def iso_filter(iso, trigger_sem_node_name):
+            sem_node_name = iso['nodes'].get(trigger_name, None)
+            if not(sem_node_name) or (sem_node_name != trigger_sem_node_name):
+                return False
+            return True
+            
+        sub_iso = TCG_graph.find_max_partial_iso(SemRep, SemRep_subgraphs, wk_frame_graph, wk_frame_subgraphs, node_match=nm, edge_match=em)
+        sub_iso = [s for s in sub_iso if iso_filter(s, trigger_sem_node_name)]
+        
+        return sub_iso
 
 class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
     """
@@ -241,46 +281,46 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
                     return True
             return False
         SemRep_subgraphs = TCG_graph.build_submultigraphs(SemRep, induced='edge', subgraph_filter=subgraph_filter)
-        
+            
         # Find triggers:
         for trigger_sem_node in [n for n in SemRep.nodes() if (n.concept in wk_frame_dict) and ('wk_WM' not in n.processed)]:
             wk_frame_schemas = wk_frame_dict[trigger_sem_node.concept]
             for wk_frame_schema in wk_frame_schemas:
-                sub_iso = self.FrameMatch_cat(SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node.name)
+                sub_iso = wk_frame_schema.FrameMatch(SemRep, SemRep_subgraphs, trigger_sem_node.name)
                 for a_sub_iso in sub_iso:
                     trace = trace = {"trigger":trigger_sem_node, "semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[wk_frame_schema]}  
                     new_instance= WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, a_sub_iso)
                     self.wk_frame_instances.append(new_instance)
                     
-    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
-        """
-        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
-        """
-        wk_frame_graph = wk_frame_schema.content.graph 
-        trigger_name = wk_frame_schema.trigger.name
-        # Build wk_frame_graph subgraphs. 
-        def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
-            return trigger_name in subgraph.nodes()
-                
-        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edge', subgraph_filter=subgraph_filter)
-        
-        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-#        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-       
-        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
-
-        def iso_filter(iso, trigger_sem_node_name):
-            sem_node_name = iso['nodes'].get(trigger_name, None)
-            if not(sem_node_name) or (sem_node_name != trigger_sem_node_name):
-                return False
-            return True
-            
-        sub_iso = TCG_graph.find_max_partial_iso(SemRep, SemRep_subgraphs, wk_frame_graph, wk_frame_subgraphs, node_match=nm, edge_match=em)
-        sub_iso = [s for s in sub_iso if iso_filter(s, trigger_sem_node_name)]
-        
-        return sub_iso
+#    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
+#        """
+#        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
+#        """
+#        wk_frame_graph = wk_frame_schema.content.graph 
+#        trigger_name = wk_frame_schema.trigger.name
+#        # Build wk_frame_graph subgraphs. 
+#        def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
+#            return trigger_name in subgraph.nodes()
+#                
+#        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edge', subgraph_filter=subgraph_filter)
+#        
+#        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+##        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+#        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+#       
+#        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+#        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+#
+#        def iso_filter(iso, trigger_sem_node_name):
+#            sem_node_name = iso['nodes'].get(trigger_name, None)
+#            if not(sem_node_name) or (sem_node_name != trigger_sem_node_name):
+#                return False
+#            return True
+#            
+#        sub_iso = TCG_graph.find_max_partial_iso(SemRep, SemRep_subgraphs, wk_frame_graph, wk_frame_subgraphs, node_match=nm, edge_match=em)
+#        sub_iso = [s for s in sub_iso if iso_filter(s, trigger_sem_node_name)]
+#        
+#        return sub_iso
     
     ####################
     ### JSON METHODS ###

@@ -49,11 +49,73 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
     """
     def __init__(self, aCXN, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=aCXN.name, content=aCXN, init_act=init_act)
+        
+    def SemMatch(self, SemRep, SemRep_subgraphs):
+        """
+        Defines the conditions of instantiation of the CXN_SCHEMA based on Semantic Matching between a Semantic Representation (SemRep) and the
+        construction schemas' SemFrame.
+        
+        Args:
+            - SemRep (graph): The semantic representation.
+            - SemRep_subgraphs(graphs): edge induced subgraphs from SemRep.
+    
+        Returns:
+            - [(a_sub_iso, match_qual), ...]:list of isomorphism mapping between subgraphs of SemReps and SemFrame as well as the quality of the match.
+            
+        Notes:
+            - the reason SemRep_subgraphs are given is so that the subgraph set doesn't have to be recomputed
+            by each instance.
+        """
+        match_output = []
+        sub_iso = self.SemMatch_cat(SemRep_subgraphs)
+        for a_sub_iso in sub_iso:
+            match_qual = self.SemMatch_qual(SemRep, a_sub_iso)
+            match_output.append((a_sub_iso, match_qual))
+        return match_output
+         
+    def SemMatch_cat(self, SemRep_subgraphs):
+        """
+        IMPORTANT ALGORITHM
+        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
+        """
+        SemFrame_graph = self.content.SemFrame.graph 
+            
+        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+       
+        nm = TCG_graph.node_iso_match(["concept", "frame"], ["", False], [node_concept_match, node_frame_match])
+        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+
+        sub_iso = TCG_graph.find_sub_iso(SemRep_subgraphs, SemFrame_graph, node_match=nm, edge_match=em)
+        return sub_iso
+    
+    def SemMatch_qual(self, SemRep, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
+        """
+        Computes the quality of match.
+        Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
+        
+        NOTE: I NEED TO THINK ABOUT HOW TO INCORPORATE FOCUS ETC....
+            - In the current version of focus, it only looks at the focus node for the quality of match. 
+                But focus should be defined as contrasts within consructions (and between constructions.)
+                Move from focus as boolean value to focus as value attached to each node.
+            - Still need to incorporate light sem. For this, need to switch to vector space representaiton of concept. 
+            This could be added on top of the is-a ontology.
+        """
+        # Compute match qual value based on focus values.
+        focus_match = 1
+#        for cxn_node, sem_node_name in a_sub_iso['nodes'].iteritems():
+#            sem_node_act = SemRep.node[sem_node_name]['cpt_inst'].activity
+#            if cxn_node.focus:
+#                focus = 1
+#                focus_match -= focus - sem_node_act # This is much too simple. But placeholder for now.            
+        return focus_match
     
     def get_initial_predictions(self):
         """
         Returns the list of initial prediction (syntactic classes or word forms)
         This is similar to getting the Left-Corner of the rule in the case of CFG.
+        Serves as a conditions of instantiation of CXN_SCHEMA based on SynForm.s
         """
         init_preds = []
         init_form = self.content.SynForm.form[0]
@@ -2256,50 +2318,49 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
         SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='edge', subgraph_filter=subgraph_filter)
         
         for cxn_schema in cxn_schemas:
-            sub_iso = self.SemMatch_cat(SemRep_subgraphs, cxn_schema)
-            for a_sub_iso in sub_iso:
-                match_qual = self.SemMatch_qual(SemRep, cxn_schema, a_sub_iso)
+            match_output = cxn_schema.SemMatch(SemRep, SemRep_subgraphs)
+            for a_sub_iso, match_qual in match_output:
                 trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}     
                 new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
-    def SemMatch_cat(self, SemRep_subgraphs, cxn_schema):
-        """
-        IMPORTANT ALGORITHM
-        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
-        """
-        SemFrame_graph = cxn_schema.content.SemFrame.graph 
-            
-        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-       
-        nm = TCG_graph.node_iso_match(["concept", "frame"], ["", False], [node_concept_match, node_frame_match])
-        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
-
-        sub_iso = TCG_graph.find_sub_iso(SemRep_subgraphs, SemFrame_graph, node_match=nm, edge_match=em)
-        return sub_iso
-    
-    def SemMatch_qual(self, SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
-        """
-        Computes the quality of match.
-        Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
-        
-        NOTE: I NEED TO THINK ABOUT HOW TO INCORPORATE FOCUS ETC....
-            - In the current version of focus, it only looks at the focus node for the quality of match. 
-                But focus should be defined as contrasts within consructions (and between constructions.)
-                Move from focus as boolean value to focus as value attached to each node.
-            - Still need to incorporate light sem. For this, need to switch to vector space representaiton of concept. 
-            This could be added on top of the is-a ontology.
-        """
-        # Compute match qual value based on focus values.
-        focus_match = 1
-#        for cxn_node, sem_node_name in a_sub_iso['nodes'].iteritems():
-#            sem_node_act = SemRep.node[sem_node_name]['cpt_inst'].activity
-#            if cxn_node.focus:
-#                focus = 1
-#                focus_match -= focus - sem_node_act # This is much too simple. But placeholder for now.            
-        return focus_match
+#    def SemMatch_cat(self, SemRep_subgraphs, cxn_schema):
+#        """
+#        IMPORTANT ALGORITHM
+#        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
+#        """
+#        SemFrame_graph = cxn_schema.content.SemFrame.graph 
+#            
+#        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+#        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+#        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+#       
+#        nm = TCG_graph.node_iso_match(["concept", "frame"], ["", False], [node_concept_match, node_frame_match])
+#        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+#
+#        sub_iso = TCG_graph.find_sub_iso(SemRep_subgraphs, SemFrame_graph, node_match=nm, edge_match=em)
+#        return sub_iso
+#    
+#    def SemMatch_qual(self, SemRep, cxn_schema, a_sub_iso): ## NEEDS TO BE WRITTEN!! At this point the formalism does not support efficient quality of match.
+#        """
+#        Computes the quality of match.
+#        Returns a value between 0 and 1: 0 -> no match, 1 -> perfect match.
+#        
+#        NOTE: I NEED TO THINK ABOUT HOW TO INCORPORATE FOCUS ETC....
+#            - In the current version of focus, it only looks at the focus node for the quality of match. 
+#                But focus should be defined as contrasts within consructions (and between constructions.)
+#                Move from focus as boolean value to focus as value attached to each node.
+#            - Still need to incorporate light sem. For this, need to switch to vector space representaiton of concept. 
+#            This could be added on top of the is-a ontology.
+#        """
+#        # Compute match qual value based on focus values.
+#        focus_match = 1
+##        for cxn_node, sem_node_name in a_sub_iso['nodes'].iteritems():
+##            sem_node_act = SemRep.node[sem_node_name]['cpt_inst'].activity
+##            if cxn_node.focus:
+##                focus = 1
+##                focus_match -= focus - sem_node_act # This is much too simple. But placeholder for now.            
+#        return focus_match
     
     ####################
     ### JSON METHODS ###
