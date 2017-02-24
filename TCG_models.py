@@ -36,6 +36,10 @@ def parameters(system_names):
         'init_act':0.3
         },
         
+    'WK_frame_LTM':{
+        'init_act':1.0
+        },    
+        
     'Semantic_WM_P':{
         'dyn.tau':10000.0,
         'dyn.int_weight':1.0,
@@ -171,6 +175,23 @@ def parameters(system_names):
         'C2.comp_weight':0.0,
         'C2.max_capacity':None
         },
+        
+    'WK_frame_retrieval':{},
+    
+    'WK_frame_WM':{
+        'dyn.tau':10000.0,
+        'dyn.int_weight':1.0,
+        'dyn.ext_weight':1.0,
+        'dyn.act_rest':0.001,
+        'dyn.k':10.0,
+        'dyn.noise_mean':0.0,
+        'dyn.noise_std':0.1,
+        'C2.confidence_threshold':0.0,
+        'C2.prune_threshold':0.01,
+        'C2.coop_weight':0.0,
+        'C2.comp_weight':0.0,
+        'C2.max_capacity':None
+    },
         
     'Subscene_recognition':{
         'recognition_time':50
@@ -436,14 +457,19 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     wk_schemas = [wk_frame_LTM, wk_frame_retrieval, wk_frame_WM]
     model.add_schemas(wk_schemas)
     
-    model.brain_mapping['WK_frame_LTM']=[]
-    model.brain_mapping['WK_frame_wm']=[]
-    model.brain_mapping['WK_frame_retrieval']=[]
+    model.brain_mapping.schema_mapping['WK_frame_LTM']=[]
+    model.brain_mapping.schema_mapping['WK_frame_wm']=[]
+    model.brain_mapping.schema_mapping['WK_frame_retrieval']=[]
 
     model.add_connection(semanticWM_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_semantic_WM')
     model.add_connection(wk_frame_LTM, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_wk_frame_LTM')
-    model.add_connection(wk_frame_retrieval, 'to_wk_frame_wm', wk_frame_WM, 'from_wk_frame_retrieval')
+    model.add_connection(wk_frame_retrieval, 'to_wk_frame_WM', wk_frame_WM, 'from_wk_frame_retrieval')
     model.add_connection(wk_frame_WM, 'to_semantic_WM', semanticWM_C, 'from_wk_frame_WM')
+    
+    # Parameters
+    system_names = model.schemas.keys()
+    model_params = parameters(system_names)
+    model.update_params(model_params)
     
     # Loading data
     semantics_file = "%s.json" % semantics_name

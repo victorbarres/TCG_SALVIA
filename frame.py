@@ -49,7 +49,7 @@ class WK_FRAME(FRAME):
     def copy(self):
         (new_frame, name_corr) = FRAME.copy(self)
         new_frame.frame_knowedge = self.frame_knowledge
-        new_frame.trigger = new_frame.find_elem(name_corr(self.trigger))
+        new_frame.trigger = new_frame.find_elem(name_corr[self.trigger.name])
         return (new_frame, name_corr)
         
     def show(self):

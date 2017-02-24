@@ -973,8 +973,8 @@ class SEMANTIC_WM_C(WM):
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('IN', 'from_control')
-        self.add_port('IN', 'from_WK_frame_WM')
-        self.add_port('OUT', 'to_WK_frame_WM')
+        self.add_port('IN', 'from_wk_frame_WM')
+        self.add_port('OUT', 'to_wk_frame_retrieval')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_output')
@@ -1013,6 +1013,8 @@ class SEMANTIC_WM_C(WM):
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
+        
+        self.outputs['to_wk_frame_retrieval'] = self.SemRep
     
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """

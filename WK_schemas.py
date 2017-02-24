@@ -33,6 +33,12 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
         KNOWLEDGE_SCHEMA.__init__(self, name=frame.name, content=frame, init_act=init_act)
         self.trigger = frame.trigger
     
+    def is_triggered(self, concept):
+        """
+        Returns true if the concept triggers the instantiation of the WK_FRAME_SCHEMA.
+        """
+        return concept.match(self.trigger.concept, match_type = "is_a")
+    
     def FrameMatch(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
         """
         Defines the condition of instantiation of the WK_FRAME_SCHEMA based on the state of Semantic Representation (SemRep).
@@ -104,13 +110,11 @@ class WK_FRAME_LTM(LTM):
        
     Args:
         - frame_knowledge (FRAME_KNOWLEDGE):
-        - trigger_dict ({trigger_cpt:[FRAME_SCHEMA]})
     """
     def __init__(self, name='WK_frame_LTM'):
         LTM.__init__(self, name)
-        self.add_port('OUT', 'to_wk_frame_WM')
+        self.add_port('OUT', 'to_wk_frame_retrieval')
         self.frame_knowledge = None
-        self.trigger_dict = {}
         self.params['init_act'] = 1
         
     def initialize(self, frame_knowledge):
@@ -125,18 +129,9 @@ class WK_FRAME_LTM(LTM):
         for frame in frame_knowledge.frames:
             new_schema = WK_FRAME_SCHEMA(name=frame.name, frame=frame, init_act=self.params['init_act'])
             self.add_schema(new_schema)
-        self.set_trigger_dict()
     
     def process(self):
-        self.outputs['to_wk_frame_WM'] = self.trigger_dict
-    
-    def set_trigger_dict(self):
-        for wk_frame_schema in self.schemas:
-            trig = wk_frame_schema.trigger.concept
-            if trig not in self.trigger_dict:
-                self.trigger_dict[trig] = [wk_frame_schema]
-            else:
-                self.trigger_dict[trig].append(wk_frame_schema)
+        self.outputs['to_wk_frame_retrieval'] = self.schemas
        
     ####################
     ### JSON METHODS ###
@@ -153,7 +148,7 @@ class WK_FRAME_WM(WM):
     """
     def __init__(self, name='WK_frame_WM'):
         WM.__init__(self, name)
-        self.add_port('IN', 'from_wk_frame_LTM')
+        self.add_port('IN', 'from_wk_frame_retrieval')
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('OUT', 'to_semantic_WM')
         
@@ -166,13 +161,15 @@ class WK_FRAME_WM(WM):
         """
         """
         sem_input = self.inputs['from_semantic_WM']
-        new_wk_frame_insts= self.inputs['from_cxn_retrieval_P']
+        new_wk_frame_insts= self.inputs['from_wk_frame_retrieval']
         self.outputs['to_semantic_WM'] = {}
         if new_wk_frame_insts:
-            self.add_new_insts(new_wk_frame_insts) 
-            output = self.apply_WK(new_wk_frame_insts,sem_input)
-            if output:
-                self.outputs['to_semantic_WM']['instances'] =  output['sem_WM_output']
+            # Add new instances
+            for inst in new_wk_frame_insts:
+                self.add_instance(inst, inst.activity) 
+            wk_output = self.apply_WK(sem_input)
+            if wk_output:
+                self.outputs['to_semantic_WM']['instances'] =  wk_output
         
         activations = self.sem_WM_output()
         self.outputs['to_semantic_WM']['activations'] = activations
@@ -250,9 +247,9 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         """
         SemRep = self.inputs['from_semantic_WM']
           
-        wk_frame_dict = self.inputs['from_wk_frame_LTM']
-        if wk_frame_dict and SemRep:
-            self.instantiate_wk_frames(SemRep, wk_frame_dict)
+        wk_frame_schemas = self.inputs['from_wk_frame_LTM']
+        if wk_frame_schemas and SemRep:
+            self.instantiate_wk_frames(SemRep, wk_frame_schemas)
             self.outputs['to_wk_frame_WM'] = self.wk_frame_instances
             
             # Marked all SemRep elements as processed by WK_WM
@@ -262,36 +259,46 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
                 d['processed'].append('wk_WM')
         self.wk_frame_instances = []
     
-    def instantiate_wk_frame(self, SemRep, wk_frame_dict):
+    def instantiate_wk_frames(self, SemRep, wk_frame_schemas):
         """
         """
-        if not wk_frame_dict:
+        if not wk_frame_schemas:
             return
             
-        # Build SemRep subgraphs
-        def subgraph_filter(subgraph): # I NEED TO FIX THAT TO HANDLE MULTIGRAPHS!
-            """
-            Returns True only if at least one node or edge is tagged as new.
-            """
-            for n,d in subgraph.nodes(data=True):
-                if 'wk_WM' not in d['processed']:
-                    return True
-            for n1,n2,d in subgraph.edges(data=True):
-                if 'wk_WM' not in d['processed']:
-                    return True
-            return False
-        SemRep_subgraphs = TCG_graph.build_submultigraphs(SemRep, induced='edge', subgraph_filter=subgraph_filter)
-            
+#        # Build SemRep subgraphs
+#        def subgraph_filter(subgraph): # I NEED TO FIX THAT TO HANDLE MULTIGRAPHS!
+#            """
+#            Returns True only if at least one node or edge is tagged as new.
+#            """
+#            for n,d in subgraph.nodes(data=True):
+#                if 'wk_WM' not in d['processed']:
+#                    return True
+#            for n1,n2,d in subgraph.edges(data=True):
+#                if 'wk_WM' not in d['processed']:
+#                    return True
+#            return False
+#        SemRep_subgraphs = TCG_graph.build_submultigraphs(SemRep, induced='edge', subgraph_filter=subgraph_filter)
+        
         # Find triggers:
-        for trigger_sem_node in [n for n in SemRep.nodes() if (n.concept in wk_frame_dict) and ('wk_WM' not in n.processed)]:
-            wk_frame_schemas = wk_frame_dict[trigger_sem_node.concept]
-            for wk_frame_schema in wk_frame_schemas:
-                ### THIS HAS TO BE INCORRECT! I WANT IT TO BE ABLE TO MATCH ON multiple nodes, in spite of the fact that the edges can be wrong.
-                sub_iso = wk_frame_schema.FrameMatch(SemRep, SemRep_subgraphs, trigger_sem_node.name)
-                for a_sub_iso in sub_iso:
-                    trace = trace = {"trigger":trigger_sem_node, "semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[wk_frame_schema]}  
-                    new_instance= WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, a_sub_iso)
-                    self.wk_frame_instances.append(new_instance)
+        for trigger_sem_node, concept in [(n,d['concept']) for n,d in SemRep.nodes(data=True) if ('wk_WM' not in d['processed'])]:
+            triggered_schemas = [schema for schema in wk_frame_schemas if schema.is_triggered(concept)]
+            print self.t
+            print triggered_schemas
+            for wk_frame_schema in triggered_schemas:
+                trace = trace = {"trigger":trigger_sem_node, "schemas":[wk_frame_schema]}  
+                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace)
+                self.wk_frame_instances.append(new_instance)
+                    
+#        # Find triggers:
+#        for trigger_sem_node in [n for n in SemRep.nodes() if (n.concept in wk_frame_dict) and ('wk_WM' not in n.processed)]:
+#            wk_frame_schemas = wk_frame_dict[trigger_sem_node.concept]
+#            for wk_frame_schema in wk_frame_schemas:
+#                ### THIS HAS TO BE INCORRECT! I WANT IT TO BE ABLE TO MATCH ON multiple nodes, in spite of the fact that the edges can be wrong.
+#                sub_iso = wk_frame_schema.FrameMatch(SemRep, SemRep_subgraphs, trigger_sem_node.name)
+#                for a_sub_iso in sub_iso:
+#                    trace = trace = {"trigger":trigger_sem_node, "semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[wk_frame_schema]}  
+#                    new_instance= WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, a_sub_iso)
+#                    self.wk_frame_instances.append(new_instance)
                     
 #    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
 #        """

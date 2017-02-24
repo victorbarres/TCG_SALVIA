@@ -17,7 +17,7 @@ TMP_FOLDER = './tmp'
 
 ##################
 #### RUNNING MODEL
-def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}):
+def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_main', model_params = {}):
     """
     Sets up a TCG comprehension 2route systme.
     
@@ -126,6 +126,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         model.schemas['Grammatical_WM_C'].show_dynamics()
         model.schemas['Phonological_WM_C'].show_dynamics()
         model.schemas['Semantic_WM'].show_dynamics()
+        model.schemas['WK_frame_WM'].show_dynamics()
        
     if anim:
         if save:
@@ -133,11 +134,12 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
             model.schemas['Semantic_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
             model.schemas['Phonological_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
+            model.schemas['WK_frame_WM'].show_dynamics_anim(folder=FOLDER, step=anim_step)
         else:
             model.schemas['Phonological_WM_C'].show_dynamics_anim(step=anim_step)
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(step=anim_step)
             model.schemas['Semantic_WM_C'].show_dynamics_anim(step=anim_step)
-            
+            model.schemas['WK_frame_WM'].show_dynamics_anim(step=anim_step)
       
 #    model.schemas['Semantic_WM'].show_SemRep()
     model.reset() # Gets model ready for next use.
@@ -145,7 +147,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     return outputs
     
-def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -165,8 +167,8 @@ def run_diagnostic():
     """
     import json
     LING_INPUT_FILE = 'ling_inputs.json'
-    SEMANTICS_NAME = 'TCG_semantics_main'
-    GRAMMAR_NAME = 'TCG_grammar_VB_main'
+    SEMANTICS_NAME = 'TCG_semantics_dev'
+    GRAMMAR_NAME = 'TCG_grammar_VB_lex'
     VERBOSE = 2
     SEED = None
     ANIM = True
@@ -186,16 +188,9 @@ def run_diagnostic():
 
 
 if __name__=='__main__':
-#    input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
-#    num = len(input_names)
-#    for input_name in input_names:
-#        print "#### Processing -> %s" % input_name
-#        print "%i more to go!" % num
-#        num -=1
-#        run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=4, save=True, anim=True,  anim_step=1)
+#    model = set_model()
+#    model.system2dot(image_type='png', disp=True)
     run_diagnostic()
-
-#    run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_SVO', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=4, save=True, anim=True,  anim_step=1)
 
 
 
