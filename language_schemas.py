@@ -973,6 +973,7 @@ class SEMANTIC_WM_C(WM):
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('IN', 'from_control')
+        self.add_port('IN', 'from_WK_frame_WM')
         self.add_port('OUT', 'to_WK_frame_WM')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_control')
