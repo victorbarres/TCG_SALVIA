@@ -1034,101 +1034,122 @@ class SEMANTIC_WM_C(WM):
             else:
                 return None
 
-        """
-        I need to recheck the mapping (here there is no mapping) since this is not production. So mapping is None. But
-        there will be a mapping if I had feebback
-        Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
-        If so, expand mapping, move on with adding concept schemas.
-        """
-        def build_mapping(SemFrame, sem_map):
-            """
-            Find ways in wich the SemFrame can map onto the SemRep.
-            For each ways, it adds to the SemRep the portion of its graph that is not contained in the SemRep.
-            """
-            node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # I SHOULD REFACTOR ALL THIS.
-            node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-            edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-           
-            nm = TCG_graph.node_iso_match(["concept", "frame"], ["", False], [node_concept_match, node_frame_match])
-            em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
-            current_mapping = {}
-            new_mappings = self.update_mapping(SemFrame.graph, current_mapping, node_match=nm, edge_match=em)
-            return new_mappings
-        
-        new_mappings = build_mapping(SemFrame)
+#        """
+#        I need to recheck the mapping (here there is no mapping) since this is not production. So mapping is None. But
+#        there will be a mapping if I had feebback
+#        Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
+#        If so, expand mapping, move on with adding concept schemas.
+#        """
+#        def build_mapping(SemFrame):
+#            """
+#            Find ways in wich the SemFrame can map onto the SemRep.
+#            For each ways, it adds to the SemRep the portion of its graph that is not contained in the SemRep.
+#            """
+#            node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # I SHOULD REFACTOR ALL THIS.
+#            node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+#            edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+#           
+#            nm = TCG_graph.node_iso_match(["concept", "frame"], ["", False], [node_concept_match, node_frame_match])
+#            em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+#            current_mapping = {'nodes':{}, 'edges':{}}
+#            new_mappings = self.update_mapping(SemFrame.graph, current_mapping, node_match=nm, edge_match=em)
+#            return new_mappings
+#        
+#        new_mappings = build_mapping(SemFrame)
+#        if not new_mappings:
+#            cpt_insts = []
+#            name_table = {}
+#            for node in SemFrame.nodes:
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+#                name_table[node] = new_cpt_inst
+#                cpt_insts.append(new_cpt_inst)
+#            for edge in SemFrame.edges:
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+#                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
+#                new_cpt_inst.content['pTo'] = name_table[edge.pTo]
+#                cpt_insts.append(new_cpt_inst)
+#                
+#            return cpt_insts
+#            
+#        cpt_insts = []
+#        name_table = {}
+#        for mapping in new_mappings:
+#            mapped_nodes = [n for n in SemFrame.nodes if n.name in mapping['nodes']]
+#            for node in mapped_nodes:
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+#                old_cpt_inst = find_cpt_inst(sem_frame_insts)
+#                if old_cpt_inst:
+#                    old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+#                    name_table[node] = old_cpt_inst
+#                else:
+#                    cpt_inst = self.find_instance(mapping['nodes'][node.name])
+#                    cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+#                    name_table[node] = cpt_inst
+#                    
+#            unmapped_nodes = [n for n in SemFrame.nodes if n.name not in mapping['nodes']]
+#            for node in unmapped_nodes:
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+#                name_table[node] = new_cpt_inst
+#                cpt_insts.append(new_cpt_inst)
+#            
+#            mapped_edges = []
+#            for e in mapping['edges']:
+#                edge = SemFrame.find_elem(e['name'])
+#                mapped_edges.append(edge)
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
+#                old_cpt_inst = find_cpt_inst(sem_frame_insts)
+#                if old_cpt_inst:
+#                    old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+#                else:
+#                    for a_multi_edge in mapping[e]:
+#                        cpt_inst = self.find_instance(a_multi_edge['name'])
+#                        cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+#                        name_table[node] = cpt_inst
+#                    
+#            unmapped_edges = [e for e in SemFrame.edges if e not in mapped_edges]
+#            for edge in unmapped_edges:
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
+#                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
+#                new_cpt_inst.content['pTo'] = name_table[edge.pTo]
+#                cpt_insts.append(new_cpt_inst)
+#                
+#        return cpt_insts
         cpt_insts = []
         name_table = {}
-        for mapping in new_mappings:
-            ### I NEED TO HAVE A WAY TO USE MAPPING TO QUICKLY FIND AN NODE OR EDGE IN GRAPH AND REFER TO INSTANCE.
-            ##########.....>!!!!
-            mapped_nodes = [n for n in SemFrame.nodes if n.name in mapping['nodes']]
-            for node in mapped_nodes:
-                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
-                old_cpt_inst = find_cpt_inst(sem_frame_insts)
-                if old_cpt_inst:
-                    old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-                    name_table[node] = old_cpt_inst
-                else:
-                    cpt_inst = self.find_instance(mapping['nodes'][node.name])
-                    cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-                    name_table[node] = cpt_inst
-                    
-            unmapped_nodes = [n for n in SemFrame.nodes if n.name not in mapping['nodes']]
-            for node in unmapped_nodes:
-                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+        for node in SemFrame.nodes:
+            cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
+            sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+            old_cpt_inst = find_cpt_inst(sem_frame_insts)
+            if old_cpt_inst:
+                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+                name_table[node] = old_cpt_inst
+            else:
                 new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
                 name_table[node] = new_cpt_inst
                 cpt_insts.append(new_cpt_inst)
-            
-            #### THIS IS WRONG!!! TO FIX!!! I need an easy conversion from mapping to edge.
-            mapped_edges = [e for e in SemFrame.edges if e.name in [SemFrame.graph.get_edge_data(u,v,k)['name'] for u,v,k in mapping['edges']]]
-            for edge in mapped_edges:
-                cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
-                sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
-                old_cpt_inst = find_cpt_inst(sem_frame_insts)
-                if old_cpt_inst:
-                    old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-                else:
-                    for key_edge in mapping[edge]:
-                        cpt_inst = self.find_instance(mapping['edges'][d['name']])
-                        cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-                        name_table[node] = cpt_inst
-                    
-            unmapped_edges = []
-            for edge in unmapped_edges:
+        
+        for edge in SemFrame.edges:
+            cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
+            sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
+            old_cpt_inst = find_cpt_inst(sem_frame_insts)
+            if old_cpt_inst:
+                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
+            else:
                 new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
                 new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
                 new_cpt_inst.content['pTo'] = name_table[edge.pTo]
                 cpt_insts.append(new_cpt_inst)
         return cpt_insts
-#        cpt_insts = []
-#        name_table = {}
-#        for node in SemFrame.nodes:
-#            cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-#            sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
-#            old_cpt_inst = find_cpt_inst(sem_frame_insts)
-#            if old_cpt_inst:
-#                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-#                name_table[node] = old_cpt_inst
-#            else:
-#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
-#                name_table[node] = new_cpt_inst
-#                cpt_insts.append(new_cpt_inst)
-#        
-#        for edge in SemFrame.edges:
-#            cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
-#            sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
-#            old_cpt_inst = find_cpt_inst(sem_frame_insts)
-#            if old_cpt_inst:
-#                old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-#            else:
-#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
-#                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
-#                new_cpt_inst.content['pTo'] = name_table[edge.pTo]
-#                cpt_insts.append(new_cpt_inst)
-#        return cpt_insts
         
     def instantiate_wk_cpts(self, wk_inputs, cpt_schemas):
         """
