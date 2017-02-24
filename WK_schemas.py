@@ -240,7 +240,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
                 if 'wk_WM' not in d['processed']:
                     return True
             return False
-        SemRep_subgraphs = TCG_graph.build_submultigraphs(SemRep, induced='edges', subgraph_filter=subgraph_filter)
+        SemRep_subgraphs = TCG_graph.build_submultigraphs(SemRep, induced='edge', subgraph_filter=subgraph_filter)
         
         # Find triggers:
         for trigger_sem_node in [n for n in SemRep.nodes() if (n.concept in wk_frame_dict) and ('wk_WM' not in n.processed)]:
@@ -265,7 +265,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
             return trigger_name in subgraph.nodes()
                 
-        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edges', subgraph_filter=subgraph_filter)
+        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edge', subgraph_filter=subgraph_filter)
         
         node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
 #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match

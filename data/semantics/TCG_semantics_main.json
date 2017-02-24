@@ -35,7 +35,9 @@
 					},
 					"FOOD":
 					{
-						"BREAD": {}
+						"BREAD": {},
+						"CAKE" : {},
+						"APPLE" : {}
 					},
 					"CELLO" : {},
 					"TREE" : {},
@@ -235,7 +237,9 @@
 			"BALL",
 			"BREAD",
 			"MOTORCYCLE",
-			"MERRY_GO_ROUND"
+			"MERRY_GO_ROUND",
+			"CAKE", 
+			"APPLE"
 		],
 		
 		"PLACE":
@@ -388,6 +392,8 @@
 		"BREAD" : ["BREAD"],
 		"MOTORCYCLE" : ["MOTORCYCLE"],
 		"MERRY_GO_ROUND" : ["MERRY_GO_ROUND"],
+		"CAKE" : ["CAKE"],
+		"APPLE" : ["APPLE"],
 		
 		"SQUIRT" : ["SQUIRT"],
 		"TALK" : ["TALK"],

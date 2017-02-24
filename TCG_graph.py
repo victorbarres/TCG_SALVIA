@@ -119,9 +119,8 @@ def update_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, old_map
     """
     sub_iso = find_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, node_match, edge_match, iso_filter)
     for a_sub_iso in sub_iso:
+        pass
         
-    
-                    
 def is_subgraph(G1, G2):
     """
     Returns true if G1 is a subgraph of G2
@@ -138,7 +137,7 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
     """
     Returns the list of subgraphs of G (DiGraph) filtered by subgraph_filter
     induced:
-        -> 'edges': edge induced subgraphs + single nodes
+        -> 'edge': edge induced subgraphs + single nodes
         -> 'node': node induced subgraphs.
         
     - subgraph_filter (callable): subgraph_filter should be a callable that takes on a subgraph and returns True or False. Only the subgraphs that return True
@@ -171,7 +170,7 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
     """
     Returns the list of subgraphs of G (MutliDiGraph) filtered by subgraph_filter
     induced:
-        -> 'edges': edge induced subgraphs + single nodes
+        -> 'edge': edge induced subgraphs + single nodes
         -> 'node': node induced subgraphs.
     """
     if induced == 'node':

@@ -809,7 +809,7 @@ class SEMANTIC_WM_P(WM):
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
                 if self.SemRep.has_node(inst.name):
                     continue
-                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, expressed=False)
+                self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, processed=[], expressed=False)
             
             # Then add the relations
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
@@ -817,7 +817,7 @@ class SEMANTIC_WM_P(WM):
                 node_to = rel_inst.content['pTo'].name
                 if self.SemRep.has_edge(node_from, node_to):
                     continue
-                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, expressed=False)
+                self.SemRep.add_edge(node_from, node_to, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False)
             
 #            # Update concept frames
 #            self.update_cpt_frames()
@@ -1026,7 +1026,7 @@ class SEMANTIC_WM_C(WM):
         Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
         If so, expand mapping, move on with adding concept schemas.
         """
-       pass
+        pass
     
     def convey_gram_activations(self, gram_activations):
         """
@@ -2229,9 +2229,9 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             self.outputs['to_grammatical_WM_P'] = self.cxn_instances
             # Marked all SemRep elements as processed by gram_WM_C
             for n, d in SemRep.nodes(data=True):
-                d['processed'].append('gram_WM_C')
+                d['processed'].append('gram_WM_P')
             for u,v,d in SemRep.edges(data=True):
-                d['processed'].append('gram_WM_C')
+                d['processed'].append('gram_WM_P')
         self.cxn_instances = []
     
     def instantiate_cxns(self, SemRep, cxn_schemas):
@@ -2245,15 +2245,15 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             Returns True only if at least one node or edge is tagged as new.
             """
             for n,d in subgraph.nodes(data=True):
-                if 'gram_WM_C' not in d['processed']:
+                if 'gram_WM_P' not in d['processed']:
                     return True
             for n1,n2,d in subgraph.edges(data=True):
-                if 'gram_WM_C' not in d['processed']:
+                if 'gram_WM_P' not in d['processed']:
                     return True
             return False
         
         # Build SemRep subgraphs
-        SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='edges', subgraph_filter=subgraph_filter)
+        SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='edge', subgraph_filter=subgraph_filter)
         
         for cxn_schema in cxn_schemas:
             sub_iso = self.SemMatch_cat(SemRep_subgraphs, cxn_schema)
