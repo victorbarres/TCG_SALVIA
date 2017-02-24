@@ -286,6 +286,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         for trigger_sem_node in [n for n in SemRep.nodes() if (n.concept in wk_frame_dict) and ('wk_WM' not in n.processed)]:
             wk_frame_schemas = wk_frame_dict[trigger_sem_node.concept]
             for wk_frame_schema in wk_frame_schemas:
+                ### THIS HAS TO BE INCORRECT! I WANT IT TO BE ABLE TO MATCH ON multiple nodes, in spite of the fact that the edges can be wrong.
                 sub_iso = wk_frame_schema.FrameMatch(SemRep, SemRep_subgraphs, trigger_sem_node.name)
                 for a_sub_iso in sub_iso:
                     trace = trace = {"trigger":trigger_sem_node, "semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[wk_frame_schema]}  
