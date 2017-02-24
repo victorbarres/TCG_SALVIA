@@ -114,12 +114,60 @@ def find_max_partial_iso(G, G_subgraphs, G_pat, G_pat_subgraphs, node_match=None
     output = [s for s in output if iso_filter(s)]
     return output
     
-def update_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, old_mappings, node_match=None, edge_match=None, iso_filter=lambda x:True):
-    """For each partial iso mapping in old_mappings, checks if they can be expanded on newG.
+def update_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, old_sub_iso, node_match=None, edge_match=None, iso_filter=lambda x:True):
+    """For a partial iso mapping old_sub_iso, checks if it can be expanded on newG.
+    Returns:
+        List of max_partial_iso that expand old_sub_iso on newG
     """
     sub_iso = find_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, node_match, edge_match, iso_filter)
+    new_sub_iso = []
     for a_sub_iso in sub_iso:
-        pass
+        if sub_multi_iso_include(a_sub_iso, old_sub_iso):
+            new_sub_iso.append(a_sub_iso)
+
+def sub_iso_include(sub_iso1, sub_iso2):
+    """
+    Compare two subgraph isomorphisms from a graph G1 onto a graph G2
+    Returns True if sub_iso1 includes sub_iso2
+    """ 
+    nodes_map1 = sub_iso1['nodes']
+    nodes_map2 = sub_iso2['nodes']
+    node_flag = True
+    for n,v in nodes_map1.iteritems():
+        if not(n in nodes_map2) or nodes_map2(n) != v:
+            node_flag = False
+            break
+    edges_map1 = sub_iso1['edges']
+    edges_map2 = sub_iso2['edges']
+    edge_flag = True
+    for e,v in edges_map1.iteritems():
+        if not(e in edges_map2) or edges_map2(e) != v:
+            edge_flag = False
+            break
+        
+    return node_flag and edge_flag   
+                               
+def sub_multi_iso_include(sub_iso1, sub_iso2):
+    """
+    Compare two sub mutltigraph isomorphisms from a graph G1 onto a graph G2
+    Returns True if sub_iso1 includes sub_iso2
+    """
+    nodes_map1 = sub_iso1['nodes']
+    nodes_map2 = sub_iso2['nodes']
+    node_flag = True
+    for n,v in nodes_map1.iteritems():
+        if not(n in nodes_map2) or nodes_map2(n) != v:
+            node_flag = False
+            break
+    edges_map1 = sub_iso1['edges']
+    edges_map2 = sub_iso2['edges']
+    edge_flag = True
+    for e,v in edges_map1.iteritems():
+        if not(e in edges_map2) or [i for i in edges_map2[e] if i in v] != edges_map2[e]:
+            edge_flag = False
+            break
+        
+    return node_flag and edge_flag
         
 def is_subgraph(G1, G2):
     """

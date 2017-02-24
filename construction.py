@@ -189,9 +189,11 @@ class TP_SEMFRAME(TP_ELEM):
     def _create_graph(self):
         graph = nx.DiGraph()
         for node in self.nodes:
-            graph.add_node(node, concept=node.concept, frame=node.frame)
+            graph.add_node(node.name, concept=node.concept, frame=node.frame)
         for edge in self.edges:
-            graph.add_edge(edge.pFrom, edge.pTo, concept=edge.concept)
+            pFrom = edge.pFrom.name if edge.pFrom else None
+            pTo =  edge.pTo.name if edge.pTo else None
+            graph.add_edge(pFrom, pTo, concept=edge.concept)
         
         self.graph = graph
     

@@ -248,11 +248,8 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
             for wk_frame_schema in wk_frame_schemas:
                 sub_iso = self.FrameMatch_cat(SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node.name)
                 for a_sub_iso in sub_iso:
-                    trace = trace = {"trigger":trigger_sem_node, "semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[wk_frame_schema]}
-                    node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
-                    edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
-                    mapping = {'nodes':node_mapping, 'edges':edge_mapping}    
-                    new_instance= WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, mapping)
+                    trace = trace = {"trigger":trigger_sem_node, "semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[wk_frame_schema]}  
+                    new_instance= WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, a_sub_iso)
                     self.wk_frame_instances.append(new_instance)
                     
     def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):

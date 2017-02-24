@@ -2259,11 +2259,8 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             sub_iso = self.SemMatch_cat(SemRep_subgraphs, cxn_schema)
             for a_sub_iso in sub_iso:
                 match_qual = self.SemMatch_qual(SemRep, cxn_schema, a_sub_iso)
-                trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}
-                node_mapping  = dict([(k.name, v) for k,v in a_sub_iso['nodes'].iteritems()])
-                edge_mapping  = dict([((k[0].name, k[1].name), v) for k,v in a_sub_iso['edges'].iteritems()])
-                mapping = {'nodes':node_mapping, 'edges':edge_mapping}                
-                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, mapping)
+                trace = {"semrep":{"nodes":a_sub_iso["nodes"].values(), "edges":a_sub_iso["edges"].values()}, "schemas":[cxn_schema]}     
+                new_instance = CXN_SCHEMA_INST(cxn_schema, trace, a_sub_iso)
                 self.cxn_instances.append({"cxn_inst":new_instance, "match_qual":match_qual})
                     
     def SemMatch_cat(self, SemRep_subgraphs, cxn_schema):
