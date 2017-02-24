@@ -70,7 +70,7 @@ def find_sub_multi_iso(G, G_subgraphs, G_pat, node_match=None, edge_match=None, 
             u2 = iso["nodes"][u1]
             v2 = iso["nodes"][v1]
             target_edges = G[u2][v2]
-            iso["edges"][(k1, u1,v1)] = []
+            iso["edges"][(k1, u1, v1)] = []
             for k2,attr2 in target_edges.iteritems():
                 if attr1['val'] == attr2['val']:
                     iso["edges"][(k1, u1,v1)].append((k2,u2, v2))
@@ -124,6 +124,7 @@ def update_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, old_sub
     for a_sub_iso in sub_iso:
         if sub_multi_iso_include(a_sub_iso, old_sub_iso):
             new_sub_iso.append(a_sub_iso)
+    return new_sub_iso
 
 def sub_iso_include(sub_iso1, sub_iso2):
     """

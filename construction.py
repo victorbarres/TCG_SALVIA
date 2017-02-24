@@ -193,7 +193,7 @@ class TP_SEMFRAME(TP_ELEM):
         for edge in self.edges:
             pFrom = edge.pFrom.name if edge.pFrom else None
             pTo =  edge.pTo.name if edge.pTo else None
-            graph.add_edge(pFrom, pTo, concept=edge.concept)
+            graph.add_edge(pFrom, pTo, name=edge.name, concept=edge.concept)
         
         self.graph = graph
     
