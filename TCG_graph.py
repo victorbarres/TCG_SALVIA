@@ -133,15 +133,15 @@ def sub_iso_include(sub_iso1, sub_iso2):
     nodes_map1 = sub_iso1['nodes']
     nodes_map2 = sub_iso2['nodes']
     node_flag = True
-    for n,v in nodes_map1.iteritems():
-        if not(n in nodes_map2) or nodes_map2(n) != v:
+    for n,v in nodes_map2.iteritems():
+        if not(n in nodes_map1) or nodes_map1(n) != v:
             node_flag = False
             break
     edges_map1 = sub_iso1['edges']
     edges_map2 = sub_iso2['edges']
     edge_flag = True
-    for e,v in edges_map1.iteritems():
-        if not(e in edges_map2) or edges_map2(e) != v:
+    for e,v in edges_map2.iteritems():
+        if not(e in edges_map1) or edges_map1(e) != v:
             edge_flag = False
             break
         
@@ -155,18 +155,22 @@ def sub_multi_iso_include(sub_iso1, sub_iso2):
     nodes_map1 = sub_iso1['nodes']
     nodes_map2 = sub_iso2['nodes']
     node_flag = True
-    for n,v in nodes_map1.iteritems():
-        if not(n in nodes_map2) or nodes_map2(n) != v:
+    for n,v in nodes_map2.iteritems():
+        if not(n in nodes_map1) or nodes_map1(n) != v:
             node_flag = False
             break
     edges_map1 = sub_iso1['edges']
     edges_map2 = sub_iso2['edges']
     edge_flag = True
-    for e,v in edges_map1.iteritems():
-        if not(e in edges_map2) or [i for i in edges_map2[e] if i in v] != edges_map2[e]:
+    for e,v in edges_map2.iteritems():   
+        if not(e in edges_map1):
             edge_flag = False
             break
-        
+        s1 = set(edges_map1[e])
+        s2 = set(v)
+        if not s2.issubset(s1):
+            edge_flag = False
+            break  
     return node_flag and edge_flag
         
 def is_subgraph(G1, G2):

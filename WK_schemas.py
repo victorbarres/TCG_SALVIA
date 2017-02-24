@@ -282,7 +282,6 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         
         return sub_iso
     
-    
     ####################
     ### JSON METHODS ###
     ####################

@@ -3266,7 +3266,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
     
     def instantiate_lexical_cxns(self, phon_inst, cxn_schemas):
         """
-        Instantiates the construcitons whose left-corner matches phon_inst content.
+        Instantiates the constructions whose left-corner matches phon_inst content.
         Returns instances and the set of their classes that form the basis of Bottom-up grammatial predictions
         used in left-corner instantiation in instantiate_cxns()
         """
