@@ -7,7 +7,7 @@ Defines World knowledge schemas for TCG.
 from __future__ import division
 
 from schema_theory import SYSTEM_SCHEMA, KNOWLEDGE_SCHEMA, SCHEMA_INST, LTM, WM
-import TCG_graph
+#import TCG_graph
 
 ####################################
 ##### WORLD KNOWLEDGE SCHEMAS ######
@@ -39,45 +39,45 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
         """
         return concept.match(self.trigger.concept, match_type = "is_a")
     
-    def FrameMatch(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
-        """
-        Defines the condition of instantiation of the WK_FRAME_SCHEMA based on the state of Semantic Representation (SemRep).
-        
-        Notes:
-            - Here the trigger is given. This is is mostly for running efficiency.
-        """
-        sub_iso = self.FrameMatch_cat(SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name)
-        return sub_iso
-    
-    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
-        """
-        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
-        """
-        wk_frame_graph = self.content.graph 
-        trigger_name = self.trigger.name
-        # Build wk_frame_graph subgraphs. 
-        def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
-            return trigger_name in subgraph.nodes()
-                
-        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edge', subgraph_filter=subgraph_filter)
-        
-        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-    #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-       
-        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
-    
-        def iso_filter(iso, trigger_sem_node_name):
-            sem_node_name = iso['nodes'].get(trigger_name, None)
-            if not(sem_node_name) or (sem_node_name != trigger_sem_node_name):
-                return False
-            return True
-            
-        sub_iso = TCG_graph.find_max_partial_iso(SemRep, SemRep_subgraphs, wk_frame_graph, wk_frame_subgraphs, node_match=nm, edge_match=em)
-        sub_iso = [s for s in sub_iso if iso_filter(s, trigger_sem_node_name)]
-        
-        return sub_iso
+#    def FrameMatch(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
+#        """
+#        Defines the condition of instantiation of the WK_FRAME_SCHEMA based on the state of Semantic Representation (SemRep).
+#        
+#        Notes:
+#            - Here the trigger is given. This is is mostly for running efficiency.
+#        """
+#        sub_iso = self.FrameMatch_cat(SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name)
+#        return sub_iso
+#    
+#    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
+#        """
+#        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
+#        """
+#        wk_frame_graph = self.content.graph 
+#        trigger_name = self.trigger.name
+#        # Build wk_frame_graph subgraphs. 
+#        def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
+#            return trigger_name in subgraph.nodes()
+#                
+#        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edge', subgraph_filter=subgraph_filter)
+#        
+#        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+#    #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+#        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+#       
+#        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+#        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
+#    
+#        def iso_filter(iso, trigger_sem_node_name):
+#            sem_node_name = iso['nodes'].get(trigger_name, None)
+#            if not(sem_node_name) or (sem_node_name != trigger_sem_node_name):
+#                return False
+#            return True
+#            
+#        sub_iso = TCG_graph.find_max_partial_iso(SemRep, SemRep_subgraphs, wk_frame_graph, wk_frame_subgraphs, node_match=nm, edge_match=em)
+#        sub_iso = [s for s in sub_iso if iso_filter(s, trigger_sem_node_name)]
+#        
+#        return sub_iso
 
 class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
     """
@@ -178,24 +178,24 @@ class WK_FRAME_WM(WM):
         self.update_activations()
         self.prune()
         
-        """
-        TO DO:
-            - find the WK_FRAME that should be instantiated.
-            - For this I need to allow for partial match
-            - So I need largest subgraphs of SemRep that partially map onto frames.
-            - Then I instantiate the Frames and link it to SemRep + send info to SemRep that is
-            can be updated if it is a partial match.
-            - The activation of the Frames supports some aspects of the SemRep.
-            - In SemRep, edges between same nodes in multigraph compete.
-            - Question: Are the frames triggered by the SemRep or by the lexical items?
-            - I can simply force the posting of the lexical item content onto SemWM directly as they are 
-            recovered (any element construction marked as done might need to be automatically expressed in SemRep.)
-            - On the other hand, it might be worth it considering the fact that lexical items directly tie to WK.
-            - They could trigger the recovery of any frames that matches them. (simple).
-            - Then those would project onto the SemRep where the lexical content should serve as the way to link the two (hinges).
-            - The difficult part is that now, the GrammaticalWM needs to check whether or not the information it wants to post is already there,
-            which means graph iso matching from Sem to GramWM
-        """
+#        """
+#        TO DO:
+#            - find the WK_FRAME that should be instantiated.
+#            - For this I need to allow for partial match
+#            - So I need largest subgraphs of SemRep that partially map onto frames.
+#            - Then I instantiate the Frames and link it to SemRep + send info to SemRep that is
+#            can be updated if it is a partial match.
+#            - The activation of the Frames supports some aspects of the SemRep.
+#            - In SemRep, edges between same nodes in multigraph compete.
+#            - Question: Are the frames triggered by the SemRep or by the lexical items?
+#            - I can simply force the posting of the lexical item content onto SemWM directly as they are 
+#            recovered (any element construction marked as done might need to be automatically expressed in SemRep.)
+#            - On the other hand, it might be worth it considering the fact that lexical items directly tie to WK.
+#            - They could trigger the recovery of any frames that matches them. (simple).
+#            - Then those would project onto the SemRep where the lexical content should serve as the way to link the two (hinges).
+#            - The difficult part is that now, the GrammaticalWM needs to check whether or not the information it wants to post is already there,
+#            which means graph iso matching from Sem to GramWM
+#        """
     
     def apply_WK(self, sem_input):
         """
@@ -204,7 +204,7 @@ class WK_FRAME_WM(WM):
         wk_output = []
         for inst in wk_frame_insts:
             #Send their wk_frame to SemWM.
-            wk_output.append((inst.content, inst.covers))
+            wk_output.append((inst.content, inst.trace.trigger))
             inst.expressed = True
         return wk_output
         

@@ -193,6 +193,7 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
     Returns the list of subgraphs of G (DiGraph) filtered by subgraph_filter
     induced:
         -> 'edge': edge induced subgraphs + single nodes
+        -> 'edge+': edges induced subgraphs + nodes powerset.
         -> 'node': node induced subgraphs.
         
     - subgraph_filter (callable): subgraph_filter should be a callable that takes on a subgraph and returns True or False. Only the subgraphs that return True
@@ -201,6 +202,7 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
         subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
+    
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
@@ -215,6 +217,21 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
             subG = DiGraph()
             subG.add_node(n,d)
             subgraphs.append(subG)
+            
+    if induced == 'edge+':
+        edge_powerset = list_powerset(G.edges(data=True))
+        subgraphs = []
+        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
+            subG = DiGraph(e_list) # Creating subraph from edges
+            for n in subG.node.keys():
+                subG.node[n] = G.node[n] # Transfering node attributes
+            subgraphs.append(subG)
+            
+        node_powerset = list_powerset(G.nodes(data=True))
+        for n_list in [n for n in node_powerset if n!=[]]:
+            subG = DiGraph()
+            subG.add_nodes_from(n_list)
+            subgraphs.append(subG)
     
     # Filtering
     subgraphs = [sG for sG in subgraphs if subgraph_filter(sG)]
@@ -226,11 +243,13 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
     Returns the list of subgraphs of G (MutliDiGraph) filtered by subgraph_filter
     induced:
         -> 'edge': edge induced subgraphs + single nodes
+        -> 'edge+': edges induced subgraphs + nodes powerset.
         -> 'node': node induced subgraphs.
     """
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
         subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
+    
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
@@ -244,6 +263,21 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
         for n, d in G.nodes(data=True):
             subG = MultiDiGraph()
             subG.add_node(n,d)
+            subgraphs.append(subG) 
+            
+    if induced == 'edge+':
+        edge_powerset = list_powerset(G.edges(data=True))
+        subgraphs = []
+        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
+            subG = MultiDiGraph(e_list)# Creating subraph from edges
+            for n in subG.node.keys():
+                subG.node[n] = G.node[n] # Transfering node attributes
+            subgraphs.append(subG)
+            
+        node_powerset = list_powerset(G.nodes(data=True))
+        for n_list in [n for n in node_powerset if n!=[]]:
+            subG = MultiDiGraph()
+            subG.add_nodes_from(n_list)
             subgraphs.append(subG)
     
     # Filtering
@@ -430,7 +464,7 @@ def test3():
     G_pat.add_edge("a","b", attr_dict={'val':1})
     G_pat.add_edge("b","c", attr_dict={'val':1})
     
-    G_pat_subgraphs = build_submultigraphs(G_pat, induced='edge')
+    G_pat_subgraphs = build_submultigraphs(G_pat, induced='edge+')
     
     # Generic match functions
     op = lambda x,y: x == y

@@ -990,26 +990,33 @@ class SEMANTIC_WM_C(WM):
     
     def process(self):
         """
-        """   
-        cpt_insts = None        
-        gram_activations = {}
+        """
+        INIT_VAL = self.params['C2']['confidence_threshold'] # TO CLEAN UP
+
         gram_input = self.inputs['from_grammatical_WM_C']
         if gram_input:
             gram_activations = gram_input['activations']
             instance_data  = gram_input.get('instances', None)
-            if instance_data:
+            if instance_data: # Instantiate data from constructions
                 SemFrame = instance_data['SemFrame']
                 sem_map = instance_data['sem_map']
                 cpt_schemas = self.inputs['from_concept_LTM']
                 if cpt_schemas and SemFrame and sem_map:
                     cpt_insts  = self.instantiate_gram_cpts(SemFrame, sem_map, cpt_schemas)
-   
-        if cpt_insts:
-            for inst in cpt_insts:
-                self.add_instance(inst, 0.2)   
-        
-        self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
-#        self.convey_WK_activations(WK_activations)
+                    for inst in cpt_insts:
+                        self.add_instance(inst, INIT_VAL)
+            self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
+            
+        wk_input = self.inputs['from_wk_frame_WM']
+        if wk_input:
+            wk_activations = wk_input['activations']
+            instance_data = wk_input.get('instances', None)
+            if instance_data: # Instantiate data from constructions
+                cpt_schemas = self.inputs['from_concept_LTM']
+                cpt_insts = self.instantiate_wk_cpts(self, instance_data, cpt_schemas)
+                for inst in cpt_insts:
+                    self.add_instance(inst, INIT_VAL)
+            self.convey_WK_activations(wk_activations)
         self.update_activations()
         self.update_SemRep(cpt_insts)        
         self.prune()
@@ -1168,7 +1175,7 @@ class SEMANTIC_WM_C(WM):
         Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
         If so, expand mapping, move on with adding concept schemas.
         """
-        pass
+        return []
     
     def convey_gram_activations(self, gram_activations):
         """

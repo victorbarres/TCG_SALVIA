@@ -6,6 +6,7 @@ Defines semantic network related classes for TCG.
 """
 from __future__ import division
 from knowledge_rep import FRAME, FRAME_NODE, FRAME_REL
+import TCG_graph
 
 class WK_FRAME_NODE(FRAME_NODE):
     """Define WK_FRAME_NODE
