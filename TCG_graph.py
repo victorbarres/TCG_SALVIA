@@ -25,6 +25,7 @@ def find_sub_iso(G_subgraphs, G_pat, node_match=None, edge_match=None, iso_filte
     """
     sub_iso = []
     mappings = []
+    
     for subgraph in G_subgraphs:
             DiGM = isomorphism.DiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
             if DiGM.is_isomorphic():
@@ -56,7 +57,7 @@ def find_sub_multi_iso(G, G_subgraphs, G_pat, node_match=None, edge_match=None, 
         - iso_filter (callable): a filter imposed on the isomorphisms that will be returned. Should go from sub_iso to BOOL
     """
     sub_iso = []
-    mappings = []
+    mappings = []    
     for subgraph in G_subgraphs:
         MultDiGM = isomorphism.MultiDiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
         if MultDiGM.is_isomorphic():
@@ -97,7 +98,8 @@ def find_max_partial_iso(G, G_subgraphs, G_pat, G_pat_subgraphs, node_match=None
     """
     sub_isos = {}
     for G_pat_sub in G_pat_subgraphs:
-        sub_iso = find_sub_multi_iso(G, G_subgraphs, G_pat_sub, node_match, edge_match)
+        G_subgraphs_sub = [g for g in G_subgraphs if len(g.nodes())==len(G_pat_sub.nodes()) and len(g.edges())==len(G_pat_sub.edges())]
+        sub_iso = find_sub_multi_iso(G, G_subgraphs_sub, G_pat_sub, node_match, edge_match, iso_filter)
         if sub_iso: # none empty sub_isos
             if not(sub_isos):
                 sub_isos[G_pat_sub] = sub_iso
@@ -113,7 +115,6 @@ def find_max_partial_iso(G, G_subgraphs, G_pat, G_pat_subgraphs, node_match=None
     for iso in sub_isos.values():
         output.extend(iso)
         
-    output = [s for s in output if iso_filter(s)]
     return output
     
 def update_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, old_sub_iso, node_match=None, edge_match=None, iso_filter=lambda x:True):
@@ -137,14 +138,14 @@ def sub_iso_include(sub_iso1, sub_iso2):
     nodes_map2 = sub_iso2['nodes']
     node_flag = True
     for n,v in nodes_map2.iteritems():
-        if not(n in nodes_map1) or nodes_map1(n) != v:
+        if not(n in nodes_map1) or nodes_map1[n] != v:
             node_flag = False
             break
     edges_map1 = sub_iso1['edges']
     edges_map2 = sub_iso2['edges']
     edge_flag = True
     for e,v in edges_map2.iteritems():
-        if not(e in edges_map1) or edges_map1(e) != v:
+        if not(e in edges_map1) or edges_map1[e] != v:
             edge_flag = False
             break
         
@@ -157,24 +158,22 @@ def sub_multi_iso_include(sub_iso1, sub_iso2):
     """
     nodes_map1 = sub_iso1['nodes']
     nodes_map2 = sub_iso2['nodes']
-    node_flag = True
+
     for n,v in nodes_map2.iteritems():
-        if not(n in nodes_map1) or nodes_map1(n) != v:
-            node_flag = False
-            break
+        if not(n in nodes_map1) or nodes_map1[n] != v:
+            return False
+    
     edges_map1 = sub_iso1['edges']
     edges_map2 = sub_iso2['edges']
-    edge_flag = True
+
     for e,v in edges_map2.iteritems():   
         if not(e in edges_map1):
-            edge_flag = False
-            break
+            return False
         s1 = set(edges_map1[e])
         s2 = set(v)
         if not s2.issubset(s1):
-            edge_flag = False
-            break  
-    return node_flag and edge_flag
+            return False 
+    return True
         
 def is_subgraph(G1, G2):
     """

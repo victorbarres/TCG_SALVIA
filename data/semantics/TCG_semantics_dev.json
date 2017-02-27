@@ -213,13 +213,17 @@
 		"preference" : 1,
 		"WK_Frame" : {
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
-						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
+						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},
+						{"name" : "REF_ACT", "concept": "TRANS_ACT", "frame" : false},
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
 						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : false},
-						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true}
+						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
+						{"name" : "REF2", "concept", "ENTITY", "frame" : false}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
+						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "REF2"},
+						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "REF_ACT"},
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]},

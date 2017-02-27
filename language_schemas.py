@@ -1002,7 +1002,7 @@ class SEMANTIC_WM_C(WM):
                 sem_map = instance_data['sem_map']
                 cpt_schemas = self.inputs['from_concept_LTM']
                 if cpt_schemas and SemFrame and sem_map:
-                    cpt_insts  = self.instantiate_gram_cpts(SemFrame, sem_map, cpt_schemas)
+                    cpt_insts  = self.instantiate_gram_cpts2(SemFrame, sem_map, cpt_schemas)
                     new_insts.extend(cpt_insts)
                     for inst in cpt_insts:
                         self.add_instance(inst, INIT_VAL)
@@ -1044,110 +1044,7 @@ class SEMANTIC_WM_C(WM):
                 return output[0]
             else:
                 return None
-        
-        get_sem_frame_insts = lambda elem: set([k for k,v in sem_map.iteritems() if elem.name in v])
-                
-        def build_mappings(SemFrame, sem_map):
-            """Returns the alread existing mappings between SemFrame and SemRep
-            """
-            ### Actually, the idea is to build mappings under constraints.
-            
-            ### A problem emerge if an semframe element can lead to multiple concept insts
-            ### In this case, the issue is that i need to keep track of the full mappings elements are part of and that need to be expanded.
-            ### Or again, it might be simpler to recompute all the possible match and then cross out those that don't fit.
-            pass
            
-
-#        """
-#        I need to recheck the mapping (here there is no mapping) since this is not production. So mapping is None. But
-#        there will be a mapping if I had feebback
-#        Expand the mapping: Given a frame and a preliminary mapping, can I find bigger mappings that contains the initial mapping.
-#        If so, expand mapping, move on with adding concept schemas.
-#        """
-#        def build_mapping(SemFrame):
-#            """
-#            Find ways in wich the SemFrame can map onto the SemRep.
-#            For each ways, it adds to the SemRep the portion of its graph that is not contained in the SemRep.
-#            """
-#            node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # I SHOULD REFACTOR ALL THIS.
-#            node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-#            edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-#           
-#            nm = TCG_graph.node_iso_match(["concept", "frame"], ["", False], [node_concept_match, node_frame_match])
-#            em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
-#            current_mapping = {'nodes':{}, 'edges':{}}
-#            new_mappings = self.update_mapping(SemFrame.graph, current_mapping, node_match=nm, edge_match=em)
-#            return new_mappings
-#        
-#        new_mappings = build_mapping(SemFrame)
-#        if not new_mappings:
-#            cpt_insts = []
-#            name_table = {}
-#            for node in SemFrame.nodes:
-#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
-#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
-#                name_table[node] = new_cpt_inst
-#                cpt_insts.append(new_cpt_inst)
-#            for edge in SemFrame.edges:
-#                cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
-#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
-#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
-#                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
-#                new_cpt_inst.content['pTo'] = name_table[edge.pTo]
-#                cpt_insts.append(new_cpt_inst)
-#                
-#            return cpt_insts
-#            
-#        cpt_insts = []
-#        name_table = {}
-#        for mapping in new_mappings:
-#            mapped_nodes = [n for n in SemFrame.nodes if n.name in mapping['nodes']]
-#            for node in mapped_nodes:
-#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
-#                old_cpt_inst = find_cpt_inst(sem_frame_insts)
-#                if old_cpt_inst:
-#                    old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-#                    name_table[node] = old_cpt_inst
-#                else:
-#                    cpt_inst = self.find_instance(mapping['nodes'][node.name])
-#                    cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-#                    name_table[node] = cpt_inst
-#                    
-#            unmapped_nodes = [n for n in SemFrame.nodes if n.name not in mapping['nodes']]
-#            for node in unmapped_nodes:
-#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
-#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
-#                name_table[node] = new_cpt_inst
-#                cpt_insts.append(new_cpt_inst)
-#            
-#            mapped_edges = []
-#            for e in mapping['edges']:
-#                edge = SemFrame.find_elem(e['name'])
-#                mapped_edges.append(edge)
-#                cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
-#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
-#                old_cpt_inst = find_cpt_inst(sem_frame_insts)
-#                if old_cpt_inst:
-#                    old_cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-#                else:
-#                    for a_multi_edge in mapping[e]:
-#                        cpt_inst = self.find_instance(a_multi_edge['name'])
-#                        cpt_inst.trace['sem_frame_insts'].update(sem_frame_insts)
-#                        name_table[node] = cpt_inst
-#                    
-#            unmapped_edges = [e for e in SemFrame.edges if e not in mapped_edges]
-#            for edge in unmapped_edges:
-#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
-#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'sem_frame_insts':sem_frame_insts})
-#                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom]
-#                new_cpt_inst.content['pTo'] = name_table[edge.pTo]
-#                cpt_insts.append(new_cpt_inst)
-#                
-#        return cpt_insts
         cpt_insts = []
         name_table = {}
         for node in SemFrame.nodes:
@@ -1175,6 +1072,7 @@ class SEMANTIC_WM_C(WM):
                 cpt_insts.append(new_cpt_inst)
         return cpt_insts
         
+    
     def instantiate_wk_cpts(self, wk_inputs, cpt_schemas):
         """
         Builds SemRep based on a wk_inputs.
@@ -1193,7 +1091,6 @@ class SEMANTIC_WM_C(WM):
         for wk_frame, sem_trigger in wk_inputs:
             constraints = {'nodes':{wk_frame.trigger.name: sem_trigger}, 'edges':{}}
             sub_isos = self.FrameMatch(wk_frame, constraints)
-            print sub_isos
             for sub_iso in sub_isos:
                 name_table = {}
                 for n1,n2 in sub_iso['nodes'].iteritems():
@@ -1204,7 +1101,7 @@ class SEMANTIC_WM_C(WM):
                     for e2 in e2_list:
                         edge_inst = self.find_instance(e2[3]) # by definition mutli edges are given as (from, to, key, name)
                         edge_inst.trace['wk_frame_insts'].update(set([e1[3]]))
-                
+                        
                 for node in [n for n in wk_frame.nodes if n.name not in sub_iso['nodes'].keys()]:
                     cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
                     new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([node.name]),'sem_frame_insts':set([])})
@@ -1285,7 +1182,7 @@ class SEMANTIC_WM_C(WM):
         new_mappings = TCG_graph.update_max_partial_iso(self.SemRep, SemRep_subgraphs, sem_input_frame, sem_input_frame_subgraphs, sem_input_mapping, node_match, edge_match, iso_filter)
         return new_mappings
         
-    def FrameMatch(self, sem_input_frame, constraints):
+    def FrameMatch(self, sem_input_frame, constraints, strict=False):
         """
         Defines the possible matches between input frame semantic info and the current state of the SemRep given the constraints "constraints"
         defined as frame_node to sem_frame_node mapping.
@@ -1300,7 +1197,6 @@ class SEMANTIC_WM_C(WM):
         """
         frame_graph = sem_input_frame.graph
 
-        # Build frame_graph subgraphs. 
         def subgraph_filter_source(subgraph, constraints=constraints):# Only the subgraph that contain the all the constraining elements are considered as legal for partial match.
             for n in constraints['nodes'].keys():
                 if n not in subgraph.nodes():
@@ -1309,15 +1205,6 @@ class SEMANTIC_WM_C(WM):
                 if e not in subgraph.edges():
                     return False
             return True
-                
-        frame_subgraphs = TCG_graph.build_submultigraphs(frame_graph, induced='edge+', subgraph_filter=subgraph_filter_source)
-        
-        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-    #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-       
-        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-        em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
             
         def subgraph_filter_target(subgraph, constraints=constraints):# Only the SemRep subgraph that contain the all the constraining elements are considered as legal for partial match.
             for n in constraints['nodes'].values():
@@ -1328,10 +1215,18 @@ class SEMANTIC_WM_C(WM):
                     if e not in subgraph.edges():
                         return False
             return True
-                    
+         
+        # Build subgraphs sets 
+        frame_subgraphs = TCG_graph.build_submultigraphs(frame_graph, induced='edge+', subgraph_filter=subgraph_filter_source)
         SemRep_subgraphs = TCG_graph.build_submultigraphs(self.SemRep, induced='edge+', subgraph_filter=subgraph_filter_target)
         
-        def iso_filter(iso, constraints):
+        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
+    #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+        em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
+        
+        def iso_filter(iso, constraints=constraints):
             """Checks that the isomorphisms includes the constraints.
             """
             for n1, n2 in constraints['nodes'].iteritems():
@@ -1344,8 +1239,8 @@ class SEMANTIC_WM_C(WM):
                 if not(sem_edge_list) or not set(e2_list).issubset(set(sem_edge_list)):
                     return False
             return True
-        sub_iso = TCG_graph.find_max_partial_iso(self.SemRep, SemRep_subgraphs, frame_graph, frame_subgraphs, node_match=nm, edge_match=em)
-        sub_iso = [s for s in sub_iso if iso_filter(s, constraints)]
+            
+        sub_iso = TCG_graph.find_max_partial_iso(self.SemRep, SemRep_subgraphs, frame_graph, frame_subgraphs, node_match=nm, edge_match=em, iso_filter=iso_filter)
         
         return sub_iso
 
