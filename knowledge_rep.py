@@ -405,7 +405,9 @@ class FRAME(object):
         for node in self.nodes:
             graph.add_node(node.name, concept=node.concept)
         for edge in self.edges:
-            graph.add_edge(edge.pFrom, edge.pTo, name=edge.name, concept=edge.concept)
+            pFrom = edge.pFrom.name if edge.pFrom else None
+            pTo =  edge.pTo.name if edge.pTo else None
+            graph.add_edge(pFrom, pTo, name=edge.name, concept=edge.concept)
         
         self.graph = graph
     

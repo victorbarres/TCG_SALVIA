@@ -27,7 +27,7 @@ def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_m
         - model_prams (DICT): Dictionary defining the model parameters (if different than default)
     
     Returns: 
-        - comphrension 2route model
+        - comprehension 2route model
     """
     
     model = TCG_comprehension_2route_system(grammar_name=grammar_name, semantics_name=semantics_name)

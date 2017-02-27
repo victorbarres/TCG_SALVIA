@@ -204,7 +204,7 @@ class WK_FRAME_WM(WM):
         wk_output = []
         for inst in wk_frame_insts:
             #Send their wk_frame to SemWM.
-            wk_output.append((inst.content, inst.trace.trigger))
+            wk_output.append((inst.content, inst.trace['trigger']))
             inst.expressed = True
         return wk_output
         
@@ -282,8 +282,6 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         # Find triggers:
         for trigger_sem_node, concept in [(n,d['concept']) for n,d in SemRep.nodes(data=True) if ('wk_WM' not in d['processed'])]:
             triggered_schemas = [schema for schema in wk_frame_schemas if schema.is_triggered(concept)]
-            print self.t
-            print triggered_schemas
             for wk_frame_schema in triggered_schemas:
                 trace = trace = {"trigger":trigger_sem_node, "schemas":[wk_frame_schema]}  
                 new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace)

@@ -73,7 +73,7 @@ def find_sub_multi_iso(G, G_subgraphs, G_pat, node_match=None, edge_match=None, 
             name1 = attr1.get('name', None)
             iso["edges"][(u1, v1, k1, name1)] = []
             for k2,attr2 in target_edges_dat.iteritems():
-                if edge_match({'attr':attr1}, {'attr':attr2}): # not completely sure about that. I wish I could figure out how to have nx return directly the edge mapping...
+                if not(edge_match) or  edge_match({'attr':attr1}, {'attr':attr2}): # not completely sure about that. I wish I could figure out how to have nx return directly the edge mapping...
                     name2 = attr2.get('name', None)
                     iso["edges"][(u1, v1, k1, name1)].append((u2, v2, k2, name2))
         sub_iso.append(iso)
@@ -463,6 +463,7 @@ def test3():
     
     G_pat.add_edge("a","b", attr_dict={'val':1})
     G_pat.add_edge("b","c", attr_dict={'val':1})
+    G_pat.add_edge("b","c", attr_dict={'val':2})
     
     G_pat_subgraphs = build_submultigraphs(G_pat, induced='edge+')
     
