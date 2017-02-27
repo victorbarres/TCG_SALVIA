@@ -218,7 +218,7 @@
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
 						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : false},
 						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "REF2", "concept", "ENTITY", "frame" : false}
+						{"name" : "REF2", "concept": "ENTITY", "frame" : false}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},

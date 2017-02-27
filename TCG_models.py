@@ -37,7 +37,7 @@ def parameters(system_names):
         },
         
     'WK_frame_LTM':{
-        'init_act':1.0
+        'init_act':0.2
         },    
         
     'Semantic_WM_P':{
@@ -179,14 +179,14 @@ def parameters(system_names):
     'WK_frame_retrieval':{},
     
     'WK_frame_WM':{
-        'dyn.tau':10000.0,
+        'dyn.tau':100.0,
         'dyn.int_weight':1.0,
         'dyn.ext_weight':1.0,
         'dyn.act_rest':0.001,
         'dyn.k':10.0,
         'dyn.noise_mean':0.0,
         'dyn.noise_std':0.1,
-        'C2.confidence_threshold':0.0,
+        'C2.confidence_threshold':0.5,
         'C2.prune_threshold':0.01,
         'C2.coop_weight':0.0,
         'C2.comp_weight':0.0,
@@ -449,6 +449,10 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     model = TCG_comprehension_system(name, grammar_name, semantics_name, grammar_path,semantics_path)
     semanticWM_C = model.schemas['Semantic_WM_C']
     conceptLTM = model.schemas['Concept_LTM']
+    cxn_retrieval_C = model.schemas['Cxn_retrieval_C']
+    phonWM_C = model.schemas['Phonological_WM_C']
+
+    
     
     # Additional subsystems
     wk_frame_LTM = wks.WK_FRAME_LTM()
@@ -461,10 +465,11 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     model.brain_mapping.schema_mapping['WK_frame_wm']=[]
     model.brain_mapping.schema_mapping['WK_frame_retrieval']=[]
 
-    model.add_connection(semanticWM_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_semantic_WM')
     model.add_connection(wk_frame_LTM, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_wk_frame_LTM')
     model.add_connection(wk_frame_retrieval, 'to_wk_frame_WM', wk_frame_WM, 'from_wk_frame_retrieval')
     model.add_connection(wk_frame_WM, 'to_semantic_WM', semanticWM_C, 'from_wk_frame_WM')
+    model.add_connection(cxn_retrieval_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_cxn_retrieval_C')
+    model.add_connection(phonWM_C, 'to_wk_frame_WM', wk_frame_WM, 'from_phonological_WM_C')
     
     # Parameters
     system_names = model.schemas.keys()
@@ -827,6 +832,6 @@ def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
         
 
 if __name__ == '__main__':
-    model = TCG_language_system()
+    model = TCG_comprehension_2route_system()
     model.system2dot(image_type='png', disp=True)
 #    st.save(production_system)

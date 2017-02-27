@@ -974,7 +974,6 @@ class SEMANTIC_WM_C(WM):
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('IN', 'from_control')
         self.add_port('IN', 'from_wk_frame_WM')
-        self.add_port('OUT', 'to_wk_frame_retrieval')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_output')
@@ -1002,7 +1001,7 @@ class SEMANTIC_WM_C(WM):
                 sem_map = instance_data['sem_map']
                 cpt_schemas = self.inputs['from_concept_LTM']
                 if cpt_schemas and SemFrame and sem_map:
-                    cpt_insts  = self.instantiate_gram_cpts2(SemFrame, sem_map, cpt_schemas)
+                    cpt_insts  = self.instantiate_gram_cpts(SemFrame, sem_map, cpt_schemas)
                     new_insts.extend(cpt_insts)
                     for inst in cpt_insts:
                         self.add_instance(inst, INIT_VAL)
@@ -1022,8 +1021,6 @@ class SEMANTIC_WM_C(WM):
         self.update_activations()
         self.update_SemRep(new_insts)        
         self.prune()
-        
-        self.outputs['to_wk_frame_retrieval'] = self.SemRep
     
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """
@@ -1088,7 +1085,7 @@ class SEMANTIC_WM_C(WM):
         If so, expand mapping, move on with adding concept schemas.
         """
         cpt_insts = []
-        for wk_frame, sem_trigger in wk_inputs:
+        for wk_frame, inst_name in wk_inputs:
             constraints = {'nodes':{wk_frame.trigger.name: sem_trigger}, 'edges':{}}
             sub_isos = self.FrameMatch(wk_frame, constraints)
             for sub_iso in sub_isos:
@@ -2593,6 +2590,7 @@ class PHON_WM_C(WM):
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
+        self.add_port('OUT', 'to_wk_frame_WM')
         self.add_port('OUT', 'to_control')
         self.params['dyn'] = {'tau':2, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
@@ -2613,12 +2611,14 @@ class PHON_WM_C(WM):
             for phon in [phon for phon in self.phon_sequence if phon['inst'].name in gram_input]:
                 phon['expressed'] = True
 
-        self.outputs['to_grammatical_WM_C'] =  self.gram_WM_C_output()
+        self.outputs['to_grammatical_WM_C'] =  self.activation_output()
+        self.outputs['to_wk_frame_WM'] =  self.activation_output()
+        
         if phon_form:
             phon_schema = PHON_SCHEMA(name=phon_form, word_form=phon_form, init_act=1.0)
             phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
             self.add_instance(phon_inst)
-            self.phon_sequence.append({'inst':phon_inst, 'expressed':False})
+            self.phon_sequence.append({'inst':phon_inst, 'expressed':False}) # I do not use expressed anymore
             self.outputs['to_cxn_retrieval_C'] = phon_inst
             self.outputs['to_control'] =  True
         else:
@@ -2627,10 +2627,9 @@ class PHON_WM_C(WM):
         self.update_activations()     
         self.prune()
     
-    def gram_WM_C_output(self):
+    def activation_output(self):
         """
-        Returns the output to send to gram_WM_C.
-        The signal sent to gram_WM_C contains the activation levels of the phon instance that so far have not been expressed.
+        Returns the activations dict.
         """
         output = {}
         for inst in [phon['inst'] for phon in self.phon_sequence]:
@@ -3401,6 +3400,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
         self.add_port('IN', 'from_phonological_WM_C')
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('OUT', 'to_grammatical_WM_C')
+        self.add_port('OUT', 'to_wk_frame_retrieval')
         self.cxn_instances = []
 
     def reset(self):
@@ -3417,6 +3417,7 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
         phon_inst = self.inputs['from_phonological_WM_C']
         if cxn_schemas and phon_inst:
             (lexical_cxn_instances, BU_predictions) = self.instantiate_lexical_cxns(phon_inst, cxn_schemas)
+            self.outputs['to_wk_frame_retrieval'] = {'instances':lexical_cxn_instances, 'phon_inst':phon_inst}
             self.cxn_instances.extend(lexical_cxn_instances)
             self.instantiate_cxns(BU_predictions, cxn_schemas)
             self.outputs['to_grammatical_WM_C'] = (self.cxn_instances, phon_inst)
