@@ -171,7 +171,7 @@ def run_diagnostic():
     GRAMMAR_NAME = 'TCG_grammar_VB_lex'
     VERBOSE = 2
     SEED = None
-    ANIM = True
+    ANIM = False
     MAX_TIME = 900
     SPEED_PARAM = 30
     OFFSET = 10

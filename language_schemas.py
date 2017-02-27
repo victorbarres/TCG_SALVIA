@@ -1193,6 +1193,7 @@ class SEMANTIC_WM_C(WM):
         for wk_frame, sem_trigger in wk_inputs:
             constraints = {'nodes':{wk_frame.trigger.name: sem_trigger}, 'edges':{}}
             sub_isos = self.FrameMatch(wk_frame, constraints)
+            print sub_isos
             for sub_iso in sub_isos:
                 name_table = {}
                 for n1,n2 in sub_iso['nodes'].iteritems():
@@ -1319,7 +1320,7 @@ class SEMANTIC_WM_C(WM):
         em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
             
         def subgraph_filter_target(subgraph, constraints=constraints):# Only the SemRep subgraph that contain the all the constraining elements are considered as legal for partial match.
-            for n in constraints['edges'].values():
+            for n in constraints['nodes'].values():
                 if n not in subgraph.nodes():
                     return False
             for e_list in constraints['edges'].values():

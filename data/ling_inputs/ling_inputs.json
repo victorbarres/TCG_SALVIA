@@ -128,6 +128,20 @@
 			 "utterance" :["woman", "kick", "man", "in", "blue", "boxing", "ring"],
 			 "timing":[],
 			 "comments": ""
+			},
+			
+		"test_boy_eat_apple": {
+			"utter_rate": 1,
+			 "utterance" :["boy", "eat", "apple"],
+			 "timing":[],
+			 "comments": ""
+			},
+			
+		"test_eat_apple_boy": {
+			"utter_rate": 1,
+			 "utterance" :["eat", "apple", "boy"],
+			 "timing":[],
+			 "comments": ""
 			}
 	}
 }
