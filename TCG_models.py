@@ -442,46 +442,85 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
                              grammar_path = GRAMMAR_PATH,
                              semantics_path = SEMANTICS_PATH):
     """
-    Updates the TCG comprehension system to add a WK route.
+      Creates and returns the TCG comprehension 2 route model.
     """
-    
-    
-    model = TCG_comprehension_system(name, grammar_name, semantics_name, grammar_path,semantics_path)
-    semanticWM_C = model.schemas['Semantic_WM_C']
-    conceptLTM = model.schemas['Concept_LTM']
-    cxn_retrieval_C = model.schemas['Cxn_retrieval_C']
-    phonWM_C = model.schemas['Phonological_WM_C']
-
-    
-    
-    # Additional subsystems
+    # Instantiating all the necessary system schemas
+    grammaticalLTM = ls.GRAMMATICAL_LTM()
+    cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
+    phonWM_C = ls.PHON_WM_C()
+    grammaticalWM_C = ls.GRAMMATICAL_WM_C()
+    semanticWM_C = ls.SEMANTIC_WM_C2_C()
+    conceptLTM = ls.CONCEPT_LTM()
+    control = ls.CONTROL()
     wk_frame_LTM = wks.WK_FRAME_LTM()
     wk_frame_retrieval = wks.WK_FRAME_RETRIEVAL()
     wk_frame_WM = wks.WK_FRAME_WM()
-    wk_schemas = [wk_frame_LTM, wk_frame_retrieval, wk_frame_WM]
-    model.add_schemas(wk_schemas)
     
-    model.brain_mapping.schema_mapping['WK_frame_LTM']=[]
-    model.brain_mapping.schema_mapping['WK_frame_wm']=[]
-    model.brain_mapping.schema_mapping['WK_frame_retrieval']=[]
+    # Defining schema to brain mappings.
+    language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
+                    'Cxn_retrieval_C':[], 
+                    'Phonological_WM_C':['Wernicke'],
+                    'Grammatical_WM_C':['lBA44, lBA45'],
+                    'Semantic_WM_C':['left_SFG', 'LIP', 'Hippocampus'],
+                    'Concept_LTM':[''],
+                    'Control':['DLPFC'],
+                    'wk_frame_LTM':[],
+                    'WK_frame_WM'=[]
+                    'WK_frame_retrieval'=[]}
+    
+    # Initializing model
+    model = st.MODEL(name)
+    
+    # Setting up schema to brain mappings
+    language_brain_mapping = st.BRAIN_MAPPING()
+    language_brain_mapping.schema_mapping = language_mapping
+    model.brain_mapping = language_brain_mapping
+    
+    # Setting up language model.
+    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control, wk_frame_LTM, wk_frame_retrieval, wk_frame_WM]
 
+    model.add_schemas(language_schemas)
+    model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
+    model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
+    model.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
+    model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
+    model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C')
+    model.add_connection(conceptLTM, 'to_semantic_WM', semanticWM_C, 'from_concept_LTM')
+    model.add_connection(control, 'to_semantic_WM', semanticWM_C, 'from_control')
+    model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     model.add_connection(wk_frame_LTM, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_wk_frame_LTM')
     model.add_connection(wk_frame_retrieval, 'to_wk_frame_WM', wk_frame_WM, 'from_wk_frame_retrieval')
     model.add_connection(wk_frame_WM, 'to_semantic_WM', semanticWM_C, 'from_wk_frame_WM')
     model.add_connection(cxn_retrieval_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_cxn_retrieval_C')
     model.add_connection(phonWM_C, 'to_wk_frame_WM', wk_frame_WM, 'from_phonological_WM_C')
     
+    
+    model.set_input_ports([phonWM_C.find_port('from_input')])
+    model.set_output_ports([semanticWM_C.find_port('to_output')])
+    
     # Parameters
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
     
+    control.set_mode('listen')
+    
     # Loading data
     semantics_file = "%s.json" % semantics_name
-    my_conceptual_knowledge = conceptLTM.cpt_knowledge
+    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
     my_wk_frames = TCG_LOADER.load_frame_knowledge(semantics_file, semantics_path, my_conceptual_knowledge)
+    grammar_file = "%s.json" %grammar_name
+    my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
     
     # Initialize grammatical LTM content
+    grammaticalLTM.initialize(my_grammar)
+    
+    # Initialize conceptual LTM content
+    conceptLTM.initialize(my_conceptual_knowledge)
+    
+    # Initialize WK frame LTM content
     wk_frame_LTM.initialize(my_wk_frames)
     
     return model
