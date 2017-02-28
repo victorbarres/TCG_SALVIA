@@ -1,0 +1,94 @@
+{ 
+	"inputs":{
+		"woman": {
+			"utter_rate": 1,
+			 "utterance" :["woman"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"ball": {
+			"utter_rate": 1,
+			 "utterance" :["ball"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"woman_kick_ball(act)": {
+			"utter_rate": 1,
+			 "utterance" :[ "woman", "kick", "ball"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"woman_kick_ball(pas)": {
+			"utter_rate": 1,
+			 "utterance" :[ "ball", "is", "kick", "-ed", "by", "woman"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"cellist_chase_fencer(act)": {
+			"utter_rate": 1,
+			 "utterance" :[ "cellist", "chase", "fencer"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"cellist_chase_fencer(pas)": {
+			"utter_rate": 1,
+			 "utterance" :[ "fencer", "is", "chase", "-ed", "by", "fencer"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"cake_hit_cellow(act)": {
+			"utter_rate": 1,
+			 "utterance" :[ "cake", "hit", "cello"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"cake_hit_cello(pas)": {
+			"utter_rate": 1,
+			 "utterance" :[ "cello", "is", "hit", "-ed", "by", "cake"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"boy_eat_apple(act)": {
+			"utter_rate": 1,
+			 "utterance" :["boy", "eat", "apple"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"boy_eat_apple(pas)": {
+			"utter_rate": 1,
+			 "utterance" :["boy", "eat", "apple"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"apple_eat_boy(act)": {
+			"utter_rate": 1,
+			 "utterance" :["apple", "eat", "boy"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"apple_eat_boy(pas)": {
+			"utter_rate": 1,
+			 "utterance" :["boy", "is", "eat", "-ed", "by","apple"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"man_ride_motorcycle(act)": {
+			"utter_rate": 1,
+			 "utterance" :["man", "ride", "motorcycle"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"girl_ride_carousel(act)": {
+			"utter_rate": 1,
+			 "utterance" :["girl", "ride", "merry-go-round"],
+			 "timing":[],
+			 "comments": ""
+			},
+		"girl_ride_motorcycle(act)": {
+			"utter_rate": 1,
+			 "utterance" :["girl", "ride", "motorcycle"],
+			 "timing":[],
+			 "comments": ""
+			}
+	}
+}

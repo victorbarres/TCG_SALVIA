@@ -401,7 +401,7 @@ class FRAME(object):
         self._create_NX_graph()
     
     def _create_NX_graph(self):
-        graph = nx.DiGraph()
+        graph = nx.MultiDiGraph()
         for node in self.nodes:
             graph.add_node(node.name, concept=node.concept)
         for edge in self.edges:

@@ -194,6 +194,7 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
         -> 'edge': edge induced subgraphs + single nodes
         -> 'edge+': edges induced subgraphs + nodes powerset.
         -> 'node': node induced subgraphs.
+        -> 'node*': only node powersets, no edges
         
     - subgraph_filter (callable): subgraph_filter should be a callable that takes on a subgraph and returns True or False. Only the subgraphs that return True
                                         are considered for subgraph isomorphism matching. By default returns always True.
@@ -201,6 +202,14 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
         subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
+    
+    if induced == 'node*':
+        node_power_set = list_powerset(G.nodes(data=True))
+        subgraphs = []
+        for n_list in [n for n in node_power_set if n !=[]]:
+            subG = DiGraph()
+            subG.add_nodes_from(n_list)
+            subgraphs.append(subG)
     
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))

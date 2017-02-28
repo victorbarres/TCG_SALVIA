@@ -176,6 +176,7 @@ def run_diagnostic():
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
     input_names = json_data['inputs'].keys()
+    input_names.sort()
     print "\nInput list:\n %s" %'\n '.join(input_names)
     input_name = raw_input('\nEnter input name: ')
     yes_no = raw_input('\nSave? (y/n): ')

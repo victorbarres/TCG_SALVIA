@@ -39,67 +39,17 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
         """
         return concept.match(self.trigger.concept, match_type = "is_a")
     
-#    def FrameMatch(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
-#        """
-#        Defines the condition of instantiation of the WK_FRAME_SCHEMA based on the state of Semantic Representation (SemRep).
-#        
-#        Notes:
-#            - Here the trigger is given. This is is mostly for running efficiency.
-#        """
-#        sub_iso = self.FrameMatch_cat(SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name)
-#        return sub_iso
-#    
-#    def FrameMatch_cat(self, SemRep, SemRep_subgraphs, wk_frame_schema, trigger_sem_node_name):
-#        """
-#        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
-#        """
-#        wk_frame_graph = self.content.graph 
-#        trigger_name = self.trigger.name
-#        # Build wk_frame_graph subgraphs. 
-#        def subgraph_filter(subgraph): # Only the subgraph that contain the trigger are considered as legal for partial match.
-#            return trigger_name in subgraph.nodes()
-#                
-#        wk_frame_subgraphs = TCG_graph.build_submultigraphs(wk_frame_graph, induced='edge', subgraph_filter=subgraph_filter)
-#        
-#        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-#    #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-#        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-#       
-#        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-#        em = TCG_graph.edge_iso_match("concept", "", edge_concept_match)
-#    
-#        def iso_filter(iso, trigger_sem_node_name):
-#            sem_node_name = iso['nodes'].get(trigger_name, None)
-#            if not(sem_node_name) or (sem_node_name != trigger_sem_node_name):
-#                return False
-#            return True
-#            
-#        sub_iso = TCG_graph.find_max_partial_iso(SemRep, SemRep_subgraphs, wk_frame_graph, wk_frame_subgraphs, node_match=nm, edge_match=em)
-#        sub_iso = [s for s in sub_iso if iso_filter(s, trigger_sem_node_name)]
-#        
-#        return sub_iso
 
 class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
     """
     World knowledge frame schema instance. 
      - expressed
-     - covers ({"nodes":{}, "edges"={}}): maps WK_FRAME nodes and edges (in content) to SemRep elements (in the trace) (Maps the nodes and edges names to SemRep obj)
+     - covers (STR): name of the PHON_INST that triggered the instantatiation
     """
-    def __init__(self, wk_frame_schema, trace, mapping={"nodes":{}, "edges":{}}, copy=True):
+    def __init__(self, wk_frame_schema, trace, covers, copy=True):
         SCHEMA_INST.__init__(self, schema=wk_frame_schema, trace=trace)
         self.expressed = False
-        self.covers = {}
-        if copy:
-            (wk_frame_copy, c) = wk_frame_schema.content.copy()
-            self.content = wk_frame_copy
-            if mapping:
-                new_node_mapping  = dict([(c[k], v) for k,v in mapping['nodes'].iteritems()])
-                new_edge_mapping  = dict([((c[k[0]], c[k[1]]), v) for k,v in mapping['edges'].iteritems()])
-                new_mapping= {'nodes':new_node_mapping, 'edges':new_edge_mapping}
-                self.covers = new_mapping
-        
-        else:
-             self.covers = mapping
+        self.covers = covers
         
 ##########################################
 ##### WORLD KNOWLEDGE SYSTEM SCHEMAS #####
@@ -164,14 +114,14 @@ class WK_FRAME_WM(WM):
 #        sem_input = self.inputs['from_semantic_WM']
         phon_activations = self.inputs['from_phonological_WM_C']
         new_wk_frame_insts= self.inputs['from_wk_frame_retrieval']
-
+        self.outputs['to_semantic_WM'] = {}
         if new_wk_frame_insts:
             # Add new instances
             for inst in new_wk_frame_insts:
                 self.add_instance(inst, inst.activity) 
-            wk_output = self.apply_WK()
-            if wk_output:
-                self.outputs['to_semantic_WM']['instances'] =  wk_output
+        wk_output = self.apply_WK()
+        if wk_output:
+            self.outputs['to_semantic_WM']['instances'] =  wk_output
         
         activations = self.sem_WM_output()
         self.outputs['to_semantic_WM']['activations'] = activations
@@ -187,7 +137,7 @@ class WK_FRAME_WM(WM):
         wk_output = []
         for inst in wk_frame_insts:
             #Send their wk_frame to SemWM.
-            if inst.activity > self.params['C2']['confidence_threshold']:
+            if inst.activity > self.params['C2']['confidence_threshold'] and self.t>500:
                 wk_output.append((inst.content, inst.name))
                 inst.expressed = True
         return wk_output
@@ -212,7 +162,7 @@ class WK_FRAME_WM(WM):
         if not(phon_activations):
             return
         for inst in self.schema_insts:
-            val = phon_activations.get(inst.trace['trigger'], 0)
+            val = phon_activations.get(inst.covers, 0)
             inst.activation.E += val # No normalization
             
 class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
@@ -260,7 +210,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
             triggered_schemas = [schema for schema in wk_frame_schemas if schema.is_triggered(concept)]
             for wk_frame_schema in triggered_schemas:
                 trace = trace = {"trigger":phon_inst.name, "schemas":[wk_frame_schema]}  
-                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace)
+                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, phon_inst.name)
                 self.wk_frame_instances.append(new_instance)
     
     ####################
