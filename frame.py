@@ -19,8 +19,10 @@ class WK_FRAME_NODE(FRAME_NODE):
         self.trigger = False
     
     def copy(self):
-        (new_node, name_corr) = FRAME_NODE.copy(self)
-        new_node.trigger = self.trigger
+        new_node = WK_FRAME_NODE()
+        new_node.name = '%s_%i' %(self.name, new_node.id)
+        name_corr = (self.name, new_node.name)
+        new_node.concept = self.concept
         return (new_node, name_corr)
         
     
@@ -29,28 +31,57 @@ class WK_FRAME_REL(FRAME_REL):
     """
     def __init__(self):
         FRAME_REL.__init__(self)
+        
+    def copy(self):
+        new_rel = WK_FRAME_REL()
+        new_rel.name = '%s_%i' %(self.name, new_rel.id)
+        name_corr = (self.name, new_rel.name)
+        new_rel.concept = self.concept
+        new_rel.pfrom = self.pFrom
+        new_rel.pTo = self.pTo
+        return (new_rel, name_corr)
     
 class WK_FRAME(FRAME):
     """ Defines a WK_Frame object  
     Data (inherited):
         - name (STR): WK frame name
-        - preference (FLOAT): WK frame preference (usage preferences, optional)
         - nodes ([FRAME_NODES]): Set of WK FRAME nodes.
         - edges ([FRAME_REL]): Set of WK FRAME relations.
         - graph (networkx.DiGraph): A NetworkX implementation of the graph.
             Each node and edge have the additional 'concept' attribute derived from their respective node.concept and edge.concept
+     - preference (FLOAT): WK frame preference (usage preferences, optional)
      - frame_knowledge (FRAME_KNOWLEDGE): The frame knowledge instance the WK frame is part of.
      - trigger (FRAME_NODE): The frame node whose concept serve as a trigger for the WK_FRAME
     """
     def __init__(self, name='',  frame_knowledge=None):
         FRAME.__init__(self, name=name)
+        self.preference = 1.0
         self.frame_knowledge = frame_knowledge
         self.trigger = None
     
     def copy(self):
-        (new_frame, name_corr) = FRAME.copy(self)
-        new_frame.frame_knowedge = self.frame_knowledge
-        new_frame.trigger = new_frame.find_elem(name_corr[self.trigger.name])
+        """
+        """
+        new_frame = WK_FRAME()
+        new_frame.name = self.name
+        new_frame.preference = self.preference
+        new_frame.frame_knowledge = self.frame_knowledge
+        node_corr = {}
+        name_corr = {}
+        for node in self.nodes:
+            (new_node, c) = node.copy()
+            node_corr[node] = new_node
+            name_corr[c[0]] = c[1]
+            new_frame.nodes.append(new_node)
+        for edge in self.edges:
+            (new_edge, c) = edge.copy()
+            name_corr[c[0]] = c[1]
+            new_edge.pFrom = node_corr[edge.pFrom]
+            new_edge.pTo = node_corr[edge.pTo]
+            new_frame.edges.append(new_edge)
+        new_frame.trigger = node_corr[self.trigger]
+        new_frame._create_NX_graph()
+        
         return (new_frame, name_corr)
         
     def show(self):

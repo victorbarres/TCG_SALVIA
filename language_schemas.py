@@ -1102,33 +1102,57 @@ class SEMANTIC_WM_C(WM):
             
             return cpt_insts
             
-
         for wk_frame, inst_name in wk_inputs:
-            sub_isos = self.FrameMatch_simple(wk_frame)
-            print sub_isos
+            sub_isos = SEMANTIC_WM_C.FrameMatch_simple(self.SemRep, wk_frame.graph) # Check whether SemRep matches a subgraph of wk_frame (whether wk_frame adds information to SemRep)
+            names = []
             for sub_iso in sub_isos:
                 name_table = {}
                 for n1,n2 in sub_iso['nodes'].iteritems():
-                    node_inst = self.find_instance(n2)
-                    name_table[n1] = node_inst
-                    node_inst.trace['wk_frame_insts'].update(set([n1]))
+                    node_inst = self.find_instance(n1)
+                    name_table[n2] = node_inst
+                    node_inst.trace['wk_frame_insts'].update(set([n2]))
+                    names.append(n2)
                 for e1, e2_list in sub_iso['edges'].iteritems():
+                    edge_inst = self.find_instance(e1[3]) # by definition mutli edges are given as (from, to, key, name)
+                    names.append(e1[3])
                     for e2 in e2_list:
-                        edge_inst = self.find_instance(e2[3]) # by definition mutli edges are given as (from, to, key, name)
-                        edge_inst.trace['wk_frame_insts'].update(set([e1[3]]))
-                        
-                for node in [n for n in wk_frame.nodes if n.name not in sub_iso['nodes'].keys()]:
+                        edge_inst.trace['wk_frame_insts'].update(set([e2[3]]))
+                      
+                for node in [n for n in wk_frame.nodes if n.name not in names]:
                     cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
                     new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([node.name]),'sem_frame_insts':set([])})
                     name_table[node.name] = new_cpt_inst
                     cpt_insts.append(new_cpt_inst)
-                for edge in [e for e in wk_frame.edges if e.name not in [k[3] for k in sub_iso['nodes'].keys()]]:
+                    names.append(node.name)
+                for edge in [e for e in wk_frame.edges if e.name not in names]:
                     cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
                     new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge.name]), 'sem_frame_insts':set([])})
                     new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
                     new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
                     cpt_insts.append(new_cpt_inst)
-            
+                    names.append(edge.name)
+                    
+            sub_isos = SEMANTIC_WM_C.FrameMatch_simple(wk_frame.graph, self.SemRep) # Check whether wk_frame matches a subgraph of SemRep (whether wk_frame confirms or contradicts SemRep info)
+            names = []
+            for sub_iso in sub_isos:
+                name_table = {}
+                for n1,n2 in sub_iso['nodes'].iteritems():
+                    node_inst = self.find_instance(n2)
+                    name_table[n2] = node_inst
+                    node_inst.trace['wk_frame_insts'].update(set([n1]))
+                    names.append(n2)
+                for e1, e2_list in sub_iso['edges'].iteritems():
+                    edge_1 = wk_frame.find_elem(e1[3])
+                    for e2 in e2_list:
+                        edge_inst2 = self.find_instance(e2[3]) # by definition mutli edges are given as (from, to, key, name)
+                        if edge_1.concept.match(edge_inst2.content.concept): # edge concepts match
+                            edge_inst.trace['wk_frame_insts'].update(set([e1[3]]))
+                        else: # creating competing edges
+                            cpt_schema = self._find_cpt_schema(cpt_schemas, edge_1.concept.name)
+                            new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge.name]), 'sem_frame_insts':set([])})
+                            new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
+                            new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
+                            cpt_insts.append(new_cpt_inst)            
         return cpt_insts
     
     def convey_gram_activations(self, gram_activations):
@@ -1186,30 +1210,6 @@ class SEMANTIC_WM_C(WM):
             
             #Send the new state to output.
             self.outputs['to_output'] = True
-   
-    def FrameMatch_simple(self, sem_input_frame):
-        """A simple version of FrameMatch
-        Only valid for the cases in which the only 1 transitive action is to be interpreted!
-        Check whether there is a (1) subgraph isomorphism between the sem_input_frame and the SemRep (sem_input_frame confirms or compete with existing thematic relation information) or (2) between the SemRep and the sem_input_frame (sem_input_frame adds information).
-        """
-        frame_graph = sem_input_frame.graph
-        
-        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-        
-        
-        # Test SemRep included in frame_graph
-        frame_subgraphs = TCG_graph.build_submultigraphs(frame_graph, induced='edge+')
-        sub_iso = TCG_graph.find_sub_multi_iso(frame_graph, frame_subgraphs, self.SemRep, node_match=nm, edge_match=None)
-        if sub_iso:
-            return sub_iso
-        
-        # Test frame_graph included in SemRep
-        SemRep_subgraphs = TCG_graph.build_submultigraphs(self.SemRep, induced='edge+')
-        sub_iso = TCG_graph.find_sub_multi_iso(self.SemRep, SemRep_subgraphs, frame_graph, node_match=nm, edge_match=None)
-        if sub_iso:
-            return sub_iso
-        return []
         
 #     def update_mapping(self, sem_input_frame, sem_input_mapping, node_match=None, edge_match=None, iso_filter=lambda x:True):
 #        """
@@ -1296,6 +1296,28 @@ class SEMANTIC_WM_C(WM):
                 raise ValueError(error_msg)
             else:
                 return output[0]
+
+    @staticmethod
+    def FrameMatch_simple(frame_graph1, frame_graph2):
+        """A simple version of FrameMatch
+        !!Only valid for the cases in which the only 1 transitive action is to be interpreted!!
+        Check whether there is a subgraph isomorphism between frame_graph1 and frame_graph2 (frame_graph2 included in frame_graph1)
+        Frame match does not take into account edges concepts.
+        """        
+        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="equal")
+        def node_concept_match(cpt1, cpt2):
+            flag = cpt2.match(cpt1, match_type="equal")
+            if flag:
+                print "%s matches %s\n" %(cpt1.meaning, cpt2.meaning)
+            return flag
+        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+        
+        # Test SemRep included in frame_graph
+        frame_subgraphs2 = TCG_graph.build_submultigraphs(frame_graph2, induced='edge')
+        sub_iso = TCG_graph.find_sub_multi_iso(frame_graph2, frame_subgraphs2, frame_graph1, node_match=nm, edge_match=None)
+        if sub_iso:
+            return sub_iso
+        return []
         
     #######################
     ### DISPLAY METHODS ###

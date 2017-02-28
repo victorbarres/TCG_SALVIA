@@ -296,7 +296,7 @@ class K_NET(object):
 ################
 ### FRAME ###
 ################
-class FRAME_ELEM:
+class FRAME_ELEM(object):
     """
     Frame element (base class).
     """
@@ -317,13 +317,6 @@ class FRAME_NODE(FRAME_ELEM):
     """
     def __init__(self):
         FRAME_ELEM.__init__(self)
-    
-    def copy(self):
-        new_node = FRAME_NODE()
-        new_node.name = '%s_%i' %(self.name, new_node.id)
-        name_corr = (self.name, new_node.name)
-        new_node.concept = self.concept
-        return (new_node, name_corr)
 
 class FRAME_REL(FRAME_ELEM):
     """
@@ -338,15 +331,6 @@ class FRAME_REL(FRAME_ELEM):
         FRAME_ELEM.__init__(self)
         self.pFrom = None
         self.pTo = None
-    
-    def copy(self):
-        new_rel = FRAME_REL()
-        new_rel.name = '%s_%i' %(self.name, new_rel.id)
-        name_corr = (self.name, new_rel.name)
-        new_rel.concept = self.concept
-        new_rel.pfrom = self.pFrom
-        new_rel.pTo = self.pTo
-        return (new_rel, name_corr)
 
 class FRAME(object):
     """
@@ -410,28 +394,6 @@ class FRAME(object):
             graph.add_edge(pFrom, pTo, name=edge.name, concept=edge.concept)
         
         self.graph = graph
-    
-    def copy(self):
-        """
-        """
-        new_frame = FRAME()
-        new_frame.name = self.name
-        node_corr = {}
-        name_corr = {}
-        for node in self.nodes:
-            (new_node, c) = node.copy()
-            node_corr[node] = new_node
-            name_corr[c[0]] = c[1]
-            new_frame.nodes.append(new_node)
-        for edge in self.edges:
-            (new_edge, c) = edge.copy()
-            name_corr[c[0]] = c[1]
-            new_edge.pFrom = node_corr[edge.pFrom]
-            new_edge.pTo = node_corr[edge.pTo]
-            new_frame.edges.append(new_edge)
-        new_frame._create_NX_graph()
-        
-        return (new_frame, name_corr)
     
     def show(self):
         """

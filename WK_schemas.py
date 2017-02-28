@@ -46,8 +46,15 @@ class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
      - expressed
      - covers (STR): name of the PHON_INST that triggered the instantatiation
     """
-    def __init__(self, wk_frame_schema, trace, covers, copy=True):
-        SCHEMA_INST.__init__(self, schema=wk_frame_schema, trace=trace)
+    def __init__(self, wk_frame_schema, trace, covers, trigger_concept):
+        old_frame =  wk_frame_schema.content
+        (new_frame, name_corr) = old_frame.copy()
+        new_name = "%s_%s" %(old_frame.name, trigger_concept.name)
+        new_frame.name = new_name
+        new_frame.trigger.concept = trigger_concept
+        new_frame._create_NX_graph()
+        new_wk_frame_schema = WK_FRAME_SCHEMA(new_name, new_frame, wk_frame_schema.init_act)
+        SCHEMA_INST.__init__(self, schema=new_wk_frame_schema, trace=trace)
         self.expressed = False
         self.covers = covers
         
@@ -209,8 +216,8 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         for concept in concepts:
             triggered_schemas = [schema for schema in wk_frame_schemas if schema.is_triggered(concept)]
             for wk_frame_schema in triggered_schemas:
-                trace = trace = {"trigger":phon_inst.name, "schemas":[wk_frame_schema]}  
-                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, phon_inst.name)
+                trace = trace = {"trigger":concept, "schemas":[wk_frame_schema]}  
+                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, phon_inst.name, concept)
                 self.wk_frame_instances.append(new_instance)
     
     ####################
