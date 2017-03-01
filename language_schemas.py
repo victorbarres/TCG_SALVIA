@@ -1160,22 +1160,30 @@ class SEMANTIC_WM_C2_C(WM):
                 sem_map = instance_data['sem_map']
                 cpt_schemas = self.inputs['from_concept_LTM']
                 if cpt_schemas and SemFrame and sem_map:
-                    cpt_insts  = self.instantiate_gram_cpts(SemFrame, sem_map, cpt_schemas)
+                    output  = self.instantiate_gram_cpts(SemFrame, sem_map, cpt_schemas)
+                    cpt_insts = output['instances']
                     new_insts.extend(cpt_insts)
                     for inst in cpt_insts:
                         self.add_instance(inst, INIT_VAL)
+                    competitions = output['competitions']
+                    for inst1, inst2 in competitions:
+                        self.add_comp_link(inst1, inst2)
             self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
             
         wk_input = self.inputs['from_wk_frame_WM']
         if wk_input:
             wk_activations = wk_input['activations']
             instance_data = wk_input.get('instances', None)
-            if instance_data: # Instantiate data from constructions
-                cpt_schemas = self.inputs['from_concept_LTM']
-                cpt_insts = self.instantiate_wk_cpts(instance_data, cpt_schemas)
+            cpt_schemas = self.inputs['from_concept_LTM']
+            if instance_data and cpt_schemas: # Instantiate data from constructions
+                output = self.instantiate_wk_cpts(instance_data, cpt_schemas)
+                cpt_insts = output['instances']
                 new_insts.extend(cpt_insts)
                 for inst in cpt_insts:
                     self.add_instance(inst, INIT_VAL)
+                competitions = output['competitions']
+                for inst1, inst2 in competitions:
+                    self.add_comp_link(inst1, inst2)
             self.convey_WK_activations(wk_activations)
         self.update_activations()
         self.update_SemRep(new_insts)
@@ -1204,6 +1212,8 @@ class SEMANTIC_WM_C2_C(WM):
                 return None
                 
         cpt_insts = []
+        competitions = []
+        output = {'instances':cpt_insts, 'competitions':competitions}
         
         # First case
         sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, SemFrame.graph) # Check whether SemRep matches a subgraph of SemFrame (whether SemFrame adds information to SemRep)
@@ -1235,6 +1245,7 @@ class SEMANTIC_WM_C2_C(WM):
                         new_cpt_inst.content['pFrom'] = edge_inst1.content['pFrom']
                         new_cpt_inst.content['pTo'] = edge_inst1.content['pTo']
                         cpt_insts.append(new_cpt_inst) 
+                        competitions.append((edge_inst1, new_cpt_inst))
                     
             for node in [n for n in SemFrame.nodes if n.name not in names]:
                 cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
@@ -1254,7 +1265,7 @@ class SEMANTIC_WM_C2_C(WM):
         
         if sub_isos:
             print "Link SemFrame"
-            return cpt_insts
+            return output
         
         # Second case
         sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(SemFrame.graph, self.SemRep) # Check whether SemFrame matches a subgraph of SemRep (whether wk_frame confirms or contradicts SemRep info)
@@ -1285,9 +1296,10 @@ class SEMANTIC_WM_C2_C(WM):
                         new_cpt_inst.content['pFrom'] = edge_inst2.content['pFrom']
                         new_cpt_inst.content['pTo'] = edge_inst2.content['pTo']
                         cpt_insts.append(new_cpt_inst)
+                        competitions.append((edge_inst2, new_cpt_inst))
         if sub_isos:
             print "C2 SemFrame"
-            return cpt_insts
+            return output
         
         # Case add all
         name_table = {}                        
@@ -1306,7 +1318,7 @@ class SEMANTIC_WM_C2_C(WM):
             cpt_insts.append(new_cpt_inst)
         
         print "Add SemFrame"
-        return cpt_insts
+        return output
         
     
     def instantiate_wk_cpts(self, wk_inputs, cpt_schemas):
@@ -1324,6 +1336,8 @@ class SEMANTIC_WM_C2_C(WM):
         If so, expand mapping, move on with adding concept schemas.
         """
         cpt_insts = []
+        competitions = []
+        output = {'instances':cpt_insts, 'competitions':competitions}
 #        if not self.schema_insts:
 #            for wk_frame, inst_name in wk_inputs:
 #                name_table = {}                        
@@ -1369,6 +1383,7 @@ class SEMANTIC_WM_C2_C(WM):
                             new_cpt_inst.content['pFrom'] = edge_inst1.content['pFrom']
                             new_cpt_inst.content['pTo'] = edge_inst1.content['pTo']
                             cpt_insts.append(new_cpt_inst) 
+                            competitions.append((edge_inst1, new_cpt_inst))
                       
                 for node in [n for n in wk_frame.nodes if n.name not in names]:
                     cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
@@ -1413,7 +1428,8 @@ class SEMANTIC_WM_C2_C(WM):
                             new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_1.name]), 'sem_frame_insts':set([])})
                             new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
                             new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
-                            cpt_insts.append(new_cpt_inst) 
+                            cpt_insts.append(new_cpt_inst)
+                            competitions.append((edge_inst2, new_cpt_inst))
                             
             if sub_isos:
                 print "C2 wk_frame"
@@ -1433,7 +1449,8 @@ class SEMANTIC_WM_C2_C(WM):
                 cpt_insts.append(new_cpt_inst)
                 
             print "add wk_frame"
-        return cpt_insts
+        
+        return output
     
     def convey_gram_activations(self, gram_activations):
         """

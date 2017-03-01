@@ -171,9 +171,9 @@ def run_diagnostic():
     GRAMMAR_NAME = 'TCG_grammar_VB_lex'
     VERBOSE = 2
     SEED = None
-    ANIM = False
-    MAX_TIME = 1200
-    SPEED_PARAM = 30
+    ANIM = True
+    MAX_TIME = 1500
+    SPEED_PARAM = 200
     OFFSET = 10
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
