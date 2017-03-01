@@ -145,7 +145,7 @@ class WK_FRAME_WM(WM):
         for inst in wk_frame_insts:
             #Send their wk_frame to SemWM.
             if inst.activity > self.params['C2']['confidence_threshold']:
-                wk_output.append((inst.content, inst.name, inst.covers))
+                wk_output.append((inst.content, inst.name))
                 inst.expressed = True
         return wk_output
         
@@ -216,9 +216,8 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         for concept in concepts:
             triggered_schemas = [schema for schema in wk_frame_schemas if schema.is_triggered(concept)]
             for wk_frame_schema in triggered_schemas:
-                trace = trace = {"trigger":concept, "schemas":[wk_frame_schema]} 
-                covers = [phon_inst.name] 
-                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, covers, concept)
+                trace = trace = {"trigger":concept, "schemas":[wk_frame_schema]}  
+                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, phon_inst.name, concept)
                 self.wk_frame_instances.append(new_instance)
     
     ####################

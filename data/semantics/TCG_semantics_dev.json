@@ -214,11 +214,11 @@
 		"WK_Frame" : {
 			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
 						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},
-						{"name" : "REF_ACT", "concept": "TRANS_ACT", "frame" : false},
+						{"name" : "REF_ACT", "concept": "TRANS_ACT", "frame" : true},
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
 						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : false},
 						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "REF2", "concept": "ENTITY", "frame" : false}
+						{"name" : "REF2", "concept": "ENTITY", "frame" : true}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
@@ -237,9 +237,9 @@
 						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
 						{"name" : "EAT", "concept" : "EAT", "frame" : false},	
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : false},
+						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : true},
 						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "FOOD", "concept" : "FOOD", "frame" : false}
+						{"name" : "FOOD", "concept" : "FOOD", "frame" : true}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
@@ -258,9 +258,9 @@
 						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
 						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "ADULT", "concept" : "ADULT", "frame" : false},
+						{"name" : "ADULT", "concept" : "ADULT", "frame" : true},
 						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "VEHICLE", "concept" : "VEHICLE", "frame" : false}
+						{"name" : "VEHICLE", "concept" : "VEHICLE", "frame" : true}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ADULT"},
@@ -279,9 +279,9 @@
 						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
 						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
 						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "CHILD", "concept" : "CHILD", "frame" : false},
+						{"name" : "CHILD", "concept" : "CHILD", "frame" : true},
 						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "TOY", "concept" : "TOY", "frame" : false}
+						{"name" : "TOY", "concept" : "TOY", "frame" : true}
 						],
 			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
 						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "CHILD"},
