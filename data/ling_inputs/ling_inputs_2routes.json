@@ -12,6 +12,12 @@
 			 "timing":[],
 			 "comments": ""
 			},
+		"ball_cello": {
+			"utter_rate": 1,
+			 "utterance" :["ball", "cello"],
+			 "timing":[],
+			 "comments": ""
+			},
 		"woman_kick_ball(act)": {
 			"utter_rate": 1,
 			 "utterance" :[ "woman", "kick", "ball"],
@@ -36,7 +42,7 @@
 			 "timing":[],
 			 "comments": ""
 			},
-		"cake_hit_cellow(act)": {
+		"cake_hit_cello(act)": {
 			"utter_rate": 1,
 			 "utterance" :[ "cake", "hit", "cello"],
 			 "timing":[],

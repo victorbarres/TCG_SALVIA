@@ -1029,7 +1029,7 @@
 								{"name" : "N1", "concept" : "CELLO", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
 					},
-		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "CELLO"}],
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "cello"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
 		

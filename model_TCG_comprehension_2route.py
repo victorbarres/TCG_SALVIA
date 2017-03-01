@@ -17,7 +17,7 @@ TMP_FOLDER = './tmp'
 
 ##################
 #### RUNNING MODEL
-def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_main', model_params = {}):
+def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2route', model_params = {}):
     """
     Sets up a TCG comprehension 2route system.
     
@@ -37,7 +37,7 @@ def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_m
     return model
     
     
-def set_inputs(model, ling_input_file='ling_inputs.json', speed_param=10, offset=10):
+def set_inputs(model, ling_input_file='ling_inputs_2routes.json', speed_param=10, offset=10):
     """
     Sets up a TCG UTTER_GENERATOR inputs generator for TCG comprehension model.
     
@@ -147,7 +147,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     return outputs
     
-def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='test_naming', ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2route', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
