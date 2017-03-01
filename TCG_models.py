@@ -465,8 +465,8 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
                     'Concept_LTM':[''],
                     'Control':['DLPFC'],
                     'wk_frame_LTM':[],
-                    'WK_frame_WM'=[]
-                    'WK_frame_retrieval'=[]}
+                    'WK_frame_WM':[],
+                    'WK_frame_retrieval':[]}
     
     # Initializing model
     model = st.MODEL(name)

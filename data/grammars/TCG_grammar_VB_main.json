@@ -636,6 +636,20 @@
 	},
 	
 	{
+		"name" : "RIDE",
+		"class" : "V",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "RIDE", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "ride"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
 		"name" : "GIVE",
 		"class" : "V",
 		"preference" : 1,
@@ -1257,6 +1271,7 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "merry-go-round"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
+	
 	{
 		"name" : "CAKE",
 		"class" : "N",
@@ -1277,7 +1292,7 @@
 		"group": 1,
 		"SemFrame" : {
 					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
-								{"name" : "N1", "concept" : "MERRY_GO_ROUND", "frame" : false, "focus" : false, "head" : false}],
+								{"name" : "N1", "concept" : "APPLE", "frame" : false, "focus" : false, "head" : false}],
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "apple"}],
