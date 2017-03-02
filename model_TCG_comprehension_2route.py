@@ -162,19 +162,20 @@ def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
     return out
     
     
-def run_diagnostic():
+def run_diagnostic(verbose=2):
     """
     """
     import json
     LING_INPUT_FILE = 'ling_inputs_2routes.json'
     SEMANTICS_NAME = 'TCG_semantics_dev'
     GRAMMAR_NAME = 'TCG_grammar_VB_lex'
-    VERBOSE = 2
+    VERBOSE = verbose
     SEED = None
     ANIM = True
     MAX_TIME = 1500
     SPEED_PARAM = 200
     OFFSET = 10
+    PROB_TIMES = []
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
     input_names = json_data['inputs'].keys()
@@ -184,7 +185,7 @@ def run_diagnostic():
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=[550], verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
+    run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
     
 
 

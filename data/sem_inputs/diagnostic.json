@@ -70,7 +70,7 @@
 					"ENTITY(e2,F)", "BALL(ball)", "IS(is2)", "is2(e2, ball)",
 					"EVENT(evt1,F)", "TRANS_ACT(a1,F)", "IS(is3)", "is3(evt1,a1)",
 					"KICK(kick)", "IS(is4)", "is4(a1, kick)", 
-					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e2)", "pt(a1, e1)"]
+					"AGENT(agt)", "PATIENT(pt)", "agt(a1, e1)", "pt(a1, e2)"]
 			},
 			"sequence":["P1"],
 			"timing":[],

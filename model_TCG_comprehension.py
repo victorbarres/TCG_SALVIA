@@ -173,6 +173,7 @@ def run_diagnostic():
     MAX_TIME = 900
     SPEED_PARAM = 30
     OFFSET = 10
+    PROB_TIMES = []
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
     input_names = json_data['inputs'].keys()
@@ -182,7 +183,7 @@ def run_diagnostic():
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=[550], verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
+    run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
     
 
 
