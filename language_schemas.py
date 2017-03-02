@@ -1167,6 +1167,7 @@ class SEMANTIC_WM_C2_C(WM):
                         self.add_instance(inst, INIT_VAL)
                     competitions = output['competitions']
                     for inst1, inst2 in competitions:
+                        print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
                         self.add_comp_link(inst1, inst2)
             self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
             
@@ -1183,6 +1184,7 @@ class SEMANTIC_WM_C2_C(WM):
                     self.add_instance(inst, INIT_VAL)
                 competitions = output['competitions']
                 for inst1, inst2 in competitions:
+                    print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
                     self.add_comp_link(inst1, inst2)
             self.convey_WK_activations(wk_activations)
         self.update_activations()
@@ -1275,7 +1277,7 @@ class SEMANTIC_WM_C2_C(WM):
             for n1,n2 in sub_iso['nodes'].iteritems():
                 node_inst2 = self.find_instance(n2)
                 name_table[n2] = node_inst2
-                sem_frame_insts = set([k for k,v in sem_map.iteritems() if n2 in v])
+                sem_frame_insts = set([k for k,v in sem_map.iteritems() if n1 in v])
                 node_inst2.trace['sem_frame_insts'].update(sem_frame_insts)
                 names.append(n2)
                 node_1 = SemFrame.find_elem(n1)
@@ -1649,10 +1651,6 @@ class SEMANTIC_WM_C2_C(WM):
         refs1 = find_refs(frame_graph1)
         refs2 = find_refs(frame_graph2)
         corefs = find_coref(frame_graph1, frame_graph2)
-        print sub_isos
-        print refs1
-        print refs2
-        print corefs
         filtered_sub_isos = [s for s in sub_isos if sub_iso_filter(s, refs1, refs2, corefs)]
                              
                              

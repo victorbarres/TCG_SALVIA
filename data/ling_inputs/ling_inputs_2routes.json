@@ -38,7 +38,7 @@
 			},
 		"cellist_chase_fencer(pas)": {
 			"utter_rate": 1,
-			 "utterance" :[ "fencer", "is", "chase", "-ed", "by", "fencer"],
+			 "utterance" :[ "fencer", "is", "chase", "-ed", "by", "cellist"],
 			 "timing":[],
 			 "comments": ""
 			},
@@ -62,7 +62,7 @@
 			},
 		"boy_eat_apple(pas)": {
 			"utter_rate": 1,
-			 "utterance" :["boy", "eat", "apple"],
+			 "utterance" :["apple", "is", "eat", "-ed", "by", "boy"],
 			 "timing":[],
 			 "comments": ""
 			},
