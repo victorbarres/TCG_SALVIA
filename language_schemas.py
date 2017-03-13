@@ -1232,7 +1232,7 @@ class SEMANTIC_WM_C2_C(WM):
         competitions = []
         output = {'instances':cpt_insts, 'competitions':competitions}
         
-        # First case
+        # First case: Expanding SemWM based on SemFrame
         sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, SemFrame.graph) # Check whether SemRep matches a subgraph of SemFrame (whether SemFrame adds information to SemRep)
         names = []
         for sub_iso in sub_isos:
@@ -1281,11 +1281,11 @@ class SEMANTIC_WM_C2_C(WM):
                 names.append(edge.name)
         
         if sub_isos:
-            print "%i: Link SemFrame" %self.t
+            print "%i: Add partial SemFrame" %self.t
             return output
         
-        # Second case
-        sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(SemFrame.graph, self.SemRep) # Check whether SemFrame matches a subgraph of SemRep (whether wk_frame confirms or contradicts SemRep info)
+        # Second case: Check for C2 between SemFrame and SemRep
+        sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(SemFrame.graph, self.SemRep) # Check whether SemFrame matches a subgraph of SemRep (whether SemFrame confirms or contradicts SemRep info)
         names = []
         for sub_iso in sub_isos:
             name_table = {}
@@ -1304,7 +1304,7 @@ class SEMANTIC_WM_C2_C(WM):
                 edge_1 = SemFrame.find_elem(e1[3])
                 sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge_1.name in v])
                 for e2 in e2_list:
-                    edge_inst2 = self.find_instance(e2[3]) # by definition mutli edges are given as (from, to, key, name)
+                    edge_inst2 = self.find_instance(e2[3]) # by definition multi edges are given as (from, to, key, name)
                     if edge_1.concept.match(edge_inst2.content['concept'], match_type='equal'): # edge concepts match
                         edge_inst2.trace['sem_frame_insts'].update(sem_frame_insts)
                     else: # creating competing edges
@@ -1319,6 +1319,9 @@ class SEMANTIC_WM_C2_C(WM):
             return output
         
         # Case add all
+        SemFrame.draw()
+        plt.show()
+        self.show_state()
         name_table = {}                        
         for node in  SemFrame.nodes:
             cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
@@ -1334,7 +1337,7 @@ class SEMANTIC_WM_C2_C(WM):
             new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
             cpt_insts.append(new_cpt_inst)
         
-        print "%i: Add SemFrame" %self.t
+        print "%i: Add full SemFrame" %self.t
         return output
         
     
@@ -1371,9 +1374,7 @@ class SEMANTIC_WM_C2_C(WM):
 #                    cpt_insts.append(new_cpt_inst)
 #            
 #            return cpt_insts
-        self.show_state()
         for wk_frame, inst_name in wk_inputs:
-            wk_frame.show()
             sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, wk_frame.graph) # Check whether SemRep matches a subgraph of wk_frame (whether wk_frame adds information to SemRep)
             names = []
             for sub_iso in sub_isos:
@@ -1389,7 +1390,7 @@ class SEMANTIC_WM_C2_C(WM):
                         node_inst1.frame = node_2.frame
                         cpt_insts.append(node_inst1)  
                 for e1, e2_list in sub_iso['edges'].iteritems():
-                    edge_inst1 = self.find_instance(e1[3]) # by definition mutli edges are given as (from, to, key, name)
+                    edge_inst1 = self.find_instance(e1[3]) # by definition multi edges are given as (from, to, key, name)
                     for e2 in e2_list:
                         edge_2 = wk_frame.find_elem(e2[3])
                         names.append(e2[3])
@@ -1418,7 +1419,7 @@ class SEMANTIC_WM_C2_C(WM):
                     names.append(edge.name)
             
             if sub_isos:
-                print "%i: Link wk_frame" %self.t
+                print '%i: Adding partial wk frame %s' %(self.t, wk_frame.name)
                 continue
                 
             sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(wk_frame.graph, self.SemRep) # Check whether wk_frame matches a subgraph of SemRep (whether wk_frame confirms or contradicts SemRep info)
@@ -1450,7 +1451,7 @@ class SEMANTIC_WM_C2_C(WM):
                             competitions.append((edge_inst2, new_cpt_inst))
                             
             if sub_isos:
-                print "%i: C2 wk_frame" %self.t
+                print "%i: C2 wk_frame %s" %(self.t, wk_frame.name)
                 continue
                 
             name_table = {}                        
@@ -1466,7 +1467,7 @@ class SEMANTIC_WM_C2_C(WM):
                 new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
                 cpt_insts.append(new_cpt_inst)
                 
-            print "%i: Add wk_frame" %self.t
+            print "%i: Add full wk_frame %s" %(self.t, wk_frame.name)
         
         return output
     
@@ -1690,6 +1691,8 @@ class SEMANTIC_WM_C2_C(WM):
         
         frame_subgraphs2 = TCG_graph.build_submultigraphs(frame_graph2, induced='edge')
         
+        
+        ### THIS IMPLIES INCLUSION AS MULTI_GRAPH!! NOT CORRECT SINCE EDGES ARE COMPETING. MULTIGRAPH SHOULD BE DECOMPOSED IN "ASSEMBLAGES" (DIGRAPHS)
         # Test frame_graph2 included in frame_graph1, with edge matching constraints
         sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_subgraphs2, frame_graph1, node_match=nm, edge_match=em)
         filtered_sub_isos = [s for s in sub_isos if sub_iso_filter(s, refs1, refs2, corefs)]
@@ -3453,9 +3456,9 @@ class GRAMMATICAL_WM_C(WM):
             In particular the mapping between constructions and SemRep might need to be going both ways.
         """
         assemblages = self.assemble()
-        # Discard assemblages that only contain instances that have already been expressed.
-        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
-        assemblages = [a for a in assemblages if not is_expressed(a)]
+#        # Discard assemblages that only contain instances that have already been expressed.
+#        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
+#        assemblages = [a for a in assemblages if not is_expressed(a)]
         if assemblages:
             sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
