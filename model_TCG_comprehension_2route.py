@@ -17,7 +17,7 @@ TMP_FOLDER = './tmp'
 
 ##################
 #### RUNNING MODEL
-def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2route', model_params = {}):
+def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2routes', model_params = {}):
     """
     Sets up a TCG comprehension 2route system.
     
@@ -147,7 +147,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     return outputs
     
-def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2route', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2routes', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -168,10 +168,10 @@ def run_diagnostic(verbose=2):
     import json
     LING_INPUT_FILE = 'ling_inputs_2routes.json'
     SEMANTICS_NAME = 'TCG_semantics_dev'
-    GRAMMAR_NAME = 'TCG_grammar_VB_lex'
+    GRAMMAR_NAME = 'TCG_grammar_VB_2routes'
     VERBOSE = verbose
     SEED = None
-    ANIM = True
+    ANIM = False
     MAX_TIME = 1500
     SPEED_PARAM = 200
     OFFSET = 10
@@ -190,9 +190,9 @@ def run_diagnostic(verbose=2):
 
 
 if __name__=='__main__':
-#    model = set_model()
-#    model.system2dot(image_type='png', disp=True)
-    run_diagnostic()
+    model = set_model()
+    model.system2dot(image_type='svg', disp=False)
+#    run_diagnostic()
 
 
 

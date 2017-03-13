@@ -835,6 +835,8 @@ class SEMANTIC_WM_P(WM):
             for inst in cpt_insts:
                 self.add_instance(inst)
         
+        self.update_activations()      
+        self.prune() 
         self.update_SemRep(cpt_insts) 
                 
         if self.inputs['from_grammatical_WM_P']: # This should be done on the instances directly...
@@ -853,11 +855,8 @@ class SEMANTIC_WM_P(WM):
             self.outputs['to_cxn_retrieval_P'] = self.SemRep
         
         self.outputs['to_control'] = self.has_unexpressed_sem()
-        
-        self.update_activations()      
-        self.prune()                    
             
-    def update_SemRep(self, cpt_insts):
+    def update_SemRep(self, cpt_insts=[]):
         """
         Updates the SemRep: Adds the nodes and edges needed based on the received concept instances.
         
@@ -866,6 +865,7 @@ class SEMANTIC_WM_P(WM):
             - SemRep carries the instance and the concept. The concept field is redundant, but is useful in order to be able to define
             SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
         """
+        # Add new instances
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
@@ -880,19 +880,21 @@ class SEMANTIC_WM_P(WM):
                 if self.SemRep.has_edge(node_from, node_to):
                     continue
                 self.SemRep.add_edge(node_from, node_to, name=rel_inst.name, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False)
-            
-#            # Update concept frames
-#            self.update_cpt_frames()
+        
+        # Remove dead instances
+        dead_nodes = []
+        for n, d in self.SemRep.nodes(data=True):
+            if d['cpt_inst'] not in self.schema_insts:
+                dead_nodes.append(n)
+        self.SemRep.remove_nodes_from(dead_nodes)
+        
+        dead_edges = []
+        for u,v,d in self.SemRep.edges(data=True):
+            if d['cpt_inst'] not in self.schema_insts:
+                dead_edges.append((u,v))
+        self.SemRep.remove_edges_from(dead_edges)
+        
     
-#    def update_cpt_frames(self):
-#        """
-#        For all the concept frames instances. If they have an 'IS' relation, propagate is_concept to frame.
-#        """
-#        cpt_rel_name = 'IS'
-#        for u,v,d in [edge for edge in self.SemRep.edges(data=True)]:
-#            if d['concept'].name == cpt_rel_name:
-#                self.SemRep.node[u]['cpt_inst'].content = self.SemRep.node[v]['cpt_inst'].content.copy()
-#                self.SemRep.node[u]['concept'] = self.SemRep.node[v]['concept']
             
     def gram_WM_P_output(self):
         """
@@ -1005,10 +1007,10 @@ class SEMANTIC_WM_C(WM):
                     for inst in cpt_insts:
                         self.add_instance(inst, INIT_VAL)
             self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
-            
-        self.update_activations()
-        self.update_SemRep(new_insts)        
+              
+        self.update_activations()     
         self.prune()
+        self.update_SemRep(new_insts) 
     
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """
@@ -1072,7 +1074,7 @@ class SEMANTIC_WM_C(WM):
                     act += val
                 inst.activation.E += act # No normalization
 
-    def update_SemRep(self, cpt_insts):
+    def update_SemRep(self, cpt_insts=[]):
         """
         Updates the SemRep: Adds the nodes and edges needed based on the receivd concept instances.
         
@@ -1081,6 +1083,7 @@ class SEMANTIC_WM_C(WM):
             - SemRep carries the instance and the concept. The concept field is redundant, but is useful in order to be able to define
             SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
         """
+        # A new instances
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
@@ -1098,6 +1101,19 @@ class SEMANTIC_WM_C(WM):
             
             #Send the new state to output.
             self.outputs['to_output'] = True
+
+        # Remove dead instances
+        dead_nodes = []
+        for n, d in self.SemRep.nodes(data=True):
+            if d['cpt_inst'] not in self.schema_insts:
+                dead_nodes.append(n)
+        self.SemRep.remove_nodes_from(dead_nodes)
+
+        dead_edges = []
+        for u,v,d in self.SemRep.edges(data=True):
+            if d['cpt_inst'] not in self.schema_insts:
+                dead_edges.append((u,v))
+        self.SemRep.remove_edges_from(dead_edges)
         
     def _find_cpt_schema(self, cpt_schemas, cpt_name):
             """Returns, if it exists, the cpt_schema whose name matches cpt_name
@@ -1187,11 +1203,10 @@ class SEMANTIC_WM_C2_C(WM):
                     print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
                     self.add_comp_link(inst1, inst2)
             self.convey_WK_activations(wk_activations)
+        
         self.update_activations()
-        self.update_SemRep(new_insts)
-        if new_insts:
-            self.show_state()
         self.prune()
+        self.update_SemRep(new_insts)
     
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """
@@ -1266,7 +1281,7 @@ class SEMANTIC_WM_C2_C(WM):
                 names.append(edge.name)
         
         if sub_isos:
-            print "Link SemFrame"
+            print "%i: Link SemFrame" %self.t
             return output
         
         # Second case
@@ -1300,7 +1315,7 @@ class SEMANTIC_WM_C2_C(WM):
                         cpt_insts.append(new_cpt_inst)
                         competitions.append((edge_inst2, new_cpt_inst))
         if sub_isos:
-            print "C2 SemFrame"
+            print "%i: C2 SemFrame" %self.t
             return output
         
         # Case add all
@@ -1319,7 +1334,7 @@ class SEMANTIC_WM_C2_C(WM):
             new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
             cpt_insts.append(new_cpt_inst)
         
-        print "Add SemFrame"
+        print "%i: Add SemFrame" %self.t
         return output
         
     
@@ -1356,8 +1371,9 @@ class SEMANTIC_WM_C2_C(WM):
 #                    cpt_insts.append(new_cpt_inst)
 #            
 #            return cpt_insts
-            
+        self.show_state()
         for wk_frame, inst_name in wk_inputs:
+            wk_frame.show()
             sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, wk_frame.graph) # Check whether SemRep matches a subgraph of wk_frame (whether wk_frame adds information to SemRep)
             names = []
             for sub_iso in sub_isos:
@@ -1402,7 +1418,7 @@ class SEMANTIC_WM_C2_C(WM):
                     names.append(edge.name)
             
             if sub_isos:
-                print "link wk_frame"
+                print "%i: Link wk_frame" %self.t
                 continue
                 
             sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(wk_frame.graph, self.SemRep) # Check whether wk_frame matches a subgraph of SemRep (whether wk_frame confirms or contradicts SemRep info)
@@ -1434,7 +1450,7 @@ class SEMANTIC_WM_C2_C(WM):
                             competitions.append((edge_inst2, new_cpt_inst))
                             
             if sub_isos:
-                print "C2 wk_frame"
+                print "%i: C2 wk_frame" %self.t
                 continue
                 
             name_table = {}                        
@@ -1450,7 +1466,7 @@ class SEMANTIC_WM_C2_C(WM):
                 new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
                 cpt_insts.append(new_cpt_inst)
                 
-            print "add wk_frame"
+            print "%i: Add wk_frame" %self.t
         
         return output
     
@@ -1492,11 +1508,15 @@ class SEMANTIC_WM_C2_C(WM):
             - SemRep carries the instance and the concept. The concept field is redundant, but is useful in order to be able to define
             SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
         """
+        # Add new instances
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
                 if self.SemRep.has_node(inst.name):
-                    self.SemRep.node[inst.name]['concept'] = inst.content['concept']
+                    cpt1 = self.SemRep.node[inst.name]['concept']
+                    cpt2 = inst.content['concept']
+                    print "%i: Updating: %s -> %s" %(self.t, cpt1.name, cpt2.name)
+                    cpt1 = cpt2
                     self.SemRep.node[inst.name]['frame'] = inst.frame
 
                 self.SemRep.add_node(inst.name, cpt_inst=inst, concept=inst.content['concept'], frame=inst.frame, new=True, processed=[], expressed=False, dat=(inst.content['concept'], inst.frame))
@@ -1505,8 +1525,26 @@ class SEMANTIC_WM_C2_C(WM):
             for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
-                self.SemRep.add_edge(node_from, node_to, name=rel_inst.name, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=inst.frame,  new=True, processed=[], expressed=False, dat=(rel_inst.content['concept'], rel_inst.frame))
+                self.SemRep.add_edge(node_from, node_to, name=rel_inst.name, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=rel_inst.frame,  new=True, processed=[], expressed=False, dat=(rel_inst.content['concept'], rel_inst.frame))
             
+            #Send the new state to output.
+            self.outputs['to_output'] = True
+
+        # Remove dead instances
+        dead_nodes = []
+        for n, d in self.SemRep.nodes(data=True):
+            if d['cpt_inst'] not in self.schema_insts:
+                dead_nodes.append(n)
+        self.SemRep.remove_nodes_from(dead_nodes)
+
+        dead_edges = []
+        for u,v,k,d in self.SemRep.edges(data=True, keys=True):
+            if d['cpt_inst'] not in self.schema_insts:
+                dead_edges.append((u,v))
+        self.SemRep.remove_edges_from(dead_edges)
+        
+        if dead_nodes + dead_edges:
+            print "%i: Pruned concepts %s" %(self.t, dead_nodes + dead_edges)
             #Send the new state to output.
             self.outputs['to_output'] = True
         
@@ -1608,15 +1646,7 @@ class SEMANTIC_WM_C2_C(WM):
             frame_graph1 = nx.MultiDiGraph(frame_graph1)
         if not isinstance(frame_graph2, nx.MultiDiGraph):
             frame_graph2 = nx.MultiDiGraph(frame_graph2)
-                          
-        node_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a") or cpt1.match(cpt2, match_type="is_a")
-        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-        
-        # Test SemRep included in frame_graph
-        frame_subgraphs2 = TCG_graph.build_submultigraphs(frame_graph2, induced='edge')
-        
-        sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_subgraphs2, frame_graph1, node_match=nm, edge_match=None)
-              
+            
         def find_refs(frame_graph):
             refs = []
             for node, d in frame_graph.nodes(data=True):
@@ -1651,19 +1681,28 @@ class SEMANTIC_WM_C2_C(WM):
         refs1 = find_refs(frame_graph1)
         refs2 = find_refs(frame_graph2)
         corefs = find_coref(frame_graph1, frame_graph2)
+                          
+        node_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a") or cpt1.match(cpt2, match_type="is_a")
+        edge_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a")
+        
+        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+        em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
+        
+        frame_subgraphs2 = TCG_graph.build_submultigraphs(frame_graph2, induced='edge')
+        
+        # Test frame_graph2 included in frame_graph1, with edge matching constraints
+        sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_subgraphs2, frame_graph1, node_match=nm, edge_match=em)
+        filtered_sub_isos = [s for s in sub_isos if sub_iso_filter(s, refs1, refs2, corefs)]
+        if filtered_sub_isos:
+            if len(filtered_sub_isos)>1:
+                error_msg = "Multi_sub_iso!!"
+                raise ValueError(error_msg)
+            return filtered_sub_isos
+        
+        # Test frame_graph2 included in frame_graph1, without edge matching constraints
+        sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_subgraphs2, frame_graph1, node_match=nm, edge_match=None)
         filtered_sub_isos = [s for s in sub_isos if sub_iso_filter(s, refs1, refs2, corefs)]
                              
-                             
-#        res = find_coref(frame_graph1, frame_graph2)
-#        filtered_sub_isos = []
-#        if res:
-#            res = res[0]
-#            for s in sub_isos:
-#                if s['nodes'][res[0]] == res[1]:
-#                    filtered_sub_isos.append(s)
-#        else:
-#            filtered_sub_isos = sub_isos
-
         if filtered_sub_isos:
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
@@ -3414,6 +3453,9 @@ class GRAMMATICAL_WM_C(WM):
             In particular the mapping between constructions and SemRep might need to be going both ways.
         """
         assemblages = self.assemble()
+        # Discard assemblages that only contain instances that have already been expressed.
+        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
+        assemblages = [a for a in assemblages if not is_expressed(a)]
         if assemblages:
             sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
@@ -3422,7 +3464,7 @@ class GRAMMATICAL_WM_C(WM):
                 sem_WM_output['sem_map'] = a2i_map['sem_map']
                 phon_WM_output = eq_inst.covers.values()
                 for cxn_inst in winner_assemblage.schema_insts:
-                    cxn_inst.expressed = True # For now I mark all the cxn_insts that have sent their SemFrame to SemanticWM as done 
+                    cxn_inst.expressed = True # All the cxn_insts that have sent their SemFrame to SemanticWM are marked as expressed
                 
                 #Option5: Sets all the instances in the winner assembalge to subthreshold activation. Sets all the coop_weightsto 0. So f-link remains but inst participating in assemblage decay unless they are reused.
 #                self.post_prod_state(winner_assemblage) # Needed if cooperation links are symmetrical

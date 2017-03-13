@@ -128,11 +128,12 @@ def update_max_partial_iso(newG, newG_subgraphs, G_pat, G_pat_subgraphs, old_sub
         if sub_multi_iso_include(a_sub_iso, old_sub_iso):
             new_sub_iso.append(a_sub_iso)
     return new_sub_iso
+    
 
-def sub_iso_include(sub_iso1, sub_iso2):
+def sub_iso_include_nodes(sub_iso1, sub_iso2):
     """
     Compare two subgraph isomorphisms from a graph G1 onto a graph G2
-    Returns True if sub_iso1 includes sub_iso2
+    Returns True if sub_iso1 node mapping includes sub_iso2 node mapping
     """ 
     nodes_map1 = sub_iso1['nodes']
     nodes_map2 = sub_iso2['nodes']
@@ -141,6 +142,13 @@ def sub_iso_include(sub_iso1, sub_iso2):
         if not(n in nodes_map1) or nodes_map1[n] != v:
             node_flag = False
             break
+    return node_flag
+    
+def sub_iso_include_edges(sub_iso1, sub_iso2):
+    """
+    Compare two subgraph isomorphisms from a graph G1 onto a graph G2
+    Returns True if sub_iso1 edge mapping includes sub_iso2 edge mapping
+    """ 
     edges_map1 = sub_iso1['edges']
     edges_map2 = sub_iso2['edges']
     edge_flag = True
@@ -148,32 +156,61 @@ def sub_iso_include(sub_iso1, sub_iso2):
         if not(e in edges_map1) or edges_map1[e] != v:
             edge_flag = False
             break
-        
+    return edge_flag
+
+def sub_iso_include(sub_iso1, sub_iso2):
+    """
+    Compare two subgraph isomorphisms from a graph G1 onto a graph G2
+    Returns True if sub_iso1 includes sub_iso2
+    """ 
+    node_flag = sub_iso_include_nodes(sub_iso1, sub_iso2)
+    edge_flag = sub_iso_include_edges(sub_iso1, sub_iso2)        
     return node_flag and edge_flag   
+    
+    
+def sub_multi_iso_include_nodes(sub_iso1, sub_iso2):
+    """
+    Compare two sub multigraph isomorphisms from a graph G1 onto a graph G2
+    Returns True if sub_iso1 node mapping includes sub_iso2 node mapping
+    """ 
+    
+    nodes_map1 = sub_iso1['nodes']
+    nodes_map2 = sub_iso2['nodes']
+    
+    node_flag = True
+    for n,v in nodes_map2.iteritems():
+        if not(n in nodes_map1) or nodes_map1[n] != v:
+            node_flag = False
+            break
+    return node_flag
+
+def sub_multi_iso_include_edges(sub_iso1, sub_iso2):
+    """
+    Compare two sub multigraph isomorphisms from a graph G1 onto a graph G2
+    Returns True if sub_iso1 edge mapping includes sub_iso2 edge mapping
+    """ 
+    edges_map1 = sub_iso1['edges']
+    edges_map2 = sub_iso2['edges']
+    edge_flag = True
+    for e,v in edges_map2.iteritems():   
+        if not(e in edges_map1):
+            edge_flag =  False 
+            break
+        s1 = set(edges_map1[e])
+        s2 = set(v)
+        if not s2.issubset(s1):
+            edge_flag =  False 
+            break
+    return edge_flag
                                
 def sub_multi_iso_include(sub_iso1, sub_iso2):
     """
     Compare two sub mutltigraph isomorphisms from a graph G1 onto a graph G2
     Returns True if sub_iso1 includes sub_iso2
     """
-    nodes_map1 = sub_iso1['nodes']
-    nodes_map2 = sub_iso2['nodes']
-
-    for n,v in nodes_map2.iteritems():
-        if not(n in nodes_map1) or nodes_map1[n] != v:
-            return False
-    
-    edges_map1 = sub_iso1['edges']
-    edges_map2 = sub_iso2['edges']
-
-    for e,v in edges_map2.iteritems():   
-        if not(e in edges_map1):
-            return False
-        s1 = set(edges_map1[e])
-        s2 = set(v)
-        if not s2.issubset(s1):
-            return False 
-    return True
+    node_flag = sub_multi_iso_include_nodes(sub_iso1, sub_iso2)
+    edge_flag = sub_multi_iso_include_edges(sub_iso1, sub_iso2)        
+    return node_flag and edge_flag   
         
 def is_subgraph(G1, G2):
     """
