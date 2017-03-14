@@ -1216,23 +1216,24 @@ class SEMANTIC_WM_C2_C(WM):
             - SemFrame (TP_SEMFRAME)
             - cpt_schemas ([CPT_SCHEMA])
         """
-        def find_cpt_inst(sem_frame_insts):
-            """ Returns, if it exists, the cpt_inst whose sem_frame trace already contains one of the sem_frame_insts.
-            """
-            output = [inst for inst in self.schema_insts if not(inst.trace['sem_frame_insts'].isdisjoint(sem_frame_insts))]
-            if len(output)>1:
-                error_msg = 'There is more than one cpt_inst that map onto the same SemFrame element! %s' %str([o.name for o in output])
-                raise ValueError(error_msg)
-            elif len(output)==1:
-                return output[0]
-            else:
-                return None
+#        def find_cpt_inst(sem_frame_insts):
+#            """ Returns, if it exists, the cpt_inst whose sem_frame trace already contains one of the sem_frame_insts.
+#            """
+#            output = [inst for inst in self.schema_insts if not(inst.trace['sem_frame_insts'].isdisjoint(sem_frame_insts))]
+#            if len(output)>1:
+#                error_msg = 'There is more than one cpt_inst that map onto the same SemFrame element! %s' %str([o.name for o in output])
+#                raise ValueError(error_msg)
+#            elif len(output)==1:
+#                return output[0]
+#            else:
+#                return None
                 
         cpt_insts = []
         competitions = []
         output = {'instances':cpt_insts, 'competitions':competitions}
         
         # First case: Expanding SemWM based on SemFrame
+        ## ERRROR: DOESN'T WORK IF WHEN SEMREP HAS MULTIEDGE!!!
         sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, SemFrame.graph) # Check whether SemRep matches a subgraph of SemFrame (whether SemFrame adds information to SemRep)
         names = []
         for sub_iso in sub_isos:
@@ -1376,6 +1377,7 @@ class SEMANTIC_WM_C2_C(WM):
 #            return cpt_insts
         for wk_frame, inst_name in wk_inputs:
             sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, wk_frame.graph) # Check whether SemRep matches a subgraph of wk_frame (whether wk_frame adds information to SemRep)
+            ## ERRROR: DOESN'T WORK IF WHEN SEMREP HAS MULTIEDGE!!!
             names = []
             for sub_iso in sub_isos:
                 name_table = {}
@@ -1549,7 +1551,7 @@ class SEMANTIC_WM_C2_C(WM):
             #Send the new state to output.
             self.outputs['to_output'] = True
         
-#     def update_mapping(self, sem_input_frame, sem_input_mapping, node_match=None, edge_match=None, iso_filter=lambda x:True):
+#    def update_mapping(self, sem_input_frame, sem_input_mapping, node_match=None, edge_match=None, iso_filter=lambda x:True):
 #        """
 #        Updates the mapping of a sem_input to take into account the possible change of state
 #        that took place in Semantic_WM.
@@ -1560,70 +1562,79 @@ class SEMANTIC_WM_C2_C(WM):
 #        return new_mappings       
         
         
-#    def FrameMatch(self, sem_input_frame, constraints):
-#        """
-#        Defines the possible matches between input frame semantic info and the current state of the SemRep given the constraints "constraints"
-#        defined as frame_node to sem_frame_node mapping.
-#        (For now only categorical matching, no qualitative evaluation of the match value.)
-#        """
-#        sub_iso = self.FrameMatch_cat(sem_input_frame, constraints)
-#        return sub_iso
-#    
-#    def FrameMatch_cat(self, sem_input_frame, constraints):
-#        """
-#        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms. This is the main filter for instantiation.
-#        """
-#        frame_graph = sem_input_frame.graph
-#
-#        def subgraph_filter_source(subgraph, constraints=constraints):# Only the subgraph that contain the all the constraining elements are considered as legal for partial match.
-#            for n in constraints['nodes'].keys():
-#                if n not in subgraph.nodes():
-#                    return False
-#            for e in constraints['edges'].keys():
-#                if e not in subgraph.edges():
-#                    return False
-#            return True
-#            
-#        def subgraph_filter_target(subgraph, constraints=constraints):# Only the SemRep subgraph that contain the all the constraining elements are considered as legal for partial match.
-#            for n in constraints['nodes'].values():
-#                if n not in subgraph.nodes():
-#                    return False
-#            for e_list in constraints['edges'].values():
-#                for e in e_list:
-#                    if e not in subgraph.edges():
-#                        return False
-#            return True
-#         
-#        # Build subgraphs sets 
-#        frame_subgraphs = TCG_graph.build_submultigraphs(frame_graph, induced='edge+', subgraph_filter=subgraph_filter_source)
-#        SemRep_subgraphs = TCG_graph.build_submultigraphs(self.SemRep, induced='edge+', subgraph_filter=subgraph_filter_target)
-#        
-#        node_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a")
-#    #        node_frame_match = lambda frame1, frame2: (frame1 == frame2) # Frame values have to match
-#        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-#        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
-#        em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
-#        
-#        def iso_filter(iso, constraints=constraints):
-#            """Checks that the isomorphisms includes the constraints.
-#            """
-#            for n1, n2 in constraints['nodes'].iteritems():
-#                sem_node_name = iso['nodes'].get(n1, None)
-#                if not(sem_node_name) or (sem_node_name != n2):
-#                    return False
-#                
-#            for e1, e2_list in constraints['edges'].iteritems():
-#                sem_edge_list = iso['edges'].get(e1,None)
-#                if not(sem_edge_list) or not set(e2_list).issubset(set(sem_edge_list)):
-#                    return False
-#            return True
-#            
-#        sub_iso = TCG_graph.find_max_partial_iso(self.SemRep, SemRep_subgraphs, frame_graph, frame_subgraphs, node_match=nm, edge_match=em, iso_filter=iso_filter)
-#        
-#        return sub_iso
+    def FrameMatch(self, sem_input_frame, iso_constraints=None):
+        """
+        Defines the possible matches between input frame semantic info and the current state of the SemRep given the constraints "iso_constraints"
+        defined as frame_node to sem_frame_node mapping.
+        (For now only categorical matching, no qualitative evaluation of the match value.)
+        """
+        sub_iso = self.FrameMatch_cat(sem_input_frame.graph, iso_constraints)
+        return sub_iso
+    
+    def FrameMatch_cat(self, frame_graph, iso_constraints=None):
+        """
+        Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms.
+        This is the main filter for instantiation.
+        """
+        def find_refs(frame_graph):
+            refs = []
+            for node, d in frame_graph.nodes(data=True):
+                frame = d['dat'][1]
+                if not(frame):
+                    refs.append(node)
+            return refs
+            
+        def find_coref(frame_graph1, frame_graph2):
+            corefs = []
+            for node1, d1 in frame_graph1.nodes(data=True):
+                frame1 = d1['dat'][1]
+                cpt1 = d1['dat'][0]
+                for node2, d2 in frame_graph2.nodes(data=True):
+                    frame2 = d2['dat'][1]
+                    cpt2 = d2['dat'][0]
+                    if not(frame1) and not(frame2) and cpt2.match(cpt1, match_type='equal'):
+                        corefs.append((node1, node2))
+            return corefs
+        
+        def iso_coref_filter(sub_iso, refs1, refs2, corefs):
+            for c1,c2 in corefs:
+                if sub_iso['nodes'][c1] != c2:
+                    return False
+                    
+            for n1, n2 in sub_iso['nodes'].iteritems():
+                if (n1 in refs1) and (n2 in refs2):
+                    if (n1, n2) not in corefs:
+                        return False 
+            return True
+           
+            
+        refs1 = find_refs(self.SemRep)
+        refs2 = find_refs(frame_graph)
+        corefs = find_coref(self.SemRep, frame_graph)
+         
+        node_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a") or cpt1.match(cpt2, match_type="is_a")
+        edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+        nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
+        em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
+        
+        
+        if iso_constraints:
+            sub_isos = TCG_graph.update_max_partial_iso(self.SemRep, frame_graph, iso_constraints, node_match=nm, edge_match=em,  target_induce_type='edge+', source_induce_type='edge+')
+        else:
+            
+            sub_isos = TCG_graph.find_max_partial_iso(self.SemRep, frame_graph, node_match=nm, edge_match=em, target_induce_type='edge+', source_induce_type='edge+')
+        
+        #Enforcing co-reference
+        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs1, refs2, corefs)]
+        if filtered_sub_isos:
+            if len(filtered_sub_isos)>1:
+                error_msg = "Multi_sub_iso!!"
+                raise ValueError(error_msg)
+            return filtered_sub_isos
+        return []
 
     def _find_cpt_schema(self, cpt_schemas, cpt_name):
-            """Returns, if it exists, the cpt_schema whose name matches cpt_name
+            """Returns, if it exists, the cpt_schema in concept LTM content whose name matches cpt_name
             """
             output = [schema for schema in cpt_schemas if schema.name == cpt_name]
             if len(output)>1:
@@ -1640,7 +1651,6 @@ class SEMANTIC_WM_C2_C(WM):
         """A simple version of FrameMatch
         !!Only valid for the cases in which the only 1 transitive action is to be interpreted!!
         Check whether there is a subgraph isomorphism between frame_graph1 and frame_graph2 (frame_graph2 included in frame_graph1)
-        Frame match does not take into account edges concepts.
         """
         # Convert digraphs to multidigraphs
         if not isinstance(frame_graph1, nx.MultiDiGraph):
@@ -1668,7 +1678,7 @@ class SEMANTIC_WM_C2_C(WM):
                         corefs.append((node1, node2))
             return corefs
         
-        def sub_iso_filter(sub_iso, refs1, refs2, corefs):
+        def iso_coref_filter(sub_iso, refs1, refs2, corefs):
             for c1,c2 in corefs:
                 if sub_iso['nodes'][c1] != c2:
                     return False
@@ -1689,13 +1699,10 @@ class SEMANTIC_WM_C2_C(WM):
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
         
-        frame_subgraphs2 = TCG_graph.build_submultigraphs(frame_graph2, induced='edge')
-        
-        
         ### THIS IMPLIES INCLUSION AS MULTI_GRAPH!! NOT CORRECT SINCE EDGES ARE COMPETING. MULTIGRAPH SHOULD BE DECOMPOSED IN "ASSEMBLAGES" (DIGRAPHS)
         # Test frame_graph2 included in frame_graph1, with edge matching constraints
-        sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_subgraphs2, frame_graph1, node_match=nm, edge_match=em)
-        filtered_sub_isos = [s for s in sub_isos if sub_iso_filter(s, refs1, refs2, corefs)]
+        sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_graph1, node_match=nm, edge_match=em, induce_type='edge')
+        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs1, refs2, corefs)]
         if filtered_sub_isos:
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
@@ -1703,9 +1710,8 @@ class SEMANTIC_WM_C2_C(WM):
             return filtered_sub_isos
         
         # Test frame_graph2 included in frame_graph1, without edge matching constraints
-        sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_subgraphs2, frame_graph1, node_match=nm, edge_match=None)
-        filtered_sub_isos = [s for s in sub_isos if sub_iso_filter(s, refs1, refs2, corefs)]
-                             
+        sub_isos = TCG_graph.find_sub_multi_iso(frame_graph2, frame_graph1, node_match=nm, edge_match=None, induce_type='edge')
+        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs1, refs2, corefs)]                  
         if filtered_sub_isos:
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
