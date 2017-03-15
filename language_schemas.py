@@ -2489,8 +2489,10 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             # Marked all SemRep elements as processed by gram_WM_C
             for n, d in SemRep.nodes(data=True):
                 d['processed'].append('gram_WM_P')
+                d['new'] = False
             for u,v,d in SemRep.edges(data=True):
                 d['processed'].append('gram_WM_P')
+                d['new'] = False
         self.cxn_instances = []
     
     def instantiate_cxns(self, SemRep, cxn_schemas):
