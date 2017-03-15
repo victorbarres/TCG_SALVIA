@@ -58,15 +58,17 @@ class PORT(object):
         - schema (SCHEMA): the schema the port is associated with.
         - type ('IN' or 'OUT'): type of port (input or output port)
         - value(): current value at the port.
+        - weight (FLOAT): current weight at the port
     """
     TYPE_IN = 'IN'
     TYPE_OUT = 'OUT'
     ID_NEXT = 1 # Global port counter
     
-    def __init__(self, port_type, port_schema = None, port_name='', port_data = None, port_value=None):
+    def __init__(self, port_type, port_schema = None, port_name='', port_data = None, port_value=None, port_weight=None):
         self.name = port_name
         self.data = port_data
         self.value = port_value
+        self.weight =  port_weight
         self.id = PORT.ID_NEXT
         PORT.ID_NEXT += 1
         self.type = port_type
@@ -115,10 +117,12 @@ class CONNECT(object):
     def update(self):
         """
         For now does not involve weight or delay!
-        Sets the value of port_rom to the value of port_to.
+        Sets the value of port_to to the value of port_from.
         Resets the port_from value to None.
+        Sets the weight for port_to to the connect weight.
         """
         self.port_to.value = self.port_from.value
+        self.port_to.weight = self.weight
         self.port_from.value = None
     
     def set_from(self, port):
@@ -179,6 +183,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         - params (DICT): Stores the process parameters
         - inputs (DICT): At each time steps stores the inputs
         - outputs (DICT): At each time steps stores the ouputs
+        - ext_weights(DICT): At each time steps stores the weights from each incomming connection.
         - activity (float): The activity level of the schema.
         - t (FLOAT): Time.
         - dt (FLOAT): Time step.
@@ -190,6 +195,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.params = {}
         self.inputs = {}
         self.outputs = {}
+        self.ext_weights = {}
         self.activity = 0.0
         self.t = 0.0
         self.dt = 1.0
@@ -205,16 +211,20 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             self.inputs[k] = None
         for k in self.outputs:
             self.outputs[k] = None
+        for k in self.ext_weights:
+            self.ext_weights[k] = None
         self.activity = 0
         self.t = 0
         self.dt = 1.0
     
     def get(self):
         """
-        Get all inputs and store them in the local self.inputs DICT. 
+        Get all inputs and weights and store them in the local self.inputs and self.ext_weights DICT. 
         """
-        for input_name in self.inputs.keys():
+        for input_name in self.inputs:
             self.get_input(input_name)
+        for input_name in self.ext_weights:
+            self.get_weight(input_name)
     
     def post(self):
         """
@@ -241,10 +251,13 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.post()
         
         # Reset input and output namespace values.
-        for input_name in self.inputs.keys():
+        for input_name in self.inputs:
             self.inputs[input_name] = None
+
+        for input_name in self.ext_weights:
+            self.ext_weights[input_name] = None
         
-        for output_name in self.outputs.keys():
+        for output_name in self.outputs:
             self.outputs[output_name] = None
     
     def add_port(self, port_type, port_name='', port_data=None, port_value=None):
@@ -262,6 +275,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             else:
                 self.in_ports.append(new_port)
                 self.inputs[new_port.name] = None
+                self.ext_weights[new_port.name] = None
             return new_port.id
         elif port_type == PORT.TYPE_OUT:
             if self.outputs.has_key(new_port.name):
@@ -283,6 +297,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.out_ports = []
         self.inputs = {}
         self.outputs = {}
+        self.ext_weights = {}
     
     def set_params(self, params):
         """
@@ -312,7 +327,8 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         
     def get_input(self, port_name):
         """
-        Return the current value of the port with name 'port_name', stores the value in the inputs namesapce, and resets the port value to None. If the port is not an input port, if multiple ports shared the same name or if the port is 
+        Return the current value of the port with name 'port_name', stores the value in the inputs namesapce, and resets the port value to None. 
+        If the port is not an input port, if multiple ports shared the same name or if the port is 
         not found, returns None.
         """
         port = self.find_port(port_name)
@@ -321,6 +337,26 @@ class PROCEDURAL_SCHEMA(SCHEMA):
                 val = port.value
                 self.inputs[port.name] = val # Stores value in inputs namespace
                 port.value = None # Reset port value
+                return val
+        elif port and (port.type == PORT.TYPE_OUT):
+            error_msg = "Port %s refers to an output port" % port_name
+            raise ValueError(error_msg)
+        else:
+            error_msg = "port %s does not exist or could refer to multiple ports" % port_name
+            raise ValueError(error_msg)
+            
+    def get_weight(self, port_name):
+        """
+        Return the current weight of the port with name 'port_name', stores the value in the ext_weights namesapce, and resets the port weight to None. 
+        If the port is not an input port, if multiple ports shared the same name or if the port is 
+        not found, returns None.
+        """
+        port = self.find_port(port_name)
+        if port and (port.type == PORT.TYPE_IN):
+            if self.ext_weights.has_key(port.name):
+                val = port.weight
+                self.ext_weights[port.name] = val # Stores value in inputs namespace
+                port.weight = None # Reset port value
                 return val
         elif port and (port.type == PORT.TYPE_OUT):
             error_msg = "Port %s refers to an output port" % port_name

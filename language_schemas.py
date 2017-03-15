@@ -1401,10 +1401,10 @@ class GRAMMATICAL_WM_P(WM):
         - USE_GROUPS = []
         - W_1 = 1.0 # Weight of activation propagation to in groups
         - W_2 = 1.0 # Weight of activation propagation to out groups
-        - IN_GROUPE_NODE_WEIGHT = Node weight when groups are used (for in groups cxns)
-        - IN_GROUPE_EDGE_WEIGHT = Edge weight when groups are used (for in groups cxns)
-        - OUT_GROUPE_NODE_WEIGHT = Node weight when groups are used (for out groups cxns)
-        - OUT_GROUPE_EDGE_WEIGHT = Edge weight when groups are used (for out groups cxns)
+        - IN_GROUP_NODE_WEIGHT = Node weight when groups are used (for in groups cxns)
+        - IN_GROUP_EDGE_WEIGHT = Edge weight when groups are used (for in groups cxns)
+        - OUT_GROUP_NODE_WEIGHT = Node weight when groups are used (for out groups cxns)
+        - OUT_GROUP_EDGE_WEIGHT = Edge weight when groups are used (for out groups cxns)
         - NODE_WEIGHT = Node weight when groups are not used
         - EDGE_WEIGHT = Edge weight when groups are not used
     """
@@ -1412,8 +1412,10 @@ class GRAMMATICAL_WM_P(WM):
     USE_GROUPS = [1]
     W_1 = 1.0
     W_2 = 1.0
-    GROUPE_NODE_WEIGHT = 1.0
-    GROUPE_EDGE_WEIGHT = 1.0
+    IN_GROUP_NODE_WEIGHT = 1.0
+    IN_GROUP_EDGE_WEIGHT = 1.0
+    OUT_GROUP_NODE_WEIGHT = 1.0
+    OUT_GROUP_EDGE_WEIGHT = 1.0
     NODE_WEIGHT = 1.0
     EDGE_WEIGHT = 1.0
     
@@ -1551,16 +1553,16 @@ class GRAMMATICAL_WM_P(WM):
             # Propagate activation
             if use_groups:
                 if inst.content.group in use_groups:
-                    node_weight = self.IN_GROUPE_NODE_WEIGHT
-                    edge_weight = self.IN_GROUPE_EDGE_WEIGHT
+                    node_weight = self.IN_GROUP_NODE_WEIGHT
+                    edge_weight = self.IN_GROUP_EDGE_WEIGHT
                     act_node = act_node_phon + act_node_none + act_node_slot # I propagate everything
                     count_node = count_node_phon + count_node_none + count_node_slot
                     act = node_weight*act_node + edge_weight*act_edge
                     act *= self.W_1
                     count = node_weight*count_node + edge_weight*count_edge
                 else:
-                    node_weight = self.OUT_GROUPE_NODE_WEIGHT
-                    edge_weight = self.OUT_GROUPE_NODE_WEIGHT
+                    node_weight = self.OUT_GROUP_NODE_WEIGHT
+                    edge_weight = self.OUT_GROUP_NODE_WEIGHT
                     act_node = act_node_phon + act_node_none + act_node_slot # I propagate everything
                     count_node = count_node_phon + count_node_none + count_node_slot
                     act = (node_weight*act_node + edge_weight*act_edge)*self.W_2
