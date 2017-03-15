@@ -173,7 +173,7 @@ def run_diagnostic(verbose=2):
     SEED = None
     ANIM = False
     MAX_TIME = 1500
-    SPEED_PARAM = 100
+    SPEED_PARAM = 30
     OFFSET = 10
     PROB_TIMES = []
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:

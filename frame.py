@@ -6,7 +6,6 @@ Defines semantic network related classes for TCG.
 """
 from __future__ import division
 from knowledge_rep import FRAME, FRAME_NODE, FRAME_REL
-import TCG_graph
 import networkx as nx
 
 class WK_FRAME_NODE(FRAME_NODE):
@@ -84,11 +83,11 @@ class WK_FRAME(FRAME):
             new_edge.pTo = node_corr[edge.pTo]
             new_frame.edges.append(new_edge)
         new_frame.trigger = node_corr[self.trigger]
-        new_frame._create_NX_graph()
+        new_frame._create_graph()
         
         return (new_frame, name_corr)
         
-    def _create_NX_graph(self):
+    def _create_graph(self):
         graph = nx.MultiDiGraph()
         for node in self.nodes:
             graph.add_node(node.name, concept=node.concept, frame=node.frame, dat=(node.concept, node.frame))

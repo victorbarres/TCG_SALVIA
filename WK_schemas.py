@@ -52,7 +52,7 @@ class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
         new_name = "%s_%s" %(old_frame.name, trigger_concept.name)
         new_frame.name = new_name
         new_frame.trigger.concept = trigger_concept
-        new_frame._create_NX_graph()
+        new_frame._create_graph()
         new_wk_frame_schema = WK_FRAME_SCHEMA(new_name, new_frame, wk_frame_schema.init_act)
         SCHEMA_INST.__init__(self, schema=new_wk_frame_schema, trace=trace)
         self.expressed = False
@@ -197,7 +197,6 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         if wk_frame_schemas and phon_input and phon_input['instances']:
             self.instantiate_wk_frames(phon_input, wk_frame_schemas)
             self.outputs['to_wk_frame_WM'] = self.wk_frame_instances
-
         self.wk_frame_instances = []
     
     def instantiate_wk_frames(self, phon_input, wk_frame_schemas):
