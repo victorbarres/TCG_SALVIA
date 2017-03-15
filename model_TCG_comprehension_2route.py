@@ -113,7 +113,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
                 state_ISRF = isrf_writer.write_ISRF()
                 print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
             if verbose > 1:
-                prob_times.append(t + 10) #Will save the state 10 steps after utterance
+                prob_times.append(t + 10) #Will save the state 10 steps after Semantic output
         if t in prob_times: # Saving figures for prob times.
             TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=True, folder = FOLDER)
             TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_C'], folder = FOLDER)
@@ -168,12 +168,12 @@ def run_diagnostic(verbose=2):
     import json
     LING_INPUT_FILE = 'ling_inputs_2routes.json'
     SEMANTICS_NAME = 'TCG_semantics_dev'
-    GRAMMAR_NAME = 'TCG_grammar_VB_2routes'
+    GRAMMAR_NAME = 'TCG_grammar_VB_lex'
     VERBOSE = verbose
     SEED = None
     ANIM = False
-    MAX_TIME = 1500
-    SPEED_PARAM = 30
+    MAX_TIME = 2000
+    SPEED_PARAM = 100
     OFFSET = 10
     PROB_TIMES = []
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:

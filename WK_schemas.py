@@ -224,9 +224,10 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         if wk_frame_schemas and phon_input and phon_input['instances']:
             self.instantiate_wk_frames(phon_input, wk_frame_schemas)
             self.outputs['to_wk_frame_WM'] = []
-            for inst in [inst for inst in self.wk_frame_instances if inst.is_triggered()]:
-                self.outputs['to_wk_frame_WM'].append(inst)
-                self.wk_frame_instances.remove(inst)
+        for inst in [inst for inst in self.wk_frame_instances if inst.is_triggered()]:
+            print inst.name
+            self.outputs['to_wk_frame_WM'].append(inst)
+            self.wk_frame_instances.remove(inst)
     
     def instantiate_wk_frames(self, phon_input, wk_frame_schemas):
         """
@@ -247,6 +248,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
                 if wk_frame_inst.has_trigger(concept):
                     wk_frame_inst.got_trigger(concept)
                     names.append(wk_frame_inst.content.name)
+                    print "%i: %s by %s" %(self.t, wk_frame_inst.content.name, concept.name)
 
         for wk_frame_schema in [s for s in wk_frame_schemas if s.name not in names]:
             new_instance = None
@@ -256,8 +258,10 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
                         trace = {"trigger":[concept], "schemas":[wk_frame_schema]}  
                         new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, phon_inst.name)
                         new_instance.got_trigger(concept)
+                        print "%i: %s by %s" %(self.t, new_instance.content.name, concept.name)
                     else:
                         new_instance.got_trigger(concept)
+                        print "%i: %s by %s" %(self.t, new_instance.content.name, concept.name)
             if new_instance:
                 self.wk_frame_instances.append(new_instance)
     
