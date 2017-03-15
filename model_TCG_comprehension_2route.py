@@ -191,7 +191,7 @@ def run_diagnostic(verbose=2):
 
 if __name__=='__main__':
     model = set_model()
-#    model.system2dot(image_type='svg', disp=False)
+#    model.system2dot(image_type='png', disp=True)
     run_diagnostic()
 
 

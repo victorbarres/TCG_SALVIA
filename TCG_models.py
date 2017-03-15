@@ -140,6 +140,8 @@ def parameters(system_names):
         'C2.max_capacity':None,
         },
     
+    'Lex_cxn_retrieval_C':{},
+
     'Cxn_retrieval_C':{},
         
     'Grammatical_WM_C':{
@@ -303,6 +305,7 @@ def TCG_comprehension_system(name = 'language_system_C',
     """
     # Instantiating all the necessary system schemas
     grammaticalLTM = ls.GRAMMATICAL_LTM()
+    lex_cxn_retrieval_C = ls.LEX_CXN_RETRIEVAL_C()
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
     phonWM_C = ls.PHON_WM_C()
     grammaticalWM_C = ls.GRAMMATICAL_WM_C()
@@ -312,6 +315,7 @@ def TCG_comprehension_system(name = 'language_system_C',
     
     # Defining schema to brain mappings.
     language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
+                    'Lex_cxn_retrieval_C':[], 
                     'Cxn_retrieval_C':[], 
                     'Phonological_WM_C':['Wernicke'],
                     'Grammatical_WM_C':['lBA44, lBA45'],
@@ -328,17 +332,24 @@ def TCG_comprehension_system(name = 'language_system_C',
     model.brain_mapping = language_brain_mapping
     
     # Setting up language model.
-    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control]
-
+    language_schemas = [grammaticalLTM, lex_cxn_retrieval_C, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control]
     model.add_schemas(language_schemas)
+
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
-    model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalLTM, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_LTM')
+    
     model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C')
     model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
-    model.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_WM_C')
+    
+    model.add_connection(phonWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_phonological_WM_C')
+    model.add_connection(lex_cxn_retrieval_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_lex_cxn_retrieval_C')
     model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
-    model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C')
+    model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    
     model.add_connection(conceptLTM, 'to_semantic_WM', semanticWM_C, 'from_concept_LTM')
+    model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C')
+    
     model.add_connection(control, 'to_semantic_WM', semanticWM_C, 'from_control')
     model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     
@@ -450,6 +461,7 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     """
     # Instantiating all the necessary system schemas
     grammaticalLTM = ls.GRAMMATICAL_LTM()
+    lex_cxn_retrieval_C = ls.LEX_CXN_RETRIEVAL_C()
     cxn_retrieval_C = ls.CXN_RETRIEVAL_C()
     phonWM_C = ls.PHON_WM_C()
     grammaticalWM_C = ls.GRAMMATICAL_WM_C()
@@ -462,7 +474,8 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     
     # Defining schema to brain mappings.
     language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
-                    'Cxn_retrieval_C':[], 
+                    'Cxn_retrieval_C':[],
+                    'Lex_cxn_retrieval_C':[], 
                     'Phonological_WM_C':['Wernicke'],
                     'Grammatical_WM_C':['lBA44, lBA45'],
                     'Semantic_WM_C':['left_SFG', 'LIP', 'Hippocampus'],
@@ -481,24 +494,32 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     model.brain_mapping = language_brain_mapping
     
     # Setting up language model.
-    language_schemas = [grammaticalLTM, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control, wk_frame_LTM, wk_frame_retrieval, wk_frame_WM]
-
+    language_schemas = [grammaticalLTM, lex_cxn_retrieval_C, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control, wk_frame_LTM, wk_frame_retrieval, wk_frame_WM]
     model.add_schemas(language_schemas)
+    
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM')
-    model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalLTM, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_LTM')
+    
     model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C')
     model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C')
-    model.add_connection(phonWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_phonological_WM_C')
+    model.add_connection(grammaticalWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_WM_C')
+    
+    model.add_connection(phonWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_phonological_WM_C')
+    model.add_connection(lex_cxn_retrieval_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_lex_cxn_retrieval_C')
     model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C')
-    model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C')
+    model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C')
+    
     model.add_connection(conceptLTM, 'to_semantic_WM', semanticWM_C, 'from_concept_LTM')
-    model.add_connection(control, 'to_semantic_WM', semanticWM_C, 'from_control')
-    model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
+    model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C')
+    
     model.add_connection(wk_frame_LTM, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_wk_frame_LTM')
+    model.add_connection(lex_cxn_retrieval_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_lex_cxn_retrieval_C')
     model.add_connection(wk_frame_retrieval, 'to_wk_frame_WM', wk_frame_WM, 'from_wk_frame_retrieval')
     model.add_connection(wk_frame_WM, 'to_semantic_WM', semanticWM_C, 'from_wk_frame_WM')
-    model.add_connection(cxn_retrieval_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_cxn_retrieval_C')
     model.add_connection(phonWM_C, 'to_wk_frame_WM', wk_frame_WM, 'from_phonological_WM_C')
+    
+    model.add_connection(control, 'to_semantic_WM', semanticWM_C, 'from_control')
+    model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control')
     
     
     model.set_input_ports([phonWM_C.find_port('from_input')])

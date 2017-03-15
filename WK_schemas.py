@@ -178,7 +178,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
     def __init__(self, name="WK_frame_retrieval"):
         SYSTEM_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_wk_frame_LTM')
-        self.add_port('IN', 'from_cxn_retrieval_C')
+        self.add_port('IN', 'from_lex_cxn_retrieval_C')
         self.add_port('OUT', 'to_wk_frame_WM')
         self.wk_frame_instances = []
     
@@ -191,7 +191,7 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
     def process(self):
         """
         """
-        phon_input = self.inputs['from_cxn_retrieval_C']
+        phon_input = self.inputs['from_lex_cxn_retrieval_C']
           
         wk_frame_schemas = self.inputs['from_wk_frame_LTM']
         if wk_frame_schemas and phon_input and phon_input['instances']:

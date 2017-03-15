@@ -1145,8 +1145,8 @@ class SEMANTIC_WM_C2_C(WM):
         WM.__init__(self, name)
         self.add_port('IN', 'from_concept_LTM')
         self.add_port('IN', 'from_grammatical_WM_C')
-        self.add_port('IN', 'from_control')
         self.add_port('IN', 'from_wk_frame_WM')
+        self.add_port('IN', 'from_control')
         self.add_port('OUT', 'to_grammatical_WM_C')
         self.add_port('OUT', 'to_control')
         self.add_port('OUT', 'to_output')
@@ -1165,15 +1165,16 @@ class SEMANTIC_WM_C2_C(WM):
         """
         INIT_VAL = self.params['C2']['confidence_threshold'] # TO CLEAN UP
         new_insts = []
+        cpt_schemas = self.inputs['from_concept_LTM']
+                   
         gram_input = self.inputs['from_grammatical_WM_C']
         if gram_input:
             gram_activations = gram_input['activations']
             instance_data  = gram_input.get('instances', None)
-            if instance_data: # Instantiate data from constructions
+            if instance_data and cpt_schemas: # Instantiate data from constructions
                 SemFrame = instance_data['SemFrame']
                 sem_map = instance_data['sem_map']
-                cpt_schemas = self.inputs['from_concept_LTM']
-                if cpt_schemas and SemFrame and sem_map:
+                if SemFrame and sem_map:
                     output  = self.instantiate_gram_cpts(SemFrame, sem_map, cpt_schemas)
                     cpt_insts = output['instances']
                     new_insts.extend(cpt_insts)
@@ -1189,7 +1190,6 @@ class SEMANTIC_WM_C2_C(WM):
         if wk_input:
             wk_activations = wk_input['activations']
             instance_data = wk_input.get('instances', None)
-            cpt_schemas = self.inputs['from_concept_LTM']
             if instance_data and cpt_schemas: # Instantiate data from constructions
                 output = self.instantiate_wk_cpts(instance_data, cpt_schemas)
                 cpt_insts = output['instances']
@@ -1205,7 +1205,7 @@ class SEMANTIC_WM_C2_C(WM):
         self.update_activations()
         self.prune()
         self.update_SemRep(new_insts)
-    
+
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """
         Builds SemRep based on the received SemFrame.
@@ -1831,6 +1831,7 @@ class GRAMMATICAL_LTM(LTM):
         self.grammar = None
         self.add_port('OUT', 'to_cxn_retrieval_P')
         self.add_port('OUT', 'to_cxn_retrieval_C')
+        self.add_port('OUT', 'to_lex_cxn_retrieval_C')
         self.params['init_act'] = 0.5 #The initial activation value for cxn schema.
     
     def initialize(self, grammar):
@@ -1851,6 +1852,7 @@ class GRAMMATICAL_LTM(LTM):
         """
         """
         self.outputs['to_cxn_retrieval_P'] =  self.schemas
+        self.outputs['to_lex_cxn_retrieval_C'] =  self.schemas
         self.outputs['to_cxn_retrieval_C'] =  self.schemas
     
     ####################
@@ -3148,7 +3150,7 @@ class PHON_WM_C(WM):
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_grammatical_WM_C')
         self.add_port('OUT', 'to_grammatical_WM_C')
-        self.add_port('OUT', 'to_cxn_retrieval_C')
+        self.add_port('OUT', 'to_lex_cxn_retrieval_C')
         self.add_port('OUT', 'to_wk_frame_WM')
         self.add_port('OUT', 'to_control')
         self.params['dyn'] = {'tau':2, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
@@ -3178,10 +3180,10 @@ class PHON_WM_C(WM):
             phon_inst = PHON_SCHEMA_INST(phon_schema, trace = {'phon_schema':phon_schema})
             self.add_instance(phon_inst)
             self.phon_sequence.append({'inst':phon_inst, 'expressed':False}) # I do not use expressed anymore
-            self.outputs['to_cxn_retrieval_C'] = phon_inst
+            self.outputs['to_lex_cxn_retrieval_C'] = phon_inst
             self.outputs['to_control'] =  True
         else:
-            self.outputs['to_cxn_retrieval_C'] =  None
+            self.outputs['to_lex_cxn_retrieval_C'] =  None
         
         self.update_activations()     
         self.prune()
@@ -3214,6 +3216,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('IN', 'from_control')
         self.add_port('IN', 'from_cxn_retrieval_C')
         self.add_port('OUT', 'to_cxn_retrieval_C')
+        self.add_port('OUT', 'to_lex_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_C')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
@@ -3260,7 +3263,9 @@ class GRAMMATICAL_WM_C(WM):
         self.convey_phon_activations(phon_activations)
         self.update_activations()
         self.prune()
-        self.outputs['to_cxn_retrieval_C'] = self.TD_predictor()
+        TD_predictions = self.TD_predictor()
+        self.outputs['to_lex_cxn_retrieval_C'] = TD_predictions
+        self.outputs['to_cxn_retrieval_C'] = TD_predictions
         activations = self.sem_WM_output()
         self.outputs['to_semantic_WM'] = {'activations':activations}
         
@@ -3298,8 +3303,6 @@ class GRAMMATICAL_WM_C(WM):
                 output[name] = activity
         return output
             
-        
-    
     def Left_Corner_parser(self, phon_inst, pred_cxn_insts):
         """
         TCG version of Left-Corner chart parser.
@@ -3951,39 +3954,38 @@ class GRAMMATICAL_WM_C(WM):
             title = 'Assemblage_%i' % i
             GRAMMATICAL_WM_P.draw_assemblage(assemblage, title)
             i += 1
-        
-class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
+            
+class LEX_CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
     """
+    UNUSED FOR NOW. ALL IS KEPT IN CXN_RETRIEVAL_C.
     """
-    def __init__(self, name="Cxn_retrieval_C"):
+    def __init__(self, name="Lex_cxn_retrieval_C"):
         SYSTEM_SCHEMA.__init__(self,name)
         self.add_port('IN', 'from_grammatical_LTM')
         self.add_port('IN', 'from_phonological_WM_C')
         self.add_port('IN', 'from_grammatical_WM_C')
-        self.add_port('OUT', 'to_grammatical_WM_C')
+        self.add_port('OUT', 'to_cxn_retrieval_C')
         self.add_port('OUT', 'to_wk_frame_retrieval')
-        self.cxn_instances = []
+        self.lex_cxn_instances = []
 
     def reset(self):
-        """
-        """
-        super(CXN_RETRIEVAL_C, self).reset()
-        self.cxn_instances = []
-    
+            """
+            """
+            super(LEX_CXN_RETRIEVAL_C, self).reset()
+            self.lex_cxn_instances = []
     def process(self):
         """
         """
         cxn_schemas = self.inputs['from_grammatical_LTM']
-        TD_pred_input = self.inputs['from_grammatical_WM_C'] # unused here since I have removed Earley parser for now.
+        TD_predictions = self.inputs['from_grammatical_WM_C'] # unused here since I have removed Earley parser for now.
         phon_inst = self.inputs['from_phonological_WM_C']
         if cxn_schemas and phon_inst:
             (lexical_cxn_instances, BU_predictions) = self.instantiate_lexical_cxns(phon_inst, cxn_schemas)
-            self.outputs['to_wk_frame_retrieval'] = {'instances':lexical_cxn_instances, 'phon_inst':phon_inst}
-            self.cxn_instances.extend(lexical_cxn_instances)
-            self.instantiate_cxns(BU_predictions, cxn_schemas)
-            self.outputs['to_grammatical_WM_C'] = (self.cxn_instances, phon_inst)
-        self.cxn_instances = []
-    
+            self.lex_cxn_instances.extend(lexical_cxn_instances)
+            self.outputs['to_wk_frame_retrieval'] = {'instances':self.lex_cxn_instances, 'phon_inst':phon_inst}
+            self.outputs['to_cxn_retrieval_C'] = (self.lex_cxn_instances, BU_predictions, phon_inst)
+        self.lex_cxn_instances = []
+
     def instantiate_lexical_cxns(self, phon_inst, cxn_schemas):
         """
         Instantiates the constructions whose left-corner matches phon_inst content.
@@ -4002,6 +4004,46 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
                 pred = cxn_inst.content.clss
                 BU_predictions.add(pred)
         return (lexical_cxn_instances, BU_predictions)
+        
+    ####################
+    ### JSON METHODS ###
+    ####################
+    def get_state(self):
+        """
+        """
+        data = super(LEX_CXN_RETRIEVAL_C, self).get_state()
+        data['cnx_instances'] = [inst.name for inst in self.lex_cxn_instances]
+        return data
+        
+class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
+    """
+    """
+    def __init__(self, name="Cxn_retrieval_C"):
+        SYSTEM_SCHEMA.__init__(self,name)
+        self.add_port('IN', 'from_grammatical_LTM')
+        self.add_port('IN', 'from_grammatical_WM_C')
+        self.add_port('IN', 'from_lex_cxn_retrieval_C')
+        self.add_port('OUT', 'to_grammatical_WM_C')
+        self.cxn_instances = []
+
+    def reset(self):
+        """
+        """
+        super(CXN_RETRIEVAL_C, self).reset()
+        self.cxn_instances = []
+    
+    def process(self):
+        """
+        """
+        cxn_schemas = self.inputs['from_grammatical_LTM']
+        TD_predictions = self.inputs['from_grammatical_WM_C'] # unused here since I have removed Earley parser for now.
+        lex_cxn_input = self.inputs['from_lex_cxn_retrieval_C']
+        if cxn_schemas and lex_cxn_input:
+            (lex_cxn_instances, BU_predictions, phon_inst) = lex_cxn_input
+            self.cxn_instances.extend(lex_cxn_instances)
+            self.instantiate_cxns(BU_predictions, cxn_schemas)
+            self.outputs['to_grammatical_WM_C'] = (self.cxn_instances, phon_inst)
+        self.cxn_instances = []
                     
     def instantiate_cxns(self, predictions, cxn_schemas):
         """
@@ -4037,6 +4079,92 @@ class CXN_RETRIEVAL_C(SYSTEM_SCHEMA):
         data = super(CXN_RETRIEVAL_C, self).get_state()
         data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
         return data
+               
+#class CXN_RETRIEVAL_C_2(SYSTEM_SCHEMA):
+#    """
+#    """
+#    def __init__(self, name="Cxn_retrieval_C"):
+#        SYSTEM_SCHEMA.__init__(self,name)
+#        self.add_port('IN', 'from_grammatical_LTM')
+#        self.add_port('IN', 'from_phonological_WM_C')
+#        self.add_port('IN', 'from_grammatical_WM_C')
+#        self.add_port('OUT', 'to_grammatical_WM_C')
+#        self.add_port('OUT', 'to_wk_frame_retrieval')
+#        self.cxn_instances = []
+#
+#    def reset(self):
+#        """
+#        """
+#        super(CXN_RETRIEVAL_C, self).reset()
+#        self.cxn_instances = []
+#    
+#    def process(self):
+#        """
+#        """
+#        cxn_schemas = self.inputs['from_grammatical_LTM']
+#        TD_pred_input = self.inputs['from_grammatical_WM_C'] # unused here since I have removed Earley parser for now.
+#        phon_inst = self.inputs['from_phonological_WM_C']
+#        if cxn_schemas and phon_inst:
+#            (lexical_cxn_instances, BU_predictions) = self.instantiate_lexical_cxns(phon_inst, cxn_schemas)
+#            self.outputs['to_wk_frame_retrieval'] = {'instances':lexical_cxn_instances, 'phon_inst':phon_inst}
+#            self.cxn_instances.extend(lexical_cxn_instances)
+#            self.instantiate_cxns(BU_predictions, cxn_schemas)
+#            self.outputs['to_grammatical_WM_C'] = (self.cxn_instances, phon_inst)
+#        self.cxn_instances = []
+#    
+#    def instantiate_lexical_cxns(self, phon_inst, cxn_schemas):
+#        """
+#        Instantiates the constructions whose left-corner matches phon_inst content.
+#        Returns instances and the set of their classes that form the basis of Bottom-up grammatial predictions
+#        used in left-corner instantiation in instantiate_cxns()
+#        """
+#        lexical_cxn_instances = []
+#        BU_predictions = set([])
+#        BU_data = set([phon_inst.content['word_form']])
+#        for cxn_schema in cxn_schemas:
+#            left_corner = set(cxn_schema.get_initial_predictions())
+#            if not(left_corner.isdisjoint(BU_data)): # Left corner matches lexical bottom-up data.
+#                trace = {'schemas':[cxn_schema]}
+#                cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
+#                lexical_cxn_instances.append(cxn_inst)
+#                pred = cxn_inst.content.clss
+#                BU_predictions.add(pred)
+#        return (lexical_cxn_instances, BU_predictions)
+#                    
+#    def instantiate_cxns(self, predictions, cxn_schemas):
+#        """
+#        Generate the set of construction instances to be invoked in GrammaticalWM.
+#        Left-Corner based instantiation.
+#        
+#        Args:
+#            - Predictions: List of syntactic classes on which the instantiation should be based.
+#            - cxn_schemas: Direct access to the GrammaticalLTM knowledge.
+#        """
+#        pred_classes = predictions
+#        old_pred_classes = pred_classes
+#        while pred_classes: # Recursively instantiate the constructions.
+#            new_pred_classes = set([])
+#            for cxn_schema in cxn_schemas:
+#                left_corner = set(cxn_schema.get_initial_predictions())
+#                if not(left_corner.isdisjoint(pred_classes)): # Left corner matches a prediction.
+#                    trace = {'schemas':[cxn_schema]}
+#                    cxn_inst = CXN_SCHEMA_INST_C(cxn_schema, trace=trace, mapping={})
+#                    self.cxn_instances.append(cxn_inst)
+#                    # Recursively add the instances predicted by the newly instantiated cxns.
+#                    pred = cxn_inst.content.clss
+#                    if pred not in old_pred_classes:
+#                        new_pred_classes.add(pred)
+#            old_pred_classes = old_pred_classes.union(new_pred_classes)
+#            pred_classes = new_pred_classes
+#    ####################
+#    ### JSON METHODS ###
+#    ####################
+#    def get_state(self):
+#        """
+#        """
+#        data = super(CXN_RETRIEVAL_C, self).get_state()
+#        data['cnx_instances'] = [inst.name for inst in self.cxn_instances]
+#        return data
         
 ####################
 ### TASK CONTROL ###
