@@ -109,7 +109,7 @@ def find_max_partial_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=
     sub_isos = {}
     G_pat_subgraphs = build_submultigraphs(G_pat, induced=source_induce_type, subgraph_filter = source_subgraph_filter)
     for G_pat_sub in G_pat_subgraphs:
-        sub_iso = find_sub_multi_iso(G, G_pat_sub, node_match, edge_match, iso_filter)
+        sub_iso = find_sub_multi_iso(G, G_pat_sub, node_match, edge_match, iso_filter, induce_type=target_induce_type, subgraph_filter=target_subgraph_filter)
         if sub_iso: # none empty sub_isos
             if not(sub_isos):
                 sub_isos[G_pat_sub] = sub_iso
@@ -258,7 +258,8 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
     Returns the list of subgraphs of G (DiGraph) filtered by subgraph_filter
     induced:
         -> 'edge': edge induced subgraphs + single nodes
-        -> 'edge+': edges induced subgraphs + nodes powerset.
+        -> 'edge+': edge induced subgraphs + single nodes
+        -> 'edge*': edges induced subgraphs + nodes powerset.
         -> 'node': node induced subgraphs.
         -> 'node*': only node powersets, no edges
         
@@ -276,8 +277,17 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
             subG = DiGraph()
             subG.add_nodes_from(n_list)
             subgraphs.append(subG)
-    
+            
     if induced == 'edge':
+        edge_powerset = list_powerset(G.edges(data=True))
+        subgraphs = []
+        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
+            subG = DiGraph(e_list) # Creating subraph from edges
+            for n in subG.node.keys():
+                subG.node[n] = G.node[n] # Transfering node attributes
+            subgraphs.append(subG)
+            
+    if induced == 'edge+':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
         for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
@@ -292,7 +302,7 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
             subG.add_node(n,d)
             subgraphs.append(subG)
             
-    if induced == 'edge+':
+    if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
         for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
@@ -316,15 +326,25 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
     """
     Returns the list of subgraphs of G (MutliDiGraph) filtered by subgraph_filter
     induced:
-        -> 'edge': edge induced subgraphs + single nodes
-        -> 'edge+': edges induced subgraphs + nodes powerset.
+        -> 'edge': edge induced subgraphs
+        -> 'edge+':  edge induced subgraphs + single nodes
+        -> 'edge*': edges induced subgraphs + nodes powerset.
         -> 'node': node induced subgraphs.
     """
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
         subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
-    
+        
     if induced == 'edge':
+        edge_powerset = list_powerset(G.edges(data=True))
+        subgraphs = []
+        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
+            subG = MultiDiGraph(e_list)# Creating subraph from edges
+            for n in subG.node.keys():
+                subG.node[n] = G.node[n] # Transfering node attributes
+            subgraphs.append(subG)
+            
+    if induced == 'edge+':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
         for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
@@ -339,7 +359,7 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
             subG.add_node(n,d)
             subgraphs.append(subG) 
             
-    if induced == 'edge+':
+    if induced == 'edge*':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
         for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph

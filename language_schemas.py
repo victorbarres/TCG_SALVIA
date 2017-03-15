@@ -1138,10 +1138,8 @@ class SEMANTIC_WM_C(WM):
 class SEMANTIC_WM_C2_C(WM):
     """
     Comprehension version of the Semantic_WM for the 2 route model.
-    Testing some comprehension specific issues.
-    Notes:
-        - Testing the SemRep being a MutliDiGraph instead of simply a DiGraph.
-        Might need to support multi-edges (competing edges).
+    This SemanticWM hanldles concurrent asychroneous information merging from 2 routes
+    This SemanticWM only supports the comprehension of single events!
     """
     def __init__(self, name='Semantic_WM_C'):
         WM.__init__(self, name)
@@ -1216,54 +1214,44 @@ class SEMANTIC_WM_C2_C(WM):
             - SemFrame (TP_SEMFRAME)
             - cpt_schemas ([CPT_SCHEMA])
         """
-#        def find_cpt_inst(sem_frame_insts):
-#            """ Returns, if it exists, the cpt_inst whose sem_frame trace already contains one of the sem_frame_insts.
-#            """
-#            output = [inst for inst in self.schema_insts if not(inst.trace['sem_frame_insts'].isdisjoint(sem_frame_insts))]
-#            if len(output)>1:
-#                error_msg = 'There is more than one cpt_inst that map onto the same SemFrame element! %s' %str([o.name for o in output])
-#                raise ValueError(error_msg)
-#            elif len(output)==1:
-#                return output[0]
-#            else:
-#                return None
-                
         cpt_insts = []
         competitions = []
         output = {'instances':cpt_insts, 'competitions':competitions}
-        
-        # First case: Expanding SemWM based on SemFrame
-        ## ERRROR: DOESN'T WORK IF WHEN SEMREP HAS MULTIEDGE!!!
-        sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, SemFrame.graph) # Check whether SemRep matches a subgraph of SemFrame (whether SemFrame adds information to SemRep)
+
+        sub_isos = self.FrameMatch(SemFrame)
         names = []
         for sub_iso in sub_isos:
             name_table = {}
-            for n1,n2 in sub_iso['nodes'].iteritems():
-                node_inst1 = self.find_instance(n1)
-                name_table[n2] = node_inst1
-                sem_frame_insts = set([k for k,v in sem_map.iteritems() if n2 in v])
-                node_inst1.trace['sem_frame_insts'].update(sem_frame_insts)
-                names.append(n2)
-                node_2 = SemFrame.find_elem(n2)
-                if node_2.concept.match(node_inst1.content['concept'], 'is_a') and not(node_2.concept.match(node_inst1.content['concept'], match_type='equal')):
-                    node_inst1.content['concept'] = node_2.concept
-                    node_inst1.frame = node_2.frame
-                    cpt_insts.append(node_inst1)        
-            for e1, e2_list in sub_iso['edges'].iteritems():
-                edge_inst1 = self.find_instance(e1[3]) # by definition mutli edges are given as (from, to, key, name)
-                for e2 in e2_list:
-                    sem_frame_insts = set([k for k,v in sem_map.iteritems() if e2[3] in v])
-                    edge_2 = SemFrame.find_elem(e2[3])
-                    names.append(e2[3])
-                    if edge_2.concept.match(edge_inst1.content['concept'], match_type='equal'): # edge concepts match
-                        edge_inst1.trace['sem_frame_insts'].update(sem_frame_insts)
+            for n_s, n_t in sub_iso['nodes'].iteritems():
+                inst_t = self.find_instance(n_t)
+                name_table[n_s] = inst_t
+                sem_frame_insts = set([k for k,v in sem_map.iteritems() if n_s in v])
+                inst_t.trace['sem_frame_insts'].update(sem_frame_insts)
+                names.append(n_s)
+                inst_s = SemFrame.find_elem(n_s)
+                if inst_s.concept.match(inst_t.content['concept'], 'is_a') and not(inst_s.concept.match(inst_t.content['concept'], match_type='equal')):
+                    inst_t.content['concept'] = inst_s.concept #Updating concept
+                    inst_t.frame = inst_s.frame
+                    cpt_insts.append(inst_t)        
+            for e_s, e_t_list in sub_iso['edges'].iteritems():
+                dat_s = SemFrame.graph.get_edge_data(e_s[0], e_s[1], e_s[2]) # by definition multi edges are given as (from, to, key)
+                name_s = dat_s['name']
+                edge_s = SemFrame.find_elem(name_s) 
+                sem_frame_insts = set([k for k,v in sem_map.iteritems() if name_s in v])
+                names.append(name_s)
+                for e_t in e_t_list:
+                    dat_t = self.SemRep.get_edge_data(e_t[0], e_t[1], e_t[2]) # by definition multi edges are given as (from, to, key)
+                    name_t = dat_t['name']
+                    inst_t = self.find_instance(name_t) 
+                    if edge_s.concept.match(inst_t.content['concept'], match_type='equal'): # edge concepts match
+                        inst_t.trace['sem_frame_insts'].update(sem_frame_insts)
                     else: # creating competing edges
-                        cpt_schema = self._find_cpt_schema(cpt_schemas, edge_2.concept.name)
-                        new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_2.name]), 'sem_frame_insts':set([])})
-                        new_cpt_inst.content['pFrom'] = edge_inst1.content['pFrom']
-                        new_cpt_inst.content['pTo'] = edge_inst1.content['pTo']
+                        cpt_schema = self._find_cpt_schema(cpt_schemas, edge_s.concept.name)
+                        new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([]), 'sem_frame_insts':set([edge_s.name])})
+                        new_cpt_inst.content['pFrom'] = inst_t.content['pFrom']
+                        new_cpt_inst.content['pTo'] = inst_t.content['pTo']
                         cpt_insts.append(new_cpt_inst) 
-                        competitions.append((edge_inst1, new_cpt_inst))
+                        competitions.append((inst_t, new_cpt_inst))
                     
             for node in [n for n in SemFrame.nodes if n.name not in names]:
                 cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
@@ -1284,47 +1272,98 @@ class SEMANTIC_WM_C2_C(WM):
         if sub_isos:
             print "%i: Add partial SemFrame" %self.t
             return output
+            
         
-        # Second case: Check for C2 between SemFrame and SemRep
-        sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(SemFrame.graph, self.SemRep) # Check whether SemFrame matches a subgraph of SemRep (whether SemFrame confirms or contradicts SemRep info)
-        names = []
-        for sub_iso in sub_isos:
-            name_table = {}
-            for n1,n2 in sub_iso['nodes'].iteritems():
-                node_inst2 = self.find_instance(n2)
-                name_table[n2] = node_inst2
-                sem_frame_insts = set([k for k,v in sem_map.iteritems() if n1 in v])
-                node_inst2.trace['sem_frame_insts'].update(sem_frame_insts)
-                names.append(n2)
-                node_1 = SemFrame.find_elem(n1)
-                if node_1.concept.match(node_inst2.content['concept'], 'is_a') and not(node_1.concept.match(node_inst2.content['concept'], match_type='equal')):
-                    node_inst2.content['concept'] = node_1.concept
-                    node_inst2.frame = node_1.frame
-                    cpt_insts.append(node_inst2)                
-            for e1, e2_list in sub_iso['edges'].iteritems():
-                edge_1 = SemFrame.find_elem(e1[3])
-                sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge_1.name in v])
-                for e2 in e2_list:
-                    edge_inst2 = self.find_instance(e2[3]) # by definition multi edges are given as (from, to, key, name)
-                    if edge_1.concept.match(edge_inst2.content['concept'], match_type='equal'): # edge concepts match
-                        edge_inst2.trace['sem_frame_insts'].update(sem_frame_insts)
-                    else: # creating competing edges
-                        cpt_schema = self._find_cpt_schema(cpt_schemas, edge_1.concept.name)
-                        new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([]), 'sem_frame_insts':sem_frame_insts})
-                        new_cpt_inst.content['pFrom'] = edge_inst2.content['pFrom']
-                        new_cpt_inst.content['pTo'] = edge_inst2.content['pTo']
-                        cpt_insts.append(new_cpt_inst)
-                        competitions.append((edge_inst2, new_cpt_inst))
-        if sub_isos:
-            print "%i: C2 SemFrame" %self.t
-            return output
+        # First case: Expanding SemWM based on SemFrame
+        ## ERRROR: DOESN'T WORK IF WHEN SEMREP HAS MULTIEDGE!!!
+#        sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, SemFrame.graph) # Check whether SemRep matches a subgraph of SemFrame (whether SemFrame adds information to SemRep)
+#        names = []
+#        for sub_iso in sub_isos:
+#            name_table = {}
+#            for n1,n2 in sub_iso['nodes'].iteritems():
+#                node_inst1 = self.find_instance(n1)
+#                name_table[n2] = node_inst1
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if n2 in v])
+#                node_inst1.trace['sem_frame_insts'].update(sem_frame_insts)
+#                names.append(n2)
+#                node_2 = SemFrame.find_elem(n2)
+#                if node_2.concept.match(node_inst1.content['concept'], 'is_a') and not(node_2.concept.match(node_inst1.content['concept'], match_type='equal')):
+#                    node_inst1.content['concept'] = node_2.concept
+#                    node_inst1.frame = node_2.frame
+#                    cpt_insts.append(node_inst1)        
+#            for e1, e2_list in sub_iso['edges'].iteritems():
+#                edge_inst1 = self.find_instance(e1[3]) # by definition mutli edges are given as (from, to, key, name)
+#                for e2 in e2_list:
+#                    sem_frame_insts = set([k for k,v in sem_map.iteritems() if e2[3] in v])
+#                    edge_2 = SemFrame.find_elem(e2[3])
+#                    names.append(e2[3])
+#                    if edge_2.concept.match(edge_inst1.content['concept'], match_type='equal'): # edge concepts match
+#                        edge_inst1.trace['sem_frame_insts'].update(sem_frame_insts)
+#                    else: # creating competing edges
+#                        cpt_schema = self._find_cpt_schema(cpt_schemas, edge_2.concept.name)
+#                        new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_2.name]), 'sem_frame_insts':set([])})
+#                        new_cpt_inst.content['pFrom'] = edge_inst1.content['pFrom']
+#                        new_cpt_inst.content['pTo'] = edge_inst1.content['pTo']
+#                        cpt_insts.append(new_cpt_inst) 
+#                        competitions.append((edge_inst1, new_cpt_inst))
+#                    
+#            for node in [n for n in SemFrame.nodes if n.name not in names]:
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
+#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([]),'sem_frame_insts':sem_frame_insts}, frame=node.frame)
+#                name_table[node.name] = new_cpt_inst
+#                cpt_insts.append(new_cpt_inst)
+#                names.append(node.name)
+#            for edge in [e for e in SemFrame.edges if e.name not in names]:
+#                cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge.name in v])
+#                new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([]), 'sem_frame_insts':sem_frame_insts})
+#                new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
+#                new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
+#                cpt_insts.append(new_cpt_inst)
+#                names.append(edge.name)
+#        
+#        if sub_isos:
+#            print "%i: Add partial SemFrame" %self.t
+#            return output
+#        
+#        # Second case: Check for C2 between SemFrame and SemRep
+#        sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(SemFrame.graph, self.SemRep) # Check whether SemFrame matches a subgraph of SemRep (whether SemFrame confirms or contradicts SemRep info)
+#        names = []
+#        for sub_iso in sub_isos:
+#            name_table = {}
+#            for n1,n2 in sub_iso['nodes'].iteritems():
+#                node_inst2 = self.find_instance(n2)
+#                name_table[n2] = node_inst2
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if n1 in v])
+#                node_inst2.trace['sem_frame_insts'].update(sem_frame_insts)
+#                names.append(n2)
+#                node_1 = SemFrame.find_elem(n1)
+#                if node_1.concept.match(node_inst2.content['concept'], 'is_a') and not(node_1.concept.match(node_inst2.content['concept'], match_type='equal')):
+#                    node_inst2.content['concept'] = node_1.concept
+#                    node_inst2.frame = node_1.frame
+#                    cpt_insts.append(node_inst2)                
+#            for e1, e2_list in sub_iso['edges'].iteritems():
+#                edge_1 = SemFrame.find_elem(e1[3])
+#                sem_frame_insts = set([k for k,v in sem_map.iteritems() if edge_1.name in v])
+#                for e2 in e2_list:
+#                    edge_inst2 = self.find_instance(e2[3]) # by definition multi edges are given as (from, to, key, name)
+#                    if edge_1.concept.match(edge_inst2.content['concept'], match_type='equal'): # edge concepts match
+#                        edge_inst2.trace['sem_frame_insts'].update(sem_frame_insts)
+#                    else: # creating competing edges
+#                        cpt_schema = self._find_cpt_schema(cpt_schemas, edge_1.concept.name)
+#                        new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([]), 'sem_frame_insts':sem_frame_insts})
+#                        new_cpt_inst.content['pFrom'] = edge_inst2.content['pFrom']
+#                        new_cpt_inst.content['pTo'] = edge_inst2.content['pTo']
+#                        cpt_insts.append(new_cpt_inst)
+#                        competitions.append((edge_inst2, new_cpt_inst))
+#        if sub_isos:
+#            print "%i: C2 SemFrame" %self.t
+#            return output
         
         # Case add all
-        SemFrame.draw()
-        plt.show()
-        self.show_state()
         name_table = {}                        
-        for node in  SemFrame.nodes:
+        for node in SemFrame.nodes:
             cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
             sem_frame_insts = set([k for k,v in sem_map.iteritems() if node.name in v])
             new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([]),'sem_frame_insts':sem_frame_insts}, frame=node.frame)
@@ -1341,7 +1380,6 @@ class SEMANTIC_WM_C2_C(WM):
         print "%i: Add full SemFrame" %self.t
         return output
         
-    
     def instantiate_wk_cpts(self, wk_inputs, cpt_schemas):
         """
         Builds SemRep based on a wk_inputs.
@@ -1359,52 +1397,39 @@ class SEMANTIC_WM_C2_C(WM):
         cpt_insts = []
         competitions = []
         output = {'instances':cpt_insts, 'competitions':competitions}
-#        if not self.schema_insts:
-#            for wk_frame, inst_name in wk_inputs:
-#                name_table = {}                        
-#                for node in  wk_frame.nodes:
-#                    cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
-#                    new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([node.name]),'sem_frame_insts':set([])}, frame=node.frame)
-#                    name_table[node.name] = new_cpt_inst
-#                    cpt_insts.append(new_cpt_inst)
-#                for edge in wk_frame.edges:
-#                    cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
-#                    new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge.name]), 'sem_frame_insts':set([])})
-#                    new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
-#                    new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
-#                    cpt_insts.append(new_cpt_inst)
-#            
-#            return cpt_insts
         for wk_frame, inst_name in wk_inputs:
-            sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, wk_frame.graph) # Check whether SemRep matches a subgraph of wk_frame (whether wk_frame adds information to SemRep)
-            ## ERRROR: DOESN'T WORK IF WHEN SEMREP HAS MULTIEDGE!!!
+            sub_isos = self.FrameMatch(wk_frame) # Check whether SemRep matches a subgraph of wk_frame (whether wk_frame adds information to SemRep)
             names = []
             for sub_iso in sub_isos:
                 name_table = {}
-                for n1,n2 in sub_iso['nodes'].iteritems():
-                    node_inst1 = self.find_instance(n1)
-                    name_table[n2] = node_inst1
-                    node_inst1.trace['wk_frame_insts'].update(set([n2]))
-                    names.append(n2)
-                    node_2 = wk_frame.find_elem(n2)
-                    if node_2.concept.match(node_inst1.content['concept'], 'is_a') and not(node_2.concept.match(node_inst1.content['concept'], match_type='equal')):
-                        node_inst1.content['concept'] = node_2.concept
-                        node_inst1.frame = node_2.frame
-                        cpt_insts.append(node_inst1)  
-                for e1, e2_list in sub_iso['edges'].iteritems():
-                    edge_inst1 = self.find_instance(e1[3]) # by definition multi edges are given as (from, to, key, name)
-                    for e2 in e2_list:
-                        edge_2 = wk_frame.find_elem(e2[3])
-                        names.append(e2[3])
-                        if edge_2.concept.match(edge_inst1.content['concept'], match_type='equal'): # edge concepts match
-                            edge_inst1.trace['wk_frame_insts'].update(set([e2[3]]))
+                for n_s, n_t in sub_iso['nodes'].iteritems():
+                    inst_t = self.find_instance(n_t)
+                    name_table[n_s] = inst_t
+                    inst_t.trace['wk_frame_insts'].update(set([n_s]))
+                    names.append(n_s)
+                    node_s = wk_frame.find_elem(n_s)
+                    if node_s.concept.match(inst_t.content['concept'], 'is_a') and not(node_s.concept.match(inst_t.content['concept'], match_type='equal')):
+                        inst_t.content['concept'] = node_s.concept #update concept
+                        inst_t.frame = node_s.frame
+                        cpt_insts.append(inst_t)  
+                for e_s, e_t_list in sub_iso['edges'].iteritems():
+                    dat_s = wk_frame.graph.get_edge_data(e_s[0], e_s[1], e_s[2]) # by definition multi edges are given as (from, to, key)
+                    name_s = dat_s['name']
+                    edge_s = wk_frame.find_elem(name_s) 
+                    names.append(name_s)               
+                    for e_t in e_t_list:
+                        dat_t = self.SemRep.get_edge_data(e_t[0], e_t[1], e_t[2]) # by definition multi edges are given as (from, to, key)
+                        name_t = dat_t['name']
+                        inst_t = self.find_instance(name_t)
+                        if edge_s.concept.match(inst_t.content['concept'], match_type='equal'): # edge concepts match
+                            inst_t.trace['wk_frame_insts'].update(set([name_s]))
                         else: # creating competing edges
-                            cpt_schema = self._find_cpt_schema(cpt_schemas, edge_2.concept.name)
-                            new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_2.name]), 'sem_frame_insts':set([])})
-                            new_cpt_inst.content['pFrom'] = edge_inst1.content['pFrom']
-                            new_cpt_inst.content['pTo'] = edge_inst1.content['pTo']
+                            cpt_schema = self._find_cpt_schema(cpt_schemas, edge_s.concept.name)
+                            new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_s.name]), 'sem_frame_insts':set([])})
+                            new_cpt_inst.content['pFrom'] = inst_t.content['pFrom']
+                            new_cpt_inst.content['pTo'] = inst_t.content['pTo']
                             cpt_insts.append(new_cpt_inst) 
-                            competitions.append((edge_inst1, new_cpt_inst))
+                            competitions.append((inst_t, new_cpt_inst))
                       
                 for node in [n for n in wk_frame.nodes if n.name not in names]:
                     cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
@@ -1423,38 +1448,86 @@ class SEMANTIC_WM_C2_C(WM):
             if sub_isos:
                 print '%i: Adding partial wk frame %s' %(self.t, wk_frame.name)
                 continue
-                
-            sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(wk_frame.graph, self.SemRep) # Check whether wk_frame matches a subgraph of SemRep (whether wk_frame confirms or contradicts SemRep info)
-            names = []
-            for sub_iso in sub_isos:
-                name_table = {}
-                for n1,n2 in sub_iso['nodes'].iteritems():
-                    node_inst2 = self.find_instance(n2)
-                    name_table[n2] = node_inst2
-                    node_inst2.trace['wk_frame_insts'].update(set([n1]))
-                    names.append(n2)
-                    node_1 = wk_frame.find_elem(n1)
-                    if node_1.concept.match(node_inst2.content['concept'], 'is_a') and not(node_1.concept.match(node_inst2.content['concept'], match_type='equal')):
-                        node_inst2.content['concept'] = node_1.concept
-                        node_inst2.frame = node_1.frame
-                        cpt_insts.append(node_inst2)     
-                for e1, e2_list in sub_iso['edges'].iteritems():
-                    edge_1 = wk_frame.find_elem(e1[3])
-                    for e2 in e2_list:
-                        edge_inst2 = self.find_instance(e2[3]) # by definition mutli edges are given as (from, to, key, name)
-                        if edge_1.concept.match(edge_inst2.content['concept'], match_type='equal'): # edge concepts match
-                            edge_inst2.trace['wk_frame_insts'].update(set([e1[3]]))
-                        else: # creating competing edges
-                            cpt_schema = self._find_cpt_schema(cpt_schemas, edge_1.concept.name)
-                            new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_1.name]), 'sem_frame_insts':set([])})
-                            new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
-                            new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
-                            cpt_insts.append(new_cpt_inst)
-                            competitions.append((edge_inst2, new_cpt_inst))
-                            
-            if sub_isos:
-                print "%i: C2 wk_frame %s" %(self.t, wk_frame.name)
-                continue
+            
+#            sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(self.SemRep, wk_frame.graph) # Check whether SemRep matches a subgraph of wk_frame (whether wk_frame adds information to SemRep)
+#            ## ERRROR: DOESN'T WORK IF WHEN SEMREP HAS MULTIEDGE!!!
+#            names = []
+#            for sub_iso in sub_isos:
+#                name_table = {}
+#                for n1,n2 in sub_iso['nodes'].iteritems():
+#                    node_inst1 = self.find_instance(n1)
+#                    name_table[n2] = node_inst1
+#                    node_inst1.trace['wk_frame_insts'].update(set([n2]))
+#                    names.append(n2)
+#                    node_2 = wk_frame.find_elem(n2)
+#                    if node_2.concept.match(node_inst1.content['concept'], 'is_a') and not(node_2.concept.match(node_inst1.content['concept'], match_type='equal')):
+#                        node_inst1.content['concept'] = node_2.concept
+#                        node_inst1.frame = node_2.frame
+#                        cpt_insts.append(node_inst1)  
+#                for e1, e2_list in sub_iso['edges'].iteritems():
+#                    edge_inst1 = self.find_instance(e1[3]) # by definition multi edges are given as (from, to, key, name)
+#                    for e2 in e2_list:
+#                        edge_2 = wk_frame.find_elem(e2[3])
+#                        names.append(e2[3])
+#                        if edge_2.concept.match(edge_inst1.content['concept'], match_type='equal'): # edge concepts match
+#                            edge_inst1.trace['wk_frame_insts'].update(set([e2[3]]))
+#                        else: # creating competing edges
+#                            cpt_schema = self._find_cpt_schema(cpt_schemas, edge_2.concept.name)
+#                            new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_2.name]), 'sem_frame_insts':set([])})
+#                            new_cpt_inst.content['pFrom'] = edge_inst1.content['pFrom']
+#                            new_cpt_inst.content['pTo'] = edge_inst1.content['pTo']
+#                            cpt_insts.append(new_cpt_inst) 
+#                            competitions.append((edge_inst1, new_cpt_inst))
+#                      
+#                for node in [n for n in wk_frame.nodes if n.name not in names]:
+#                    cpt_schema = self._find_cpt_schema(cpt_schemas, node.concept.name)
+#                    new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([node.name]),'sem_frame_insts':set([])}, frame=node.frame)
+#                    name_table[node.name] = new_cpt_inst
+#                    cpt_insts.append(new_cpt_inst)
+#                    names.append(node.name)
+#                for edge in [e for e in wk_frame.edges if e.name not in names]:
+#                    cpt_schema = self._find_cpt_schema(cpt_schemas, edge.concept.name)
+#                    new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge.name]), 'sem_frame_insts':set([])})
+#                    new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
+#                    new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
+#                    cpt_insts.append(new_cpt_inst)
+#                    names.append(edge.name)
+#            
+#            if sub_isos:
+#                print '%i: Adding partial wk frame %s' %(self.t, wk_frame.name)
+#                continue
+#                
+#            sub_isos = SEMANTIC_WM_C2_C.FrameMatch_simple(wk_frame.graph, self.SemRep) # Check whether wk_frame matches a subgraph of SemRep (whether wk_frame confirms or contradicts SemRep info)
+#            names = []
+#            for sub_iso in sub_isos:
+#                name_table = {}
+#                for n1,n2 in sub_iso['nodes'].iteritems():
+#                    node_inst2 = self.find_instance(n2)
+#                    name_table[n2] = node_inst2
+#                    node_inst2.trace['wk_frame_insts'].update(set([n1]))
+#                    names.append(n2)
+#                    node_1 = wk_frame.find_elem(n1)
+#                    if node_1.concept.match(node_inst2.content['concept'], 'is_a') and not(node_1.concept.match(node_inst2.content['concept'], match_type='equal')):
+#                        node_inst2.content['concept'] = node_1.concept
+#                        node_inst2.frame = node_1.frame
+#                        cpt_insts.append(node_inst2)     
+#                for e1, e2_list in sub_iso['edges'].iteritems():
+#                    edge_1 = wk_frame.find_elem(e1[3])
+#                    for e2 in e2_list:
+#                        edge_inst2 = self.find_instance(e2[3]) # by definition mutli edges are given as (from, to, key, name)
+#                        if edge_1.concept.match(edge_inst2.content['concept'], match_type='equal'): # edge concepts match
+#                            edge_inst2.trace['wk_frame_insts'].update(set([e1[3]]))
+#                        else: # creating competing edges
+#                            cpt_schema = self._find_cpt_schema(cpt_schemas, edge_1.concept.name)
+#                            new_cpt_inst = CPT_SCHEMA_INST(cpt_schema, trace={'cpt_schema':cpt_schema, 'wk_frame_insts':set([edge_1.name]), 'sem_frame_insts':set([])})
+#                            new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
+#                            new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
+#                            cpt_insts.append(new_cpt_inst)
+#                            competitions.append((edge_inst2, new_cpt_inst))
+#                            
+#            if sub_isos:
+#                print "%i: C2 wk_frame %s" %(self.t, wk_frame.name)
+#                continue
                 
             name_table = {}                        
             for node in  wk_frame.nodes:
@@ -1543,7 +1616,7 @@ class SEMANTIC_WM_C2_C(WM):
         dead_edges = []
         for u,v,k,d in self.SemRep.edges(data=True, keys=True):
             if d['cpt_inst'] not in self.schema_insts:
-                dead_edges.append((u,v))
+                dead_edges.append((u,v,k))
         self.SemRep.remove_edges_from(dead_edges)
         
         if dead_nodes + dead_edges:
@@ -1568,14 +1641,17 @@ class SEMANTIC_WM_C2_C(WM):
         defined as frame_node to sem_frame_node mapping.
         (For now only categorical matching, no qualitative evaluation of the match value.)
         """
-        sub_iso = self.FrameMatch_cat(sem_input_frame.graph, iso_constraints)
-        return sub_iso
+        sub_isos = self.FrameMatch_cat(sem_input_frame.graph)
+        return sub_isos
     
-    def FrameMatch_cat(self, frame_graph, iso_constraints=None):
+    def FrameMatch_cat(self, frame_graph):
         """
         Computes the categorical matches (match/no match) -> Returns the sub-graphs isomorphisms.
         This is the main filter for instantiation.
         """
+        if not isinstance(frame_graph, nx.MultiDiGraph):
+            frame_graph = nx.MultiDiGraph(frame_graph)
+            
         def find_refs(frame_graph):
             refs = []
             for node, d in frame_graph.nodes(data=True):
@@ -1584,48 +1660,66 @@ class SEMANTIC_WM_C2_C(WM):
                     refs.append(node)
             return refs
             
-        def find_coref(frame_graph1, frame_graph2):
+        def find_coref(frame_graph_s, frame_graph_t):
             corefs = []
-            for node1, d1 in frame_graph1.nodes(data=True):
-                frame1 = d1['dat'][1]
-                cpt1 = d1['dat'][0]
-                for node2, d2 in frame_graph2.nodes(data=True):
-                    frame2 = d2['dat'][1]
-                    cpt2 = d2['dat'][0]
-                    if not(frame1) and not(frame2) and cpt2.match(cpt1, match_type='equal'):
-                        corefs.append((node1, node2))
+            for node_s, d_s in frame_graph_s.nodes(data=True):
+                frame_s = d_s['dat'][1]
+                cpt_s = d_s['dat'][0]
+                for node_t, d_t in frame_graph_t.nodes(data=True):
+                    frame_t = d_t['dat'][1]
+                    cpt_t = d_t['dat'][0]
+                    if not(frame_s) and not(frame_t) and cpt_t.match(cpt_s, match_type='equal'):
+                        corefs.append((node_s, node_t))
             return corefs
         
-        def iso_coref_filter(sub_iso, refs1, refs2, corefs):
-            for c1,c2 in corefs:
-                if sub_iso['nodes'][c1] != c2:
-                    return False
-                    
-            for n1, n2 in sub_iso['nodes'].iteritems():
-                if (n1 in refs1) and (n2 in refs2):
-                    if (n1, n2) not in corefs:
+        def iso_coref_filter(sub_iso, refs_s, refs_t, corefs):
+            for c_s, c_t in corefs:
+                for n_s, n_t in sub_iso['nodes'].iteritems():
+                    if n_s == c_s and sub_iso['nodes'][c_s] != c_t:
+                        return False
+                    if n_t == c_t and n_s!=c_s:
+                        return False
+#                if sub_iso['nodes'].has_key(c_s) and sub_iso['nodes'][c_s] != c_t:
+#                    return False         
+            for n_s, n_t in sub_iso['nodes'].iteritems():
+                if (n_s in refs_s) and (n_t in refs_t):
+                    if (n_s, n_t) not in corefs:
                         return False 
             return True
            
-            
-        refs1 = find_refs(self.SemRep)
-        refs2 = find_refs(frame_graph)
-        corefs = find_coref(self.SemRep, frame_graph)
+        
+        refs_s = find_refs(frame_graph)
+        refs_t = find_refs(self.SemRep)
+        corefs = find_coref(frame_graph, self.SemRep)
          
         node_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a") or cpt1.match(cpt2, match_type="is_a")
         edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
         
-        
-        if iso_constraints:
-            sub_isos = TCG_graph.update_max_partial_iso(self.SemRep, frame_graph, iso_constraints, node_match=nm, edge_match=em,  target_induce_type='edge+', source_induce_type='edge+')
-        else:
-            
-            sub_isos = TCG_graph.find_max_partial_iso(self.SemRep, frame_graph, node_match=nm, edge_match=em, target_induce_type='edge+', source_induce_type='edge+')
-        
+        # Test frame_graph already included in SemRep, with edge matching constraints
+        sub_isos = TCG_graph.find_sub_multi_iso(self.SemRep, frame_graph, node_match=nm, edge_match=em, induce_type='edge')
         #Enforcing co-reference
-        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs1, refs2, corefs)]
+        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
+        if filtered_sub_isos:
+            if len(filtered_sub_isos)>1:
+                error_msg = "Multi_sub_iso!!"
+                raise ValueError(error_msg)
+            return filtered_sub_isos
+        
+        # Test frame_graph already included in SemRep, without edge matching constraints
+        sub_isos = TCG_graph.find_sub_multi_iso(self.SemRep, frame_graph, node_match=nm, edge_match=None, induce_type='edge')
+        #Enforcing co-reference
+        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
+        if filtered_sub_isos:
+            if len(filtered_sub_isos)>1:
+                error_msg = "Multi_sub_iso!!"
+                raise ValueError(error_msg)
+            return filtered_sub_isos
+        
+        sub_isos = TCG_graph.find_max_partial_iso(self.SemRep, frame_graph, node_match=nm, edge_match=None, target_induce_type='edge', source_induce_type='edge')
+        #Enforcing co-reference
+        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
@@ -2874,7 +2968,7 @@ class CXN_RETRIEVAL_P(SYSTEM_SCHEMA):
             return False
         
         # Build SemRep subgraphs
-        SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='edge', subgraph_filter=subgraph_filter)
+        SemRep_subgraphs = TCG_graph.build_subgraphs(SemRep, induced='edge+', subgraph_filter=subgraph_filter)
         
         for cxn_schema in cxn_schemas:
             match_output = cxn_schema.SemMatch(SemRep, SemRep_subgraphs)
