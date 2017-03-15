@@ -22,7 +22,7 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
         - LTM (LTM): Associated long term memory.
         - content (WK_FRAME): WK_FRAME object
         - init_act (float): Initial activation value.
-    - trigger = (CPT))
+    - trigger = ([FRAME_NODE]))
     """
     def __init__(self, name, frame, init_act):
         """
@@ -33,11 +33,15 @@ class WK_FRAME_SCHEMA(KNOWLEDGE_SCHEMA):
         KNOWLEDGE_SCHEMA.__init__(self, name=frame.name, content=frame, init_act=init_act)
         self.trigger = frame.trigger
     
-    def is_triggered(self, concept):
+    def has_trigger(self, concept):
         """
-        Returns true if the concept triggers the instantiation of the WK_FRAME_SCHEMA.
+        If the concept is a trigger of the WK_FRAME_SCHEMA, returns the corresponding trigger.
+        Else returns None
         """
-        return concept.match(self.trigger.concept, match_type = "is_a")
+        for trig in self.trigger:
+            if concept.match(trig.concept, match_type = "is_a"):
+                return True
+        return False
     
 
 class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
@@ -46,17 +50,40 @@ class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
      - expressed
      - covers (STR): name of the PHON_INST that triggered the instantatiation
     """
-    def __init__(self, wk_frame_schema, trace, covers, trigger_concept):
+    def __init__(self, wk_frame_schema, trace, covers):
         old_frame =  wk_frame_schema.content
         (new_frame, name_corr) = old_frame.copy()
-        new_name = "%s_%s" %(old_frame.name, trigger_concept.name)
-        new_frame.name = new_name
-        new_frame.trigger.concept = trigger_concept
+#        new_name = "%s_%s" %(old_frame.name, trigger_concept.name)
+#        new_frame.name = new_name
+#        new_frame.trigger.concept = trigger_concept
         new_frame._create_graph()
-        new_wk_frame_schema = WK_FRAME_SCHEMA(new_name, new_frame, wk_frame_schema.init_act)
+        new_wk_frame_schema = WK_FRAME_SCHEMA(new_frame.name, new_frame, wk_frame_schema.init_act)
         SCHEMA_INST.__init__(self, schema=new_wk_frame_schema, trace=trace)
         self.expressed = False
         self.covers = covers
+        self.trigger = new_wk_frame_schema.trigger
+        
+    def has_trigger(self, concept):
+        """
+        If the concept is a trigger of the WK_FRAME_SCHEMA, returns the corresponding trigger.
+        Else returns None
+        """
+        for trig in self.trigger:
+            if concept.match(trig.concept, match_type = "is_a"):
+                return True
+        return False
+        
+    def got_trigger(self, concept):
+        """
+        """
+        trig = next((t for t in self.trigger if concept.match(t.concept, match_type = "is_a") ), None)
+        trig.concept = concept
+        self.trigger.remove(trig)
+        
+    def is_triggered(self):
+        """
+        """
+        return self.trigger == []
         
 ##########################################
 ##### WORLD KNOWLEDGE SYSTEM SCHEMAS #####
@@ -196,8 +223,10 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
         wk_frame_schemas = self.inputs['from_wk_frame_LTM']
         if wk_frame_schemas and phon_input and phon_input['instances']:
             self.instantiate_wk_frames(phon_input, wk_frame_schemas)
-            self.outputs['to_wk_frame_WM'] = self.wk_frame_instances
-        self.wk_frame_instances = []
+            self.outputs['to_wk_frame_WM'] = []
+            for inst in [inst for inst in self.wk_frame_instances if inst.is_triggered()]:
+                self.outputs['to_wk_frame_WM'].append(inst)
+                self.wk_frame_instances.remove(inst)
     
     def instantiate_wk_frames(self, phon_input, wk_frame_schemas):
         """
@@ -211,12 +240,25 @@ class WK_FRAME_RETRIEVAL(SYSTEM_SCHEMA):
             inst_concepts = [n.concept for n in lex_instance.content.SemFrame.nodes]
             concepts.update(inst_concepts)
             
-        # Find triggers:   
-        for concept in concepts:
-            triggered_schemas = [schema for schema in wk_frame_schemas if schema.is_triggered(concept)]
-            for wk_frame_schema in triggered_schemas:
-                trace = trace = {"trigger":concept, "schemas":[wk_frame_schema]}  
-                new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, phon_inst.name, concept)
+        # Find triggers:
+        names = []
+        for wk_frame_inst in self.wk_frame_instances:
+            for concept in concepts:
+                if wk_frame_inst.has_trigger(concept):
+                    wk_frame_inst.got_trigger(concept)
+                    names.append(wk_frame_inst.content.name)
+
+        for wk_frame_schema in [s for s in wk_frame_schemas if s.name not in names]:
+            new_instance = None
+            for concept in concepts:
+                if wk_frame_schema.has_trigger(concept):
+                    if not(new_instance):
+                        trace = {"trigger":[concept], "schemas":[wk_frame_schema]}  
+                        new_instance = WK_FRAME_SCHEMA_INST(wk_frame_schema, trace, phon_inst.name)
+                        new_instance.got_trigger(concept)
+                    else:
+                        new_instance.got_trigger(concept)
+            if new_instance:
                 self.wk_frame_instances.append(new_instance)
     
     ####################

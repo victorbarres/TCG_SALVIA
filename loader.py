@@ -167,9 +167,11 @@ class TCG_LOADER(object):
             frame_elem.pFrom = name_table['names'][from_name]
             frame_elem.pTo = name_table['names'][to_name]
         
-        trigger_node = name_table['names'][trigger]
-        trigger_node.trigger = True
-        new_frame.trigger = name_table['names'][trigger]
+        new_frame.trigger = []
+        for t in trigger:
+            trigger_node = name_table['names'][t]
+            trigger_node.trigger = True
+            new_frame.trigger.append(name_table['names'][t])
         
         
         new_frame._create_graph() # Creating NetworkX implementation of Frame

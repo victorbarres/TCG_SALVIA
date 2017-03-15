@@ -54,13 +54,13 @@ class WK_FRAME(FRAME):
             Each node and edge have the additional 'concept' attribute derived from their respective node.concept and edge.concept
      - preference (FLOAT): WK frame preference (usage preferences, optional)
      - frame_knowledge (FRAME_KNOWLEDGE): The frame knowledge instance the WK frame is part of.
-     - trigger (FRAME_NODE): The frame node whose concept serve as a trigger for the WK_FRAME
+     - trigger ([FRAME_NODE]): The frame nodes whose concept serve as a trigger for the WK_FRAME
     """
     def __init__(self, name='',  frame_knowledge=None):
         FRAME.__init__(self, name=name)
         self.preference = 1.0
         self.frame_knowledge = frame_knowledge
-        self.trigger = None
+        self.trigger = []
     
     def copy(self):
         """
@@ -82,7 +82,7 @@ class WK_FRAME(FRAME):
             new_edge.pFrom = node_corr[edge.pFrom]
             new_edge.pTo = node_corr[edge.pTo]
             new_frame.edges.append(new_edge)
-        new_frame.trigger = node_corr[self.trigger]
+        new_frame.trigger = [node_corr[t] for t in self.trigger]
         new_frame._create_graph()
         
         return (new_frame, name_corr)

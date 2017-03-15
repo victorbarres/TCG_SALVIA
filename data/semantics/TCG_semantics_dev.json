@@ -227,7 +227,7 @@
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]},
-			"trigger": "ANIM"
+			"trigger": ["ANIM"]
 		},
 		
 		{"name" : "EAT_EVENT",
@@ -248,7 +248,7 @@
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]},
-			"trigger": "EAT"
+			"trigger": ["EAT"]
 		},
 		
 		{"name" : "RIDE_EVENT1",
@@ -269,7 +269,7 @@
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]},
-			"trigger": "RIDE"
+			"trigger": ["ADULT", "RIDE"]
 		},
 		
 		{"name" : "RIDE_EVENT2",
@@ -290,7 +290,7 @@
 						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
 						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
 					]},
-			"trigger": "RIDE"
+			"trigger": ["CHILD", "RIDE"]
 		}
 	],
 
