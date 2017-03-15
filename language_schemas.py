@@ -5,9 +5,7 @@ Defines language schemas for TCG.
 
 Dependencies:
     - Uses NetworkX for the implementation of the content of the Semantic Working Memory (SemRep graph)
-    - Uses Numpy for vectorial operations.
     - Uses pyttsx for the text to speech implementation (optional!)
-    - Uses re for regular expression parsing of sem inputs
     
     - Uses schema_theory
     - Uses construction
@@ -1396,6 +1394,38 @@ class GRAMMATICAL_WM_P(WM):
     
         - I AM NOT USING CXN GROUPS!...
     """
+    
+    """
+    Convey semantic activations parameters: To incorporate within the schema.
+        - NORMALIZATION (BOOL): If True, the propagation of the activation is normalized by the number of nodes and edges covered.
+        - USE_GROUPS = []
+        - W_1 = 1.0 # Weight of activation propagation to in groups
+        - W_2 = 1.0 # Weight of activation propagation to out groups
+        - IN_GROUPE_NODE_WEIGHT = Node weight when groups are used (for in groups cxns)
+        - IN_GROUPE_EDGE_WEIGHT = Edge weight when groups are used (for in groups cxns)
+        - OUT_GROUPE_NODE_WEIGHT = Node weight when groups are used (for out groups cxns)
+        - OUT_GROUPE_EDGE_WEIGHT = Edge weight when groups are used (for out groups cxns)
+        - NODE_WEIGHT = Node weight when groups are not used
+        - EDGE_WEIGHT = Edge weight when groups are not used
+    """
+    NORMALIZATION = True
+    USE_GROUPS = [1]
+    W_1 = 1.0
+    W_2 = 1.0
+    GROUPE_NODE_WEIGHT = 1.0
+    GROUPE_EDGE_WEIGHT = 1.0
+    NODE_WEIGHT = 1.0
+    EDGE_WEIGHT = 1.0
+    
+    """
+    Other parameters (to incoroporate in the schema)
+    - REFRACTORY_PERIOD = Minimum time between two output to PhonWM
+    - TIME_PRESSURE_OPTION = (see apply_pressure method)
+    """
+    REFRACTORY_PERIOD = 10
+    TIME_PRESSURE_OPTION = 1
+    
+    
     def __init__(self, name='Grammatical_WM_P'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_semantic_WM')
@@ -1408,14 +1438,14 @@ class GRAMMATICAL_WM_P(WM):
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8, 'refractory_period':10}
         self.params['style'] = {'activation':1.0, 'sem_length':0, 'form_length':0, 'continuity':0} # Default value, updated by control. 
-        self.refractory_period = 10
+        self.refractory_period = self.REFRACTORY_PERIOD
         self.time_to_next_prod = 0
         
     def reset(self):
         """
         """
         super(GRAMMATICAL_WM_P, self).reset()
-        self.refractory_period = 10
+        self.refractory_period = self.REFRACTORY_PERIOD
         self.time_to_next_prod = 0    
         
     #####################
@@ -1440,7 +1470,7 @@ class GRAMMATICAL_WM_P(WM):
         
         if ctrl_input and ctrl_input['produce']:
             self.params['style'] = ctrl_input['params_style']
-            try_produce = self.apply_pressure(ctrl_input['pressure'], option=1)
+            try_produce = self.apply_pressure(ctrl_input['pressure'])
             if try_produce or wm_limit: # If the limit in wm has been reached the system tries to produce.
                 if self.time_to_next_prod<=0:
                     output = self.produce_form(sem_input, phon_input)
@@ -1468,21 +1498,22 @@ class GRAMMATICAL_WM_P(WM):
             self.cooperate(new_inst)
             self.compete(new_inst)
     
-    def convey_sem_activations(self, sem_input, normalization=True, use_groups=[1]):
+    def convey_sem_activations(self, sem_input):
         """
         Args:
             - sem_input (DICT): Unexpressed semantic nodes and relations. Used to compute sem_length score.
-            - normalization (BOOL): If True, the propagation of the activation is normalized by the number of nodes and edges covered.
-            - use_groups ([INT]): only convey activations to cxn instnaces of group in use_groups.
+            
         
-        If use_groups = []
-            A construction receives activations from semantic working memory if :
+        Notes:
+            - A construction receives activations from semantic working memory if :
                 - 1. It's semframe covers at least one semrep node that has not yet been 
             expressed. 
                 - 2. The SemFrame node that covers is linked to a TP_PHON
             This can be modified by changing the formula for 
             
         """
+        normalization = self.NORMALIZATION
+        use_groups = self.USE_GROUPS
         for inst in self.schema_insts:
             cover_nodes = inst.covers['nodes']
             cover_edges = inst.covers['edges']
@@ -1519,29 +1550,27 @@ class GRAMMATICAL_WM_P(WM):
             
             # Propagate activation
             if use_groups:
-                W_1 = 1.0 # Weight of activation propagation to in groups
-                W_2 = 1.0 # Weight of activation propagation to out groups
                 if inst.content.group in use_groups:
-                    node_weight = 1.0
-                    edge_weight = 1.0
+                    node_weight = self.IN_GROUPE_NODE_WEIGHT
+                    edge_weight = self.IN_GROUPE_EDGE_WEIGHT
                     act_node = act_node_phon + act_node_none + act_node_slot # I propagate everything
                     count_node = count_node_phon + count_node_none + count_node_slot
                     act = node_weight*act_node + edge_weight*act_edge
-                    act *= W_1
+                    act *= self.W_1
                     count = node_weight*count_node + edge_weight*count_edge
                 else:
-                    node_weight = 1.0
-                    edge_weight = 1.0
+                    node_weight = self.OUT_GROUPE_NODE_WEIGHT
+                    edge_weight = self.OUT_GROUPE_NODE_WEIGHT
                     act_node = act_node_phon + act_node_none + act_node_slot # I propagate everything
                     count_node = count_node_phon + count_node_none + count_node_slot
-                    act = (node_weight*act_node + edge_weight*act_edge)*W_2
-                    act *= W_2
+                    act = (node_weight*act_node + edge_weight*act_edge)*self.W_2
+                    act *= self.W_2
                     count = node_weight*count_node + edge_weight*count_edge
             else:
                 #######################################
                 ### CHANGE IF WANT TO USE OTHER POLICY.
-                node_weight = 1.0
-                edge_weight = 0.0
+                node_weight = self.NODE_WEIGHT
+                edge_weight = self.EDGE_WEIGHT
                 act_node = act_node_phon + act_node_none # I propagate activation to lexicalized nodes.
                 count_node = count_node_phon + count_node_none
                 act = node_weight*act_node + edge_weight*act_edge
@@ -1585,17 +1614,6 @@ class GRAMMATICAL_WM_P(WM):
                match = GRAMMATICAL_WM_P.match(new_inst, old_inst)
                if match["match_cat"] == -1:
                    self.add_comp_link(inst_from=new_inst, inst_to=old_inst)
-        
-#        # Possible addition...
-#        # Construction that correspond to 2 different hypotheses regarding which slot the new isnt should link to compete. 
-#        # This is might be problematic. See my notes in notebook.
-#        for inst1 in self.schema_insts:
-#            for inst2 in self.schema_insts:
-#                if inst1 != inst2:
-#                    link1 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst1)]
-#                    link2 = [l for l in self.coop_links if (l.inst_from == new_inst) and (l.inst_to == inst2)]
-#                    if link1 and link2:
-#                        self.add_comp_link(inst_from=inst1, inst_to=inst2)
     
     @staticmethod
     def overlap(inst1, inst2):
@@ -2031,10 +2049,11 @@ class GRAMMATICAL_WM_P(WM):
                 link.inst_from.alive = False
         self.prune()
     
-    def apply_pressure(self, pressure, option=0):
+    def apply_pressure(self, pressure):
         """
         Tests various ways to apply time pressure.
         """
+        option = self.TIME_PRESSURE_OPTION
         if option==0: # Do nothing
             try_produce = True
         elif option == 1: # Simply trigger production when pressure reaches 1.
@@ -4149,7 +4168,7 @@ class UTTER_GENERATOR(object):
 ###############################################################################
 if __name__=='__main__':
 #    print "No test case implemented"
-    test_sentence = "Your work is done"
+    test_sentence = "La parole parle comme recueil ou sonne le silence"
     TTS = TEXT2SPEECH(rate_percent=80)
     TTS.utterance = test_sentence
     TTS.utter()
