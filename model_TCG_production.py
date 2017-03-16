@@ -118,7 +118,6 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
     test_not_empty = lambda l: [x for x in l.values() if x!= None] != []
     
     for t in range(max_time):
-        print t
         if  next_time != None and t>=next_time:
             (sem_insts, next_time, prop) = generator.next()
             model.set_input(sem_insts)

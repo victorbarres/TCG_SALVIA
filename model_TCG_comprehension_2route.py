@@ -17,7 +17,7 @@ TMP_FOLDER = './tmp'
 
 ##################
 #### RUNNING MODEL
-def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2routes', model_params = {}):
+def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2route', model_params = {}):
     """
     Sets up a TCG comprehension 2route system.
     
@@ -37,7 +37,7 @@ def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
     return model
     
     
-def set_inputs(model, ling_input_file='ling_inputs_2routes.json', speed_param=10, offset=10):
+def set_inputs(model, ling_input_file='ling_inputs_2route.json', speed_param=10, offset=10):
     """
     Sets up a TCG UTTER_GENERATOR inputs generator for TCG comprehension model.
     
@@ -166,9 +166,9 @@ def run_diagnostic(verbose=2):
     """
     """
     import json
-    LING_INPUT_FILE = 'ling_inputs_2routes.json'
+    LING_INPUT_FILE = 'ling_inputs_2route.json'
     SEMANTICS_NAME = 'TCG_semantics_dev'
-    GRAMMAR_NAME = 'TCG_grammar_VB_2routes'
+    GRAMMAR_NAME = 'TCG_grammar_VB_2route'
     VERBOSE = verbose
     SEED = None
     ANIM = False

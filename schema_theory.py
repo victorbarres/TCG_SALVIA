@@ -45,10 +45,7 @@ class SCHEMA(object):
     def __init__(self, name=''):
         self.id = SCHEMA.ID_next
         SCHEMA.ID_next += 1
-        if not name:
-            self.name = self.id
-        else:
-            self.name = name
+        self.name = name
         self.model = None
 
 class PORT(object):
@@ -67,16 +64,13 @@ class PORT(object):
     TYPE_OUT = 'OUT'
     ID_NEXT = 1 # Global port counter
     
-    def __init__(self, port_type, port_schema = None, port_name='', port_data = None, port_value=None, port_weight=None):
+    def __init__(self, port_type, port_schema = None, port_name='', port_data=None, port_value=None, port_weight=None):
         self.data = port_data
         self.value = port_value
         self.weight =  port_weight
         self.id = PORT.ID_NEXT
         PORT.ID_NEXT += 1
-        if not port_name:
-            self.port_name = self.id
-        else:
-            self.port_name = port_name
+        self.name = port_name
         self.type = port_type
         self.schema = port_schema
     
@@ -106,10 +100,7 @@ class CONNECT(object):
         """
         self.id = CONNECT.ID_NEXT
         CONNECT.ID_NEXT += 1
-        if not name:
-            self.name = self.id
-        else:
-            self.name = name
+        self.name = name
         self.model = None
         self.port_from = port_from
         self.port_to = port_to
@@ -1772,7 +1763,8 @@ class MODEL(SYSTEM_OF_SYSTEMS):
             schema = self.schemas[schema_name]
             schema.t = self.t
             schema.reset()
-        for connection in self.connections:
+        for connect_name in self.connections:
+            connection = self.connections[connect_name]
             connection.reset()
     
     def add_connection(self, from_schema, from_port, to_schema, to_port, name, weight=0, delay=0):
