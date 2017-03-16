@@ -78,6 +78,7 @@ class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
         """
         trig = next((t for t in self.trigger if concept.match(t.concept, match_type = "is_a") ), None)
         trig.concept = concept
+        self.content._create_graph()
         self.trigger.remove(trig)
         
     def is_triggered(self):
