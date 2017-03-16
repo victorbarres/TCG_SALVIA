@@ -168,7 +168,7 @@ def run_diagnostic(verbose=2):
     import json
     LING_INPUT_FILE = 'ling_inputs_2routes.json'
     SEMANTICS_NAME = 'TCG_semantics_dev'
-    GRAMMAR_NAME = 'TCG_grammar_VB_lex'
+    GRAMMAR_NAME = 'TCG_grammar_VB_2routes'
     VERBOSE = verbose
     SEED = None
     ANIM = False

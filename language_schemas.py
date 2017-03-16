@@ -1266,6 +1266,21 @@ class SEMANTIC_WM_C2_C(WM):
                         corefs.append((node_s, node_t))
             return corefs
         
+#        def iso_coref_filter(sub_iso, refs_s, refs_t, corefs):
+#            for c_s, c_t in corefs:
+#                for n_s, n_t in sub_iso['nodes'].iteritems():
+#                    if n_s == c_s and sub_iso['nodes'][c_s] != c_t:
+#                        return False
+#                    if n_t == c_t and n_s!=c_s:
+#                        return False
+##                if sub_iso['nodes'].has_key(c_s) and sub_iso['nodes'][c_s] != c_t:
+##                    return False         
+#            for n_s, n_t in sub_iso['nodes'].iteritems():
+#                if (n_s in refs_s) and (n_t in refs_t):
+#                    if (n_s, n_t) not in corefs:
+#                        return False 
+#            return True
+            
         def iso_coref_filter(sub_iso, refs_s, refs_t, corefs):
             for c_s, c_t in corefs:
                 for n_s, n_t in sub_iso['nodes'].iteritems():
@@ -1275,10 +1290,10 @@ class SEMANTIC_WM_C2_C(WM):
                         return False
 #                if sub_iso['nodes'].has_key(c_s) and sub_iso['nodes'][c_s] != c_t:
 #                    return False         
-            for n_s, n_t in sub_iso['nodes'].iteritems():
-                if (n_s in refs_s) and (n_t in refs_t):
-                    if (n_s, n_t) not in corefs:
-                        return False 
+#            for n_s, n_t in sub_iso['nodes'].iteritems():
+#                if (n_s in refs_s) and (n_t in refs_t):
+#                    if (n_s, n_t) not in corefs:
+#                        return False 
             return True
            
         
