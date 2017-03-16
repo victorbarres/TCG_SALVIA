@@ -3950,6 +3950,7 @@ class ISRF_WRITER(object):
         self.data = {}
         self.var_id = 0
         self.connector = '&'
+        
     def reset(self):
         """ Resets writer.
         """
@@ -3969,7 +3970,7 @@ class ISRF_WRITER(object):
         cpt_ISRF = "%s(%s, " %(cpt_name, var_name)
         if cpt_inst.frame:
             cpt_ISRF += "F, "
-        cpt_ISRF += ".%2f)" %cpt_inst.activity
+        cpt_ISRF += "%.2f)" %cpt_inst.activity
         return (cpt_ISRF, var_name)
         
     def write_ISRF(self):
@@ -3989,7 +3990,9 @@ class ISRF_WRITER(object):
             p_to = rel_inst.content['pTo']
             cpt_ISRF_rel = "%s(%s, %s)" %(var_name, self.var_table[p_from.name], self.var_table[p_to.name])
             dat.append(cpt_ISRF_rel)
-            self.data[t] = dat
+        s = ' %s ' %self.connector
+        dat = s.join(dat)
+        self.data[t] = dat
         
         return (t,dat)
 

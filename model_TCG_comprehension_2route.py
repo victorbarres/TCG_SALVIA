@@ -109,8 +109,9 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             outputs[t] = output
         # Display methods
         if output['Semantic_WM_C']:
+            state_ISRF = isrf_writer.write_ISRF()
+            outputs[t]['Semantic_WM_C'] = state_ISRF[1]
             if verbose > 2:
-                state_ISRF = isrf_writer.write_ISRF()
                 print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after Semantic output
@@ -125,7 +126,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     if verbose>2:
         model.schemas['Grammatical_WM_C'].show_dynamics()
         model.schemas['Phonological_WM_C'].show_dynamics()
-        model.schemas['Semantic_WM'].show_dynamics()
+        model.schemas['Semantic_WM_C'].show_dynamics()
         model.schemas['WK_frame_WM'].show_dynamics()
        
     if anim:
@@ -160,8 +161,9 @@ def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
     out = {}
     out[input_name] = run(model, utter_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
     return out
-    
-    
+
+###############
+#### DIAGNOSTIC     
 def run_diagnostic(verbose=2):
     """
     """
@@ -185,14 +187,452 @@ def run_diagnostic(verbose=2):
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
+    res = run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
+#    print "\nRESULTS:\n"
+#    print res
+############################
+#### PARAMETER SPACE ANALYSIS  
+def parameter_space(folder=None, input_rate=100):
+    """
+    Defines and returns a parameter space.
     
+    Args:
+        - folder (STR): Folder path. If defined, the parameter set dictionary is pickled and saved to this folder.
+        - input_rate: input_rate that will be used for the SemGen object, serves as a time reference.
+    
+    Returns:
+        - model_params_set (DICT): a parameter space dictionary.
+    
+    """
+    import itertools
+    import numpy as np
+    
+    # Defining fixed input rate
+    INPUT_RATE = input_rate # This serves as a time reference for the range of Tau and task parameters
+
+    # Set up the model's parameter search space.
+    model_params_set = []
+    
+    ## Grammatical_WM_C
+    # C2 parameters
+    coop_weights_G =  [1.0] #np.linspace(1.0, 10.0, 2)
+    coop_asymmetries_G = [1.0] #np.linspace(0.0, 1.0, 2)
+    comp_weights_G = [-10.0]
+    max_capacity_G = [None]
+    prune_thresholds_G = [0.01] # Change prune threshold (should be done in relation to initial activation values.) 
+    conf_tresholds_G = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
+    
+    # Dyn parameters
+    taus_G = [INPUT_RATE*10] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    ks_G= [10] #np.linspace(1, 10, 2) 
+    act_rests_G = [0.001] # Act rest does not take into account the noise.
+    noise_stds_G = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
+    ext_weights_G = [1.0] #np.linspace(1, 10, 2)
+    
+    ## Semantic_WM_C
+    # C2 parameters
+    comp_weights_S = [-10.0]
+    max_capacity_S = [None]
+    prune_thresholds_S = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01
+    conf_tresholds_S = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
+
+    # Dyn parameters
+    taus_S = [INPUT_RATE*10] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    ks_S= [10] #np.linspace(1, 10, 2)
+    act_rests_S = [0.001] # Act rest does not take into account the noise.
+    noise_stds_S = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
+    ext_weights_S = [1.0] #np.linspace(1, 10, 2)
+    
+    ## WK_WM
+    # C2 parameters
+    max_capacity_WK = [None]
+    prune_thresholds_WK = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01
+    conf_tresholds_WK = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
+    
+    # Dyn parameters
+    taus_WK = [INPUT_RATE*10] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    ks_WK= [10] #np.linspace(1, 10, 2)
+    act_rests_WK = [0.001] # Act rest does not take into account the noise.
+    noise_stds_WK = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
+    ext_weights_WK = [1.0] #np.linspace(1, 10, 2)
+    
+    
+    
+    param_iter = itertools.product(coop_weights_G, coop_asymmetries_G, comp_weights_G, 
+                                   max_capacity_G, prune_thresholds_G, conf_tresholds_G, 
+                                   taus_G, ks_G, act_rests_G, noise_stds_G, ext_weights_G,
+                                   comp_weights_S, max_capacity_S, prune_thresholds_S, conf_tresholds_S, 
+                                   taus_S, ks_S, act_rests_S, noise_stds_S, ext_weights_S,
+                                   max_capacity_WK, prune_thresholds_WK, conf_tresholds_WK, 
+                                   taus_WK, ks_WK, act_rests_WK, noise_stds_WK, ext_weights_WK)
+    
+    for param in param_iter:
+        params = {'Grammatical_WM_P.C2.coop_weight':param[0], 
+                  'Grammatical_WM_P.C2.coop_asymmetry':param[1],
+                  'Grammatical_WM_P.C2.comp_weight':param[2], 
+                  'Grammatical_WM_P.C2.max_capacity':param[3],
+                  'Grammatical_WM_P.C2.prune_threshold': param[4], 
+                  'Grammatical_WM_P.C2.confidence_threshold': param[5],
+                  'Grammatical_WM_P.dyn.tau':param[6], # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+                  'Grammatical_WM_P.dyn.k': param[7],
+                  'Grammatical_WM_P.dyn.act_rest': param[8],
+                  'Grammatical_WM_P.dyn.noise_std':param[9],
+                  'Grammatical_WM_P.dyn.ext_weight':param[10],
+                  'Semantic_WM_C.C2.comp_weight':param[11], 
+                  'Semantic_WM_C.C2.max_capacity':param[12],
+                  'Semantic_WM_C.C2.prune_threshold': param[13], 
+                  'Semantic_WM_C.C2.confidence_threshold': param[14],
+                  'Semantic_WM_C.dyn.tau':param[15], # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+                  'Semantic_WM_C.dyn.k': param[16],
+                  'Semantic_WM_C.dyn.act_rest': param[17],
+                  'Semantic_WM_C.dyn.noise_std':param[18],
+                  'Semantic_WM_C.dyn.ext_weight':param[19],
+                  'WK_frame_WM.C2.max_capacity':param[20],
+                  'WK_frame_WM.C2.prune_threshold': param[21], 
+                  'WK_frame_WM.C2.confidence_threshold': param[22],
+                  'WK_frame_WM.dyn.tau':param[23], # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+                  'WK_frame_WM.dyn.k': param[24],
+                  'WK_frame_WM.dyn.act_rest': param[25],
+                  'WK_frame_WM.dyn.noise_std':param[26],
+                  'WK_frame_WMC.dyn.ext_weight':param[27]}
+
+        model_params_set.append(params)
+    
+    # Defining parameter name mapping
+    param_name_mapping = {'Grammatical_WM_P.C2.coop_weight':'coop_weight_G', 
+                      'Grammatical_WM_P.C2.coop_asymmetry':'coop_asymmetry_G',
+                      'Grammatical_WM_P.C2.comp_weight':'comp_weight_G',
+                      'Grammatical_WM_P.C2.max_capacity':'max_capacity_G',
+                      'Grammatical_WM_P.C2.prune_threshold': 'prune_threshold_G', 
+                      'Grammatical_WM_P.C2.confidence_threshold':'conf_threshold_G',
+                      'Grammatical_WM_P.C2.sub_threshold_r':'sub_threshold_G',
+                      'Grammatical_WM_P.C2.deact_weight':'deact_weight_G',
+                      'Grammatical_WM_P.dyn.tau':'tau_G',
+                      'Grammatical_WM_P.dyn.k':'k_G',
+                      'Grammatical_WM_P.dyn.act_rest':'act_rest_G',
+                      'Grammatical_WM_P.dyn.noise_std':'noise_std_G',
+                      'Grammatical_WM_P.dyn.ext_weight':'ext_weight_G',
+                      'Semantic_WM_C.C2.comp_weight':'coop_weight_S', 
+                      'Semantic_WM_C.C2.max_capacity':'max_capacity_S',
+                      'Semantic_WM_C.C2.prune_threshold': 'prune_threshold_S', 
+                      'Semantic_WM_C.C2.confidence_threshold': 'conf_threshold_S',
+                      'Semantic_WM_C.dyn.tau':'tau_S', # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+                      'Semantic_WM_C.dyn.k': 'k_S',
+                      'Semantic_WM_C.dyn.act_rest': 'act_rest_S',
+                      'Semantic_WM_C.dyn.noise_std':'noise_std_S',
+                      'Semantic_WM_C.dyn.ext_weight':'ext_weight_S',
+                      'WK_frame_WM.C2.max_capacity':'max_capacity_WK',
+                      'WK_frame_WM.C2.prune_threshold': 'prune_threshold_WK', 
+                      'WK_frame_WM.C2.confidence_threshold': 'conf_threshold_WK',
+                      'WK_frame_WM.dyn.tau':'tau_WK', # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+                      'WK_frame_WM.dyn.k': 'k_WK',
+                      'WK_frame_WM.dyn.act_rest': 'act_rest_WK',
+                      'WK_frame_WM.dyn.noise_std':'noise_std_WK',
+                      'WK_frame_WMC.dyn.ext_weight':'ext_weight_WK'}
+                
+    
+    if folder:
+        st_save(model_params_set, 'parameter_set', folder, 'params')
+        st_save(param_name_mapping, 'param_name_mapping', folder, 'params')
+    
+    return (model_params_set, param_name_mapping)
+    
+def weight_space(folder=None, input_rate=100):
+    """
+    Defines and returns a connection weights space.
+    
+    Args:
+        - folder (STR): Folder path. If defined, the parameter set dictionary is pickled and saved to this folder.
+        - input_rate: input_rate that will be used for the SemGen object, serves as a time reference.
+    
+    Returns:
+        - model_weights_set (DICT): a weight space dictionary.
+    
+    """
+    import itertools
+    import numpy as np
+    
+    # Set up the model's parameter search space.
+    model_weights_set = []
+    
+    Phon2Gram = [1.0]
+    Gram2Sem = [1.0]
+
+    Phon2WK = [1.0] 
+    WK2Sem = [1.0]
+    
+    
+    
+    weight_iter = itertools.product(Phon2Gram, Gram2Sem, Phon2WK, WK2Sem)
+    
+    for weight in weight_iter:
+        weights = {'C9':weight[0],
+                   'C11':weight[1],
+                   'WK5':weight[2],
+                   'WK4':weight[3]}
+
+        model_weights_set.append(weights)
+    
+    # Defining parameter name mapping
+    weight_name_mapping = {'C9':'Phon2Gram',
+                           'C11':'Gram2Sem',
+                           'WK5':'Phon2WK',
+                           'WK4':'WK2Sem'}
+                           
+                
+    
+    if folder:
+        st_save(model_weights_set, 'weights_set', folder, 'params')
+        st_save(weight_name_mapping, 'weight_name_mapping', folder, 'params')
+    
+    return (model_weights_set, weight_name_mapping) 
+
+def grid_search(model, utter_gen, input_name, max_time, folder, model_params_set=[], model_weights_set=[], num_restarts=10, seed=None, verbose=1, save_models=True):
+    """
+    Runs model "model" for all the inputs in "utter_gen" over the search space defined by "model_params_set" and  "model_weights_set".
+    For each point of the search space, model is ran "num_restarts" times.
+    
+    Args:
+        - model (): the model
+        - utter_gen (): the lingustic input generator.
+        - input_name (STR): name of the input (necessary since for now we only use macros as inputs)
+        - model_params_set (ARRAY): Array of model parameters dict.
+        - model_weights_set (ARRAY): Array of model weights dict
+        - num_restarts (INT): Number of restarts for each model run.
+        
+    Returns:
+        - output (ARRAY): Array of model's summarized outputs for each run in the grid search
+    """
+    import time
+    t0 = time.time()
+
+    grid_output = []
+    count = 1
+    
+    num_sim = len(utter_gen.ling_inputs)*num_restarts*len(model_params_set)*len(model_weights_set)
+    
+    for model_params in model_params_set:
+        model.update_params(model_params)
+        for weight_params in model_weights_set:
+            model.update_weights(weight_params)
+            for name in utter_gen.ling_inputs:
+                param_dict = {'input_name':input_name, 'num_restarts': num_restarts}
+                param_dict.update(model_params)
+                param_dict.update(weight_params)
+                for i in range(num_restarts):
+                    start = time.time()
+                    sim_name = '%s_%s' %(input_name, name)
+                    sim_output = run(model, utter_gen, name, sim_name=sim_name, sim_folder=folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=[], save=save_models, anim=False, anim_step=10)
+                    # Summerize output
+                    summarized_output = summarize_data(sim_output, sem_gen.ground_truths)
+                    run_output = {'input_name':input_name, 'params':param_dict, 'sim_output':summarized_output}
+                    grid_output.append(run_output)
+                    
+                    end = time.time()
+                    sim_time = end - start
+                    remaining_time = (num_sim - count)*sim_time
+                    remaining_time = time.strftime("%H:%M:%S", time.gmtime(remaining_time))
+                    if verbose>0:
+                        print "RUN %i OF %i (%.2fs) (remaining %s)" %(count, num_sim, sim_time, remaining_time)
+                    count +=1
+    
+    tf = time.time()
+    tot_time = tf-t0
+    grid_time = time.strftime("%H:%M:%S", time.gmtime(tot_time))
+    if verbose>0:
+        print "TOTAL GRID SEARCH TIME: %s" %(grid_time)
+    return grid_output
+    
+def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=True):
+    """
+    Runs the production model using grid_search.
+    
+    Returns:
+        - output ({input_name(STR):grid_search_output(ARRAY)}
+    If save = True, saves results to .json file
+    If intermediate_save = True: saves to json at the end of each grid_search
+    """
+    pass
+##    import numpy as np
+#    
+#    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
+#        random.seed(seed)
+#        seed = random.randint(0,10**9)
+#    random.seed(seed)
+#    
+#    sim_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+#    
+#    if not(sim_name):
+#        sim_name = '%s_(%s)' %(sim_time, str(seed))
+#    else:
+#        sim_name = '%s_%s_(%s)' %(sim_time, sim_name, str(seed))
+#    
+#    folder = '%s/%s/' %(sim_folder, sim_name)
+#    
+#    verbose = 1
+#        
+#    # Defining the number of restarts
+#    NUM_RESTARTS = 10
+#
+#    # Defining fixed input rate
+#    INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
+#    INPUT_STD = 0
+#    
+#    # Defining simulation time
+#    max_time = 10*INPUT_RATE
+#    
+#    
+#    # Saving meta parameters
+#    meta_params = {'seed':seed, 'num_restarts':NUM_RESTARTS, 'input_rate':INPUT_RATE, 'input_std':STD, 'max_time':max_time}
+#    st_save(meta_params, 'meta_parameters', folder, 'params')
+#    
+#    # Set up and save the model's parameter search space.
+#    (model_params_set, param_name_mapping) = parameter_space(folder, INPUT_RATE)
+#    
+#    #Setting up and saving model
+#    semantics_name = 'TCG_semantics_main'
+#    grammar_name = 'TCG_grammar_VB_SVO_only'
+#    model  = set_model(semantics_name, grammar_name)
+#    st_save(model, model.name, folder)
+#    
+#    # Defining inputs.
+#    sem_input_file = 'kuchinsky_simple.json'
+#    sem_input_macro = True # For now it only uses macros
+#    
+#    # Define the set of inputs on which the model will be run.
+#    #    inputs = ["scene_girlkickboy"]
+#    #    inputs = ["woman_kick_man_static", "young_woman_punch_man_static", "woman_punch_man_kick_can_static"]
+#    #    inputs = ["woman_kick_man_static"]
+#    
+#    benchmark_inputs = ["test_naming", "test_naming_ambiguous", "test_naming_2", "young_woman_static","young_woman_dyn","woman_kick_man_static", "woman_kick_man_dyn", "young_woman_punch_man_static", "young_woman_punch_man_dyn", "woman_punch_man_kick_can_static", "woman_punch_man_kick_can_dyn", "woman_in_blue_static"] 
+#
+#    kuchinksy_inputs = [u'event_agent_patient_action', u'patient_event_agent_action', u'action_event_agent_patient', 
+#                         u'event_agent_action_patient', u'event_patient_agent_action', u'action_patient_agent_event', 
+#                         u'action_patient_event_agent', u'patient_agent_action_event', u'patient_agent_event_action', 
+#                         u'agent_action_event_patient', u'action_agent_event_patient', u'patient_action_event_agent', 
+#                         u'event_action_agent_patient', u'event_patient_action_agent', u'agent_event_patient_action', 
+#                         u'agent_patient_action_event', u'patient_event_action_agent', u'action_agent_patient_event', 
+#                         u'agent_action_patient_event', u'agent_patient_event_action', u'event_action_patient_agent', 
+#                         u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent'
+#                        ] # 24 inputs (all the permutations)
+#                        
+#    kuchinsky_simple = ["agent_patient_action", "patient_agent_action",
+#                        "action_agent_patient", "action_patient_agent",
+#                        "agent_action_patient", "patient_action_agent"
+#                        ] # 6 inputs (all the permutations)
+#                        
+#    kuchinsky_jin = ["scene_incremental", "scene_structural"]
+#                        
+#    threshold_inputs = ["girl_man_kick_act_agent_cued", "man_girl_kick_act_patient_cued", "act_kick_girl_man", "act_kick_girl_man_agent_cued","act_kick_man_girl", "act_kick_man_girl_patient_cued",
+#                        "woman_man_kick_act_agent_cued", "man_woman_kick_act_patient_cued", "act_kick_woman_man", "act_kick_woman_man_agent_cued","act_kick_man_woman", "act_kick_man_woman_patient_cued",
+#                        "girl_woman_kick_act_agent_cued", "woman_girl_kick_act_patient_cued", "act_kick_girl_woman", "act_kick_girl_woman_agent_cued","act_kick_woman_girl", "act_kick_woman_girl_patient_cued",
+#                        "young_woman_punch_man_dyn", "young_woman_punch_man_dyn_agent_cued", "young_woman_punch_man_dyn_patient_cued", 
+#                        "complex1_dyn", "complex2_dyn", "complex3_dyn", "complex4_dyn", "complex5_dyn"
+#                        ]
+#                        
+#    test_inputs = [u'event_action_patient_agent', u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent']
+#                        
+#    inputs = kuchinsky_jin
+#    output = {}
+#    print "SIMULATION STARTING"
+#    start_time = time.time()
+#    # Run the grid search for inputs X parameters X num_restarts
+#    count = 1
+#    for name in inputs:
+#        input_name = name
+#        print "\nProcessing input: %s (%i/%s)" %(input_name, count,len(inputs))
+#        #Setting up and saving input generator
+#        sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param=INPUT_RATE, std=INPUT_STD)
+#        st_save(sem_gen, 'sem_gen_' + input_name, folder)
+#        
+#        grid_output = grid_search(model=model, sem_gen=sem_gen, input_name=input_name, max_time=max_time, folder=folder, model_params_set=model_params_set, num_restarts=NUM_RESTARTS, seed=seed, verbose=verbose, save_models=False)
+#        
+#        output[name] = grid_output
+#        
+#        # if intermediate_save, saves to json each grid_search
+#        if intermediate_save:
+#            print "SAVING"
+#            st_save(grid_output, name, folder,'grd')
+#            grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
+#        
+#        # If speak, give audio feedback
+#        if speak:
+#            tell_me('Grid search %i done. %i remaining.' %(count, len(inputs) - count))
+#        count +=1
+#    
+#        # saves full grid search
+#    if save:
+#        st_save(output, 'full_grid_search', folder, 'grd')
+#        if not(intermediate_save):
+#            print "SAVING ALL"
+#            for input_name, grid_output in output.iteritems():
+#                grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
+#    print "\nDONE!"
+#    end_time = time.time()
+#    sim_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))
+#    print "TOTAL SIMULATION TIME: %s" %sim_time
+#    
+#    # if speak, give audio feedback
+#    if speak:
+#        tell_me('Your work is done.')
+#        
+#    return output
+
+def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping):
+    """
+    Only saves the statistical analysis of run outputs
+    """
+    pass
+#    import numpy as np
+#    param_names = meta_params.keys() + grid_output[0]['params'].keys()
+#    gram_output_names = grid_output[0]['sim_output']['GramWM'].keys()
+#    sem_output_names = grid_output[0]['sim_output']['SemWM'].keys()
+#    phon_output_names = grid_output[0]['sim_output']['PhonWM'].keys()
+#    header = [param_name_mapping.get(name, name) for name in param_names] + gram_output_names + sem_output_names + phon_output_names
+#    line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
+#    
+#    file_name = './%s/%s.csv' %(folder, input_name)
+#    with open(file_name, 'w') as f:
+#         header = line(header)
+#         f.write(header)
+#         for output in grid_output:
+#            params = output['params']
+#            params.update(meta_params) # adding meta parameters
+#            param_row = []
+#            for name in param_names:
+#                val = params[name] if params[name]!=None else np.NaN
+#                param_row.append(val)
+#            
+#            sim_output = output['sim_output']
+#            output_row = []
+#            # GramWM
+#            sim_stats = sim_output['GramWM']
+#            for name in gram_output_names:
+#                val = sim_stats[name]['mean']
+#                output_row.append(val)
+#                
+#            # SemWM
+#            sim_stats = sim_output['SemWM']
+#            for name in sem_output_names:
+#                val = sim_stats[name] if sim_stats[name] else np.NaN
+#                output_row.append(val)
+#            
+#            # PhonWM
+#            sim_stats = sim_output['PhonWM']
+#            for name in phon_output_names:
+#                val = sim_stats[name] if sim_stats[name] else np.NaN
+#                output_row.append(val)
+#            
+#            # write to csv
+#            new_line = line(param_row + output_row)
+#            f.write(new_line)
 
 
 if __name__=='__main__':
     model = set_model()
 #    model.system2dot(image_type='png', disp=True)
-    run_diagnostic()
+    out = run_diagnostic()
+    print out
 
 
 
