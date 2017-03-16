@@ -354,8 +354,7 @@ def run_diagnostics(verbose=3, prob_times=[]):
 #        print res
 
 ############################
-#### PARAMTER SPACE ANALYSIS      
-
+#### PARAMETER SPACE ANALYSIS      
 def parameter_space(folder=None, input_rate=100):
     """
     Defines and returns a parameter space.
@@ -367,11 +366,11 @@ def parameter_space(folder=None, input_rate=100):
     Returns:
         - model_params_set (DICT): a parameter space dictionary.
     
-    Note:
-    - I should allow this to be passed to a model?
+    Notes:
+    - Should I allow this to be passed to a model?
     - For many of those things I should allow those to be saved and then reloaded.
-    - I NEED TO INCLUDE THE USE OF GROUPS LEXICAL VS NON-LEXICAL CXN PARAMTERS!!!
-    - I NEED TO INCLUDE THE STYLE PARAMTERS
+    - I NEED TO INCLUDE THE USE OF GROUPS LEXICAL VS NON-LEXICAL CXN PARAMETERS!!!
+    - I NEED TO INCLUDE THE STYLE PARAMETERS
     
     """
     import itertools
@@ -638,8 +637,6 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
         
     return output
     
-
-
 def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping):
     """
     Only saves the statistical analysis of run outputs

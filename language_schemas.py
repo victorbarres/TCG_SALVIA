@@ -945,7 +945,8 @@ class SEMANTIC_WM_C2_C(WM):
         new_insts = []
         cpt_schemas = self.inputs['from_concept_LTM']
                    
-        gram_input = self.inputs['from_grammatical_WM_C']
+        gram_input = self.inputs['from_grammatical_WM_C']   
+        gram_weight = self.ext_weights['from_grammatical_WM_C']
         if gram_input:
             gram_activations = gram_input['activations']
             instance_data  = gram_input.get('instances', None)
@@ -962,9 +963,10 @@ class SEMANTIC_WM_C2_C(WM):
                     for inst1, inst2 in competitions:
                         print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
                         self.add_comp_link(inst1, inst2)
-            self.convey_gram_activations(gram_activations) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
+            self.convey_gram_activations(gram_activations, gram_weight) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
             
         wk_input = self.inputs['from_wk_frame_WM']
+        wk_weight = self.ext_weights['from_wk_frame_WM']
         if wk_input:
             wk_activations = wk_input['activations']
             instance_data = wk_input.get('instances', None)
@@ -978,7 +980,7 @@ class SEMANTIC_WM_C2_C(WM):
                 for inst1, inst2 in competitions:
                     print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
                     self.add_comp_link(inst1, inst2)
-            self.convey_WK_activations(wk_activations)
+            self.convey_WK_activations(wk_activations, wk_weight)
         
         self.update_activations()
         self.prune()
@@ -1149,7 +1151,7 @@ class SEMANTIC_WM_C2_C(WM):
         
         return output
     
-    def convey_gram_activations(self, gram_activations):
+    def convey_gram_activations(self, gram_activations, weight=1):
         """SemRep instances receives external activations from the 
         construction instances they are linked to.
         
@@ -1164,9 +1166,9 @@ class SEMANTIC_WM_C2_C(WM):
                 act = 0
                 if k in inst.trace['sem_frame_insts']:
                     act += val
-                inst.activation.E += act # No normalization
+                inst.activation.E += act*weight # No normalization
     
-    def convey_WK_activations(self, WK_activations):
+    def convey_WK_activations(self, WK_activations, weight=1):
         """SemRep instances receive external activations from the 
         WK_frames instances they are linked to.
         
@@ -1180,7 +1182,7 @@ class SEMANTIC_WM_C2_C(WM):
                 act=0
                 if k in inst.trace['wk_frame_insts']:
                     act+=val
-                inst.activation.E += act # No normalization
+                inst.activation.E += act*weight # No normalization
 
     def update_SemRep(self, cpt_insts):
         """Updates the SemRep: Adds the nodes and edges needed 
@@ -3948,6 +3950,7 @@ class ISRF_WRITER(object):
         self.data = {}
         self.var_id = 0
         self.connector = '&'
+        
     def reset(self):
         """ Resets writer.
         """
@@ -3967,7 +3970,7 @@ class ISRF_WRITER(object):
         cpt_ISRF = "%s(%s, " %(cpt_name, var_name)
         if cpt_inst.frame:
             cpt_ISRF += "F, "
-        cpt_ISRF += ".%2f)" %cpt_inst.activity
+        cpt_ISRF += "%.2f)" %cpt_inst.activity
         return (cpt_ISRF, var_name)
         
     def write_ISRF(self):
@@ -3987,7 +3990,9 @@ class ISRF_WRITER(object):
             p_to = rel_inst.content['pTo']
             cpt_ISRF_rel = "%s(%s, %s)" %(var_name, self.var_table[p_from.name], self.var_table[p_to.name])
             dat.append(cpt_ISRF_rel)
-            self.data[t] = dat
+        s = ' %s ' %self.connector
+        dat = s.join(dat)
+        self.data[t] = dat
         
         return (t,dat)
 

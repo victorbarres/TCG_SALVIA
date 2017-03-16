@@ -42,7 +42,7 @@ class SCHEMA(object):
         - model (MODEL): model to which the schema belongs.
     """
     ID_next = 1 # Global schema ID counter
-    def __init__(self, name=""):
+    def __init__(self, name=''):
         self.id = SCHEMA.ID_next
         SCHEMA.ID_next += 1
         self.name = name
@@ -58,17 +58,19 @@ class PORT(object):
         - schema (SCHEMA): the schema the port is associated with.
         - type ('IN' or 'OUT'): type of port (input or output port)
         - value(): current value at the port.
+        - weight (FLOAT): current weight at the port
     """
     TYPE_IN = 'IN'
     TYPE_OUT = 'OUT'
     ID_NEXT = 1 # Global port counter
     
-    def __init__(self, port_type, port_schema = None, port_name='', port_data = None, port_value=None):
-        self.name = port_name
+    def __init__(self, port_type, port_schema = None, port_name='', port_data=None, port_value=None, port_weight=None):
         self.data = port_data
         self.value = port_value
+        self.weight =  port_weight
         self.id = PORT.ID_NEXT
         PORT.ID_NEXT += 1
+        self.name = port_name
         self.type = port_type
         self.schema = port_schema
     
@@ -93,12 +95,12 @@ class CONNECT(object):
         - delay (float)
     """
     ID_NEXT = 1
-    def __init__(self, name="",  port_from=None, port_to=None, weight=0, delay=0):
+    def __init__(self, name='',  port_from=None, port_to=None, weight=1, delay=0):
         """
         """
-        self.name = name
         self.id = CONNECT.ID_NEXT
         CONNECT.ID_NEXT += 1
+        self.name = name
         self.model = None
         self.port_from = port_from
         self.port_to = port_to
@@ -115,10 +117,12 @@ class CONNECT(object):
     def update(self):
         """
         For now does not involve weight or delay!
-        Sets the value of port_rom to the value of port_to.
+        Sets the value of port_to to the value of port_from.
         Resets the port_from value to None.
+        Sets the weight for port_to to the connect weight.
         """
         self.port_to.value = self.port_from.value
+        self.port_to.weight = self.weight
         self.port_from.value = None
     
     def set_from(self, port):
@@ -179,6 +183,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         - params (DICT): Stores the process parameters
         - inputs (DICT): At each time steps stores the inputs
         - outputs (DICT): At each time steps stores the ouputs
+        - ext_weights(DICT): At each time steps stores the weights from each incomming connection.
         - activity (float): The activity level of the schema.
         - t (FLOAT): Time.
         - dt (FLOAT): Time step.
@@ -190,6 +195,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.params = {}
         self.inputs = {}
         self.outputs = {}
+        self.ext_weights = {}
         self.activity = 0.0
         self.t = 0.0
         self.dt = 1.0
@@ -205,16 +211,20 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             self.inputs[k] = None
         for k in self.outputs:
             self.outputs[k] = None
+        for k in self.ext_weights:
+            self.ext_weights[k] = None
         self.activity = 0
         self.t = 0
         self.dt = 1.0
     
     def get(self):
         """
-        Get all inputs and store them in the local self.inputs DICT. 
+        Get all inputs and weights and store them in the local self.inputs and self.ext_weights DICT. 
         """
-        for input_name in self.inputs.keys():
+        for input_name in self.inputs:
             self.get_input(input_name)
+        for input_name in self.ext_weights:
+            self.get_weight(input_name)
     
     def post(self):
         """
@@ -241,10 +251,13 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.post()
         
         # Reset input and output namespace values.
-        for input_name in self.inputs.keys():
+        for input_name in self.inputs:
             self.inputs[input_name] = None
+
+        for input_name in self.ext_weights:
+            self.ext_weights[input_name] = None
         
-        for output_name in self.outputs.keys():
+        for output_name in self.outputs:
             self.outputs[output_name] = None
     
     def add_port(self, port_type, port_name='', port_data=None, port_value=None):
@@ -262,6 +275,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
             else:
                 self.in_ports.append(new_port)
                 self.inputs[new_port.name] = None
+                self.ext_weights[new_port.name] = None
             return new_port.id
         elif port_type == PORT.TYPE_OUT:
             if self.outputs.has_key(new_port.name):
@@ -283,6 +297,7 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         self.out_ports = []
         self.inputs = {}
         self.outputs = {}
+        self.ext_weights = {}
     
     def set_params(self, params):
         """
@@ -312,7 +327,8 @@ class PROCEDURAL_SCHEMA(SCHEMA):
         
     def get_input(self, port_name):
         """
-        Return the current value of the port with name 'port_name', stores the value in the inputs namesapce, and resets the port value to None. If the port is not an input port, if multiple ports shared the same name or if the port is 
+        Return the current value of the port with name 'port_name', stores the value in the inputs namesapce, and resets the port value to None. 
+        If the port is not an input port, if multiple ports shared the same name or if the port is 
         not found, returns None.
         """
         port = self.find_port(port_name)
@@ -321,6 +337,26 @@ class PROCEDURAL_SCHEMA(SCHEMA):
                 val = port.value
                 self.inputs[port.name] = val # Stores value in inputs namespace
                 port.value = None # Reset port value
+                return val
+        elif port and (port.type == PORT.TYPE_OUT):
+            error_msg = "Port %s refers to an output port" % port_name
+            raise ValueError(error_msg)
+        else:
+            error_msg = "port %s does not exist or could refer to multiple ports" % port_name
+            raise ValueError(error_msg)
+            
+    def get_weight(self, port_name):
+        """
+        Return the current weight of the port with name 'port_name', stores the value in the ext_weights namesapce, and resets the port weight to None. 
+        If the port is not an input port, if multiple ports shared the same name or if the port is 
+        not found, returns None.
+        """
+        port = self.find_port(port_name)
+        if port and (port.type == PORT.TYPE_IN):
+            if self.ext_weights.has_key(port.name):
+                val = port.weight
+                self.ext_weights[port.name] = val # Stores value in inputs namespace
+                port.weight = None # Reset port value
                 return val
         elif port and (port.type == PORT.TYPE_OUT):
             error_msg = "Port %s refers to an output port" % port_name
@@ -427,12 +463,12 @@ class SYSTEM_OF_SYSTEMS(object):
     Data:
         - name (str):
         - schemas({schema_name:SYSTEM_SCHEMAS}):
-        - connections ([CONNECT]):
+        - connections ({connect_name: CONNECT}):
     """
     def __init__(self, name=""):
         self.name = name
         self.schemas = {}
-        self.connections = []
+        self.connections = {}
     
 ################################
 ### KNOWLEDGE SCHEMA CLASSES ###
@@ -1680,7 +1716,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
     Data (inherited):
         - name (str):
         - schemas({schema_name:SYSTEM_SCHEMAS}):
-        - connections ([CONNECT]):
+        - connections ({connect_name:CONNECT}):
     Data:
         - params (DICT): offers direct access to all the parameters in the model.
         - default_params (DICT): can store default parameter values.s
@@ -1701,7 +1737,9 @@ class MODEL(SYSTEM_OF_SYSTEMS):
     def __init__(self, name=''):
         SYSTEM_OF_SYSTEMS.__init__(self, name)
         self.params = None
+        self.weights = None
         self.default_params = None
+        self.default_weights = None
         self.input_ports = None
         self.output_ports = None
         self.input = None
@@ -1725,10 +1763,11 @@ class MODEL(SYSTEM_OF_SYSTEMS):
             schema = self.schemas[schema_name]
             schema.t = self.t
             schema.reset()
-        for connection in self.connections:
+        for connect_name in self.connections:
+            connection = self.connections[connect_name]
             connection.reset()
     
-    def add_connection(self, from_schema, from_port, to_schema, to_port, name='', weight=0, delay=0):
+    def add_connection(self, from_schema, from_port, to_schema, to_port, name, weight=0, delay=0):
         """
         Adds connection (CONNECT) between from_schema:from_port (SYSTEM_SCHEMA:PORT) to to_schema:to_port (SYSTEM_SCHEMA:PORT).
         Returns True if successful, False otherwise.
@@ -1737,7 +1776,10 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         port_to = to_schema.find_port(to_port)
         if port_from and port_to:
             new_connect = CONNECT(name=name, port_from=port_from, port_to=port_to, weight=weight, delay=delay)
-            self.connections.append(new_connect)
+            if new_connect.name in self.connections:
+                error_msg = "There is already a connections named %s" % new_connect.name
+                raise ValueError(error_msg)
+            self.connections[new_connect.name] = new_connect
             new_connect.model = self
             return True
         else:
@@ -1789,8 +1831,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
     
     def update_params(self, params):
         """
-        Update the parameter value for all schema_name defined
-        as keys in param_set with the values param_path to param_value.
+        Update schemas' parameter values based on parameter dict "params".
         
          Args:
             - params (DICT): {"schema_name.param_path":"param_value"}
@@ -1802,6 +1843,22 @@ class MODEL(SYSTEM_OF_SYSTEMS):
             path_list.reverse()
             param_path = '.'.join(path_list)
             self.update_schema_param(schema_name, param_path, param_value)
+            
+    def update_connect_weight(self, connect_name, weight_value):
+        """
+        Updates the value of the connection "connect_name" to "weight_value"
+        """
+        connect = self.connections[connect_name]
+        connect.set_weight(weight_value)
+            
+    def update_weights(self, weights):
+        """
+         Update connections' weights based on weights dict "weights".
+         Args:
+            - weights (DICT): {"connect_name":"weight_value"}
+        """
+        for name, weight in weights.iteritems():
+            self.update_connect_weight(name, weight)
         
     def get_output(self):
         """
@@ -1829,7 +1886,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
                     print 'Update %s, (%f s)' %(schema_name, end_t - init_t)
             
             # Propagate value through connections
-            for connection in self.connections:
+            for connect_name, connection in self.connections.iteritems():
                 connection.update()
         
     def update(self):
@@ -1858,7 +1915,7 @@ class MODEL(SYSTEM_OF_SYSTEMS):
                 print 'Update %s, (%f s)' %(schema_name, end_t - init_t)
         
         # Propagate value through connections
-        for connection in self.connections:
+        for connect_name, connection in self.connections.iteritems():
             connection.update()
         
         # Update the system output
@@ -1889,6 +1946,22 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         """
         self.params = self.default_params.copy()
         
+    def set_default_weights(self, weights=None):
+        """
+        Set default model weights to weights if weights != None. Else set default params to self.weights.
+        If weights != None, the model does not check for compatibility of the input with the weight space of the model!
+        """
+        if weights:
+            self.default_weights = weights
+        else:
+            self.default_weights = weights.copy()
+            
+    def reset_default_weights(self):
+        """
+        Resets the params to the default weights
+        """
+        self.params = self.default_weights.copy()
+        
     
     ####################
     ### JSON METHODS ###
@@ -1897,7 +1970,6 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         """
         """
         data = {'name':self.name, 'T0':MODEL.T0, 'TIME_STEP':MODEL.TIME_STEP, 'dt':self.dt}
-        data['connections'] = [c.get_info() for c in self.connections]
         data['input_ports'] = [p.name for p in self.input_ports]
         data['output_ports']= [p.name for p in self.output_ports]
         data['brain_mapping'] = self.brain_mapping.get_info()
@@ -1905,6 +1977,10 @@ class MODEL(SYSTEM_OF_SYSTEMS):
         data['system_schemas'] = {}
         for schema_name, schema in self.schemas.iteritems():
             data['system_schemas'][schema_name] = schema.get_info()
+            
+        data['connections'] = {}
+        for connect_name, connection in self.connections.iteritems():
+            data['connections'][connect_name] = connection.get_info()
         
         return data
     

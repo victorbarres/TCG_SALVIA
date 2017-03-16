@@ -105,10 +105,12 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         model.update()
         # Store output
         output = model.get_output()
-        if test_not_empty(output): # filter out ouputs with all valyues == None
+        if test_not_empty(output): # filter out ouputs with all values == None
             outputs[t] = output
         # Display methods
         if output['Semantic_WM_C']:
+            state_ISRF = isrf_writer.write_ISRF()
+            outputs[t]['Semantic_WM_C'] = state_ISRF[1]
             if verbose > 2:
                 state_ISRF = isrf_writer.write_ISRF()
                 print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
@@ -125,7 +127,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     if verbose>2:
         model.schemas['Grammatical_WM_C'].show_dynamics()
         model.schemas['Phonological_WM_C'].show_dynamics()
-        model.schemas['Semantic_WM'].show_dynamics()
+        model.schemas['Semantic_WM_C'].show_dynamics()
        
     if anim:
         if save:
@@ -158,8 +160,10 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     out = {}
     out[input_name] = run(model, utter_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
     return out
+
     
-    
+###############
+#### DIAGNOSTIC      
 def run_diagnostic():
     """
     """
@@ -183,9 +187,9 @@ def run_diagnostic():
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
-    
-
+    res = run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
+    print "\nRESULTS:\n"
+    print res
 
 if __name__=='__main__':
 #    input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
