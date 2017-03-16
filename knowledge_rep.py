@@ -382,9 +382,9 @@ class FRAME(object):
             return False
         
         # Update NetworkX graph
-        self._create_NX_graph()
+        self._create_graph()
     
-    def _create_NX_graph(self):
+    def _create_graph(self):
         graph = nx.MultiDiGraph()
         for node in self.nodes:
             graph.add_node(node.name, concept=node.concept)
@@ -398,7 +398,7 @@ class FRAME(object):
     def show(self):
         """
         """
-        self._create_NX_graph()
+        self._create_graph()
         plt.figure(facecolor='white')
         plt.axis('off')
         title = 'Frame'
