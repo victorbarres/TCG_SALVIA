@@ -37,7 +37,7 @@ def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
     return model
     
     
-def set_inputs(model, ling_input_file='ling_inputs_2route.json', speed_param=10, offset=10):
+def set_inputs(model, ling_input_file='ling_inputs_2route.json', speed_param=10, offset=10, std=0):
     """
     Sets up a TCG UTTER_GENERATOR inputs generator for TCG comprehension model.
     
@@ -45,6 +45,8 @@ def set_inputs(model, ling_input_file='ling_inputs_2route.json', speed_param=10,
         - model (): model to which the inputs will be sent
         - ling_input_file (STR): Linguistic input file name.
         - speed_param (INT): multiplier of the rate defined in the ISRF input (by default the ISFR rate is 1.)
+        - offset (FLOAT):
+        - std (FLAOT)
     
     Returns:
         - input UTTER_GENERATOR object.
@@ -52,7 +54,7 @@ def set_inputs(model, ling_input_file='ling_inputs_2route.json', speed_param=10,
     LING_INPUT_PATH = './data/ling_inputs/'
     ling_inputs = TCG_LOADER.load_ling_input(ling_input_file, LING_INPUT_PATH)
     
-    utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset)
+    utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset, std=std)
     
     return utter_gen
     
@@ -148,7 +150,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     return outputs
     
-def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2routes', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2routes', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, std=0, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -156,7 +158,7 @@ def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
         - out (ARRAY): Array of model's outputs (single output if not macro, series of output if macro.)
     """
     model = set_model(semantics_name, grammar_name, model_params=model_params)
-    utter_gen = set_inputs(model, ling_input_file, speed_param, offset)
+    utter_gen = set_inputs(model, ling_input_file, speed_param, offset, std)
     
     out = {}
     out[input_name] = run(model, utter_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
@@ -177,6 +179,7 @@ def run_diagnostic(verbose=2):
     MAX_TIME = 2000
     SPEED_PARAM = 100
     OFFSET = 10
+    STD = 0
     PROB_TIMES = []
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
@@ -187,7 +190,7 @@ def run_diagnostic(verbose=2):
     yes_no = raw_input('\nSave? (y/n): ')
     save = yes_no == 'y'
     print "#### Processing -> %s\n" % input_name
-    res = run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
+    res = run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, std=STD, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
 #    print "\nRESULTS:\n"
 #    print res
 ############################
@@ -231,7 +234,7 @@ def parameter_space(folder=None, input_rate=100):
     
     ## Semantic_WM_C
     # C2 parameters
-    comp_weights_S = [-10.0]
+    comp_weights_S = [-1, -10.0]
     max_capacity_S = [None]
     prune_thresholds_S = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01
     conf_tresholds_S = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
@@ -337,13 +340,12 @@ def parameter_space(folder=None, input_rate=100):
     
     return (model_params_set, param_name_mapping)
     
-def weight_space(folder=None, input_rate=100):
+def weight_space(folder=None):
     """
     Defines and returns a connection weights space.
     
     Args:
         - folder (STR): Folder path. If defined, the parameter set dictionary is pickled and saved to this folder.
-        - input_rate: input_rate that will be used for the SemGen object, serves as a time reference.
     
     Returns:
         - model_weights_set (DICT): a weight space dictionary.
@@ -358,8 +360,8 @@ def weight_space(folder=None, input_rate=100):
     Phon2Gram = [1.0]
     Gram2Sem = [1.0]
 
-    Phon2WK = [1.0] 
-    WK2Sem = [1.0]
+    Phon2WK = np.linspace(0,1,10)
+    WK2Sem = np.linspace(0,1,10)
     
     
     
@@ -452,131 +454,101 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     If save = True, saves results to .json file
     If intermediate_save = True: saves to json at the end of each grid_search
     """
-    pass
-##    import numpy as np
-#    
-#    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
-#        random.seed(seed)
-#        seed = random.randint(0,10**9)
-#    random.seed(seed)
-#    
-#    sim_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-#    
-#    if not(sim_name):
-#        sim_name = '%s_(%s)' %(sim_time, str(seed))
-#    else:
-#        sim_name = '%s_%s_(%s)' %(sim_time, sim_name, str(seed))
-#    
-#    folder = '%s/%s/' %(sim_folder, sim_name)
-#    
-#    verbose = 1
-#        
-#    # Defining the number of restarts
-#    NUM_RESTARTS = 10
-#
-#    # Defining fixed input rate
-#    INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
-#    INPUT_STD = 0
-#    
-#    # Defining simulation time
-#    max_time = 10*INPUT_RATE
-#    
-#    
-#    # Saving meta parameters
-#    meta_params = {'seed':seed, 'num_restarts':NUM_RESTARTS, 'input_rate':INPUT_RATE, 'input_std':STD, 'max_time':max_time}
-#    st_save(meta_params, 'meta_parameters', folder, 'params')
-#    
-#    # Set up and save the model's parameter search space.
-#    (model_params_set, param_name_mapping) = parameter_space(folder, INPUT_RATE)
-#    
-#    #Setting up and saving model
-#    semantics_name = 'TCG_semantics_main'
-#    grammar_name = 'TCG_grammar_VB_SVO_only'
-#    model  = set_model(semantics_name, grammar_name)
-#    st_save(model, model.name, folder)
-#    
-#    # Defining inputs.
-#    sem_input_file = 'kuchinsky_simple.json'
-#    sem_input_macro = True # For now it only uses macros
-#    
-#    # Define the set of inputs on which the model will be run.
-#    #    inputs = ["scene_girlkickboy"]
-#    #    inputs = ["woman_kick_man_static", "young_woman_punch_man_static", "woman_punch_man_kick_can_static"]
-#    #    inputs = ["woman_kick_man_static"]
-#    
-#    benchmark_inputs = ["test_naming", "test_naming_ambiguous", "test_naming_2", "young_woman_static","young_woman_dyn","woman_kick_man_static", "woman_kick_man_dyn", "young_woman_punch_man_static", "young_woman_punch_man_dyn", "woman_punch_man_kick_can_static", "woman_punch_man_kick_can_dyn", "woman_in_blue_static"] 
-#
-#    kuchinksy_inputs = [u'event_agent_patient_action', u'patient_event_agent_action', u'action_event_agent_patient', 
-#                         u'event_agent_action_patient', u'event_patient_agent_action', u'action_patient_agent_event', 
-#                         u'action_patient_event_agent', u'patient_agent_action_event', u'patient_agent_event_action', 
-#                         u'agent_action_event_patient', u'action_agent_event_patient', u'patient_action_event_agent', 
-#                         u'event_action_agent_patient', u'event_patient_action_agent', u'agent_event_patient_action', 
-#                         u'agent_patient_action_event', u'patient_event_action_agent', u'action_agent_patient_event', 
-#                         u'agent_action_patient_event', u'agent_patient_event_action', u'event_action_patient_agent', 
-#                         u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent'
-#                        ] # 24 inputs (all the permutations)
-#                        
-#    kuchinsky_simple = ["agent_patient_action", "patient_agent_action",
-#                        "action_agent_patient", "action_patient_agent",
-#                        "agent_action_patient", "patient_action_agent"
-#                        ] # 6 inputs (all the permutations)
-#                        
-#    kuchinsky_jin = ["scene_incremental", "scene_structural"]
-#                        
-#    threshold_inputs = ["girl_man_kick_act_agent_cued", "man_girl_kick_act_patient_cued", "act_kick_girl_man", "act_kick_girl_man_agent_cued","act_kick_man_girl", "act_kick_man_girl_patient_cued",
-#                        "woman_man_kick_act_agent_cued", "man_woman_kick_act_patient_cued", "act_kick_woman_man", "act_kick_woman_man_agent_cued","act_kick_man_woman", "act_kick_man_woman_patient_cued",
-#                        "girl_woman_kick_act_agent_cued", "woman_girl_kick_act_patient_cued", "act_kick_girl_woman", "act_kick_girl_woman_agent_cued","act_kick_woman_girl", "act_kick_woman_girl_patient_cued",
-#                        "young_woman_punch_man_dyn", "young_woman_punch_man_dyn_agent_cued", "young_woman_punch_man_dyn_patient_cued", 
-#                        "complex1_dyn", "complex2_dyn", "complex3_dyn", "complex4_dyn", "complex5_dyn"
-#                        ]
-#                        
-#    test_inputs = [u'event_action_patient_agent', u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent']
-#                        
-#    inputs = kuchinsky_jin
-#    output = {}
-#    print "SIMULATION STARTING"
-#    start_time = time.time()
-#    # Run the grid search for inputs X parameters X num_restarts
-#    count = 1
-#    for name in inputs:
-#        input_name = name
-#        print "\nProcessing input: %s (%i/%s)" %(input_name, count,len(inputs))
-#        #Setting up and saving input generator
-#        sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param=INPUT_RATE, std=INPUT_STD)
-#        st_save(sem_gen, 'sem_gen_' + input_name, folder)
-#        
-#        grid_output = grid_search(model=model, sem_gen=sem_gen, input_name=input_name, max_time=max_time, folder=folder, model_params_set=model_params_set, num_restarts=NUM_RESTARTS, seed=seed, verbose=verbose, save_models=False)
-#        
-#        output[name] = grid_output
-#        
-#        # if intermediate_save, saves to json each grid_search
-#        if intermediate_save:
-#            print "SAVING"
-#            st_save(grid_output, name, folder,'grd')
-#            grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
-#        
-#        # If speak, give audio feedback
-#        if speak:
-#            tell_me('Grid search %i done. %i remaining.' %(count, len(inputs) - count))
-#        count +=1
-#    
-#        # saves full grid search
-#    if save:
-#        st_save(output, 'full_grid_search', folder, 'grd')
-#        if not(intermediate_save):
-#            print "SAVING ALL"
-#            for input_name, grid_output in output.iteritems():
-#                grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
-#    print "\nDONE!"
-#    end_time = time.time()
-#    sim_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))
-#    print "TOTAL SIMULATION TIME: %s" %sim_time
-#    
-#    # if speak, give audio feedback
-#    if speak:
-#        tell_me('Your work is done.')
-#        
-#    return output
+#    import numpy as np
+    
+    if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
+        random.seed(seed)
+        seed = random.randint(0,10**9)
+    random.seed(seed)
+    
+    sim_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    
+    if not(sim_name):
+        sim_name = '%s_(%s)' %(sim_time, str(seed))
+    else:
+        sim_name = '%s_%s_(%s)' %(sim_time, sim_name, str(seed))
+    
+    folder = '%s/%s/' %(sim_folder, sim_name)
+    
+    verbose = 1
+        
+    # Defining the number of restarts
+    NUM_RESTARTS = 10
+
+    # Defining fixed input rate
+    INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
+    INPUT_STD = 0
+    INPUT_OFFSET = 10
+    
+    # Defining simulation time
+    max_time = 10*INPUT_RATE
+    
+    
+    # Saving meta parameters
+    meta_params = {'seed':seed, 'num_restarts':NUM_RESTARTS, 'input_rate':INPUT_RATE, 'input_std':INPUT_STD, 'max_time':max_time}
+    st_save(meta_params, 'meta_parameters', folder, 'params')
+    
+    # Set up and save the model's parameter search space.
+    (model_params_set, param_name_mapping) = parameter_space(folder, INPUT_RATE)
+    
+    # Set up and save the model's connect weights search space.
+    (model_weights_set, weight_name_mapping) = weight_space(folder)
+    
+    #Setting up and saving model
+    semantics_name = 'TCG_semantics_dev'
+    grammar_name = 'TCG_grammar_VB_2route'
+    model  = set_model(semantics_name, grammar_name)
+    st_save(model, model.name, folder)
+    
+    # Defining inputs.
+    ling_input_file = 'ling_inputs_2route.json'
+    
+    # Define the set of inputs on which the model will be run.                        
+    inputs = []
+    output = {}
+    print "SIMULATION STARTING"
+    start_time = time.time()
+    # Run the grid search for inputs X parameters X weights X num_restarts
+    count = 1
+    for name in inputs:
+        input_name = name
+        print "\nProcessing input: %s (%i/%s)" %(input_name, count,len(inputs))
+        #Setting up and saving input generator
+        utter_gen = set_inputs(model, ling_input_file, speed_param=INPUT_RATE, offset=INPUT_OFFSET, std=INPUT_STD)
+        st_save(utter_gen, 'utter_gen_' + input_name, folder)
+        
+        grid_output = grid_search(model=model, utter_gen=utter_gen, input_name=input_name, max_time=max_time, folder=folder, model_params_set=model_params_set, model_weights_set=model_weights_set, num_restarts=NUM_RESTARTS, seed=seed, verbose=verbose, save_models=False)
+        
+        output[name] = grid_output
+        
+        # if intermediate_save, saves to json each grid_search
+        if intermediate_save:
+            print "SAVING"
+            st_save(grid_output, name, folder,'grd')
+            grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
+        
+        # If speak, give audio feedback
+        if speak:
+            ls.tell_me('Grid search %i done. %i remaining.' %(count, len(inputs) - count))
+        count +=1
+    
+    # saves full grid search
+    if save:
+        st_save(output, 'full_grid_search', folder, 'grd')
+        if not(intermediate_save):
+            print "SAVING ALL"
+            for input_name, grid_output in output.iteritems():
+                grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
+    print "\nDONE!"
+    end_time = time.time()
+    sim_time = time.strftime("%H:%M:%S", time.gmtime(end_time - start_time))
+    print "TOTAL SIMULATION TIME: %s" %sim_time
+    
+    # if speak, give audio feedback
+    if speak:
+        ls.tell_me('Your work is done.')
+        
+    return output
 
 def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping):
     """

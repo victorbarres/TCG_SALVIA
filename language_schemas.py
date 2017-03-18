@@ -3839,6 +3839,15 @@ class TEXT2SPEECH(object):
             self.engine.runAndWait()
             self.utterance = None
             
+def tell_me(utterance):
+    """
+    Simple function to produce an utterance sound output
+    """
+    TTS = TEXT2SPEECH(rate_percent=80)
+    TTS.utterance = utterance
+    TTS.utter()
+
+            
 class ISRF_INTERPRETER(object):
     """
     Interprets ISRF expressions.
@@ -4001,21 +4010,24 @@ class SEM_GENERATOR(object):
     Serves to generate incremental semantic inputs to the SemanticWM as defined by ISRF format.
     
     Data:
-        - sem_inputs (DICT): Dictionary of all inputs in text form
-        - conceptLTM (CONCEPT_LTM): Direct access to the conceptual long term memory
-        - speed_param (FLOAT): speed_param >0. Factor applied to the timing of the input to slow it down (<1) or speed it up (>1).
+        - sem_inputs: a semantic input dict loaded using TCG_LOADER.load_sem_input()
+        - conceptLTM (CONCEPT_LTM): Contains concept schemas.
+        - speed_param (FLOAT): speed_param >0. Factor applied to the timing of the input.
+        - offset (FLOAT: defines the time offset
+        - std (FLOAT): defines standard deviation of uniform distribution centered on a timing t0 around which the time of utterance is chosen (introduces stochasticity in the input timing)
         - is_macro (BOOL): True if the input is a sem_gen macro.
         - ground_truths (DICT): Dictionary associating sem_inputs to an array of utterances each providing a ground-truth linguistic expression of the semantic content.
     
     Notes: 
         - Does not allow for verbal guidance. Designed for purely serial update of semanticWM state.
     """
-    def __init__(self, sem_inputs, conceptLTM, speed_param=1, std=0, is_macro=False, ground_truths=None):
+    def __init__(self, sem_inputs, conceptLTM, speed_param=1, offset=0, std=0, is_macro=False, ground_truths=None):
         """
         Args:
             - sem_inputs: a semantic input dict loaded using TCG_LOADER.load_sem_input()
             - conceptLTM (CONCEPT_LTM): Contains concept schemas.
             - speed_param (FLOAT): speed_param >0. Factor applied to the timing of the input.
+            - offset (FLOAT: defines the time offset
             - std (FLOAT): defines standard deviation of uniform distribution centered on a timing t0 around which the time of utterance is chosen (introduces stochasticity in the input timing)
             - is_macro (BOOL): True if the input is a sem_gen macro.
             - ground_truths (DICT): Dictionary associating sem_inputs to an array of utterances each providing a ground-truth linguistic expression of the semantic content.
@@ -4023,6 +4035,7 @@ class SEM_GENERATOR(object):
         self.sem_inputs = sem_inputs
         self.interpreter = ISRF_INTERPRETER(conceptLTM)
         self.speed_param = speed_param
+        self.offset = offset
         self.std = std
         self.is_macro = is_macro
         self.ground_truths = ground_truths
@@ -4041,7 +4054,7 @@ class SEM_GENERATOR(object):
                 if sem_rate<2*self.std:
                     error_msg = "Input sequence order compromised. Sem_Rate=%.2f < 2*std=%.2f. SemRate should be > 2*std" %(sem_rate, 2*self.std)
                     raise ValueError(error_msg)
-                sem_input['timing'] = [get_time(i, sem_rate, self.std) for i in range(len(sequence))]
+                sem_input['timing'] = [get_time(i, sem_rate, self.std) + self.offset for i in range(len(sequence))]
             if not(timing) and not(sem_rate):
                 print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
                 
@@ -4120,10 +4133,11 @@ class SEM_GENERATOR(object):
 class UTTER_GENERATOR(object):
     """
     """
-    def __init__(self, ling_inputs, speed_param=1, offset=10):
+    def __init__(self, ling_inputs, speed_param=1, offset=10, std=0):
         self.ling_inputs = ling_inputs
         self.speed_param = speed_param
         self.offset = offset
+        self.std = std
         self.preprocess_inputs()
     
     def preprocess_inputs(self):
@@ -4133,8 +4147,9 @@ class UTTER_GENERATOR(object):
             utter_rate = ling_input['utter_rate']*self.speed_param
             utterance = ling_input['utterance']
             timing = [t*self.speed_param for t in ling_input['timing']]
+            get_time = lambda i, rate, std: max(random.uniform(i*utter_rate-std, i*utter_rate+std), 0)
             if utter_rate and not(timing):
-                ling_input['timing'] = [i*utter_rate + self.offset for i in range(len(utterance))]
+                ling_input['timing'] = [get_time(i, utter_rate, self.std) + self.offset for i in range(len(utterance))]
             if not(timing) and not(utter_rate):
                 print "PREPROCESSING ERROR: Provide either timing or rate for %s" %name
     

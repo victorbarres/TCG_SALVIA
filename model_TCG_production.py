@@ -42,7 +42,7 @@ def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
     return model
     
-def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_macro=False, speed_param=10, std=0):
+def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_macro=False, speed_param=10, offset=0, std=0):
     """
     Sets up a TCG ISRF inputs generator for TCG production model.
     
@@ -52,6 +52,7 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
         - sem_input_file (STR): Semantic input file name. For non-macro input, set to 'ALL' to load all inputs from file.
         - sem_input_macro (BOOL): True is the input is an ISRF macro.
         - speed_param (FLOAT): multiplier of the rate defined in the ISRF input (by default the ISFR rate is 1.)
+        - offset (FLOAT):
         - std (FLOAT): standard deviation of the uniform distribution used around a mean utter time to determine the actual utter time.
     
     Returns:
@@ -64,16 +65,16 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
     if not(sem_input_macro):
         sem_inputs = TCG_LOADER.load_sem_input(sem_input_file, SEM_INPUT_PATH)
         if input_name == 'ALL':
-            sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param, std=std, is_macro=sem_input_macro)
+            sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param, offset=offset, std=std, is_macro=sem_input_macro)
             sem_gen.ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
         else:
             sem_input = {input_name:sem_inputs[input_name]}
-            sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=speed_param, std=std, is_macro=sem_input_macro)
+            sem_gen = ls.SEM_GENERATOR(sem_input, conceptLTM, speed_param=speed_param, offset=offset, std=std, is_macro=sem_input_macro)
             ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
             sem_gen.ground_truths = ground_truths.get(input_name, None)
     if sem_input_macro:
         sem_inputs = TCG_LOADER.load_sem_macro(input_name, sem_input_file, SEM_INPUT_PATH)
-        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param, std=std, is_macro=sem_input_macro)
+        sem_gen = ls.SEM_GENERATOR(sem_inputs, conceptLTM, speed_param=speed_param, offset=offset, std=std, is_macro=sem_input_macro)
         ground_truths = TCG_LOADER.load_ground_truths(sem_input_file, SEM_INPUT_PATH)
         sem_gen.ground_truths = ground_truths.get(input_name, None)
     
@@ -253,7 +254,7 @@ def summarize_data(outputs, ground_truth=None):
     summary = {'GramWM':gram_analysis, 'PhonWM':phon_analysis, 'SemWM':sem_analysis}
     return summary
                        
-def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman_kick_man_static', sem_input_file='diagnostic.json', sem_input_macro=False, max_time=900, seed=None, speed_param=10, std=0, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman_kick_man_static', sem_input_file='diagnostic.json', sem_input_macro=False, max_time=900, seed=None, speed_param=10, offset=0, std=0, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -261,7 +262,7 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
         - out (ARRAY): Array of model's outputs (single output if not macro, series of output if macro.)
     """
     model = set_model(semantics_name, grammar_name, model_params=model_params)
-    sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param, std=std)
+    sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param, offset=offset, std=std)
         
     ground_truth = sem_gen.ground_truths
     
@@ -301,6 +302,7 @@ def run_diagnostics(verbose=3, prob_times=[]):
     DIAGNOSTIC_FILE = 'diagnostic.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
+    OFFSET = 0
     STD = 0
     MODEL_PARAMS = {'Control.task.start_produce':500, 
                     'Control.task.time_pressure':100, 
@@ -328,7 +330,7 @@ def run_diagnostics(verbose=3, prob_times=[]):
     ###    
     
     model = set_model(semantics_name, grammar_name, model_params = MODEL_PARAMS)
-    my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro=SEM_MACRO, speed_param=SPEED_PARAM, std=STD)
+    my_inputs = set_inputs(model, 'ALL', sem_input_file=DIAGNOSTIC_FILE, sem_input_macro=SEM_MACRO, speed_param=SPEED_PARAM, offset=OFFSET, std=STD)
     
     input_names = my_inputs.sem_inputs.keys()
     diagnostic_list = dict(zip(range(len(input_names)), input_names))
@@ -535,6 +537,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
 
     # Defining fixed input rate
     INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
+    INPUT_OFFSET = 0
     INPUT_STD = 0
     
     # Defining simulation time
@@ -542,7 +545,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     
     
     # Saving meta parameters
-    meta_params = {'seed':seed, 'num_restarts':NUM_RESTARTS, 'input_rate':INPUT_RATE, 'input_std':STD, 'max_time':max_time}
+    meta_params = {'seed':seed, 'num_restarts':NUM_RESTARTS, 'input_rate':INPUT_RATE, 'input_offset':INPUT_OFFSET, 'input_std':INPUT_STD, 'max_time':max_time}
     st_save(meta_params, 'meta_parameters', folder, 'params')
     
     # Set up and save the model's parameter search space.
@@ -601,7 +604,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
         input_name = name
         print "\nProcessing input: %s (%i/%s)" %(input_name, count,len(inputs))
         #Setting up and saving input generator
-        sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param=INPUT_RATE, std=INPUT_STD)
+        sem_gen = set_inputs(model, input_name, sem_input_file, sem_input_macro, speed_param=INPUT_RATE, offset = INPUT_OFFSET, std=INPUT_STD)
         st_save(sem_gen, 'sem_gen_' + input_name, folder)
         
         grid_output = grid_search(model=model, sem_gen=sem_gen, input_name=input_name, max_time=max_time, folder=folder, model_params_set=model_params_set, num_restarts=NUM_RESTARTS, seed=seed, verbose=verbose, save_models=False)
@@ -616,7 +619,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
         
         # If speak, give audio feedback
         if speak:
-            tell_me('Grid search %i done. %i remaining.' %(count, len(inputs) - count))
+            ls.tell_me('Grid search %i done. %i remaining.' %(count, len(inputs) - count))
         count +=1
     
         # saves full grid search
@@ -633,7 +636,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     
     # if speak, give audio feedback
     if speak:
-        tell_me('Your work is done.')
+        ls.tell_me('Your work is done.')
         
     return output
     
@@ -684,14 +687,6 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
             # write to csv
             new_line = line(param_row + output_row)
             f.write(new_line)
-
-def tell_me(utterance):
-    """
-    Simple function to produce an utterance sound output
-    """
-    TTS = ls.TEXT2SPEECH(rate_percent=80)
-    TTS.utterance = utterance
-    TTS.utter()
     
 if __name__=='__main__':
     run_diagnostics(verbose=3, prob_times=[])

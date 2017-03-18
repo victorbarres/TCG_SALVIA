@@ -1205,7 +1205,6 @@ class TCG_VIEWER:
         plt.title('saliency map')
         plt.plot(saliency_map)
         plt.show()
-
 ###############################################################################
 if __name__ == '__main__':
     data_folder = './output/'
