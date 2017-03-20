@@ -91,13 +91,23 @@ def get_TRA(isrf_sem_state):
 
     return res    
     
-def analysis_gram(data):
+def analysis_gram(data, ground_truths):
     """
     Looks at the final usage of passive and active construciton
     """
     res = {}
-    res['active'] = data.get('SVO', np.NaN)
-    res['passive'] = data.get('PAS_SVO', np.NaN)  
+    res['active'] = data.get('SVO', 0)
+    res['passive'] = data.get('PAS_SVO', 0)
+    res['input_voice'] = ground_truths['voice']
+
+    # Some analyses (could be done later.)
+    if res['active'] > res['passive']:
+        res['voice'] = 'active'
+    elif res['passive'] > res['active']:
+        res['voice'] = 'passive'
+    else:
+        res['voice'] = None
+
     return res
 
 def analysis_wk(data):
@@ -108,7 +118,23 @@ def analysis_wk(data):
 def analysis_sem(data, ground_truths):
     """
     """
-    pass
+    TRA_dat = get_TRA(data)
+    res = {}
+    res['agent'] = TRA_dat['agent']
+    res['patient'] = TRA_dat['patient']
+    res['input_agent'] = ground_truths['agent']
+    res['input_patient'] = ground_truths['patient']
+
+    # Some analyses (could be done later)
+    if res['agent'] == res['input_agent'] and res['patient'] == res['input_patient']:
+        res['TRA'] = 'correct'
+    elif res['agent'] == res['input_patient'] and res['patient'] == res['input_agent']:
+        res['TRA'] = 'reversed'
+    else:
+        res['TRA'] = 'incorrect'
+
+    return res
+    
     
 ##########################
 ### WkWM ANALYSES ###

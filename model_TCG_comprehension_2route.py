@@ -184,14 +184,12 @@ def summarize_data(outputs, ground_truths=None):
     final_output = data_to_analyze[-1] # Only looks at the last output
     
     # GramWM
-    gram_summary = analysis_gram(final_output['Grammatical_WM_C'])
+    gram_summary = analysis_gram(final_output['Grammatical_WM_C'], ground_truths)
 
     # WkWM
-    wk_summary = {}
-    wk_summary['wk_frame'] =  analysis_wk(final_output['WK_frame_WM'])
+    wk_summary=  analysis_wk(final_output['WK_frame_WM'])
 
     # SemWM
-    sem_summary = {}
     sem_summary = analysis_sem(final_output['Semantic_WM_C'], ground_truths) # Should indicate whether or not proper TRA was achieved
     
     summary = {'GramWM':gram_summary, 'WkWM':wk_summary, 'SemWM':sem_summary}
