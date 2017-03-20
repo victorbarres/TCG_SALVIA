@@ -1,0 +1,118 @@
+{ 
+	"inputs":{
+		"reversible_animate(act)": {
+			"utter_rate": 1,
+			 "utterance" :[ "tiger", "chase", "cheetah"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"reversible_animate(pas)": {
+			"utter_rate": 1,
+			 "utterance" :[ "cheetah", "is", "chase", "-ed", "by", "tiger"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"irreversible(act)": {
+			"utter_rate": 1,
+			 "utterance" :["man", "eat", "apple"],
+			 "timing":[],
+			 "comments": "Animate-agent + eat-frame WK"
+			},
+		"irreversible(pas)": {
+			"utter_rate": 1,
+			 "utterance" :["apple", "is", "eat", "-ed", "by", "man"],
+			 "timing":[],
+			 "comments": "Animate-agent + eat-frame WK"
+			},
+		"counterfactual(act)": {
+			"utter_rate": 1,
+			 "utterance" :["apple", "eat", "man"],
+			 "timing":[],
+			 "comments": "Animate-agent + eat-frame WK"
+			},
+		"counterfactual(pas)": {
+			"utter_rate": 1,
+			 "utterance" :["man", "is", "eat", "-ed", "by","apple"],
+			 "timing":[],
+			 "comments": "Animate-agent + eat-frame WK"
+			},
+		"reversible_animate_agt(act)": {
+			"utter_rate": 1,
+			 "utterance" :[ "man", "hit", "ball"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"reversible_animate_agt(pas)": {
+			"utter_rate": 1,
+			 "utterance" :[ "ball", "is", "hit", "-ed", "by", "man"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"reversible_animate_pt(act)": {
+			"utter_rate": 1,
+			 "utterance" :["ball", "hit", "man"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"reversible_animate_pt(pas)": {
+			"utter_rate": 1,
+			 "utterance" :["man", "is", "hit", "-ed", "by","ball"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			}
+			
+	},
+	"ground_truths":{
+		"reversible_animate(act)": {
+			"voice": "active",
+			"agent": "TIGER",
+			"patient": "CHEETAH"
+			},
+		"reversible_animate(pas)": {
+			"voice": "passive",
+			"agent": "TIGER",
+			"patient": "CHEETAH"
+			},
+		"irreversible(act)": {
+			"voice": "active",
+			"agent": "MAN",
+			"patient": "APPLE"
+			},
+		"irreversible(pas)": {
+			"voice": "passive",
+			"agent": "MAN",
+			"patient": "APPLE"
+			},
+		"counterfactual(act)": {
+			"voice": "active",
+			"agent": "APPLE",
+			"patient": "MAN"
+			},
+		"counterfactual(pas)": {
+			"voice": "passive",
+			"agent": "APPLE",
+			"patient": "MAN"
+			},
+		"reversible_animate_agt(act)": {
+			"voice": "active",
+			"agent": "MAN",
+			"patient": "BALL"
+			},
+		"reversible_animate_agt(pas)": {
+			"voice": "passive",
+			"agent": "MAN",
+			"patient": "BALL"
+			},
+		"reversible_animate_pt(act)": {
+			"voice": "active",
+			"agent": "BALL",
+			"patient": "MAN"
+			},
+		"reversible_animate_pt(pas)": {
+			"voice": "passive",
+			"agent": "BALL",
+			"patient": "MAN"
+			}
+		
+	}
+}

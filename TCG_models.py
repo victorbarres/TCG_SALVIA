@@ -414,7 +414,7 @@ def TCG_comprehension_system(name = 'language_system_C',
     model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control', name='C13')
     
     model.set_input_ports([phonWM_C.find_port('from_input')])
-    model.set_output_ports([semanticWM_C.find_port('to_output')])
+    model.set_output_ports([semanticWM_C.find_port('to_output'), grammaticalWM_C.find_port('to_output')])
     
     # Parameters
     system_names = model.schemas.keys()
@@ -588,7 +588,7 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     
     
     model.set_input_ports([phonWM_C.find_port('from_input')])
-    model.set_output_ports([semanticWM_C.find_port('to_output')])
+    model.set_output_ports([semanticWM_C.find_port('to_output'), grammaticalWM_C.find_port('to_output'), wk_frame_WM.find_port('to_output')])
     
     # Parameters
     system_names = model.schemas.keys()

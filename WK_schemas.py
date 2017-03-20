@@ -53,9 +53,6 @@ class WK_FRAME_SCHEMA_INST(SCHEMA_INST):
     def __init__(self, wk_frame_schema, trace, covers):
         old_frame =  wk_frame_schema.content
         (new_frame, name_corr) = old_frame.copy()
-#        new_name = "%s_%s" %(old_frame.name, trigger_concept.name)
-#        new_frame.name = new_name
-#        new_frame.trigger.concept = trigger_concept
         new_frame._create_graph()
         new_wk_frame_schema = WK_FRAME_SCHEMA(new_frame.name, new_frame, wk_frame_schema.init_act)
         SCHEMA_INST.__init__(self, schema=new_wk_frame_schema, trace=trace)
@@ -137,6 +134,7 @@ class WK_FRAME_WM(WM):
         self.add_port('IN', 'from_wk_frame_retrieval')
         self.add_port('IN', 'from_semantic_WM')
         self.add_port('OUT', 'to_semantic_WM')
+        self.add_port('OUT', 'to_output')
         
     def reset(self):
         """
@@ -160,10 +158,20 @@ class WK_FRAME_WM(WM):
         
         activations = self.sem_WM_output()
         self.outputs['to_semantic_WM']['activations'] = activations
+        self.outputs['to_output'] = self.to_output()
             
         self.convey_phon_activations(phon_activations)
         self.update_activations()
         self.prune()
+
+    def to_output(self):
+        """
+        """
+        to_output = {}
+        for inst in [inst for inst in self.schema_insts if inst.expressed]:
+            to_output[inst.content.name] = inst.activity
+        return to_output
+            
     
     def apply_WK(self):
         """

@@ -16,7 +16,7 @@ from TCG_models import TCG_production_system
 from viewer import TCG_VIEWER
 from loader import TCG_LOADER
 from schema_theory import st_save
-from prod_analysis import prod_summary, BLEU
+from analysis_prod import prod_summary, BLEU
 import language_schemas as ls
 
 TMP_FOLDER = './tmp'
@@ -213,11 +213,11 @@ def bleu_scores(utter_list, ground_truth, n_gram=1):
         scores.append(score)
     return scores
     
-def summarize_data(outputs, ground_truth=None):
+def summarize_data(outputs, ground_truths=None):
     """
     Args:
         - outputs (DICT): output generate by run()
-        - ground_truth (ARRAY): Array of ground truth utterances
+        - ground_truths (ARRAY): Array of ground truth utterances
     Returns:
         - summary of outputs from run()
     
@@ -239,8 +239,8 @@ def summarize_data(outputs, ground_truth=None):
     utter, utter_list = get_produced_utterances(outputs)
     phon_analysis['utterance'] = utter
     max_BLEU_score = None
-    if ground_truth and utter_list:
-        BLEU_scores = bleu_scores(utter_list, ground_truth)
+    if ground_truths and utter_list:
+        BLEU_scores = bleu_scores(utter_list, ground_truths)
         max_BLEU_score = max(BLEU_scores)
     phon_analysis['max_BLEU_score'] = max_BLEU_score
         

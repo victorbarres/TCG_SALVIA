@@ -6,12 +6,14 @@ TCG WK model
 from __future__ import division
 import random
 import time
+import warnings
 
 from TCG_models import TCG_comprehension_2route_system
 import language_schemas as ls
 from loader import TCG_LOADER
 from viewer import TCG_VIEWER
 from schema_theory import st_save
+from analysis_comp import analysis_gram
 
 TMP_FOLDER = './tmp'
 
@@ -37,13 +39,14 @@ def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
     return model
     
     
-def set_inputs(model, ling_input_file='ling_inputs_2route.json', speed_param=10, offset=10, std=0):
+def set_inputs(model, ling_input_file='ling_inputs_2route.json', input_name='ALL', speed_param=10, offset=10, std=0):
     """
     Sets up a TCG UTTER_GENERATOR inputs generator for TCG comprehension model.
     
     Args:
         - model (): model to which the inputs will be sent
         - ling_input_file (STR): Linguistic input file name.
+        - input_name (STR): 'ALL', loads all the inputs.
         - speed_param (INT): multiplier of the rate defined in the ISRF input (by default the ISFR rate is 1.)
         - offset (FLOAT):
         - std (FLAOT)
@@ -53,9 +56,22 @@ def set_inputs(model, ling_input_file='ling_inputs_2route.json', speed_param=10,
     """
     LING_INPUT_PATH = './data/ling_inputs/'
     ling_inputs = TCG_LOADER.load_ling_input(ling_input_file, LING_INPUT_PATH)
+    ground_truths = TCG_LOADER.load_ground_truths(ling_input_file, LING_INPUT_PATH)
+    if input_name != 'ALL':
+        if input_name not in ling_inputs:
+            error_msg = "%s input cannot be found in %s" %(input_name, ling_input_file)
+            raise ValueError(error_msg)
+        ling_inputs = {input_name: ling_inputs[input_name]}
+        if not(ground_truths) or input_name not in ground_truths:
+            warn_msg = "No ground truth for %s in %s" %(input_name, ling_input_file)
+            warnings.warn(warn_msg)
+            ground_truths = ground_truths.get(input_name, None)
+    else:
+        if not(ground_truths):
+            warn_msg = "No ground truth in %s" % ling_input_file
+            warnings.warn(warn_msg)
     
-    utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset, std=std)
-    
+    utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset, std=std, ground_truths)
     return utter_gen
     
     
@@ -109,10 +125,11 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         output = model.get_output()
         if test_not_empty(output): # filter out ouputs with all valyues == None
             outputs[t] = output
-        # Display methods
         if output['Semantic_WM_C']:
+            # Convert to ISRF
             state_ISRF = isrf_writer.write_ISRF()
             outputs[t]['Semantic_WM_C'] = state_ISRF[1]
+            # Display methods
             if verbose > 2:
                 print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
             if verbose > 1:
@@ -150,6 +167,36 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     
     return outputs
     
+def summarize_data(outputs, ground_truths=None):
+    """
+    Args:
+        - outputs (DICT): output generate by run()
+        - ground_truths (DICT): {voice, agent, patient}
+    Returns:
+        - summary of outputs from run()
+    """
+    data_to_analyze = [] # data should be ordered by time
+    times = outputs.keys()
+    times.sort()
+    for t in times:
+        data_to_analyze.extend(v)
+      
+    final_output = data_to_analyze[-1] # Only looks at the last output
+    
+    # GramWM
+    gram_summary = analysis_gram(final_output['Grammatical_WM_C'])
+
+    # WkWM
+    wk_summary = {}
+    wk_summary['wk_frame'] =  analysis_wk(final_output['WK_frame_WM'])
+
+    # SemWM
+    sem_summary = {}
+    sem_summary = analysis_sem(final_output['Semantic_WM_C'], ground_truths) # Should indicate whether or not proper TRA was achieved
+    
+    summary = {'GramWM':gram_summary, 'WkWM':wk_summary, 'SemWM':sem_summary}
+    return summary
+    
 def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2routes', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, std=0, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
@@ -158,7 +205,7 @@ def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
         - out (ARRAY): Array of model's outputs (single output if not macro, series of output if macro.)
     """
     model = set_model(semantics_name, grammar_name, model_params=model_params)
-    utter_gen = set_inputs(model, ling_input_file, speed_param, offset, std)
+    utter_gen = set_inputs(model, ling_input_file, input_name,  speed_param, offset, std)
     
     out = {}
     out[input_name] = run(model, utter_gen, input_name, sim_name=sim_name, sim_folder=sim_folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=prob_times, save=save, anim=anim, anim_step=anim_step)
@@ -525,7 +572,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
         if intermediate_save:
             print "SAVING"
             st_save(grid_output, name, folder,'grd')
-            grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping)
+            grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping, weight_name_mapping)
         
         # If speak, give audio feedback
         if speak:
@@ -550,56 +597,55 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
         
     return output
 
-def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping):
+def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_params_set, param_name_mapping, weight_name_mapping):
     """
     Only saves the statistical analysis of run outputs
     """
     pass
-#    import numpy as np
-#    param_names = meta_params.keys() + grid_output[0]['params'].keys()
-#    gram_output_names = grid_output[0]['sim_output']['GramWM'].keys()
-#    sem_output_names = grid_output[0]['sim_output']['SemWM'].keys()
-#    phon_output_names = grid_output[0]['sim_output']['PhonWM'].keys()
-#    header = [param_name_mapping.get(name, name) for name in param_names] + gram_output_names + sem_output_names + phon_output_names
-#    line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
-#    
-#    file_name = './%s/%s.csv' %(folder, input_name)
-#    with open(file_name, 'w') as f:
-#         header = line(header)
-#         f.write(header)
-#         for output in grid_output:
-#            params = output['params']
-#            params.update(meta_params) # adding meta parameters
-#            param_row = []
-#            for name in param_names:
-#                val = params[name] if params[name]!=None else np.NaN
-#                param_row.append(val)
-#            
-#            sim_output = output['sim_output']
-#            output_row = []
-#            # GramWM
-#            sim_stats = sim_output['GramWM']
-#            for name in gram_output_names:
-#                val = sim_stats[name]['mean']
-#                output_row.append(val)
-#                
-#            # SemWM
-#            sim_stats = sim_output['SemWM']
-#            for name in sem_output_names:
-#                val = sim_stats[name] if sim_stats[name] else np.NaN
-#                output_row.append(val)
-#            
-#            # PhonWM
-#            sim_stats = sim_output['PhonWM']
-#            for name in phon_output_names:
-#                val = sim_stats[name] if sim_stats[name] else np.NaN
-#                output_row.append(val)
-#            
-#            # write to csv
-#            new_line = line(param_row + output_row)
-#            f.write(new_line)
+    import numpy as np
+    param_names = meta_params.keys() + grid_output[0]['params'].keys()
+    gram_output_names = grid_output[0]['sim_output']['GramWM'].keys()
+    wk_output_names = grid_output[0]['sim_output']['WkWM'].keys()
+    sem_output_names = grid_output[0]['sim_output']['SemWM'].keys()
+    header = [param_name_mapping.get(name, name) for name in param_names] + gram_output_names + wk_output_names + sem_output_names
+    line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
+    
+    file_name = './%s/%s.csv' %(folder, input_name)
+    with open(file_name, 'w') as f:
+         header = line(header)
+         f.write(header)
+         for output in grid_output:
+            params = output['params']
+            params.update(meta_params) # adding meta parameters
+            param_row = []
+            for name in param_names:
+                val = params[name] if params[name]!=None else np.NaN
+                param_row.append(val)
+            
+            sim_output = output['sim_output']
+            output_row = []
+            # GramWM
+            sim_stats = sim_output['GramWM']
+            for name in gram_output_names:
+                val = sim_stats[name]['mean']
+                output_row.append(val)
+                
+            # WkWM
+            sim_stats = sim_output['WkWM']
+            for name in wk_output_names:
+                val = sim_stats[name] if sim_stats[name] else np.NaN
+                output_row.append(val)
 
-
+            # SemWM
+            sim_stats = sim_output['SemWM']
+            for name in sem_output_names:
+                val = sim_stats[name] if sim_stats[name] else np.NaN
+                output_row.append(val)
+            
+            # write to csv
+            new_line = line(param_row + output_row)
+            f.write(new_line)
+s
 if __name__=='__main__':
     model = set_model()
 #    model.system2dot(image_type='png', disp=True)

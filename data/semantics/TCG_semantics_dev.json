@@ -67,7 +67,9 @@
 				{
 					"MOUSE" :{},
 					"TURTLE" : {},
-					"DOG" : {}
+					"DOG" : {},
+					"TIGER" :{},
+					"CHEETAH" :{}
 				}
 			},
 			"PLACE" :
@@ -79,7 +81,7 @@
 			"ANIMATE" : 
 			{ 
 				"HUMAN" : {},
-				"ANIMAL" : {} 
+				"ANIMAL" : {}
 			},
 
 			"MALE" : 
@@ -331,6 +333,8 @@
 			"POLICEMAN",
 			"HUNTER",
 			"DOG",
+			"TIGER", 
+			"CHEETAH",
 			"HOOK",
 			"BOOKSHELF",
 			"WAGON", 
@@ -485,6 +489,8 @@
 		"POLICEMAN" : ["POLICEMAN"],
 		"HUNTER" : ["HUNTER"],
 		"DOG" : ["DOG"],
+		"TIGER" : ["TIGER"],
+		"CHEETAH" : ["CHEETAH"],
 		"HOOK" : ["HOOK"],
 		"BOOKSHELF" : ["BOOKSHELF"],
 		"WAGON" : ["WAGON"],

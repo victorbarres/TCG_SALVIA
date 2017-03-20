@@ -984,7 +984,8 @@ class SEMANTIC_WM_C2_C(WM):
         
         self.update_activations()
         self.prune()
-        self.update_SemRep(new_insts)
+        state_changed = self.update_SemRep(new_insts)
+        self.outputs['to_output'] = state_changed
 
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """Builds SemRep based on the received SemFrame.
@@ -1194,6 +1195,7 @@ class SEMANTIC_WM_C2_C(WM):
             SemMatch between SemRep graph and SemFrames (graphs needs to have same data key).
         """
         # Add new instances
+        state_changed = False
         if cpt_insts:
             # First process all the instances that are not relations.
             for inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]:
@@ -1213,7 +1215,7 @@ class SEMANTIC_WM_C2_C(WM):
                 self.SemRep.add_edge(node_from, node_to, name=rel_inst.name, cpt_inst=rel_inst, concept=rel_inst.content['concept'], frame=rel_inst.frame,  new=True, processed=[], expressed=False, dat=(rel_inst.content['concept'], rel_inst.frame))
             
             #Send the new state to output.
-            self.outputs['to_output'] = True
+            state_changed = True
 
         # Remove dead instances
         dead_nodes = []
@@ -1229,9 +1231,9 @@ class SEMANTIC_WM_C2_C(WM):
         self.SemRep.remove_edges_from(dead_edges)
         
         if dead_nodes + dead_edges:
-            print "%i: Pruned concepts %s" %(self.t, dead_nodes + dead_edges)
-            #Send the new state to output.
-            self.outputs['to_output'] = True
+            state_changed = True
+            
+        return state_changed
                 
     def FrameMatch(self, sem_input_frame, iso_constraints=None):
         """Defines the possible matches between input frame semantic info and the current state of the SemRep given the constraints "iso_constraints"
@@ -2780,6 +2782,7 @@ class GRAMMATICAL_WM_C(WM):
         self.add_port('OUT', 'to_lex_cxn_retrieval_C')
         self.add_port('OUT', 'to_semantic_WM')
         self.add_port('OUT', 'to_phonological_WM_C')
+        self.add_port('OUT', 'to_output')
         self.params['dyn'] = {'tau':30.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.3}
         self.params['C2'] = {'coop_weight':1.0, 'comp_weight':-4.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0, 'deact_weight':0.0, 'prune_threshold':0.3, 'confidence_threshold':0.8, 'sub_threshold_r':0.8}
         self.params['parser'] = {'pred_init':{'S':[1]}, 'parser_type':'Left-Corner'}  # S is used to initialize the set of predictions. This is not not really in line with usage based... but for now I'll keep it this way.
@@ -2828,7 +2831,8 @@ class GRAMMATICAL_WM_C(WM):
         self.outputs['to_lex_cxn_retrieval_C'] = TD_predictions
         self.outputs['to_cxn_retrieval_C'] = TD_predictions
         activations = self.sem_WM_output()
-        self.outputs['to_semantic_WM'] = {'activations':activations}
+        self.outputs['to_semantic_WM'] = {'activations':activations}     
+        self.outputs['to_output'] = self.to_output()
         
         # Define when meaning read-out should take place
 #        if ctrl_input and ctrl_input['produce'] == self.t:
@@ -2837,6 +2841,14 @@ class GRAMMATICAL_WM_C(WM):
             if output:
                 self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
                 self.outputs['to_semantic_WM']['instances'] = output['sem_WM_output']
+
+    def to_output(self):
+        """
+        """
+        to_output = {}
+        for inst in [inst for inst in self.schema_insts if inst.expressed]:
+            to_output[inst.content.name] = inst.activity
+        return to_output
 
     def convey_phon_activations(self, phon_activations):
         """
@@ -3846,15 +3858,29 @@ def tell_me(utterance):
     TTS = TEXT2SPEECH(rate_percent=80)
     TTS.utterance = utterance
     TTS.utter()
-
             
 class ISRF_INTERPRETER(object):
     """
     Interprets ISRF expressions.
     """
-    def __init__(self, conceptLTM):
+        # For reference.
+#        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
+#        cpt_name_pattern = r"[A-Z0-9_]+"
+#        var_name_pattern = r"[a-z0-9]+"
+#        frame_flag_pattern = r"F"
+#        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
+#        cpt_var_flag_pattern = r"\?"
+        
+    # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var, F, act) - act and F optional -  or var1(var2, var3) (and ?CONCEPT(var))
+    FUNC_PATTERN_CPT = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
+    FUNC_PATTERN_REL = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation activation is defined alongside the relation concept.
+    CONNECTOR = '&'
+    CPT_VAR = '?'
+        
+    def __init__(self, conceptLTM=None):
         self.conceptLTM = conceptLTM
         self.name_table = {}
+
 
     def reset(self):
         """
@@ -3873,29 +3899,16 @@ class ISRF_INTERPRETER(object):
         Notes:
             - A concept is only interpreted into an instance once. Following interpretations are skipped.
         """
-        connector = '&'
         if isinstance(proposition, str):
-            proposition = [s.strip() for s in proposition.split(connector)]
-                           
-        # For reference.
-#        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
-#        cpt_name_pattern = r"[A-Z0-9_]+"
-#        var_name_pattern = r"[a-z0-9]+"
-#        frame_flag_pattern = r"F"
-#        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
-#        cpt_var_flag_pattern = r"\?"
-        
-        # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var, F, act) - act and F optional -  or var1(var2, var3) (and ?CONCEPT(var))
-        func_pattern_cpt = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
-        func_pattern_rel = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation activation is defined alongside the relation concept.
+            proposition = [s.strip() for s in proposition.split(self.CONNECTOR)]
         
         instances = []
         
         cpts_match = []
         rels_match = []
         for term in proposition:
-            match1 = re.search(func_pattern_cpt, term)
-            match2 = re.search(func_pattern_rel, term)
+            match1 = re.search(self.FUNC_PATTERN_CPT, term)
+            match2 = re.search(self.FUNC_PATTERN_REL, term)
             if match1:
                 cpts_match.append(match1)
             elif match2:
@@ -3906,7 +3919,7 @@ class ISRF_INTERPRETER(object):
                 
         for match in cpts_match: #First process define concept schemas
             dat = match.groupdict()
-            cpt_var = dat['cpt_var'] == '?'
+            cpt_var = dat['cpt_var'] == self.CPT_VAR
             concept = dat['operator']
             var = dat['var']
             if self.name_table.has_key(var): # Do not reinterpret a schema inst that has already been interpreted.
@@ -3949,6 +3962,50 @@ class ISRF_INTERPRETER(object):
         """
         return self.name_table[var_name]
 
+    @staticmethod
+    def prop_grapher(proposition):
+        """Returns a MultiDiGraph for the isrf proposition.
+        """
+        import networkx as nx
+        graph = nx.MultiDiGraph()
+        if isinstance(proposition, str):
+            proposition = [s.strip() for s in proposition.split(ISRF_INTERPRETER.CONNECTOR)]
+                           
+        cpts_match = []
+        rels_match = []
+        for term in proposition:
+            match1 = re.search(ISRF_INTERPRETER.FUNC_PATTERN_CPT, term)
+            match2 = re.search(ISRF_INTERPRETER.FUNC_PATTERN_REL, term)
+            if match1:
+                cpts_match.append(match1)
+            elif match2:
+                rels_match.append(match2)
+            else:
+                error_msg = "Unknown formula %s" %term
+                raise ValueError(error_msg)
+        name_table = {}     
+        for match in cpts_match:
+            dat = match.groupdict()
+            concept = dat['operator']
+            var = dat['var']
+            cpt_frame = dat.get('frame', None)
+            cpt_act = dat.get('act', None)
+            name_table[var] = {'concept':concept, 'act':cpt_act, 'frame':cpt_frame}
+
+        rel_table = {}
+        for match in rels_match:
+            dat = match.groupdict()
+            rel_var = dat['operator']
+            arg1 = dat['var1']
+            arg2 = dat['var2']
+            rel_table[rel_var] =(arg1, arg2)
+            
+        for var in [v for v in name_table if v not in rel_table]: # First process cpt nodes
+            graph.add_node(var, concept=name_table[var]['concept'], act=name_table[var]['act'], frame=name_table[var]['frame'])
+        for var, dat in rel_table.iter_items: # Then add edges
+            graph.add_edge(dat[0], dat[1],  concept=name_table[var]['concept'], act=name_table[var]['act'])
+                        
+        return graph
 
 class ISRF_WRITER(object):
     """ Translates SemanticWM state into ISRF format
@@ -4133,11 +4190,14 @@ class SEM_GENERATOR(object):
 class UTTER_GENERATOR(object):
     """
     """
-    def __init__(self, ling_inputs, speed_param=1, offset=10, std=0):
+    def __init__(self, ling_inputs, speed_param=1, offset=10, std=0, ground_truths=None):
+        """
+        """
         self.ling_inputs = ling_inputs
         self.speed_param = speed_param
         self.offset = offset
         self.std = std
+        self.ground_truths = ground_truths
         self.preprocess_inputs()
     
     def preprocess_inputs(self):

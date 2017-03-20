@@ -720,6 +720,34 @@
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "dog"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
+	
+	{
+		"name" : "TIGER",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "TIGER", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "tiger"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "CHEETAH",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "CHEETAH", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "cheetah"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
 		
 	{
 		"name" : "HOOK",
