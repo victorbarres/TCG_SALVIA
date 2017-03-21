@@ -13,7 +13,7 @@ import language_schemas as ls
 from loader import TCG_LOADER
 from viewer import TCG_VIEWER
 from schema_theory import st_save
-from analysis_comp import analysis_gram
+from analysis_comp import analysis_gram, analysis_wk, analysis_sem
 
 TMP_FOLDER = './tmp'
 
@@ -65,13 +65,13 @@ def set_inputs(model, ling_input_file='ling_inputs_2route.json', input_name='ALL
         if not(ground_truths) or input_name not in ground_truths:
             warn_msg = "No ground truth for %s in %s" %(input_name, ling_input_file)
             warnings.warn(warn_msg)
-            ground_truths = ground_truths.get(input_name, None)
+        ground_truths = ground_truths.get(input_name, None)
     else:
         if not(ground_truths):
             warn_msg = "No ground truth in %s" % ling_input_file
             warnings.warn(warn_msg)
     
-    utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset, std=std, ground_truths)
+    utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset, std=std, ground_truths=ground_truths)
     return utter_gen
     
     
@@ -179,9 +179,9 @@ def summarize_data(outputs, ground_truths=None):
     times = outputs.keys()
     times.sort()
     for t in times:
-        data_to_analyze.extend(v)
-      
+        data_to_analyze.append(outputs[t])
     final_output = data_to_analyze[-1] # Only looks at the last output
+    print final_output
     
     # GramWM
     gram_summary = analysis_gram(final_output['Grammatical_WM_C'], ground_truths)
@@ -279,7 +279,7 @@ def parameter_space(folder=None, input_rate=100):
     
     ## Semantic_WM_C
     # C2 parameters
-    comp_weights_S = [-1, -10.0]
+    comp_weights_S = [-10.0]
     max_capacity_S = [None]
     prune_thresholds_S = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01
     conf_tresholds_S = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
@@ -315,17 +315,17 @@ def parameter_space(folder=None, input_rate=100):
                                    taus_WK, ks_WK, act_rests_WK, noise_stds_WK, ext_weights_WK)
     
     for param in param_iter:
-        params = {'Grammatical_WM_P.C2.coop_weight':param[0], 
-                  'Grammatical_WM_P.C2.coop_asymmetry':param[1],
-                  'Grammatical_WM_P.C2.comp_weight':param[2], 
-                  'Grammatical_WM_P.C2.max_capacity':param[3],
-                  'Grammatical_WM_P.C2.prune_threshold': param[4], 
-                  'Grammatical_WM_P.C2.confidence_threshold': param[5],
-                  'Grammatical_WM_P.dyn.tau':param[6], # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
-                  'Grammatical_WM_P.dyn.k': param[7],
-                  'Grammatical_WM_P.dyn.act_rest': param[8],
-                  'Grammatical_WM_P.dyn.noise_std':param[9],
-                  'Grammatical_WM_P.dyn.ext_weight':param[10],
+        params = {'Grammatical_WM_C.C2.coop_weight':param[0], 
+                  'Grammatical_WM_C.C2.coop_asymmetry':param[1],
+                  'Grammatical_WM_C.C2.comp_weight':param[2], 
+                  'Grammatical_WM_C.C2.max_capacity':param[3],
+                  'Grammatical_WM_C.C2.prune_threshold': param[4], 
+                  'Grammatical_WM_C.C2.confidence_threshold': param[5],
+                  'Grammatical_WM_C.dyn.tau':param[6], # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+                  'Grammatical_WM_C.dyn.k': param[7],
+                  'Grammatical_WM_C.dyn.act_rest': param[8],
+                  'Grammatical_WM_C.dyn.noise_std':param[9],
+                  'Grammatical_WM_C.dyn.ext_weight':param[10],
                   'Semantic_WM_C.C2.comp_weight':param[11], 
                   'Semantic_WM_C.C2.max_capacity':param[12],
                   'Semantic_WM_C.C2.prune_threshold': param[13], 
@@ -342,24 +342,24 @@ def parameter_space(folder=None, input_rate=100):
                   'WK_frame_WM.dyn.k': param[24],
                   'WK_frame_WM.dyn.act_rest': param[25],
                   'WK_frame_WM.dyn.noise_std':param[26],
-                  'WK_frame_WMC.dyn.ext_weight':param[27]}
+                  'WK_frame_WM.dyn.ext_weight':param[27]}
 
         model_params_set.append(params)
     
     # Defining parameter name mapping
     param_name_mapping = {'Grammatical_WM_P.C2.coop_weight':'coop_weight_G', 
-                      'Grammatical_WM_P.C2.coop_asymmetry':'coop_asymmetry_G',
-                      'Grammatical_WM_P.C2.comp_weight':'comp_weight_G',
-                      'Grammatical_WM_P.C2.max_capacity':'max_capacity_G',
-                      'Grammatical_WM_P.C2.prune_threshold': 'prune_threshold_G', 
-                      'Grammatical_WM_P.C2.confidence_threshold':'conf_threshold_G',
-                      'Grammatical_WM_P.C2.sub_threshold_r':'sub_threshold_G',
-                      'Grammatical_WM_P.C2.deact_weight':'deact_weight_G',
-                      'Grammatical_WM_P.dyn.tau':'tau_G',
-                      'Grammatical_WM_P.dyn.k':'k_G',
-                      'Grammatical_WM_P.dyn.act_rest':'act_rest_G',
-                      'Grammatical_WM_P.dyn.noise_std':'noise_std_G',
-                      'Grammatical_WM_P.dyn.ext_weight':'ext_weight_G',
+                      'Grammatical_WM_C.C2.coop_asymmetry':'coop_asymmetry_G',
+                      'Grammatical_WM_C.C2.comp_weight':'comp_weight_G',
+                      'Grammatical_WM_C.C2.max_capacity':'max_capacity_G',
+                      'Grammatical_WM_C.C2.prune_threshold': 'prune_threshold_G', 
+                      'Grammatical_WM_C.C2.confidence_threshold':'conf_threshold_G',
+                      'Grammatical_WM_C.C2.sub_threshold_r':'sub_threshold_G',
+                      'Grammatical_WM_C.C2.deact_weight':'deact_weight_G',
+                      'Grammatical_WM_C.dyn.tau':'tau_G',
+                      'Grammatical_WM_C.dyn.k':'k_G',
+                      'Grammatical_WM_C.dyn.act_rest':'act_rest_G',
+                      'Grammatical_WM_C.dyn.noise_std':'noise_std_G',
+                      'Grammatical_WM_C.dyn.ext_weight':'ext_weight_G',
                       'Semantic_WM_C.C2.comp_weight':'coop_weight_S', 
                       'Semantic_WM_C.C2.max_capacity':'max_capacity_S',
                       'Semantic_WM_C.C2.prune_threshold': 'prune_threshold_S', 
@@ -405,8 +405,8 @@ def weight_space(folder=None):
     Phon2Gram = [1.0]
     Gram2Sem = [1.0]
 
-    Phon2WK = np.linspace(0,1,10)
-    WK2Sem = np.linspace(0,1,10)
+    Phon2WK = np.linspace(0,1,2)
+    WK2Sem = np.linspace(0,1,2)
     
     
     
@@ -471,7 +471,7 @@ def grid_search(model, utter_gen, input_name, max_time, folder, model_params_set
                     sim_name = '%s_%s' %(input_name, name)
                     sim_output = run(model, utter_gen, name, sim_name=sim_name, sim_folder=folder, max_time=max_time, seed=seed, verbose=verbose, prob_times=[], save=save_models, anim=False, anim_step=10)
                     # Summerize output
-                    summarized_output = summarize_data(sim_output, sem_gen.ground_truths)
+                    summarized_output = summarize_data(sim_output, utter_gen.ground_truths)
                     run_output = {'input_name':input_name, 'params':param_dict, 'sim_output':summarized_output}
                     grid_output.append(run_output)
                     
@@ -518,11 +518,11 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     verbose = 1
         
     # Defining the number of restarts
-    NUM_RESTARTS = 10
+    NUM_RESTARTS = 2
 
     # Defining fixed input rate
-    INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
-    INPUT_STD = 0
+    INPUT_RATE = 10 # This serves as a time reference for the range of Tau and task parameters 
+    INPUT_STD = 0.3
     INPUT_OFFSET = 10
     
     # Defining simulation time
@@ -546,10 +546,17 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     st_save(model, model.name, folder)
     
     # Defining inputs.
-    ling_input_file = 'ling_inputs_2route.json'
+    ling_input_file = 'ling_inputs_2route_aphasia.json'
     
     # Define the set of inputs on which the model will be run.                        
-    inputs = []
+    aphasia_inputs = [u'irreversible(pas)', u'reversible_animate_pt(act)', u'reversible_animate_pt(pas)', 
+                      u'irreversible(act)', u'reversible_animate(act)', u'counterfactual(pas)',
+                      u'reversible_animate_agt(pas)', u'reversible_animate(pas)', u'reversible_animate_agt(act)',
+                      u'counterfactual(act)']
+
+    test_input = [u'irreversible(pas)']
+                  
+    inputs = test_input
     output = {}
     print "SIMULATION STARTING"
     start_time = time.time()
@@ -559,7 +566,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
         input_name = name
         print "\nProcessing input: %s (%i/%s)" %(input_name, count,len(inputs))
         #Setting up and saving input generator
-        utter_gen = set_inputs(model, ling_input_file, speed_param=INPUT_RATE, offset=INPUT_OFFSET, std=INPUT_STD)
+        utter_gen = set_inputs(model, ling_input_file, name, speed_param=INPUT_RATE, offset=INPUT_OFFSET, std=INPUT_STD)
         st_save(utter_gen, 'utter_gen_' + input_name, folder)
         
         grid_output = grid_search(model=model, utter_gen=utter_gen, input_name=input_name, max_time=max_time, folder=folder, model_params_set=model_params_set, model_weights_set=model_weights_set, num_restarts=NUM_RESTARTS, seed=seed, verbose=verbose, save_models=False)
@@ -607,7 +614,7 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
     sem_output_names = grid_output[0]['sim_output']['SemWM'].keys()
     header = [param_name_mapping.get(name, name) for name in param_names] + gram_output_names + wk_output_names + sem_output_names
     line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
-    
+
     file_name = './%s/%s.csv' %(folder, input_name)
     with open(file_name, 'w') as f:
          header = line(header)
@@ -625,7 +632,7 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
             # GramWM
             sim_stats = sim_output['GramWM']
             for name in gram_output_names:
-                val = sim_stats[name]['mean']
+                val = sim_stats[name]
                 output_row.append(val)
                 
             # WkWM
@@ -643,12 +650,13 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
             # write to csv
             new_line = line(param_row + output_row)
             f.write(new_line)
-s
+
 if __name__=='__main__':
     model = set_model()
 #    model.system2dot(image_type='png', disp=True)
-    out = run_diagnostic()
-    print out
+#    out = run_diagnostic()
+#    print out
+    run_grid_search(sim_name='test')
 
 
 

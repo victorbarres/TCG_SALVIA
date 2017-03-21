@@ -34,11 +34,11 @@ def get_TRA(isrf_sem_state):
         act = 0
         key = None
         edge_data = graph.get_edge_data(act_name, ent_name)
-        for k, dat in edge_data:
+        for k, dat in edge_data.iteritems():
             if float(dat['act']) > act:
                 key = k
                 act = float(dat['act'])
-        win_dat = edge_data(act_name, ent_name, key)
+        win_dat = graph.get_edge_data(act_name, ent_name, key)
         if win_dat['concept'] == 'AGENT':
             if agt_ent_name:
                 error_msg = "Multiple agent winner found"
@@ -49,6 +49,8 @@ def get_TRA(isrf_sem_state):
                 error_msg = "Multiple patient winner found"
                 raise ValueError(error_msg)  
             pt_ent_name = ent_name
+        elif win_dat['concept'] == 'IS':
+            continue
         else:
             error_msg = "Unexpected TRA relation %s" %win_dat['concept']
             raise ValueError(error_msg)
@@ -60,8 +62,8 @@ def get_TRA(isrf_sem_state):
             error_msg = "Multiple agent concept"
             raise ValueError(error_msg)
         if len(successors) == 1:
-            data = graph.get_edge_data(agt_ent_name, successors[0])
-            edge_data = data.keys()
+            edge_data = graph.get_edge_data(agt_ent_name, successors[0])
+            edge_data = edge_data.values()
             if len(edge_data) > 1:
                 error_msg = "Unexpected multiple relation (only IS expected)"
                 raise ValueError(error_msg)
@@ -69,7 +71,7 @@ def get_TRA(isrf_sem_state):
             if edge_data['concept'] != 'IS':
                 error_msg = "Unexpected relation %s (IS expected)" %edge_data['concept']
                 raise ValueError(error_msg)
-            res['agent'] = graph[successors[0]]['concept']
+            res['agent'] = graph.node[successors[0]]['concept']
     
     # Find patient concept
     if pt_ent_name:
@@ -78,8 +80,8 @@ def get_TRA(isrf_sem_state):
             error_msg = "Multiple patient concept"
             raise ValueError(error_msg)
         if len(successors) == 1:
-            data = graph.get_edge_data(pt_ent_name, successors[0])
-            edge_data = data.keys()
+            edge_data = graph.get_edge_data(pt_ent_name, successors[0])
+            edge_data = edge_data.values()
             if len(edge_data) > 1:
                 error_msg = "Unexpected multiple relation (only IS expected)"
                 raise ValueError(error_msg)
@@ -87,8 +89,9 @@ def get_TRA(isrf_sem_state):
             if edge_data['concept'] != 'IS':
                 error_msg = "Unexpected relation %s (IS expected)" %edge_data['concept']
                 raise ValueError(error_msg)
-            res['patient'] = graph[successors[0]]['concept']
+            res['patient'] = graph.node[successors[0]]['concept']
 
+    print res
     return res    
     
 def analysis_gram(data, ground_truths):

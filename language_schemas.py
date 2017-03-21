@@ -931,7 +931,8 @@ class SEMANTIC_WM_C2_C(WM):
         self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
         self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1.0, 'comp_asymmetry':0.0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
         self.SemRep = nx.MultiDiGraph() # Uses networkx to easily handle graph structure.
-    
+        self.verbose = 0
+        
     def reset(self):
         """
         """
@@ -961,7 +962,8 @@ class SEMANTIC_WM_C2_C(WM):
                         self.add_instance(inst, INIT_VAL)
                     competitions = output['competitions']
                     for inst1, inst2 in competitions:
-                        print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
+                        if self.verbose>0:
+                            print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
                         self.add_comp_link(inst1, inst2)
             self.convey_gram_activations(gram_activations, gram_weight) # NEED TO DEFINE WEIGHT IF THERE IS COMPETITION. DO THAT USING THE CONNECT WEIGHT
             
@@ -978,14 +980,15 @@ class SEMANTIC_WM_C2_C(WM):
                     self.add_instance(inst, INIT_VAL)
                 competitions = output['competitions']
                 for inst1, inst2 in competitions:
-                    print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
+                    if self.verbose>0:
+                        print "%i, %s vs. %s" %(self.t, inst1.name, inst2.name)
                     self.add_comp_link(inst1, inst2)
             self.convey_WK_activations(wk_activations, wk_weight)
         
         self.update_activations()
         self.prune()
         state_changed = self.update_SemRep(new_insts)
-        self.outputs['to_output'] = state_changed
+        self.outputs['to_output'] = True # state_changed
 
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """Builds SemRep based on the received SemFrame.
@@ -1050,7 +1053,8 @@ class SEMANTIC_WM_C2_C(WM):
                 names.append(edge.name)
         
         if sub_isos:
-            print "%i: Add partial SemFrame" %self.t
+            if self.verbose > 0:
+                print "%i: Add partial SemFrame" %self.t
             return output
         
         # Case add all
@@ -1069,7 +1073,8 @@ class SEMANTIC_WM_C2_C(WM):
             new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
             cpt_insts.append(new_cpt_inst)
         
-        print "%i: Add full SemFrame" %self.t
+        if self.verbose > 0:
+            print "%i: Add full SemFrame" %self.t
         return output
         
     def instantiate_wk_cpts(self, wk_inputs, cpt_schemas):
@@ -1131,7 +1136,8 @@ class SEMANTIC_WM_C2_C(WM):
                     names.append(edge.name)
             
             if sub_isos:
-                print '%i: Adding partial wk frame %s' %(self.t, wk_frame.name)
+                if self.verbose > 0:
+                    print '%i: Adding partial wk frame %s' %(self.t, wk_frame.name)
                 continue
             
             # Case add all    
@@ -1147,8 +1153,9 @@ class SEMANTIC_WM_C2_C(WM):
                 new_cpt_inst.content['pFrom'] = name_table[edge.pFrom.name]
                 new_cpt_inst.content['pTo'] = name_table[edge.pTo.name]
                 cpt_insts.append(new_cpt_inst)
-                
-            print "%i: Add full wk_frame %s" %(self.t, wk_frame.name)
+            
+            if self.verbose > 0:
+                print "%i: Add full wk_frame %s" %(self.t, wk_frame.name)
         
         return output
     
@@ -1202,7 +1209,8 @@ class SEMANTIC_WM_C2_C(WM):
                 if self.SemRep.has_node(inst.name):
                     cpt1 = self.SemRep.node[inst.name]['concept']
                     cpt2 = inst.content['concept']
-                    print "%i: Updating: %s -> %s" %(self.t, cpt1.name, cpt2.name)
+                    if self.verbose > 0:
+                        print "%i: Updating: %s -> %s" %(self.t, cpt1.name, cpt2.name)
                     cpt1 = cpt2
                     self.SemRep.node[inst.name]['frame'] = inst.frame
 
@@ -3866,14 +3874,14 @@ class ISRF_INTERPRETER(object):
         # For reference.
 #        func_pattern = r"(?P<operator>\w+)\((?P<args>.*)\)"
 #        cpt_name_pattern = r"[A-Z0-9_]+"
-#        var_name_pattern = r"[a-z0-9]+"
+#        var_name_pattern = r"[a-z0-9_]+"
 #        frame_flag_pattern = r"F"
 #        act_pattern = r"[0-9]*\.[0-9]+|[0-9]+"
 #        cpt_var_flag_pattern = r"\?"
         
     # More directly specialized pattern. Works since I limit myself to two types of expressions CONCEPT(var, F, act) - act and F optional -  or var1(var2, var3) (and ?CONCEPT(var))
-    FUNC_PATTERN_CPT = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
-    FUNC_PATTERN_REL = r"(?P<operator>[a-z0-9]+)\(\s*(?P<var1>[a-z0-9]+)(\s*,\s*)(?P<var2>[a-z0-9]+)\s*\)" # Relation activation is defined alongside the relation concept.
+    FUNC_PATTERN_CPT = r"(?P<cpt_var>\??)(?P<operator>[A-Z0-9_]+)\(\s*(?P<var>[a-z0-9_]+)((\s*,\s*)(?P<frame>F))?((\s*,\s*)(?P<act>[0-9]*\.[0-9]+|[0-9]+))?\s*\)" # Concept definition with activation and frame flag
+    FUNC_PATTERN_REL = r"(?P<operator>[a-z0-9_]+)\(\s*(?P<var1>[a-z0-9_]+)(\s*,\s*)(?P<var2>[a-z0-9_]+)\s*\)" # Relation activation is defined alongside the relation concept.
     CONNECTOR = '&'
     CPT_VAR = '?'
         
@@ -3991,7 +3999,7 @@ class ISRF_INTERPRETER(object):
             cpt_frame = dat.get('frame', None)
             cpt_act = dat.get('act', None)
             name_table[var] = {'concept':concept, 'act':cpt_act, 'frame':cpt_frame}
-
+        
         rel_table = {}
         for match in rels_match:
             dat = match.groupdict()
@@ -4002,7 +4010,7 @@ class ISRF_INTERPRETER(object):
             
         for var in [v for v in name_table if v not in rel_table]: # First process cpt nodes
             graph.add_node(var, concept=name_table[var]['concept'], act=name_table[var]['act'], frame=name_table[var]['frame'])
-        for var, dat in rel_table.iter_items: # Then add edges
+        for var, dat in rel_table.iteritems(): # Then add edges
             graph.add_edge(dat[0], dat[1],  concept=name_table[var]['concept'], act=name_table[var]['act'])
                         
         return graph
@@ -4028,7 +4036,7 @@ class ISRF_WRITER(object):
         """
         """
         var_name = self.var_table.get(cpt_inst.name, None)
-        cpt_name = str(cpt_inst.trace['cpt_schema'].name)
+        cpt_name = str(cpt_inst.content['concept'].name)
         if not var_name:        
             var_name = "%s_%i" %(str.lower(cpt_name), self.var_id)
             self.var_table[cpt_inst.name] = var_name
@@ -4046,10 +4054,10 @@ class ISRF_WRITER(object):
         t = self.SemanticWM.t
         dat = []
         cpt_insts = self.SemanticWM.schema_insts
-        for cpt_inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]: # Start with nodes.
+        for cpt_inst in [i for i in cpt_insts if not(isinstance(i.content['concept'], CPT_RELATION_SCHEMA))]: # Start with nodes.
             (cpt_ISRF, var_name) = self.cpt_2_ISRF(cpt_inst)
             dat.append(cpt_ISRF)
-        for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]: # Then move on to relations
+        for rel_inst in [i for i in cpt_insts if isinstance(i.content['concept'], CPT_RELATION_SCHEMA)]: # Then move on to relations
             (cpt_ISRF, var_name) = self.cpt_2_ISRF(rel_inst)
             dat.append(cpt_ISRF)
             p_from = rel_inst.content['pFrom']
