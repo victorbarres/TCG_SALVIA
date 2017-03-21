@@ -6,6 +6,7 @@ data/scenes/*.mat
 *.mat
 to_fix/
 data_analysis/
-simulation_analyses/analyses/
+simulation_analyses/*
+simulations/*
 doc/build/*
 tcg_salvia/*

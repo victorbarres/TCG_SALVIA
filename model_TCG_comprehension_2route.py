@@ -103,7 +103,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
         st_save(utter_gen, 'utter_gen', FOLDER)
     
     # initializing generator for the model.
-    generator = utter_gen.utter_generator(input_name, verbose = (verbose>0))
+    generator = utter_gen.utter_generator(input_name, verbose = (verbose>1))
     (word_form, next_time) = generator.next()
 
     model.initialize_states() # initializing model
@@ -181,7 +181,6 @@ def summarize_data(outputs, ground_truths=None):
     for t in times:
         data_to_analyze.append(outputs[t])
     final_output = data_to_analyze[-1] # Only looks at the last output
-    print final_output
     
     # GramWM
     gram_summary = analysis_gram(final_output['Grammatical_WM_C'], ground_truths)
@@ -215,16 +214,16 @@ def run_diagnostic(verbose=2):
     """
     """
     import json
-    LING_INPUT_FILE = 'ling_inputs_2route.json'
+    LING_INPUT_FILE = 'ling_inputs_2route_aphasia.json'
     SEMANTICS_NAME = 'TCG_semantics_dev'
     GRAMMAR_NAME = 'TCG_grammar_VB_2route'
     VERBOSE = verbose
     SEED = None
     ANIM = False
-    MAX_TIME = 2000
+    MAX_TIME = 1000
     SPEED_PARAM = 100
     OFFSET = 10
-    STD = 0
+    STD = 0.3
     PROB_TIMES = []
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
@@ -268,10 +267,10 @@ def parameter_space(folder=None, input_rate=100):
     comp_weights_G = [-10.0]
     max_capacity_G = [None]
     prune_thresholds_G = [0.01] # Change prune threshold (should be done in relation to initial activation values.) 
-    conf_tresholds_G = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
+    conf_tresholds_G = [0.5] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
     
     # Dyn parameters
-    taus_G = [INPUT_RATE*10] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    taus_G = [INPUT_RATE] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
     ks_G= [10] #np.linspace(1, 10, 2) 
     act_rests_G = [0.001] # Act rest does not take into account the noise.
     noise_stds_G = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
@@ -281,11 +280,11 @@ def parameter_space(folder=None, input_rate=100):
     # C2 parameters
     comp_weights_S = [-10.0]
     max_capacity_S = [None]
-    prune_thresholds_S = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01
-    conf_tresholds_S = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
+    prune_thresholds_S = [0.0] # Change prune threshold (should be done in relation to initial activation values.) #0.01
+    conf_tresholds_S = [0.0] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
 
     # Dyn parameters
-    taus_S = [INPUT_RATE*10] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    taus_S = [INPUT_RATE] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
     ks_S= [10] #np.linspace(1, 10, 2)
     act_rests_S = [0.001] # Act rest does not take into account the noise.
     noise_stds_S = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
@@ -295,10 +294,10 @@ def parameter_space(folder=None, input_rate=100):
     # C2 parameters
     max_capacity_WK = [None]
     prune_thresholds_WK = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01
-    conf_tresholds_WK = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
+    conf_tresholds_WK = [0.5] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
     
     # Dyn parameters
-    taus_WK = [INPUT_RATE*10] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    taus_WK = [INPUT_RATE] #[INPUT_RATE/10, INPUT_RATE*10] #np.linspace(int(INPUT_RATE/10), INPUT_RATE*10, 3) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
     ks_WK= [10] #np.linspace(1, 10, 2)
     act_rests_WK = [0.001] # Act rest does not take into account the noise.
     noise_stds_WK = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
@@ -347,7 +346,7 @@ def parameter_space(folder=None, input_rate=100):
         model_params_set.append(params)
     
     # Defining parameter name mapping
-    param_name_mapping = {'Grammatical_WM_P.C2.coop_weight':'coop_weight_G', 
+    param_name_mapping = {'Grammatical_WM_C.C2.coop_weight':'coop_weight_G', 
                       'Grammatical_WM_C.C2.coop_asymmetry':'coop_asymmetry_G',
                       'Grammatical_WM_C.C2.comp_weight':'comp_weight_G',
                       'Grammatical_WM_C.C2.max_capacity':'max_capacity_G',
@@ -376,7 +375,7 @@ def parameter_space(folder=None, input_rate=100):
                       'WK_frame_WM.dyn.k': 'k_WK',
                       'WK_frame_WM.dyn.act_rest': 'act_rest_WK',
                       'WK_frame_WM.dyn.noise_std':'noise_std_WK',
-                      'WK_frame_WMC.dyn.ext_weight':'ext_weight_WK'}
+                      'WK_frame_WM.dyn.ext_weight':'ext_weight_WK'}
                 
     
     if folder:
@@ -403,10 +402,10 @@ def weight_space(folder=None):
     model_weights_set = []
     
     Phon2Gram = [1.0]
-    Gram2Sem = [1.0]
+    Gram2Sem =  np.linspace(0,1,10)
 
-    Phon2WK = np.linspace(0,1,2)
-    WK2Sem = np.linspace(0,1,2)
+    Phon2WK = [1.0]
+    WK2Sem = np.linspace(0,1,10)
     
     
     
@@ -434,7 +433,7 @@ def weight_space(folder=None):
     
     return (model_weights_set, weight_name_mapping) 
 
-def grid_search(model, utter_gen, input_name, max_time, folder, model_params_set=[], model_weights_set=[], num_restarts=10, seed=None, verbose=1, save_models=True):
+def grid_search(model, utter_gen, input_name, max_time, folder, model_params_set=[], model_weights_set=[], num_restarts=10, seed=None, verbose=0, save_models=True):
     """
     Runs model "model" for all the inputs in "utter_gen" over the search space defined by "model_params_set" and  "model_weights_set".
     For each point of the search space, model is ran "num_restarts" times.
@@ -490,7 +489,7 @@ def grid_search(model, utter_gen, input_name, max_time, folder, model_params_set
         print "TOTAL GRID SEARCH TIME: %s" %(grid_time)
     return grid_output
     
-def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=True):
+def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False):
     """
     Runs the production model using grid_search.
     
@@ -518,10 +517,10 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     verbose = 1
         
     # Defining the number of restarts
-    NUM_RESTARTS = 2
+    NUM_RESTARTS = 5
 
     # Defining fixed input rate
-    INPUT_RATE = 10 # This serves as a time reference for the range of Tau and task parameters 
+    INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
     INPUT_STD = 0.3
     INPUT_OFFSET = 10
     
@@ -556,7 +555,8 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
 
     test_input = [u'irreversible(pas)']
                   
-    inputs = test_input
+    inputs = aphasia_inputs
+
     output = {}
     print "SIMULATION STARTING"
     start_time = time.time()
@@ -608,11 +608,15 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
     """
     pass
     import numpy as np
+    name_mapping = {}
+    name_mapping.update(param_name_mapping)
+    name_mapping.update(weight_name_mapping)
+    
     param_names = meta_params.keys() + grid_output[0]['params'].keys()
     gram_output_names = grid_output[0]['sim_output']['GramWM'].keys()
     wk_output_names = grid_output[0]['sim_output']['WkWM'].keys()
     sem_output_names = grid_output[0]['sim_output']['SemWM'].keys()
-    header = [param_name_mapping.get(name, name) for name in param_names] + gram_output_names + wk_output_names + sem_output_names
+    header = [name_mapping.get(name, name) for name in param_names] + gram_output_names + wk_output_names + sem_output_names
     line = lambda vals: ','.join([str(v) for v in vals]) + '\n'
 
     file_name = './%s/%s.csv' %(folder, input_name)
@@ -656,7 +660,7 @@ if __name__=='__main__':
 #    model.system2dot(image_type='png', disp=True)
 #    out = run_diagnostic()
 #    print out
-    run_grid_search(sim_name='test')
+    run_grid_search(sim_name='aphasia_sim_route_weights')
 
 
 

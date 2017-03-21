@@ -29,32 +29,33 @@ def get_TRA(isrf_sem_state):
     
     agt_ent_name = None
     pt_ent_name = None
+    agt_act = 0
+    pt_act = 0            
     # Find agent and patient entity if they exist (if ambiguous picks the most active edge)
     for ent_name in graph.successors_iter(act_name):
-        act = 0
-        key = None
         edge_data = graph.get_edge_data(act_name, ent_name)
         for k, dat in edge_data.iteritems():
-            if float(dat['act']) > act:
-                key = k
-                act = float(dat['act'])
-        win_dat = graph.get_edge_data(act_name, ent_name, key)
-        if win_dat['concept'] == 'AGENT':
-            if agt_ent_name:
-                error_msg = "Multiple agent winner found"
-                raise ValueError(error_msg)  
-            agt_ent_name = ent_name
-        elif win_dat['concept'] == 'PATIENT':
-            if pt_ent_name:
-                error_msg = "Multiple patient winner found"
-                raise ValueError(error_msg)  
-            pt_ent_name = ent_name
-        elif win_dat['concept'] == 'IS':
-            continue
-        else:
-            error_msg = "Unexpected TRA relation %s" %win_dat['concept']
-            raise ValueError(error_msg)
-    
+            flag_agt = False
+            flag_pt = False
+            if dat['concept'] == 'AGENT' and float(dat['act']) > agt_act:
+                flag_agt = True
+            if dat['concept'] == 'PATIENT' and float(dat['act']) > pt_act:
+                flag_pt = True
+                
+            if flag_agt and not flag_pt:
+                agt_act =  float(dat['act'])
+                agt_ent_name = ent_name
+            if flag_pt and not flag_agt:
+                pt_act =  float(dat['act'])
+                pt_ent_name = ent_name
+            if flag_agt and flag_pt: # Random assigment strategy
+                if np.random.rand() <0.5:
+                    agt_act =  float(dat['act'])
+                    agt_ent_name = ent_name
+                else:
+                    pt_act =  float(dat['act'])
+                    pt_ent_name = ent_name
+                    
     # Find agent concept
     if agt_ent_name:
         successors = graph.successors(agt_ent_name)
@@ -91,7 +92,6 @@ def get_TRA(isrf_sem_state):
                 raise ValueError(error_msg)
             res['patient'] = graph.node[successors[0]]['concept']
 
-    print res
     return res    
     
 def analysis_gram(data, ground_truths):

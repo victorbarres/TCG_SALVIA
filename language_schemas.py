@@ -988,7 +988,8 @@ class SEMANTIC_WM_C2_C(WM):
         self.update_activations()
         self.prune()
         state_changed = self.update_SemRep(new_insts)
-        self.outputs['to_output'] = True # state_changed
+        self.outputs['to_output'] = True 
+#        self.outputs['to_output'] =  state_changed
 
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """Builds SemRep based on the received SemFrame.
@@ -2850,6 +2851,12 @@ class GRAMMATICAL_WM_C(WM):
                 self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
                 self.outputs['to_semantic_WM']['instances'] = output['sem_WM_output']
 
+#        if ctrl_input and ctrl_input['produce'] == self.t:
+        output = self.produce_meaning()
+        if output:
+            self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
+            self.outputs['to_semantic_WM']['instances'] = output['sem_WM_output']
+
     def to_output(self):
         """
         """
@@ -3140,9 +3147,9 @@ class GRAMMATICAL_WM_C(WM):
             In particular the mapping between constructions and SemRep might need to be going both ways.
         """
         assemblages = self.assemble()
-#        # Discard assemblages that only contain instances that have already been expressed.
-#        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
-#        assemblages = [a for a in assemblages if not is_expressed(a)]
+        # Discard assemblages that only contain instances that have already been expressed.
+        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
+        assemblages = [a for a in assemblages if not is_expressed(a)]
         if assemblages:
             sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
@@ -4006,7 +4013,7 @@ class ISRF_INTERPRETER(object):
             rel_var = dat['operator']
             arg1 = dat['var1']
             arg2 = dat['var2']
-            rel_table[rel_var] =(arg1, arg2)
+            rel_table[rel_var] = (arg1, arg2)
             
         for var in [v for v in name_table if v not in rel_table]: # First process cpt nodes
             graph.add_node(var, concept=name_table[var]['concept'], act=name_table[var]['act'], frame=name_table[var]['frame'])
@@ -4054,10 +4061,10 @@ class ISRF_WRITER(object):
         t = self.SemanticWM.t
         dat = []
         cpt_insts = self.SemanticWM.schema_insts
-        for cpt_inst in [i for i in cpt_insts if not(isinstance(i.content['concept'], CPT_RELATION_SCHEMA))]: # Start with nodes.
+        for cpt_inst in [i for i in cpt_insts if not(isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA))]: # Start with nodes.
             (cpt_ISRF, var_name) = self.cpt_2_ISRF(cpt_inst)
             dat.append(cpt_ISRF)
-        for rel_inst in [i for i in cpt_insts if isinstance(i.content['concept'], CPT_RELATION_SCHEMA)]: # Then move on to relations
+        for rel_inst in [i for i in cpt_insts if isinstance(i.trace['cpt_schema'], CPT_RELATION_SCHEMA)]: # Then move on to relations
             (cpt_ISRF, var_name) = self.cpt_2_ISRF(rel_inst)
             dat.append(cpt_ISRF)
             p_from = rel_inst.content['pFrom']
@@ -4114,7 +4121,7 @@ class SEM_GENERATOR(object):
             sem_rate = float(sem_input['sem_rate'])*self.speed_param
             sequence = sem_input['sequence']
             timing = [t*self.speed_param for t in sem_input['timing']]
-            get_time = lambda i, rate, std: max(random.uniform(i*sem_rate-std, i*sem_rate+std), 0)
+            get_time = lambda i, rate, std: max(random.uniform((i-std)*sem_rate, (i+std)*sem_rate), 0)
             if sem_rate and not(timing):
                 if sem_rate<2*self.std:
                     error_msg = "Input sequence order compromised. Sem_Rate=%.2f < 2*std=%.2f. SemRate should be > 2*std" %(sem_rate, 2*self.std)
@@ -4215,7 +4222,7 @@ class UTTER_GENERATOR(object):
             utter_rate = ling_input['utter_rate']*self.speed_param
             utterance = ling_input['utterance']
             timing = [t*self.speed_param for t in ling_input['timing']]
-            get_time = lambda i, rate, std: max(random.uniform(i*utter_rate-std, i*utter_rate+std), 0)
+            get_time = lambda i, rate, std: max(random.uniform((i-std)*utter_rate, (i+std)*utter_rate), 0)
             if utter_rate and not(timing):
                 ling_input['timing'] = [get_time(i, utter_rate, self.std) + self.offset for i in range(len(utterance))]
             if not(timing) and not(utter_rate):
