@@ -988,8 +988,8 @@ class SEMANTIC_WM_C2_C(WM):
         self.update_activations()
         self.prune()
         state_changed = self.update_SemRep(new_insts)
-        self.outputs['to_output'] = True 
-#        self.outputs['to_output'] =  state_changed
+#        self.outputs['to_output'] = True 
+        self.outputs['to_output'] =  state_changed
 
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
         """Builds SemRep based on the received SemFrame.

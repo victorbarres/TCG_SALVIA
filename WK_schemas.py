@@ -151,7 +151,11 @@ class WK_FRAME_WM(WM):
         if new_wk_frame_insts:
             # Add new instances
             for inst in new_wk_frame_insts:
-                self.add_instance(inst, inst.activity) 
+                self.add_instance(inst, inst.activity)
+                # Looking for possible comptitors
+                competitors = [old_inst for old_inst in self.schema_insts if old_inst.content.name == inst.content.name and  old_inst != inst]
+                for comp_inst in competitors:
+                    self.add_comp_link(inst, comp_inst)
         wk_output = self.apply_WK()
         if wk_output:
             self.outputs['to_semantic_WM']['instances'] =  wk_output
