@@ -264,6 +264,7 @@ def parameter_space(folder=None, input_rate=100):
     # Set up the model's parameter search space.
     model_params_set = []
     
+    ###################
     ## Grammatical_WM_C
     # C2 parameters
     coop_weights_G =  [1.0] #np.linspace(1.0, 10.0, 2)
@@ -280,6 +281,7 @@ def parameter_space(folder=None, input_rate=100):
     noise_stds_G = [0.3] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
     ext_weights_G = [1.0] #np.linspace(1, 10, 2)
     
+    ################
     ## Semantic_WM_C
     # C2 parameters
     comp_weights_S = [-1.0]
@@ -294,6 +296,7 @@ def parameter_space(folder=None, input_rate=100):
     noise_stds_S = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
     ext_weights_S = [1.0] #np.linspace(1, 10, 2)
     
+    ###############
     ## WK_WM
     # C2 parameters
     comp_weights_WK = [-1.0]
@@ -409,7 +412,7 @@ def weight_space(folder=None):
     model_weights_set = []
     
     Phon2Gram = [1.0]
-    Gram2Sem = np.linspace(0,1,10)
+    Gram2Sem = np.linspace(0,0.5,100)
 
     Phon2WK = [1.0]
     WK2Sem = [0.5]
@@ -496,7 +499,7 @@ def grid_search(model, utter_gen, input_name, max_time, folder, model_params_set
         print "TOTAL GRID SEARCH TIME: %s" %(grid_time)
     return grid_output
     
-def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False):
+def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=True):
     """
     Runs the production model using grid_search.
     
@@ -524,7 +527,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     verbose = 1
         
     # Defining the number of restarts
-    NUM_RESTARTS = 5
+    NUM_RESTARTS = 10
 
     # Defining fixed input rate
     INPUT_RATE = 10 # This serves as a time reference for the range of Tau and task parameters 
@@ -666,7 +669,7 @@ if __name__=='__main__':
 #    model.system2dot(image_type='png', disp=True)
 #    out = run_diagnostic()
 #    print out
-    run_grid_search(sim_name='aphasia_sim_route_weights_WK05_5')
+    run_grid_search(sim_name='aphasia_sim_route_weights_WK05_7')
 
 
 

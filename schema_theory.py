@@ -1257,6 +1257,7 @@ class WM(SYSTEM_SCHEMA):
         """
         step (INT): step betwween time values read (t_vals = range(0, max_time, step))
         """
+        from viewer import TCG_VIEWER
         if folder and not(os.path.exists(folder)):
             os.mkdir(folder)
             
@@ -1276,7 +1277,7 @@ class WM(SYSTEM_SCHEMA):
         lines = []
         texts = []
         for index in range(num_obj):
-            lobj = ax.plot([],[],lw=2, label=inst_names[index])[0]
+            lobj = ax.plot([],[],lw=2, color=TCG_VIEWER._obj_to_color(inst_names[index]), label=inst_names[index])[0]
             lines.append(lobj)
             tobj = ax.text(0,0,inst_names[index])
             texts.append(tobj)
@@ -1316,11 +1317,13 @@ class WM(SYSTEM_SCHEMA):
         
         if folder:
             # Set up formatting for the movie files
-#            plt.rcParams['animation.ffmpeg_path'] ='C:\\ffmpeg\\bin\\ffmpeg.exe'
+            plt.rcParams['animation.ffmpeg_path'] ='C:\\ffmpeg\\bin\\ffmpeg.exe'
+#            animation.FFMpegWriter.bin_path() # I am having trouble getting plt to recognize the codec
+#            animation.FFMpegWriter.isAvailable()
             FFMpegWriter = animation.writers['ffmpeg']
             metadata = dict(title='WM_activity', artist='SALVIA_TCG',
                 comment='')
-            writer = FFMpegWriter(fps=24, metadata=metadata, bitrate=None)
+            writer = FFMpegWriter(fps=60, metadata=metadata, bitrate=None)
             file_name = '%s/%s_%s' %(folder, self.name, 'WM_inst_activity.mp4')
             anim.save(file_name, writer=writer)
             plt.close(fig)

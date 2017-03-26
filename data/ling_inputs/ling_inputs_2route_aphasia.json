@@ -36,27 +36,52 @@
 			 "timing":[],
 			 "comments": "Animate-agent + eat-frame WK"
 			},
-		"reversible_animate_agt(act)": {
+		"man_kick_ball(act)": {
 			"utter_rate": 1,
-			 "utterance" :[ "man", "hit", "ball"],
+			 "utterance" :[ "man", "kick", "ball"],
 			 "timing":[],
 			 "comments": "Animate-agent WK"
 			},
-		"reversible_animate_agt(pas)": {
+		"man_kick_ball(pas)": {
 			"utter_rate": 1,
-			 "utterance" :[ "ball", "is", "hit", "-ed", "by", "man"],
+			 "utterance" :[ "ball", "is", "kick", "-ed", "by", "man"],
 			 "timing":[],
 			 "comments": "Animate-agent WK"
 			},
-		"reversible_animate_pt(act)": {
+		"ball_kick_man(act)": {
 			"utter_rate": 1,
-			 "utterance" :["ball", "hit", "man"],
+			 "utterance" :["ball", "kick", "man"],
 			 "timing":[],
 			 "comments": "Animate-agent WK"
 			},
-		"reversible_animate_pt(pas)": {
+		"ball_kick_man(pas)": {
 			"utter_rate": 1,
-			 "utterance" :["man", "is", "hit", "-ed", "by","ball"],
+			 "utterance" :["man", "is", "kick", "-ed", "by","ball"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+			
+		"cat_swat_ball(act)": {
+			"utter_rate": 1,
+			 "utterance" :[ "cat", "swat", "ball"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"cat_swat_ball(pas)": {
+			"utter_rate": 1,
+			 "utterance" :[ "ball", "is", "swat", "-ed", "by", "cat"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"ball_swat_cat(act)": {
+			"utter_rate": 1,
+			 "utterance" :["ball", "swat", "cat"],
+			 "timing":[],
+			 "comments": "Animate-agent WK"
+			},
+		"ball_swat_cat(pas)": {
+			"utter_rate": 1,
+			 "utterance" :["cat", "is", "swat", "-ed", "by","cat"],
 			 "timing":[],
 			 "comments": "Animate-agent WK"
 			}
@@ -93,25 +118,45 @@
 			"agent": "APPLE",
 			"patient": "MAN"
 			},
-		"reversible_animate_agt(act)": {
+		"man_kick_ball(act)": {
 			"voice": "active",
 			"agent": "MAN",
 			"patient": "BALL"
 			},
-		"reversible_animate_agt(pas)": {
+		"man_kick_ball(pas)": {
 			"voice": "passive",
 			"agent": "MAN",
 			"patient": "BALL"
 			},
-		"reversible_animate_pt(act)": {
+		"ball_kick_man(act)": {
 			"voice": "active",
 			"agent": "BALL",
 			"patient": "MAN"
 			},
-		"reversible_animate_pt(pas)": {
+		"ball_kick_man(pas)": {
 			"voice": "passive",
 			"agent": "BALL",
 			"patient": "MAN"
+			},
+		"cat_swat_ball(act)": {
+			"voice": "active",
+			"agent": "CAT",
+			"patient": "BALL"
+			},
+		"cat_swat_ball(pas)": {
+			"voice": "passive",
+			"agent": "CAT",
+			"patient": "BALL"
+			},
+		"ball_swat_cat(act)": {
+			"voice": "active",
+			"agent": "BALL",
+			"patient": "CAT"
+			},
+		"ball_swat_cat(pas)": {
+			"voice": "passive",
+			"agent": "BALL",
+			"patient": "CAT"
 			}
 		
 	}

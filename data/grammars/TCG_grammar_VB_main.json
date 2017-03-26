@@ -650,6 +650,20 @@
 	},
 	
 	{
+		"name" : "SWAT",
+		"class" : "V",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "SWAT", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ACT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "swat"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
 		"name" : "GIVE",
 		"class" : "V",
 		"preference" : 1,
@@ -1185,6 +1199,20 @@
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "cheetah"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "CAT",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "CAT", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "cat"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
 		

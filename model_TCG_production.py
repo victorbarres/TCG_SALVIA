@@ -23,7 +23,7 @@ TMP_FOLDER = './tmp'
 
 ##################
 #### RUNNING MODEL
-def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}):
+def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_main', model_params = {}):
     """
     Sets up a TCG production model.
     
@@ -135,9 +135,14 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
                 print "t:%i, '%s'" %(t, ' '.join(output['Grammatical_WM_P'][0]['phon_form']))
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
-        if t in prob_times: # Saving figures for prob times.
-            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER)
-    
+#        if t in prob_times: # Saving figures for prob times.
+#            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
+#            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
+#            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
+        if t>=2000: # Saving all_figures
+#            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
+            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
+#            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
     if save:
         model.save_sim(file_path = FOLDER, file_name = 'output')
         
@@ -295,11 +300,11 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
 ###############
 #### DIAGNOSTIC 
-def run_diagnostics(verbose=3, prob_times=[]):
+def run_diagnostics(verbose=0, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'diagnostic.json'
+    DIAGNOSTIC_FILE = 'TCG_p_theory_input.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
     OFFSET = 0
@@ -320,11 +325,11 @@ def run_diagnostics(verbose=3, prob_times=[]):
 #    MODEL_PARAMS['Grammatical_WM_P.dyn.act_rest'] = 0.001 # Act rest does not take into account the noise.
 
     ### GENERAL PARAMETERS
-    semantics_name = 'TCG_semantics_main'
+    semantics_name = 'TCG_semantics_dev'
     grammar_name='TCG_grammar_VB_main'  
     max_time =1000
-    seed=None
-    save = False
+    seed=403653764
+    save = True
     anim = True
     anim_step = 1
     ###    
@@ -689,7 +694,7 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
             f.write(new_line)
     
 if __name__=='__main__':
-    run_diagnostics(verbose=3, prob_times=[])
+    run_diagnostics(verbose=0, prob_times=[])
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()

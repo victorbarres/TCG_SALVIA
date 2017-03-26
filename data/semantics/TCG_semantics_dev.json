@@ -69,7 +69,8 @@
 					"TURTLE" : {},
 					"DOG" : {},
 					"TIGER" :{},
-					"CHEETAH" :{}
+					"CHEETAH" :{},
+					"CAT" :{}
 				}
 			},
 			"PLACE" :
@@ -115,7 +116,8 @@
 				"CHASE" : {},
 				"FLEE" : {},
 				"EAT" : {},
-				"RIDE": {}
+				"RIDE": {},
+				"SWAT": {}
 			},
 			
 			"SYM_ACT":
@@ -335,6 +337,7 @@
 			"DOG",
 			"TIGER", 
 			"CHEETAH",
+			"CAT",
 			"HOOK",
 			"BOOKSHELF",
 			"WAGON", 
@@ -369,7 +372,8 @@
 			"CHASE",
 			"FLEE",
 			"EAT",
-			"RIDE"
+			"RIDE",
+			"SWAT"
 		],
 		
 		"QUALITY":
@@ -439,7 +443,9 @@
 				"EATER", 
 				"EATEE", 
 				"RIDER", 
-				"RIDEE"
+				"RIDEE",
+				"SWATTER", 
+				"SWATTEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -491,6 +497,7 @@
 		"DOG" : ["DOG"],
 		"TIGER" : ["TIGER"],
 		"CHEETAH" : ["CHEETAH"],
+		"CAT" : ["CAT"],
 		"HOOK" : ["HOOK"],
 		"BOOKSHELF" : ["BOOKSHELF"],
 		"WAGON" : ["WAGON"],
@@ -517,6 +524,7 @@
 		"FLEE" : ["FLEE"],
 		"EAT" : ["EAT"], 
 		"RIDE" : ["RIDE"],
+		"SWAT" : ["SWAT"],
 		
 		"RED" : ["RED"],
 		"BLUE" : ["BLUE"],
@@ -538,8 +546,8 @@
 		"SUCCESSIVE" : ["SUCCESSIVE"],
 		"CONCURRENT" : ["CONCURRENT"],
 
-		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER", "RIDER"],
-		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE", "RIDEE"],
+		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER", "RIDER", "SWATTER"],
+		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE", "RIDEE", "SWATTEE"],
 		"AGT+PT" :["MEET_REL", "SHAKE_HANDS_REL"],
 		"THEME": ["GIVEN", "SENT"],
 		"RECIPIENT" : ["GIVEE", "SENDEE"]
