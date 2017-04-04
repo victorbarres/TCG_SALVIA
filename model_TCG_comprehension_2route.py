@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @author: Victor Barres
-TCG WK model
+TCG 2 route comprehension model
 """
 from __future__ import division
 import random

@@ -327,9 +327,9 @@ def run_diagnostics(verbose=0, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time =1000
-    seed=403653764
-    save = True
+    max_time = 1000
+    seed = None
+    save = False
     anim = True
     anim_step = 1
     ###    

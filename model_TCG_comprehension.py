@@ -168,28 +168,56 @@ def run_diagnostic():
     """
     """
     import json
+    # Data files
     LING_INPUT_FILE = 'ling_inputs.json'
     SEMANTICS_NAME = 'TCG_semantics_main'
     GRAMMAR_NAME = 'TCG_grammar_VB_main'
-    VERBOSE = 2
+    
+    # Default Parameters
+    VERBOSE = 0
     SEED = None
-    ANIM = True
+    SAVE = False
+    ANIM = False
     MAX_TIME = 900
     SPEED_PARAM = 30
     OFFSET = 10
     PROB_TIMES = []
+
+    print "Data files:"
+    print "Ling inputs: %s" % LING_INPUT_FILE
+    print "Semantics: %s" % SEMANTICS_NAME
+    print "Grammar: %s" % GRAMMAR_NAME
+    
+    # Get user inputs
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
     input_names = json_data['inputs'].keys()
     input_names.sort()
     print "\nInput list:\n %s" %'\n '.join(input_names)
     input_name = raw_input('\nEnter input name: ')
-    yes_no = raw_input('\nSave? (y/n): ')
-    save = yes_no == 'y'
-    print "#### Processing -> %s\n" % input_name
-    res = run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=save, anim=ANIM,  anim_step=1)
-    print "\nRESULTS:\n"
-    print res
+    
+    set_params1 = raw_input('\nSet parameters? (y/n): ') == 'y'
+    if set_params1:
+        VERBOSE = int(raw_input('\nVerbose (0,1,2,...): '))
+        SAVE = raw_input('\nSave? (y/n): ') == 'y'
+        ANIM = raw_input('\nAnim? (y/n): ') == 'y'
+    
+    set_params2 = raw_input('\nSet more parameters? (y/n): ') == 'y'
+    if set_params2: 
+        MAX_TIME = int(raw_input('\nMax time: '))
+        SPEED_PARAM = int(raw_input('\nSpeed param: '))
+        OFFSET = int(raw_input('\nOffset: '))      
+        SEED = int(raw_input('\nSeed: '))
+        if SEED == 'None':
+            SEED = None
+        else:
+            SEED = int(SEED)
+    
+    print "\n#### Processing -> %s\n" % input_name
+    
+    res = run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=SAVE, anim=ANIM,  anim_step=1)
+#    print "\nRESULTS:\n"
+#    print res
 
 if __name__=='__main__':
 #    input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
