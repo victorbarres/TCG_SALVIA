@@ -19,7 +19,7 @@ TMP_FOLDER = './tmp'
 
 ##################
 #### RUNNING MODEL
-def set_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2route', model_params = {}):
+def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_2route', model_params = {}):
     """
     Sets up a TCG comprehension 2route system.
     
@@ -77,7 +77,7 @@ def set_inputs(model, ling_input_file='ling_inputs_2route.json', input_name='ALL
     
 def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10):
     """
-    Run the model "model" for an utterance gerator "utter_gen" using the input "input_name"
+    Run the model "model" for an utterance generator "utter_gen" using the input "input_name"
     Verbose modes: 0,1 -> no output printed. 2 -> only semantic state printed, 3 -> input and semantic state printed as they are received and produced. >3 -> 10steps after utter_input received added to prob_times as well as 10 steps before max_time
     prob_times ([INT]): For time in list, saves a view of LinguisticWM concise in tmp folder.
     
@@ -195,7 +195,7 @@ def summarize_data(outputs, ground_truths=None):
     summary = {'GramWM':gram_summary, 'WkWM':wk_summary, 'SemWM':sem_summary}
     return summary
     
-def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2routes', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, std=0, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
+def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_2routes', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name='woman', ling_input_file='ling_inputs_2routes.json', max_time=900, seed=None, speed_param=10, offset=10, std=0, prob_times=[], verbose=0, save=True, anim=False,  anim_step=10):
     """
     Runs the model
     
@@ -216,7 +216,7 @@ def run_diagnostic(verbose=2):
     """
     import json
     LING_INPUT_FILE = 'ling_inputs_2route_aphasia.json'
-    SEMANTICS_NAME = 'TCG_semantics_dev'
+    SEMANTICS_NAME = 'TCG_semantics_main'
     GRAMMAR_NAME = 'TCG_grammar_VB_2route'
     VERBOSE = verbose
     SEED = None
@@ -549,7 +549,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     (model_weights_set, weight_name_mapping) = weight_space(folder)
     
     #Setting up and saving model
-    semantics_name = 'TCG_semantics_dev'
+    semantics_name = 'TCG_semantics_main'
     grammar_name = 'TCG_grammar_VB_2route'
     model  = set_model(semantics_name, grammar_name)
     st_save(model, model.name, folder)

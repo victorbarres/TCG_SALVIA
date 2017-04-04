@@ -12,24 +12,17 @@
 			{
 				"HUMAN" :
 				{
+					"MAN" : {},
+					"BOY" : {}, 
+					"WOMAN" : {}, 
+					"GIRL" : {},
 					"PEOPLE" : {},
 					"BALLERINA" : {},
 					"CELLIST" :{},
 					"FENCER" : {},
 					"ROBBER" : {},
 					"POLICEMAN" : {},
-					"HUNTER" : {},
-					"ADULT" : 
-					{
-						"MAN" : {},
-						"WOMAN" : {}
-					},
-					"CHILD" :
-					{
-						"BOY" : {},
-						"GIRL" :{}
-					}
-					
+					"HUNTER" : {}
 				},
 				"ITEM" : 
 				{
@@ -54,23 +47,14 @@
 					"BOOKSHELF" :{},
 					"WAGON" : {}, 
 					"BALL" :{},
-					"TOY" :
-					{
-						"MERRY_GO_ROUND" : {}
-					},
-					"VEHICLE" :
-					{
-						"MOTORCYCLE" : {}
-					}
+					"MOTORCYCLE" : {},
+					"MERRY_GO_ROUND" : {}
 				},
 				"ANIMAL" : 
 				{
 					"MOUSE" :{},
 					"TURTLE" : {},
-					"DOG" : {},
-					"TIGER" :{},
-					"CHEETAH" :{},
-					"CAT" :{}
+					"DOG" : {}
 				}
 			},
 			"PLACE" :
@@ -82,7 +66,7 @@
 			"ANIMATE" : 
 			{ 
 				"HUMAN" : {},
-				"ANIMAL" : {}
+				"ANIMAL" : {} 
 			},
 
 			"MALE" : 
@@ -116,8 +100,7 @@
 				"CHASE" : {},
 				"FLEE" : {},
 				"EAT" : {},
-				"RIDE": {},
-				"SWAT": {}
+				"RIDE": {}
 			},
 			
 			"SYM_ACT":
@@ -210,93 +193,6 @@
 			}
 		}
 	},
-	
-	"WK_FRAMES":[
-		
-		{"name" : "ANIMATE_AGENT",
-		"preference" : 1,
-		"WK_Frame" : {
-			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
-						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},
-						{"name" : "REF_ACT", "concept": "TRANS_ACT", "frame" : true},
-						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : false},
-						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "REF2", "concept": "ENTITY", "frame" : true}
-						],
-			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
-						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
-						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "REF2"},
-						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "REF_ACT"},
-						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
-						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]},
-			"trigger": ["ANIM"]
-		},
-		
-		{"name" : "EAT_EVENT",
-		"preference" : 1,
-		"WK_Frame" : {
-			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
-						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
-						{"name" : "EAT", "concept" : "EAT", "frame" : false},	
-						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "ANIM", "concept" : "ANIMATE", "frame" : true},
-						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "FOOD", "concept" : "FOOD", "frame" : true}
-						],
-			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
-						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ANIM"},
-						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "FOOD"},
-						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "EAT"},
-						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
-						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]},
-			"trigger": ["EAT"]
-		},
-		
-		{"name" : "RIDE_EVENT1",
-		"preference" : 1,
-		"WK_Frame" : {
-			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
-						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
-						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
-						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "ADULT", "concept" : "ADULT", "frame" : true},
-						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "VEHICLE", "concept" : "VEHICLE", "frame" : true}
-						],
-			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
-						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "ADULT"},
-						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "VEHICLE"},
-						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "RIDE"},
-						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
-						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]},
-			"trigger": ["ADULT", "RIDE"]
-		},
-		
-		{"name" : "RIDE_EVENT2",
-		"preference" : 1,
-		"WK_Frame" : {
-			"nodes" : [{"name" : "EVT", "concept" : "EVENT", "frame" : true},
-						{"name" : "ACT", "concept" : "TRANS_ACT", "frame" : true},	
-						{"name" : "RIDE", "concept" : "RIDE", "frame" : false},	
-						{"name" : "ENT1", "concept" : "ENTITY", "frame" : true},
-						{"name" : "CHILD", "concept" : "CHILD", "frame" : true},
-						{"name" : "ENT2", "concept" : "ENTITY", "frame" : true},
-						{"name" : "TOY", "concept" : "TOY", "frame" : true}
-						],
-			"edges" : [{"name" : "IS1", "concept" : "IS", "from" : "EVT", "to" : "ACT"},
-						{"name" : "IS2", "concept" : "IS", "from" : "ENT1", "to" : "CHILD"},
-						{"name" : "IS3", "concept" : "IS", "from" : "ENT2", "to" : "TOY"},
-						{"name" : "IS4", "concept" : "IS", "from" : "ACT", "to" : "RIDE"},
-						{"name" : "ACT_AGT", "concept" : "AGENT", "from" : "ACT", "to" : "ENT1"},
-						{"name" : "ACT_PT", "concept" : "PATIENT", "from" : "ACT", "to" : "ENT2"}
-					]},
-			"trigger": ["CHILD", "RIDE"]
-		}
-	],
 
 	"PERCEPTUAL_KNOWLEDGE" :
 	{
@@ -335,9 +231,6 @@
 			"POLICEMAN",
 			"HUNTER",
 			"DOG",
-			"TIGER", 
-			"CHEETAH",
-			"CAT",
 			"HOOK",
 			"BOOKSHELF",
 			"WAGON", 
@@ -345,7 +238,7 @@
 			"BREAD",
 			"MOTORCYCLE",
 			"MERRY_GO_ROUND",
-			"CAKE",
+			"CAKE", 
 			"APPLE"
 		],
 		
@@ -372,8 +265,7 @@
 			"CHASE",
 			"FLEE",
 			"EAT",
-			"RIDE",
-			"SWAT"
+			"RIDE"
 		],
 		
 		"QUALITY":
@@ -443,9 +335,7 @@
 				"EATER", 
 				"EATEE", 
 				"RIDER", 
-				"RIDEE",
-				"SWATTER", 
-				"SWATTEE"
+				"RIDEE"
 			],
 			"SPATIAL_REL":
 			[
@@ -495,9 +385,6 @@
 		"POLICEMAN" : ["POLICEMAN"],
 		"HUNTER" : ["HUNTER"],
 		"DOG" : ["DOG"],
-		"TIGER" : ["TIGER"],
-		"CHEETAH" : ["CHEETAH"],
-		"CAT" : ["CAT"],
 		"HOOK" : ["HOOK"],
 		"BOOKSHELF" : ["BOOKSHELF"],
 		"WAGON" : ["WAGON"],
@@ -524,7 +411,6 @@
 		"FLEE" : ["FLEE"],
 		"EAT" : ["EAT"], 
 		"RIDE" : ["RIDE"],
-		"SWAT" : ["SWAT"],
 		
 		"RED" : ["RED"],
 		"BLUE" : ["BLUE"],
@@ -546,8 +432,8 @@
 		"SUCCESSIVE" : ["SUCCESSIVE"],
 		"CONCURRENT" : ["CONCURRENT"],
 
-		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER", "RIDER", "SWATTER"],
-		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE", "RIDEE", "SWATTEE"],
+		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER", "RIDER"],
+		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE", "RIDEE"],
 		"AGT+PT" :["MEET_REL", "SHAKE_HANDS_REL"],
 		"THEME": ["GIVEN", "SENT"],
 		"RECIPIENT" : ["GIVEE", "SENDEE"]
