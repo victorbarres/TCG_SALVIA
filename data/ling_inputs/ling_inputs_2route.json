@@ -90,11 +90,19 @@
 			 "timing":[],
 			 "comments": ""
 			},
+			
 		"girl_ride_motorcycle(act)": {
 			"utter_rate": 1,
 			 "utterance" :["girl", "ride", "motorcycle"],
 			 "timing":[],
 			 "comments": ""
-			}
+			},
+		
+		"boy_eat_cake_in_bedroom": {
+			"utter_rate": 1,
+			 "utterance" :["boy", "eat", "cake", "in", "bedroom"],
+			 "timing":[],
+			 "comments": ""
+		}
 	}
 }

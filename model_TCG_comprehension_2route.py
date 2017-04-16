@@ -84,6 +84,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     Returns:
         outputs (DICT): {time:model.get_output()} for all time in simulation time steps for which model's output is not empty.
     """
+    IMG_TYPE='png'
     if not(seed): # Quick trick so that I can have access to the seed used to run the simulation.
         random.seed(seed)
         seed = random.randint(0,10**9)
@@ -136,8 +137,8 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after Semantic output
         if t in prob_times: # Saving figures for prob times.
-            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=True, folder = FOLDER)
-            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_C'], folder = FOLDER)
+            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=True, folder=FOLDER, file_type=IMG_TYPE)
+            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_C'], folder=FOLDER, file_type=IMG_TYPE)
     
     if save:
         model.save_sim(file_path = FOLDER, file_name = 'output')
@@ -215,30 +216,44 @@ def run_diagnostic(verbose=2):
     """
     """
     import json
-    LING_INPUT_FILE = 'ling_inputs_2route_aphasia.json'
-    SEMANTICS_NAME = 'TCG_semantics_main'
+    # Data files
+    LING_INPUT_FILE = 'ling_inputs_2route.json'
+    SEMANTICS_NAME = 'TCG_semantics_no_frame'
     GRAMMAR_NAME = 'TCG_grammar_VB_2route'
+    
+    # Default Parameters
     VERBOSE = verbose
     SEED = None
+    SAVE = True
     ANIM = False
-    ANIM_STEP = 1
-    MAX_TIME = 1000
-    INPUT_RATE = 100
-    INPUT_OFFSET = 10
+    MAX_TIME = 1500
+    SPEED_PARAM = 150
+    INPUT_OFFSET = 100
     INPUT_STD = 0.3
+    ANIM_STEP = 1
     PROB_TIMES = []
+
+    print "Data files:"
+    print "Ling inputs: %s" % LING_INPUT_FILE
+    print "Semantics: %s" % SEMANTICS_NAME
+    print "Grammar: %s" % GRAMMAR_NAME
+    
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
     input_names = json_data['inputs'].keys()
     input_names.sort()
     print "\nInput list:\n %s" %'\n '.join(input_names)
     input_name = raw_input('\nEnter input name: ')
-    yes_no = raw_input('\nSave? (y/n): ')
-    save = yes_no == 'y'
+    
+    set_params1 = raw_input('\nSet parameters? (y/n): ') == 'y'
+    if set_params1:
+        VERBOSE = int(raw_input('\nVerbose (0,1,2,...): '))
+        SAVE = raw_input('\nSave? (y/n): ') == 'y'
+        ANIM = raw_input('\nAnim? (y/n): ') == 'y'
     print "#### Processing -> %s\n" % input_name
     model  = set_model(SEMANTICS_NAME, GRAMMAR_NAME)
-    utter_gen = set_inputs(model, LING_INPUT_FILE, input_name, speed_param=INPUT_RATE, offset=INPUT_OFFSET, std=INPUT_STD)
-    res = run(model, utter_gen, input_name, sim_name='diagnostic', sim_folder=TMP_FOLDER, max_time=MAX_TIME, seed=SEED, verbose=VERBOSE, prob_times=PROB_TIMES, save=save, anim=ANIM, anim_step=ANIM_STEP)
+    utter_gen = set_inputs(model, LING_INPUT_FILE, input_name, speed_param=SPEED_PARAM, offset=INPUT_OFFSET, std=INPUT_STD)
+    res = run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=MAX_TIME, seed=SEED, verbose=VERBOSE, prob_times=PROB_TIMES, save=SAVE, anim=ANIM, anim_step=ANIM_STEP)
 #    print "\nRESULTS:\n"
 #    print res
 ############################

@@ -90,7 +90,7 @@
 		
 		"test_subj_rel_PAS_SVO": {
 			"utter_rate": 1,
-			 "utterance" :["woman", "that", "man",  "kiss", "-ed", "by", "man", "kick", "ball"],
+			 "utterance" :["woman", "that",  "is", "kiss", "-ed", "by", "man", "kick", "ball"],
 			 "timing":[],
 			 "comments": ""
 			},
@@ -140,6 +140,13 @@
 		"test_eat_apple_boy": {
 			"utter_rate": 1,
 			 "utterance" :["eat", "apple", "boy"],
+			 "timing":[],
+			 "comments": ""
+			},
+			
+		"boy_eat_cake_in_bedroom": {
+			"utter_rate": 1,
+			 "utterance" :["boy", "eat", "cake", "in", "bedroom"],
 			 "timing":[],
 			 "comments": ""
 			}

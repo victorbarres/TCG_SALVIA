@@ -1,6 +1,23 @@
 {"grammar" :[
 
 	{
+		"name" : "PP_IN",
+		"class" : "S",
+		"preference" : 1,
+		"group": 2,
+		"SemFrame" : 
+		{
+			"nodes"  : [{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : true},
+						{"name" : "PLACE", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : false}],
+			"edges" : [{"name" : "EVT_PP", "concept" : "IN", "from" : "EVT", "to" : "PLACE"}]
+		},
+		"SynForm" : [{"name" : "S1", "type" : "SLOT", "classes" : ["S"]},
+					{"name" : "S2", "type" : "PHON", "phon" : "in"},
+					{"name" : "S3", "type" : "SLOT", "classes" : ["NP", "N"]}],
+		"SymLinks" : {"EVT" : "S1", "PLACE" : "S3"}		
+	},
+
+	{
 		"name" : "SVO",
 		"class" : "S",
 		"preference" : 1,
@@ -584,6 +601,20 @@
 					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
 					},
 		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "park"}],
+		"SymLinks" : {"N1" : "S1"}
+	},
+	
+	{
+		"name" : "BEDROOM",
+		"class" : "N",
+		"preference" : 1,
+		"group": 1,
+		"SemFrame" : {
+					"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : false, "head" : true},
+								{"name" : "N1", "concept" : "BEDROOM", "frame" : false, "focus" : false, "head" : false}],
+					"edges" : [{"name" : "IS", "concept" : "IS", "from" : "ENT", "to" : "N1"}]
+					},
+		"SynForm" : [{"name" : "S1", "type" : "PHON", "phon" : "bedroom"}],
 		"SymLinks" : {"N1" : "S1"}
 	},
 	

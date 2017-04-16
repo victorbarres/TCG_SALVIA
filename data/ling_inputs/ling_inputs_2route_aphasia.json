@@ -157,7 +157,14 @@
 			"voice": "passive",
 			"agent": "BALL",
 			"patient": "CAT"
-			}
+			},
+			
+		"boy_eat_cake_in_bedroom": {
+			"utter_rate": 1,
+			 "utterance" :["boy", "eat", "cake", "in", "bedroom"],
+			 "timing":[],
+			 "comments": ""
+	}
 		
 	}
 }
