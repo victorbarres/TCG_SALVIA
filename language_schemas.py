@@ -605,7 +605,7 @@ class SEMANTIC_WM_P(WM):
         """
         """
         super(SEMANTIC_WM_P, self).reset()
-        self.SemRep = nx.MultiDiGraph()
+        self.SemRep = nx.DiGraph()
     
     def process(self):
         """
@@ -617,7 +617,7 @@ class SEMANTIC_WM_P(WM):
         
         self.update_activations()      
         self.prune() 
-        self.update_SemRep(cpt_insts) 
+        self.update_SemRep(cpt_insts)
                 
         if self.inputs['from_grammatical_WM_P']: # This should be done on the instances directly...
             # Note nodes and edges as expressed
@@ -673,9 +673,7 @@ class SEMANTIC_WM_P(WM):
             if d['cpt_inst'] not in self.schema_insts:
                 dead_edges.append((u,v))
         self.SemRep.remove_edges_from(dead_edges)
-        
-    
-            
+         
     def gram_WM_P_output(self):
         """
         Returns the output to send to gram_WM_P.
@@ -686,6 +684,8 @@ class SEMANTIC_WM_P(WM):
             if not(d['expressed']):
                 output['nodes'][n] = d['cpt_inst'].activity
         for u,v,d in self.SemRep.edges(data=True):
+            if d == True:
+                print "here"
             if not(d['expressed']):
                 output['edges'][(u,v)] = d['cpt_inst'].activity
         return output
