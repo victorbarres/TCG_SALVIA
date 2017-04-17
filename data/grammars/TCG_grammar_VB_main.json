@@ -285,7 +285,7 @@
 	},
 	
 	{
-		"name" : "N_PP",
+		"name" : "N_PP_IN",
 		"class": "N",
 		"preference" : 1,
 		"group" : 2,
@@ -293,7 +293,7 @@
 		{
 			"nodes" : [{"name" : "ENT", "concept" : "ENTITY", "frame" : true, "focus" : true, "head" : true},
 						{"name" : "EVT", "concept" : "EVENT", "frame" : true, "focus" : false, "head" : false}],
-			"edges" : [{"name" : "MOD", "concept" : "MODIFY", "from" : "ENT", "to" : "EVT"}]
+			"edges" : [{"name" : "MOD", "concept" : "IN", "from" : "ENT", "to" : "EVT"}]
 		},
 		"SynForm" :[{"name" : "S1", "type" : "SLOT", "classes" : ["N"]},
 					{"name" : "S2", "type" : "SLOT", "classes" : ["PP"]}],

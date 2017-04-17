@@ -135,14 +135,14 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
                 print "t:%i, '%s'" %(t, ' '.join(output['Grammatical_WM_P'][0]['phon_form']))
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
-#        if t in prob_times: # Saving figures for prob times.
-#            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
-#            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
-#            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
-        if t>=2000: # Saving all_figures
-#            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
+        if t in prob_times: # Saving figures for prob times.
+            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
             TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
-#            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
+            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
+#        if t>=2000: # Saving all_figures
+##            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
+#            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
+##            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
     if save:
         model.save_sim(file_path = FOLDER, file_name = 'output')
         
@@ -300,15 +300,15 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
 ###############
 #### DIAGNOSTIC 
-def run_diagnostics(verbose=0, prob_times=[]):
+def run_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'TCG_p_theory_input.json'
+    DIAGNOSTIC_FILE = 'diagnostic.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
-    OFFSET = 0
-    STD = 0
+    OFFSET = 100
+    STD = .3
     MODEL_PARAMS = {'Control.task.start_produce':500, 
                     'Control.task.time_pressure':100, 
                     'Grammatical_WM_P.dyn.ext_weight':1.0, 
@@ -327,10 +327,10 @@ def run_diagnostics(verbose=0, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time = 1000
+    max_time = 1500
     seed = None
-    save = False
-    anim = True
+    save = True
+    anim = False
     anim_step = 1
     ###    
     

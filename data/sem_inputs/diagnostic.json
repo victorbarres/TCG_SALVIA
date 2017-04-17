@@ -342,6 +342,43 @@
 			"timing":[],
 			"comments":"Two actions, modifier"
 		},
+		
+		"woman_kick_ball_while_boy_laugh_dyn":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+				"P2":"KICK(kick) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+				"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
+				"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
+				"P5":"EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
+				"P6":"INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
+				"P7":"LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)",
+				"P8":"BOY(boy) & IS(is7) & is7(e3, boy)"
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+			"timing":[],
+			"comments":"2 events (conjunction)"
+		},
+		
+		"woman_kick_ball_dog_chase_while_boy_laugh_dyn":{
+			"sem_rate":1,
+			"propositions": {
+				"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+				"P2":"KICK(kick) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+				"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
+				"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
+				"P5":"EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
+				"P6":"INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
+				"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)",
+				"P8":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & mod1(e2, evt3)",
+				"P9":"CHASE(chase) & IS(is9) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & pt3(a3, e2)",
+				"P10":"DOG(dog) & IS(is10) & is10(e4, dog)"	
+			},
+			"sequence" :["P1", "P2", "P3", "P4", "P8", "P9", "P10", "P5", "P6", "P7"],
+			"timing":[],
+			"comments":"3 events (object-object relative + conjunction)"
+		},
+		
 			
 		"Jin_ex":{
 			"sem_rate":1,

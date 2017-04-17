@@ -117,10 +117,10 @@ def parameters(system_names):
         
     'Control':{
         'task.mode':'produce',
-        'task.time_pressure': 200, #200.0,
-        'task.start_produce': 400.0, #400.0,
-        'style.activation':0.7, #0.7
-        'style.sem_length':0.0, #0.5
+        'task.time_pressure': 100, #200.0,
+        'task.start_produce': 200.0, #400.0,
+        'style.activation':1.0, #0.7
+        'style.sem_length':1.0, #0.5
         'style.form_length':0.0, #0.0
         'style.continuity':0.3  #0.0
         },

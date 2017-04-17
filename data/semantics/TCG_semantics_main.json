@@ -1,27 +1,6 @@
 {
 	"CONCEPTUAL_KNOWLEDGE" : 
 	{
-		"EVENT":
-		{
-		
-		},
-		
-		"ENTITY" : 
-		{
-			"OBJECT" : 
-			{
-				"HUMAN" :
-				{
-					"PEOPLE" : {},
-					"BALLERINA" : {},
-					"CELLIST" :{},
-					"FENCER" : {},
-					"ROBBER" : {},
-					"POLICEMAN" : {},
-					"HUNTER" : {},
-					"ADULT" : 
-					{
-						"MAN" : {},
 				
 		"EVENT":
 		{
@@ -564,7 +543,7 @@
 		"SMALL" : ["SMALL"],
 		"YOUNG" : ["YOUNG"],
 		"PRETTY": ["PRETTY"],
-		"HANDSOME" : ["HANDSOME"]
+		"HANDSOME" : ["HANDSOME"],
 				
 		
 		"IS" : ["IS"],

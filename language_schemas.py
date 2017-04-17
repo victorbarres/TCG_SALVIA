@@ -3914,7 +3914,7 @@ class ISRF_INTERPRETER(object):
         Notes:
             - A concept is only interpreted into an instance once. Following interpretations are skipped.
         """
-        if isinstance(proposition, str):
+        if isinstance(proposition, basestring):
             proposition = [s.strip() for s in proposition.split(self.CONNECTOR)]
         
         instances = []
@@ -3932,7 +3932,7 @@ class ISRF_INTERPRETER(object):
                 error_msg = "Unknown formula %s" %term
                 raise ValueError(error_msg)
                 
-        for match in cpts_match: #First process define concept schemas
+        for match in cpts_match: #First process defined concept schemas
             dat = match.groupdict()
             cpt_var = dat['cpt_var'] == self.CPT_VAR
             concept = dat['operator']
@@ -3962,7 +3962,7 @@ class ISRF_INTERPRETER(object):
             arg1 = dat['var1']
             arg2 = dat['var2']
             if not((rel in self.name_table) and (arg1 in self.name_table) and (arg2 in self.name_table)):
-                error_msg = "ISRF variable used before it is defined."
+                error_msg = "ISRF variable used before it is defined. %s(%s, %s)" %(rel, arg1, arg2)
                 raise ValueError(error_msg)
             else:
                 rel_inst = self.name_table[rel]
@@ -4153,7 +4153,7 @@ class SEM_GENERATOR(object):
             sequence = sem_input['sequence']
             timing = sem_input['timing']
             for i in range(len(sequence)):
-                print 't: %.1f, prop: %s' %(timing[i], ' , '.join(propositions[sequence[i]]))
+                print 't: %.1f, prop: %s' %(timing[i], str(propositions[sequence[i]]))
                                
     def sem_generator(self, input_name, verbose=False):
         """
@@ -4179,7 +4179,7 @@ class SEM_GENERATOR(object):
             prop_name = sequence[idx]
             proposition = propositions[prop_name]
             if verbose:
-                print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], ' , '.join(proposition))
+                print 'sem_input <- t: %.1f, prop: %s' %(timing[idx], str(proposition))
             instances = self.interpreter.prop_interpreter(proposition)
             
             next_idx = idx + 1       
