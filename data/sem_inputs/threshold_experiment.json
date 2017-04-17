@@ -5,9 +5,9 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & is4(e2, ball)"
+					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)"
 				},
 				"sequence" :["P1", "P2", "P3", "P4"],
 				"timing":[],
@@ -22,7 +22,7 @@
 				"sem_rate":1,
 				"propositions": {
 					"P6":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"
+					"P7":"BOY(boy) & IS(is7) & INTRANS_ACT(a2,F) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"
 				},
 				"sequence" :["P6", "P7"],
 				"timing":[],
@@ -37,10 +37,10 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & DITRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"GIVE(give) & IS(is2) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
-					"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
-					"P5":"BOY(boy) & IS(is5) & is5(e3, boy)"	
+					"P2":"GIVE(give) & IS(is2) & DITRANS_ACT(a1, F) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
+					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
+					"P5":"BOY(boy) & ENTITY(e3,F) & IS(is5) & is5(e3, boy)"	
 				},
 				"sequence" :["P1", "P2", "P3", "P4", "P5"],
 				"timing":[],
@@ -56,12 +56,12 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
-					"P5":"EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
-					"P6":"INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"	
+					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
+					"P5":"EVENT(evt1,F) & EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
+					"P6":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
+					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & INTRANS_ACT(a2,F) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"	
 				},
 				"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
 				"timing":[],
@@ -76,12 +76,12 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
+					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"P3":"WOMAN(woman) & IS(is3) & ENTITY(e1,F) & is3(e1, woman)",
+					"P4":"BALL(ball) & IS(is4) & ENTITY(e2,F) & is4(e2, ball)",
 					"P5":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt2, evt1)",
 					"P6":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"
+					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & INTRANS_ACT(a2,F) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"
 				},
 				"sequence" :["P6", "P7", "P5", "P1", "P2", "P3", "P4"],
 				"timing":[],
@@ -96,13 +96,13 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & DITRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"GIVE(give) & IS(is2) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
-					"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
-					"P5":"BOY(boy) & IS(is5) & is5(e3, boy)",
+					"P2":"GIVE(give) & IS(is2) & DITRANS_ACT(a1, F) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
+					"P3":"WOMAN(woman) & IS(is3)  & ENTITY(e1,F) & is3(e1, woman)",
+					"P4":"BALL(ball) & IS(is4)  & ENTITY(e2,F) & is4(e2, ball)",
+					"P5":"BOY(boy) & IS(is5) & ENTITY(e3,F) & is5(e3, boy)",
 					"P6":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt2, evt1)",
 					"P7":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is6) & is6(evt2, a2)",
-					"P8":"DOG(dog) & IS(is7) & is7(e3, dog) & EAT(eat) & IS(is8) & is8(a2, eat) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"	
+					"P8":"DOG(dog) & IS(is7) & is7(e3, dog) & EAT(eat) & IS(is8) & INTRANS_ACT(a2,F) & is8(a2, eat) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"	
 				},
 				"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
 				"timing":[],
@@ -117,12 +117,12 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
-					"P8":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & mod1(e2, evt3)",
-					"P9":"CHASE(chase) & IS(is9) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & pt3(a3, e2)",
-					"P10":"DOG(dog) & IS(is10) & is10(e4, dog)"	
+					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
+					"P8":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & ENTITY(e2,F) & mod1(e2, evt3)",
+					"P9":"CHASE(chase) & IS(is9) & TRANS_ACT(a3, F) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & ENTITY(e2,F) & pt3(a3, e2)",
+					"P10":"DOG(dog) & IS(is10) & ENTITY(e4,F) & is10(e4, dog)"	
 				},
 				"sequence" :["P1", "P2", "P3", "P4", "P8", "P9", "P10"],
 				"timing":[],
@@ -137,10 +137,10 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & INTRANS_ACT(a1,F) & IS(is1) & is1(evt1,a1)",
-					"P2":"WOMAN(woman) & IS(is3) & is3(e1, woman) & LAUGH(laugh) & IS(is2) & is2(a1, laugh) & ENTITY(e1,F) & AGENT(agt1) & agt1(a1, e1)",
-					"P3":"EVENT(evt2, F) & TRANS_ACT(a2, F) & IS(is4) & is4(evt2, a2) & MODIFY(mod1) & mod1(e1, evt2)",
+					"P2":"WOMAN(woman) & IS(is3) & INTRANS_ACT(a1,F) & is3(e1, woman) & LAUGH(laugh) & IS(is2) & is2(a1, laugh) & ENTITY(e1,F) & AGENT(agt1) & agt1(a1, e1)",
+					"P3":"EVENT(evt2, F) & TRANS_ACT(a2, F) & IS(is4) & is4(evt2, a2) & ENTITY(e1,F) & MODIFY(mod1) & mod1(e1, evt2)",
 					"P4":"ENTITY(e2,F) & DOG(dog) & IS(is5) & is5(e2, dog)",
-					"P5":"CHASE(chase) & IS(is6) & is6(a2, chase) & ENTITY(e2,F) & AGENT(agt2) & PATIENT(pt1) & agt2(a2, e2) & pt1(a2, e1)"
+					"P5":"CHASE(chase) & IS(is6) & TRANS_ACT(a2, F) & is6(a2, chase) & ENTITY(e2,F) & AGENT(agt2) & PATIENT(pt1) & agt2(a2, e2) & ENTITY(e1,F) & pt1(a2, e1)"
 						
 				},
 				"sequence" :["P1", "P2", "P3", "P4", "P5"],
@@ -156,15 +156,15 @@
 				"sem_rate":1,
 				"propositions": {
 					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & is4(e2, ball)",
-					"P5":"EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
-					"P6":"INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)",
+					"P2":"KICK(kick) & TRANS_ACT(a1, F) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
+					"P5":"EVENT(evt1,F) & EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
+					"P6":"INTRANS_ACT(a2,F) & IS(is5) & EVENT(evt2,F) & is5(evt2, a2)",
+					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & INTRANS_ACT(a2,F) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)",
 					"P8":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & mod1(e2, evt3)",
-					"P9":"CHASE(chase) & IS(is9) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & pt3(a3, e2)",
-					"P10":"DOG(dog) & IS(is10) & is10(e4, dog)"	
+					"P9":"CHASE(chase) & IS(is9) & TRANS_ACT(a3, F) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & ENTITY(e2,F) & pt3(a3, e2)",
+					"P10":"DOG(dog) & ENTITY(e4,F) & IS(is10) & is10(e4, dog)"	
 				},
 				"sequence" :["P1", "P2", "P3", "P4", "P8", "P9", "P10", "P5", "P6", "P7"],
 				"timing":[],
