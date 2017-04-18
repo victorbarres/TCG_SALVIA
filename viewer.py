@@ -105,7 +105,7 @@ class TCG_VIEWER:
         Uses graphviz with pydot implementation.
         """        
         prog = 'neato' #fdp, neato, dot
-        file_type = 'png'
+        file_type = 'svg'
         
         cpt_folder = self.VIEWER_TMP + 'cpt/'        
         
@@ -144,7 +144,7 @@ class TCG_VIEWER:
         Uses graphviz with pydot implementation.
         """  
         prog = 'neato'
-        file_type = 'png'
+        file_type = 'svg'
         
         per_folder = self.VIEWER_TMP + 'per/'        
         
@@ -185,7 +185,7 @@ class TCG_VIEWER:
         Uses graphviz with pydot implementation.
         """        
         prog = 'dot'
-        file_type = 'png'
+        file_type = 'svg'
         
         czer_folder = self.VIEWER_TMP + 'czer/'        
         
@@ -232,7 +232,7 @@ class TCG_VIEWER:
         
         Obsolete, check format of display_cxn
         """        
-        file_type = 'png'
+        file_type = 'svg'
         
         cxn_folder = self.VIEWER_TMP + 'cxn/'  
         
@@ -580,12 +580,12 @@ class TCG_VIEWER:
         inst_cluster.add_subgraph(cxn_cluster)
         
         #For now I'll remove the input ports. Too much cluter.
-        for port in cxn_inst.in_ports:
-            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2')
-            inst_cluster.add_node(port_node)
-            edge = pydot.Edge(str(port), str(port.data), style='dashed', dir='none', splines='spline')
-            inst_cluster.add_edge(edge)
-        
+#        for port in cxn_inst.in_ports:
+#            port_node = pydot.Node(name=str(port), label=str(port.name), shape='point', height='0.2')
+#            inst_cluster.add_node(port_node)
+#            edge = pydot.Edge(str(port), str(port.data), style='dashed', dir='none', splines='spline')
+#            inst_cluster.add_edge(edge)
+#        
         
         return inst_cluster
     
@@ -851,7 +851,7 @@ class TCG_VIEWER:
         labeljust='l'
         penwidth = '2'
         rankdir = 'LR'
-        res = 300 #in dpi
+        res = 100 #in dpi
         
         dot_cxn = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth, ratio='compress')
         dot_cxn.set_rankdir(rankdir)
