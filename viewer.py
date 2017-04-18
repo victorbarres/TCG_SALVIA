@@ -92,7 +92,7 @@ class TCG_VIEWER:
         self.grammar = TCG_LOADER.load_grammar("TCG_grammar.json", self.VIEWER_TMP, self.conceptual_knowledge)
 #        self.scene = TCG_LOADER.load_scene("TCG_scene.json", self.VIEWER_TMP)
         
-#        self._create_cxn_imgs()
+        self._create_cxn_imgs()
         self._create_concept_img()
         self._create_percept_img()
         self._create_conceptualizer_img()
@@ -291,6 +291,8 @@ class TCG_VIEWER:
         """
         Returns a DOT cluster containing all the information regarding the conceptual knowledge.
         """
+        top='CONCEPT' # To remove 'CONCEPT' from the graph
+        
         font_name = 'consolas'
         font_size = '12'
         node_color = 'grey'
@@ -298,8 +300,8 @@ class TCG_VIEWER:
         node_shape = 'box'
         style = 'rounded'
         fill_color = 'white'
-        edge_color = 'black'
-        
+        edge_color = '#00000088'
+
         
         if not(name):
             name = "conceptual_knowledge"
@@ -308,13 +310,17 @@ class TCG_VIEWER:
         cluster_cpt = pydot.Cluster(cluster_name)
         
         for concept in cpt_knowledge.nodes:
+            if concept.name ==top:
+                continue
             label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, concept.name)
             new_node = pydot.Node(concept.name, label=label, color=node_color, style=style, fontcolor=font_color, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
             cluster_cpt.add_node(new_node)
         
         for sem_rel in cpt_knowledge.edges:
+            if sem_rel.pTo.name == top:
+                continue
             label = ''
-#           label = sem_rel.type
+#           label = sem_rel.typeconcept
             new_edge = pydot.Edge(sem_rel.pFrom.name, sem_rel.pTo.name, color=edge_color, label=label, fontsize=font_size)
             cluster_cpt.add_edge(new_edge)
         
@@ -325,13 +331,17 @@ class TCG_VIEWER:
         """
         Returns a DOT cluster containing all the information regarding the perceptual knowledge.
         """
+        top='PERCEPT' # To remove 'PERCEPT' from the graph
+        
         font_name = 'consolas'
-        font_size = '16'
-        color = 'black'
+        font_size = '12'
+        node_color = 'grey'
         node_shape1 = 'box'
         node_shape2 = 'octagon'
+        font_color = 'black'
         style = 'filled'
         fill_color = 'white'
+        edge_color = '#00000088'
         
         if not(name):
             name = "perceptual_knowledge"
@@ -340,18 +350,22 @@ class TCG_VIEWER:
         cluster_per = pydot.Cluster(cluster_name)
         
         for per in per_knowledge.nodes:
+            if per.name ==top:
+                continue
             label = '<<FONT FACE="%s">%s</FONT>>' %(font_name, per.name)
             if isinstance(per, PERCEPT_CAT):
                 node_shape=node_shape1
             else:
                 node_shape=node_shape2
-            new_node = pydot.Node(per.name, label=label, color=color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size)
+            new_node = pydot.Node(per.name, label=label, color=node_color, style=style, shape=node_shape, fillcolor=fill_color, fontsize=font_size, fontcolor=font_color)
             cluster_per.add_node(new_node)
         
         for sem_rel in per_knowledge.edges:
+            if sem_rel.pTo.name == top:
+                continue
             label = ''
 #           label = sem_rel.type
-            new_edge = pydot.Edge(sem_rel.pFrom.name, sem_rel.pTo.name, label=label, fontsize=font_size)
+            new_edge = pydot.Edge(sem_rel.pFrom.name, sem_rel.pTo.name, color=edge_color, label=label, fontsize=font_size)
             cluster_per.add_edge(new_edge)
         
         return cluster_per
@@ -481,19 +495,19 @@ class TCG_VIEWER:
         SynForm_node_color = 'black'
         SynForm_node_fill_color = 'white'
         
-        SymLinks_color = 'lightgrey'
+        SymLinks_color = '#00000055'
         SymLinks_width = '4'
         SymLinks_style = 'dashed'
         
         if not(name):
             name = cxn.name
             
-        label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT">name: %s</TD></TR><TR><TD ALIGN="LEFT">class: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
+        label = '<<FONT FACE="%s"><TABLE BORDER="0" ALIGN="LEFT"><TR><TD ALIGN="LEFT"><B>name</B>: %s</TD></TR><TR><TD ALIGN="LEFT"><B>class</B>: %s</TD></TR></TABLE></FONT>>' %(font_name, cxn.name, cxn.clss)
         cluster_name = name
         cluster_cxn = pydot.Cluster(cluster_name, label=label, style=cxn_style, color=cxn_color)
         cluster_cxn.set_bgcolor(cxn_bg_color)
         
-        label = '<<FONT FACE="%s">SemFrame</FONT>>' %font_name
+        label = '<<FONT FACE="%s"><B>SemFrame</B></FONT>>' %font_name
         cluster_SemFrame = pydot.Cluster(name + '_SemFrame', label=label, style=SemFrame_style, color=SemFrame_color)
         cluster_SemFrame.set_bgcolor(SemFrame_bg_color)
         for node in cxn.SemFrame.nodes:
@@ -510,7 +524,7 @@ class TCG_VIEWER:
             else:
                 fill_color = SemFrame_node_fill_color
                 
-            new_node = pydot.Node(node.name, label=label, color=SemFrame_node_color, penwidth=node_width, fillcolor=fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name)
+            new_node = pydot.Node(node.name, label=label, color=SemFrame_node_color, penwidth=node_width, fillcolor=fill_color, shape=node_shape, style=node_style, fontsize=font_size, fontname=font_name, margin=0.01)
             cluster_SemFrame.add_node(new_node)
         for edge in cxn.SemFrame.edges:
             new_edge = pydot.Edge(edge.pFrom.name, edge.pTo.name, style=edge_style, penwidth=edge_width, label=edge.concept.meaning, fontsize=font_size, fontname=font_name)
@@ -518,16 +532,16 @@ class TCG_VIEWER:
         
         cluster_cxn.add_subgraph(cluster_SemFrame)
         
-        label = '<<FONT FACE="%s">SynForm</FONT>>' %font_name
+        label = '<<FONT FACE="%s"><B>SynForm</B></FONT>>' %font_name
         cluster_SynForm = pydot.Cluster(name + '_SynForm', label=label, style=SynForm_style, color=SynForm_color)
         cluster_SynForm.set_bgcolor(SynForm_bg_color)
         pre_form = None
         for form in cxn.SynForm.form:
             if isinstance(form, TP_SLOT):
-                new_node = pydot.Node(str(form), label ="[" +  ", ".join(form.cxn_classes) +"]",penwidth=node_width, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
+                new_node = pydot.Node(str(form), label ="[" +  ", ".join(form.cxn_classes) +"]",penwidth=node_width, shape=SynForm_shape, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name, margin=0.01)
                 cluster_SynForm.add_node(new_node)
             elif isinstance(form, TP_PHON):
-                new_node = pydot.Node(str(form), label = form.cxn_phonetics, shape=SynForm_shape, penwidth=node_width, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name)
+                new_node = pydot.Node(str(form), label = form.cxn_phonetics, shape=SynForm_shape, penwidth=node_width, style=node_style, color=SynForm_node_color, fillcolor=SynForm_node_fill_color, fontsize=font_size, fontname=font_name,  margin=0.01)
                 cluster_SynForm.add_node(new_node)
             if not(pre_form):
                 pre_form = form
@@ -837,7 +851,7 @@ class TCG_VIEWER:
         labeljust='l'
         penwidth = '2'
         rankdir = 'LR'
-        cxn_res = 300 #in dpi
+        res = 300 #in dpi
         
         dot_cxn = pydot.Dot(graph_type='digraph', labeljust=labeljust, penwidth=penwidth, ratio='compress')
         dot_cxn.set_rankdir(rankdir)
@@ -849,7 +863,7 @@ class TCG_VIEWER:
         file_name = tmp_folder + cxn.name + ".gv"
         dot_cxn.write(file_name)
             
-        cmd = "%s -T%s -Gdpi=%i %s > %s.%s" %(prog, file_type, cxn_res, file_name, file_name, file_type)
+        cmd = "%s -T%s -Gdpi=%i %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         if show:
             img_name = '%s.%s' %(file_name,file_type)          
@@ -873,6 +887,7 @@ class TCG_VIEWER:
         prog = 'dot'
         
         font_name ='consolas'
+        res = 300
 
         inst_cluster = TCG_VIEWER._create_cxn_inst_cluster(cxn_inst)
         
@@ -883,7 +898,7 @@ class TCG_VIEWER:
         file_name = tmp_folder + name + ".gv"
         inst_graph.write(file_name)
         
-        cmd = "%s -T%s -Gdpi=300 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        cmd = "%s -T%s -Gdpi=%i %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         if show:
             img_name = '%s.%s' %(file_name,file_type)
@@ -906,6 +921,7 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
             
         prog = 'dot'
+        res = 300
         
         if not(concise):
             C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(cxn_assemblage.schema_insts, cxn_assemblage.coop_links,[])
@@ -922,7 +938,7 @@ class TCG_VIEWER:
         file_name = tmp_folder + name + ".gv"
         assemblage_graph.write(file_name)
         
-        cmd = "%s -T%s -Gdpi=300 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        cmd = "%s -T%s -Gdpi=%i %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         
         if show:
@@ -945,6 +961,7 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
             
         prog = 'dot'
+        res = 300
         
         if not(concise):
             C2_cluster = TCG_VIEWER._create_cxn_inst_C2_cluster(WM.schema_insts, WM.coop_links,WM.comp_links)
@@ -961,7 +978,7 @@ class TCG_VIEWER:
         file_name = '%s%s%05d.gv' %(tmp_folder, name, WM.t)
         gram_WM_state_graph.write(file_name)
         
-        cmd = "%s -T%s -Gdpi=300 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        cmd = "%s -T%s -Gdpi=%i %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         
         if show:
@@ -985,6 +1002,7 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
         
         prog = 'dot'
+        res = 300
     
         name = 'semanticWM'
         
@@ -997,7 +1015,7 @@ class TCG_VIEWER:
         file_name = '%s%s%05d.gv' %(tmp_folder, semWM.name, semWM.t)
         semWM_graph.write(file_name)
         
-        cmd = "%s -T%s -Gdpi=300 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        cmd = "%s -T%s -Gdpi=%i %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         if show:
             img_name = '%s.%s' %(file_name,file_type)
@@ -1020,6 +1038,7 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
         
         prog = 'dot'
+        res = 300
         
         if not(concise):
             name='LinguisticWM'
@@ -1035,7 +1054,7 @@ class TCG_VIEWER:
         file_name = '%s%s%05d.gv' %(tmp_folder, name, semWM.t)
         lingWM_graph.write(file_name)
         
-        cmd = "%s -T%s -Gdpi=300 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type)
+        cmd = "%s -T%s -Gdpi=%i %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type)
         subprocess.call(cmd, shell=True)
         if show:
             img_name = '%s.%s' %(file_name,file_type)
@@ -1058,6 +1077,7 @@ class TCG_VIEWER:
             os.mkdir(tmp_folder)
         
         prog = 'neato' # Need to use neato or fdp to make use of node positions in rendering
+        res = 300
         
         name = 'visualWM'
         
@@ -1068,7 +1088,7 @@ class TCG_VIEWER:
         file_name = '%s%s%.1f.gv' %(tmp_folder, visWM.name, visWM.t)
         visWM_graph.write(file_name)
         
-        cmd = "%s -T%s -Gdpi=300 -n2 %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
+        cmd = "%s -T%s -Gdpi=%i -n2 %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
         subprocess.call(cmd, shell=True)
         if show:
             img_name = '%s.%s' %(file_name,file_type)
@@ -1091,7 +1111,8 @@ class TCG_VIEWER:
         
         
         prog = 'dot' # Need to use neato or fdp to make use of node positions in rendering
-
+        res = 300
+        
         if not(concise):
             name='WMs '
         else:
@@ -1105,7 +1126,7 @@ class TCG_VIEWER:
         file_name = '%s%s%.1f.gv' %(tmp_folder, name, semWM.t)
         WMs_graph.write(file_name)
         
-        cmd = "%s -T%s  -Gdpi=300 -s %s > %s.%s" %(prog, file_type, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
+        cmd = "%s -T%s  -Gdpi=%i -s %s > %s.%s" %(prog, file_type, res, file_name, file_name, file_type) # For neato flag -n or n2: assumes that positions have been set up by layout and are given in points.
         subprocess.call(cmd, shell=True)
         if show:
             img_name = '%s.%s' %(file_name,file_type)
