@@ -391,7 +391,7 @@ def parameter_space(folder=None, input_rate=100):
     
     # Task parameters
     start_produces = [1] #np.linspace(1, INPUT_RATE*10, 2)
-    time_pressures = np.linspace(INPUT_RATE/3, INPUT_RATE*10, 10)
+    time_pressures = np.linspace(INPUT_RATE/3, INPUT_RATE*10, 2)
     
     # C2 parameters
     coop_weights =  [1.0] #np.linspace(1.0, 10.0, 2)
@@ -599,7 +599,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
 #                        
 #    test_inputs = [u'event_action_patient_agent', u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent']
                         
-    inputs = ["woman_dog_chase_laugh_dyn"]
+    inputs = 'ALL'
     output = {}
     print "SIMULATION STARTING"
     start_time = time.time()
