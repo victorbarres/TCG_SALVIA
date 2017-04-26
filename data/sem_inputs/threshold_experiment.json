@@ -1,15 +1,15 @@
 { 
 	"input_macros":{
-		"woman_kick_ball_dyn":{
+		"woman_kick_ball":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)"
+					"EVENT_TRANS":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"AGENT":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"PATIENT":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)"
 				},
-				"sequence" :["P1", "P2", "P3", "P4"],
+				"sequence" :["EVENT_TRANS", "ACTION", "AGENT", "PATIENT"],
 				"timing":[],
 				"comments":"1 event (trans_event)"
 			},
@@ -17,14 +17,14 @@
 			}
 		},
 		
-		"boy_laugh_dyn":{
+		"boy_laugh":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P6":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & INTRANS_ACT(a2,F) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"
+					"EVENT_INTRANS":"EVENT(evt1,F) & INTRANS_ACT(a1,F) & IS(is1) & is1(evt1, a1)",
+					"AGENT_ACTION":"BOY(boy) & IS(is2) & INTRANS_ACT(a1,F) & is2(e1, boy) & LAUGH(laugh) & IS(is3) & is3(a1, laugh) & AGENT(agt1) & ENTITY(e1, F) & agt1(a1, e1)"
 				},
-				"sequence" :["P6", "P7"],
+				"sequence" :["EVENT_INTRANS", "AGENT_ACTION"],
 				"timing":[],
 				"comments":"1 event (intrans_event)"
 			},
@@ -32,17 +32,17 @@
 			}
 		},
 		
-		"woman_give_boy_ball_dyn":{
+		"woman_give_boy_ball":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & DITRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"GIVE(give) & IS(is2) & DITRANS_ACT(a1, F) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
-					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
-					"P5":"BOY(boy) & ENTITY(e3,F) & IS(is5) & is5(e3, boy)"	
+					"TRI_EVENT":"EVENT(evt1,F) & DITRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION":"GIVE(give) & IS(is2) & DITRANS_ACT(a1, F) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
+					"AGENT":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"RECIPIENT":"BOY(boy) & ENTITY(e3,F) & IS(is4) & is4(e2, boy)",
+					"THEME":"BALL(ball) & ENTITY(e2,F) & IS(is5) & is5(e3, ball)"
 				},
-				"sequence" :["P1", "P2", "P3", "P4", "P5"],
+				"sequence" :["TRI_EVENT", "ACTION", "AGENT", "RECIPIENT", "THEME"],
 				"timing":[],
 				"comments":"1 event (tri_event)"
 			},
@@ -51,19 +51,19 @@
 		},
 		
 		
-		"woman_kick_ball_while_boy_laugh_dyn":{
+		"woman_kick_ball_while_boy_laugh":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
-					"P5":"EVENT(evt1,F) & EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
-					"P6":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & INTRANS_ACT(a2,F) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"	
+					"EVENT_TRANS_1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION_1":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"AGENT_1":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"PATIENT_1":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
+					"CONCURRENT":"EVENT(evt1,F) & EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
+					"EVENT_INTRANS_2":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
+					"ACTION_AGENT_2":"BOY(boy) & IS(is7) & is7(e3, boy) & INTRANS_ACT(a2,F) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"	
 				},
-				"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+				"sequence" :["EVENT_TRANS_1", "ACTION_1", "AGENT_1", "PATIENT_1", "CONCURRENT", "EVENT_INTRANS_2", "ACTION_AGENT_2"],
 				"timing":[],
 				"comments":"2 events (trans_event + intrans_event_conjunction)"
 			},
@@ -71,19 +71,19 @@
 			}
 		},
 		
-		"boy_laugh_while_woman_kick_ball_dyn":{
+		"boy_laugh_while_woman_kick_ball":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & IS(is3) & ENTITY(e1,F) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4) & ENTITY(e2,F) & is4(e2, ball)",
-					"P5":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt2, evt1)",
-					"P6":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & INTRANS_ACT(a2,F) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"
+					"EVENT_INTRANS_1":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is5) & is5(evt2, a2)",
+					"ACTION_AGENT_1":"BOY(boy) & IS(is7) & is7(e3, boy) & LAUGH(laugh) & IS(is6) & INTRANS_ACT(a2,F) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)",
+					"CONCURRENT":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt2, evt1)",
+					"EVENT_TRANS_2":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION_2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"AGENT_2":"WOMAN(woman) & IS(is3) & ENTITY(e1,F) & is3(e1, woman)",
+					"PATIENT_2":"BALL(ball) & IS(is4) & ENTITY(e2,F) & is4(e2, ball)"
 				},
-				"sequence" :["P6", "P7", "P5", "P1", "P2", "P3", "P4"],
+				"sequence" :["EVENT_INTRANS_1", "ACTION_AGENT_1", "CONCURRENT", "EVENT_TRANS_2", "ACTION_2", "AGENT_2", "PATIENT_2"],
 				"timing":[],
 				"comments":"2 events (intrans_event + trans_event_conjunction)"
 			},
@@ -91,20 +91,20 @@
 			}
 		},
 		
-		"woman_give_boy_ball_while_dog_eat_dyn":{
+		"woman_give_boy_ball_while_dog_eat":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & DITRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"GIVE(give) & IS(is2) & DITRANS_ACT(a1, F) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
-					"P3":"WOMAN(woman) & IS(is3)  & ENTITY(e1,F) & is3(e1, woman)",
-					"P4":"BALL(ball) & IS(is4)  & ENTITY(e2,F) & is4(e2, ball)",
-					"P5":"BOY(boy) & IS(is5) & ENTITY(e3,F) & is5(e3, boy)",
-					"P6":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt2, evt1)",
-					"P7":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is6) & is6(evt2, a2)",
-					"P8":"DOG(dog) & IS(is7) & is7(e3, dog) & EAT(eat) & IS(is8) & INTRANS_ACT(a2,F) & is8(a2, eat) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"	
+					"EVENT_DITRANS_1":"EVENT(evt1,F) & DITRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION_1":"GIVE(give) & IS(is2) & DITRANS_ACT(a1, F) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
+					"AGENT_1":"WOMAN(woman) & IS(is3)  & ENTITY(e1,F) & is3(e1, woman)",
+					"RECIPIENT_1":"BOY(boy) & IS(is4) & ENTITY(e3,F) & is4(e2, boy)",
+					"THEME_1":"BALL(ball) & IS(is5)  & ENTITY(e2,F) & is5(e3, ball)",
+					"CONCURRENT":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt2, evt1)",
+					"EVENT_INTRANS_2":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is6) & is6(evt2, a2)",
+					"ACTION_AGENT_2":"DOG(dog) & IS(is7) & is7(e4, dog) & EAT(eat) & IS(is8) & INTRANS_ACT(a2,F) & is8(a2, eat) & AGENT(agt2) & ENTITY(e4, F) & agt2(a2, e4)"	
 				},
-				"sequence" :["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8"],
+				"sequence" :["EVENT_DITRANS_1", "ACTION_1", "AGENT_1", "RECIPIENT_1", "THEME_1", "CONCURRENT", "EVENT_INTRANS_2", "ACTION_AGENT_2"],
 				"timing":[],
 				"comments":"2 events (tri_event + intrans_event_conjunction)"
 			},
@@ -112,38 +112,76 @@
 			}
 		},
 		
-		"woman_kick_ball_dog_chase_dyn":{
+		"dog_eat_while_woman_give_boy_ball":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
-					"P8":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & ENTITY(e2,F) & mod1(e2, evt3)",
-					"P9":"CHASE(chase) & IS(is9) & TRANS_ACT(a3, F) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & ENTITY(e2,F) & pt3(a3, e2)",
-					"P10":"DOG(dog) & IS(is10) & ENTITY(e4,F) & is10(e4, dog)"	
+					"EVENT_DITRANS_2":"EVENT(evt1,F) & DITRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION_2":"GIVE(give) & IS(is2) & DITRANS_ACT(a1, F) & is2(a1, give) & ENTITY(e1,F) & ENTITY(e2,F), & ENTITY(e3,F) & AGENT(agt1) & THEME(thm1) & RECIPIENT(rcpt1) & agt1(a1, e1) & rcpt1(a1, e2) & thm1(a1, e3)",
+					"AGENT_2":"WOMAN(woman) & IS(is3)  & ENTITY(e1,F) & is3(e1, woman)",
+					"RECIPIENT_2":"BOY(boy) & IS(is4) & ENTITY(e3,F) & is4(e2, boy)",
+					"THEME_2":"BALL(ball) & IS(is5)  & ENTITY(e2,F) & is5(e3, ball)",
+					"CONCURRENT":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt1, evt2)",
+					"EVENT_INTRANS_1":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is6) & is6(evt2, a2)",
+					"ACTION_AGENT_1":"DOG(dog) & IS(is7) & is7(e4, dog) & EAT(eat) & IS(is8) & INTRANS_ACT(a2,F) & is8(a2, eat) & AGENT(agt2) & ENTITY(e4, F) & agt2(a2, e4)"	
 				},
-				"sequence" :["P1", "P2", "P3", "P4", "P8", "P9", "P10"],
+				"sequence" :["EVENT_INTRANS_1", "ACTION_AGENT_1", "CONCURRENT", "EVENT_DITRANS_2", "ACTION_2", "AGENT_2", "RECIPIENT_2", "THEME_2"],
 				"timing":[],
-				"comments":"2 events (trans_event + pt_agt sub_event)"
+				"comments":"2 events (intrans_event + tri_event_conjunction)"
 			},
 			"substitutions":{
 			}
 		},
 		
-		"woman_dog_chase_laugh_dyn":{
+		"boy_laugh_while_dog_eat":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & INTRANS_ACT(a1,F) & IS(is1) & is1(evt1,a1)",
-					"P2":"WOMAN(woman) & IS(is3) & INTRANS_ACT(a1,F) & is3(e1, woman) & LAUGH(laugh) & IS(is2) & is2(a1, laugh) & ENTITY(e1,F) & AGENT(agt1) & agt1(a1, e1)",
-					"P3":"EVENT(evt2, F) & TRANS_ACT(a2, F) & IS(is4) & is4(evt2, a2) & ENTITY(e1,F) & MODIFY(mod1) & mod1(e1, evt2)",
-					"P4":"ENTITY(e2,F) & DOG(dog) & IS(is5) & is5(e2, dog)",
-					"P5":"CHASE(chase) & IS(is6) & TRANS_ACT(a2, F) & is6(a2, chase) & ENTITY(e2,F) & AGENT(agt2) & PATIENT(pt1) & agt2(a2, e2) & ENTITY(e1,F) & pt1(a2, e1)"
-						
+					"EVENT_INTRANS_1":"EVENT(evt1,F) & INTRANS_ACT(a1,F) & IS(is1) & is1(evt1, a1)",
+					"ACTION_AGENT_1":"BOY(boy) & IS(is2) & is2(e1, boy) & LAUGH(laugh) & IS(is3) & INTRANS_ACT(a1,F) & is3(a1, laugh) & AGENT(agt1) & ENTITY(e1, F) & agt1(a1, e1)",
+					"CONCURRENT":"EVENT(evt2,F) & CONCURRENT(concurrent) & EVENT(evt1,F) & concurrent(evt2, evt1)",
+					"EVENT_INTRANS_2":"EVENT(evt2,F) & INTRANS_ACT(a2,F) & IS(is4) & is4(evt2, a2)",
+					"ACTION_AGENT_2":"DOG(dog) & IS(is5) & is5(e2, dog) & EAT(eat) & IS(is6) & INTRANS_ACT(a2,F) & is6(a2, eat) & AGENT(agt2) & ENTITY(e2, F) & agt2(a2, e2)"	
 				},
-				"sequence" :["P1", "P2", "P3", "P4", "P5"],
+				"sequence" :["EVENT_INTRANS_1", "ACTION_AGENT_1", "CONCURRENT", "EVENT_INTRANS_2", "ACTION_AGENT_2"],
+				"timing":[],
+				"comments":"2 events (intrans_event + intrans_event_conjunction)"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"woman_kick_ball_dog_chase":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions": {
+					"EVENT_TRANS_1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION_1":"KICK(kick) & IS(is2) & TRANS_ACT(a1, F) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"AGENT_1":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"PATIENT_1":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
+					"SUB_EVENT_1_TRANS_1":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & ENTITY(e2,F) & mod1(e2, evt3)",
+					"ACTION_1_1":"CHASE(chase) & IS(is9) & TRANS_ACT(a3, F) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & ENTITY(e2,F) & pt3(a3, e2)",
+					"PATIENT_AGENT_1_1":"DOG(dog) & IS(is10) & ENTITY(e4,F) & is10(e4, dog)"	
+				},
+				"sequence" :["EVENT_TRANS_1", "ACTION_1", "AGENT_1", "PATIENT_1", "SUB_EVENT_1_TRANS_1", "ACTION_1_1", "PATIENT_AGENT_1_1"],
+				"timing":[],
+				"comments":"2 events (trans_event + pt_agt sub_trans_event)"
+			},
+			"substitutions":{
+			}
+		},
+		
+		"woman_dog_chase_laugh":{
+			"sem_input_frame":{
+				"sem_rate":1,
+				"propositions": {
+					"EVENT_INTRANS_1":"EVENT(evt1,F) & INTRANS_ACT(a1,F) & IS(is1) & is1(evt1,a1)",
+					"ACTION_AGENT_1":"WOMAN(woman) & IS(is3) & INTRANS_ACT(a1,F) & is3(e1, woman) & LAUGH(laugh) & IS(is2) & is2(a1, laugh) & ENTITY(e1,F) & AGENT(agt1) & agt1(a1, e1)",
+					"SUB_EVENT_1_TRANS_1":"EVENT(evt2, F) & TRANS_ACT(a2, F) & IS(is4) & is4(evt2, a2) & ENTITY(e1,F) & MODIFY(mod1) & mod1(e1, evt2)",
+					"ACTION_1_1":"CHASE(chase) & IS(is6) & TRANS_ACT(a2, F) & is6(a2, chase) & ENTITY(e2,F) & AGENT(agt2) & PATIENT(pt1) & agt2(a2, e2) & ENTITY(e1,F) & pt1(a2, e1)",
+					"AGENT_1_1":"ENTITY(e2,F) & DOG(dog) & IS(is5) & is5(e2, dog)"	
+				},
+				"sequence" :["EVENT_INTRANS_1", "ACTION_AGENT_1", "SUB_EVENT_1_TRANS_1", "ACTION_1_1", "AGENT_1_1"],
 				"timing":[],
 				"comments":"2 events (intrans_event + agt sub_event)"
 			},
@@ -151,22 +189,22 @@
 			}
 		},
 		
-		"woman_kick_ball_dog_chase_while_boy_laugh_dyn":{
+		"woman_kick_ball_dog_chase_while_boy_laugh":{
 			"sem_input_frame":{
 				"sem_rate":1,
 				"propositions": {
-					"P1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
-					"P2":"KICK(kick) & TRANS_ACT(a1, F) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
-					"P3":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
-					"P4":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
-					"P5":"EVENT(evt1,F) & EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
-					"P6":"INTRANS_ACT(a2,F) & IS(is5) & EVENT(evt2,F) & is5(evt2, a2)",
-					"P7":"BOY(boy) & IS(is7) & is7(e3, boy) & INTRANS_ACT(a2,F) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)",
-					"P8":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & mod1(e2, evt3)",
-					"P9":"CHASE(chase) & IS(is9) & TRANS_ACT(a3, F) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & ENTITY(e2,F) & pt3(a3, e2)",
-					"P10":"DOG(dog) & ENTITY(e4,F) & IS(is10) & is10(e4, dog)"	
+					"EVENT_TRANS_1":"EVENT(evt1,F) & TRANS_ACT(a1, F) & IS(is1) & is1(evt1,a1)",
+					"ACTION_1":"KICK(kick) & TRANS_ACT(a1, F) & IS(is2) & is2(a1, kick) & ENTITY(e1,F) & ENTITY(e2,F) & AGENT(agt1) & PATIENT(pt1) & agt1(a1, e1) & pt1(a1, e2)",
+					"AGENT_1":"WOMAN(woman) & ENTITY(e1,F) & IS(is3) & is3(e1, woman)",
+					"PATIENT_1":"BALL(ball) & ENTITY(e2,F) & IS(is4) & is4(e2, ball)",
+					"SUB_EVENT_1_TRANS_1":"EVENT(evt3, F) & TRANS_ACT(a3, F) & IS(is8) & is8(evt3, a3) & MODIFY(mod1) & mod1(e2, evt3)",
+					"ACTION_1_1":"CHASE(chase) & IS(is9) & TRANS_ACT(a3, F) & is9(a3, chase) & ENTITY(e4,F) & AGENT(agt3) & PATIENT(pt3) & agt3(a3, e4) & ENTITY(e2,F) & pt3(a3, e2)",
+					"PATIENT_AGENT_1_1":"DOG(dog) & ENTITY(e4,F) & IS(is10) & is10(e4, dog)",
+					"CONCURRENT":"EVENT(evt1,F) & EVENT(evt2,F) & CONCURRENT(concurrent) & concurrent(evt1, evt2)",
+					"EVENT_INTRANS_2":"INTRANS_ACT(a2,F) & IS(is5) & EVENT(evt2,F) & is5(evt2, a2)",
+					"ACTION_AGENT_2":"BOY(boy) & IS(is7) & is7(e3, boy) & INTRANS_ACT(a2,F) & LAUGH(laugh) & IS(is6) & is6(a2, laugh) & AGENT(agt2) & ENTITY(e3, F) & agt2(a2, e3)"
 				},
-				"sequence" :["P1", "P2", "P3", "P4", "P8", "P9", "P10", "P5", "P6", "P7"],
+				"sequence" :["EVENT_TRANS_1", "ACTION_1", "AGENT_1", "PATIENT_1", "SUB_EVENT_1_TRANS_1", "ACTION_1_1", "PATIENT_AGENT_1_1", "CONCURRENT", "EVENT_INTRANS_2", "ACTION_AGENT_2"],
 				"timing":[],
 				"comments":"3 events (trans_event + pt_agt trans_sub_event + intrans_event_conjunction)"
 			},

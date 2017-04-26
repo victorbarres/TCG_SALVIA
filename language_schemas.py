@@ -113,7 +113,7 @@ class CXN_SCHEMA(KNOWLEDGE_SCHEMA):
         """
         Returns the list of initial prediction (syntactic classes or word forms)
         This is similar to getting the Left-Corner of the rule in the case of CFG.
-        Serves as a conditions of instantiation of CXN_SCHEMA based on SynForm.s
+        Serves as a conditions of instantiation of CXN_SCHEMA based on SynForm.
         """
         init_preds = []
         init_form = self.content.SynForm.form[0]
@@ -198,6 +198,7 @@ class CXN_SCHEMA_INST_C(CXN_SCHEMA_INST):
     Added:
         - form_sequence
         - form_state
+        - chart_pos (Should be reorganized with Covers)
         - has_predicted
         - expressed
     Notes:
@@ -2944,7 +2945,7 @@ class GRAMMATICAL_WM_C(WM):
         
         NOTES: 
             - Check the existing instances whose form match the phon_inst.content['word_form']. If there is a match, move dot.
-            - This is when the competitions are taking place.
+            - This is when a first set of competitions are taking place.
             - Covers, to fit with production, should be a mapping between SynForm and PhonRep, while Trace is the part that only keeps track of the element that triggered the instantiation.
             - A key step is to reset the activation of the instance that is confirmed by an input to that of the Phon instance. Right now it is just set to the value of the phone instance. 
             But it should be clamped to it or receive a constant input from it.
@@ -2964,7 +2965,7 @@ class GRAMMATICAL_WM_C(WM):
     
     def completer(self):
         """
-        TCG version of the Earley chart parsing completer. (Where cooperations are defined)
+        TCG version of the Earley chart parsing completer. (Competitions and cooperations are defined)
         NOTES:
             -  Recursively check all the "completed" cxn (dot all the way to the right) and make the appropriate coop links.
             - I HAVE ADDED COMPETITION HERE... BUT I AM NOT SURE THAT THIS IS THE WAY TO GO.

@@ -304,18 +304,15 @@ def run_diagnostics(verbose=2, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'diagnostic.json'
+    DIAGNOSTIC_FILE = 'threshold_experiment.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
-    OFFSET = 100
+    OFFSET = 10
     STD = .3
-    MODEL_PARAMS = {'Control.task.start_produce':500, 
-                    'Control.task.time_pressure':100, 
+    MODEL_PARAMS = {'Control.task.start_produce':1, 
+                    'Control.task.time_pressure':30, 
                     'Grammatical_WM_P.dyn.ext_weight':1.0, 
-                    'Grammatical_WM_P.C2.prune_threshold': 0.01, 
-                    'Grammatical_WM_P.C2.coop_weight':1.0, 
-                    'Grammatical_WM_P.C2.comp_weight':-10.0, 
-                    'Grammatical_WM_P.C2.coop_asymmetry':1.0}
+                    'Grammatical_WM_P.C2.prune_threshold': 0.01}
     
     # Attempts to model lesion
 #    MODEL_PARAMS['Grammatical_WM_P.C2.coop_weight']=0.1 # Reduce cooperation weights
@@ -327,7 +324,7 @@ def run_diagnostics(verbose=2, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time = 1500
+    max_time = 2000
     seed = None
     save = True
     anim = False
@@ -391,20 +388,20 @@ def parameter_space(folder=None, input_rate=100):
     
     # Task parameters
     start_produces = [1] #np.linspace(1, INPUT_RATE*10, 2)
-    time_pressures = np.linspace(INPUT_RATE/3, INPUT_RATE*10, 2)
+    time_pressures = np.linspace(INPUT_RATE/2, INPUT_RATE*10, 5)
     
     # C2 parameters
     coop_weights =  [1.0] #np.linspace(1.0, 10.0, 2)
     coop_asymmetries = [1.0] #np.linspace(0.0, 1.0, 2)
     comp_weights = [-10.0]
     max_capacity = [None]
-    prune_thresholds = [0.01] # Change prune threshold (should be done in relation to initial activation values.) #0.01 # Manipulations can yield "broca's aphasia" (0.3)
+    prune_thresholds = [0.0] # Change prune threshold (should be done in relation to initial activation values.) #0.01 # Manipulations can yield "broca's aphasia" (0.3)
     conf_tresholds = [0.3] #np.linspace(0.1, 0.9, 2) # np.linspace(0.3,0.3, 1) #0.7
     sub_threholds = [0.8]
     deact_weights = [0.0] #np.linspace(0.0, 0.9, 2)
     
     # Dyn parameters
-    taus = [INPUT_RATE] #np.linspace(INPUT_RATE/10, INPUT_RATE*10) # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+    taus = np.linspace(INPUT_RATE/3, INPUT_RATE*3, 3)# Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
     ks= [10] #np.linspace(1, 10, 2) # Interesting effects, bifurcation at a given value.
     act_rests = [0.001] # Act rest does not take into account the noise.
     noise_stds = [1.0] #np.linspace(1.0, 2.0, 2) # Impact of dynamic noise -> Not useful. But might have impact in early symmetry breaking.
@@ -455,7 +452,7 @@ def parameter_space(folder=None, input_rate=100):
     return (model_params_set, param_name_mapping) 
         
         
-def grid_search(model, sem_gen, input_name, max_time, folder, model_params_set=[], num_restarts=10, seed=None, verbose=1, save_models=True):
+def grid_search(model, sem_gen, input_name, max_time, folder, model_params_set=[], num_restarts=10, seed=None, verbose=2, save_models=True):
     """
     Runs model "model" for all the inputs in "sem_gen" over the search space defined by "model_params_set".
     For each point of the search space, model is ran "num_restarts" times.
@@ -538,7 +535,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
     verbose = 1
         
     # Defining the number of restarts
-    NUM_RESTARTS = 1
+    NUM_RESTARTS =10
 
     # Defining fixed input rate
     INPUT_RATE = 100 # This serves as a time reference for the range of Tau and task parameters 
@@ -599,7 +596,7 @@ def run_grid_search(sim_name='', sim_folder=TMP_FOLDER, seed=None, save=True, in
 #                        
 #    test_inputs = [u'event_action_patient_agent', u'patient_action_agent_event', u'agent_event_action_patient', u'action_event_patient_agent']
                         
-    inputs = 'ALL'
+    inputs = 'ALL' #["woman_give_boy_ball_while_dog_eat_dyn"] #'ALL'
     output = {}
     print "SIMULATION STARTING"
     start_time = time.time()
@@ -700,8 +697,8 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
             f.write(new_line)
     
 if __name__=='__main__':
-    run_diagnostics(verbose=2, prob_times=[])
-#    run_grid_search()
+#    run_diagnostics(verbose=2, prob_times=[])
+    run_grid_search()
 #    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
 #    out, out2str = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_punch_man_dyn", sem_input_file='TCG_AAAI_input.json', sem_input_macro=False, max_time=1000, seed=None, speed_param=100, prob_times=[], verbose=4, save=True, anim=False, anim_step=1)
