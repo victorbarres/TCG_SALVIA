@@ -152,7 +152,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
            
     # Display end states
     if verbose>2:
-        model.schemas['Grammatical_WM_P'].show_dynamics()
+        model.schemas['Grammatical_WM_P'].show_dynamics(folder=FOLDER)
         
     if anim:
         if save:
@@ -697,8 +697,8 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
             f.write(new_line)
     
 if __name__=='__main__':
-#    run_diagnostics(verbose=2, prob_times=[])
-    run_grid_search()
+    run_diagnostics(verbose=2, prob_times=[])
+#    run_grid_search()
 #    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()
 #    out, out2str = run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}, input_name="woman_punch_man_dyn", sem_input_file='TCG_AAAI_input.json', sem_input_macro=False, max_time=1000, seed=None, speed_param=100, prob_times=[], verbose=4, save=True, anim=False, anim_step=1)

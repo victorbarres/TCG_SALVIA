@@ -19,7 +19,7 @@ TMP_FOLDER = './tmp'
 #### RUNNING MODEL
 def set_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', model_params = {}):
     """
-    Sets up a TCG comphrehension model.
+    Sets up a TCG comprehension model.
     
     Args:
         - semantics_name (STR): Name of the semantic file containing the perceptual, world, and conceptualization knowledge.
@@ -125,9 +125,9 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
            
     # Display end states
     if verbose>2:
-        model.schemas['Grammatical_WM_C'].show_dynamics()
-        model.schemas['Phonological_WM_C'].show_dynamics()
-        model.schemas['Semantic_WM_C'].show_dynamics()
+        model.schemas['Grammatical_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['Phonological_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['Semantic_WM_C'].show_dynamics(folder=FOLDER)
        
     if anim:
         if save:
@@ -171,15 +171,15 @@ def run_diagnostic(verbose=2):
     # Data files
     LING_INPUT_FILE = 'ling_inputs.json'
     SEMANTICS_NAME = 'TCG_semantics_main'
-    GRAMMAR_NAME = 'TCG_grammar_VB_main'
+    GRAMMAR_NAME = 'TCG_grammar_VB_2route'
     
     # Default Parameters
     VERBOSE = verbose
     SEED = None
     SAVE = True
     ANIM = False
-    MAX_TIME = 900
-    SPEED_PARAM = 50
+    MAX_TIME = 1500
+    SPEED_PARAM = 200
     OFFSET = 10
     ANIM_STEP = 1
     PROB_TIMES = []

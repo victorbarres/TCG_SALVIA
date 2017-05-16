@@ -989,6 +989,8 @@ class SEMANTIC_WM_C2_C(WM):
         self.update_activations()
         self.prune()
         state_changed = self.update_SemRep(new_insts)
+        if state_changed:
+            self.show_state()
 #        self.outputs['to_output'] = True 
         self.outputs['to_output'] =  state_changed
 
@@ -1027,7 +1029,7 @@ class SEMANTIC_WM_C2_C(WM):
                 for e_t in e_t_list:
                     dat_t = self.SemRep.get_edge_data(e_t[0], e_t[1], e_t[2]) # by definition multi edges are given as (from, to, key)
                     name_t = dat_t['name']
-                    inst_t = self.find_instance(name_t) 
+                    inst_t = self.find_instance(name_t)
                     if edge_s.concept.match(inst_t.content['concept'], match_type='equal'): # edge concepts match
                         inst_t.trace['sem_frame_insts'].update(sem_frame_insts)
                     else: # creating competing edges
@@ -1317,6 +1319,8 @@ class SEMANTIC_WM_C2_C(WM):
          
         node_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a") or cpt1.match(cpt2, match_type="is_a")
         edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+
+
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
         
@@ -1325,6 +1329,7 @@ class SEMANTIC_WM_C2_C(WM):
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
+            print "EDGE MATCH CONSTRAINTS"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)
@@ -1335,6 +1340,7 @@ class SEMANTIC_WM_C2_C(WM):
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
+            print "NO EDGE MATCH CONSTRAINTS"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)

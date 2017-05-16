@@ -145,10 +145,10 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
            
     # Display end states
     if verbose>2:
-        model.schemas['Grammatical_WM_C'].show_dynamics()
-        model.schemas['Phonological_WM_C'].show_dynamics()
-        model.schemas['Semantic_WM_C'].show_dynamics()
-        model.schemas['WK_frame_WM'].show_dynamics()
+        model.schemas['Grammatical_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['Phonological_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['Semantic_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['WK_frame_WM'].show_dynamics(folder=FOLDER)
        
     if anim:
         if save:
@@ -212,7 +212,7 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
 
 ###############
 #### DIAGNOSTIC     
-def run_diagnostic(verbose=2):
+def run_diagnostic(verbose=3):
     """
     """
     import json
@@ -682,9 +682,9 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
 if __name__=='__main__':
     model = set_model()
 #    model.system2dot(image_type='png', disp=True)
-#    out = run_diagnostic()
+    out = run_diagnostic()
 #    print out
-    run_grid_search(sim_name='aphasia_sim_route_weights_WK05_7')
+#    run_grid_search(sim_name='aphasia_sim_route_weights_WK05_7')
 
 
 

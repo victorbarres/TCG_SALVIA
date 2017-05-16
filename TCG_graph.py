@@ -60,10 +60,10 @@ def find_sub_multi_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=la
     sub_iso = []
     mappings = []  
     G_subgraphs = build_submultigraphs(G, induced=induce_type, subgraph_filter=subgraph_filter)  
-    G_subgraphs = [g for g in G_subgraphs if len(g.nodes())==len(G_pat.nodes()) and len(g.edges())==len(G_pat.edges())]
     for subgraph in G_subgraphs:
         MultDiGM = isomorphism.MultiDiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
-        if MultDiGM.is_isomorphic() and not MultDiGM.mapping in mappings: # Because of the way nx works, it migth return twice the same mapping for different multi edges. See comment below about trying to have nx returning edge_mapping directly...
+        is_isomorphic = MultDiGM.is_isomorphic()
+        if is_isomorphic and not MultDiGM.mapping in mappings: # Because of the way nx works, it migth return twice the same mapping for different multi edges. See comment below about trying to have nx returning edge_mapping directly...
             mappings.append(MultDiGM.mapping)
     
     for mapping in mappings:
@@ -493,17 +493,24 @@ def test2():
     # Main graph
     G = nx.MultiDiGraph()
     
-    G.add_node(0, attr_dict={'val':1})
-    G.add_node(1, attr_dict={'val':2})
-    G.add_node(2, attr_dict={'val':3})
-    G.add_node(3, attr_dict={'val':0})
+#    G.add_node(0, attr_dict={'val':1})
+#    G.add_node(1, attr_dict={'val':2})
+#    G.add_node(2, attr_dict={'val':3})
+#    G.add_node(3, attr_dict={'val':0})
+#    
+#    G.add_edge(0,1, attr_dict={'val':1})
+#    G.add_edge(0,1, attr_dict={'val':2})
+#    G.add_edge(0,1, attr_dict={'val':3})
+#    G.add_edge(1,2, attr_dict={'val':1})
+#    G.add_edge(1,2, attr_dict={'val':2})
+#    G.add_edge(2,0, attr_dict={'val':1})
+
+    G.add_node(1, attr_dict={'val':1})
+    G.add_node(2, attr_dict={'val':2})
+    G.add_node(3, attr_dict={'val':1})
     
-    G.add_edge(0,1, attr_dict={'val':1})
-    G.add_edge(0,1, attr_dict={'val':2})
-    G.add_edge(0,1, attr_dict={'val':3})
     G.add_edge(1,2, attr_dict={'val':1})
-    G.add_edge(1,2, attr_dict={'val':2})
-    G.add_edge(2,0, attr_dict={'val':1})
+    G.add_edge(3,2, attr_dict={'val':2})
 
     
     # Graph pattern
@@ -511,10 +518,10 @@ def test2():
     
     G_pat.add_node("a", attr_dict={'val':1})
     G_pat.add_node("b", attr_dict={'val':2})
-    G_pat.add_node("c", attr_dict={'val':3})
+    G_pat.add_node("c", attr_dict={'val':1})
     
-    G_pat.add_edge("a","b", attr_dict={'val':1})
-    G_pat.add_edge("b","c", attr_dict={'val':1})
+    G_pat.add_edge("a","b", attr_dict={'val':2})
+    G_pat.add_edge("c","b", attr_dict={'val':1})
     
     G_subgraphs = build_submultigraphs(G, induced='edge') # In this example, if induced = 'nodes' it won't find any isomorphisms.
     
@@ -522,7 +529,7 @@ def test2():
     op = lambda x,y: x == y
     nm_gen = node_iso_match("val", 0, op)
     em_gen = multi_edge_iso_match("val", 0, op)
-    sub_iso = find_sub_multi_iso(G, G_subgraphs, G_pat, node_match = nm_gen, edge_match=em_gen)
+    sub_iso = find_sub_multi_iso(G, G_pat, node_match=nm_gen, edge_match=em_gen)
     
     if sub_iso:
         print sub_iso
@@ -573,4 +580,4 @@ def test3():
     
 ###############################################################################
 if __name__=="__main__":
-    test3()
+    test2()
