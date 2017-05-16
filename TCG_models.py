@@ -49,7 +49,7 @@ def parameters(system_names):
         'dyn.noise_mean':0.0,
         'dyn.noise_std':0.1,
         'C2.confidence_threshold':0.0,
-        'C2.prune_threshold':0.01,
+        'C2.prune_threshold':0.0,
         'C2.coop_weight':0.0,
         'C2.comp_weight':0.0,
         'C2.max_capacity':None

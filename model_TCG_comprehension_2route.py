@@ -654,9 +654,9 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
 if __name__=='__main__':
     model = set_model()
 #    model.system2dot(image_type='png', disp=True)
-#    out = run_diagnostic()
+    out = run_diagnostic()
 #    print out
-    run_grid_search(sim_name='test')
+#    run_grid_search(sim_name='test')
 
 
 
