@@ -143,10 +143,10 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
            
     # Display end states
     if verbose>2:
-        model.schemas['Grammatical_WM_C'].show_dynamics()
-        model.schemas['Phonological_WM_C'].show_dynamics()
-        model.schemas['Semantic_WM_C'].show_dynamics()
-        model.schemas['WK_frame_WM'].show_dynamics()
+        model.schemas['Grammatical_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['Phonological_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['Semantic_WM_C'].show_dynamics(folder=FOLDER)
+        model.schemas['WK_frame_WM'].show_dynamics(folder=FOLDER)
        
     if anim:
         if save:
@@ -211,7 +211,7 @@ def run_model(semantics_name='TCG_semantics_dev', grammar_name='TCG_grammar_VB_2
 
 ###############
 #### DIAGNOSTIC     
-def run_diagnostic(verbose=2):
+def run_diagnostic(verbose=3):
     """
     """
     import json
@@ -221,7 +221,7 @@ def run_diagnostic(verbose=2):
     VERBOSE = verbose
     SEED = None
     ANIM = False
-    MAX_TIME = 2000
+    MAX_TIME = 1000
     SPEED_PARAM = 100
     OFFSET = 10
     STD = 0
