@@ -164,23 +164,23 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
 ###############
 #### DIAGNOSTIC      
-def run_diagnostic(verbose=2):
+def run_diagnostic(verbose=3):
     """
     """
     import json
     # Data files
     LING_INPUT_FILE = 'ling_inputs.json'
     SEMANTICS_NAME = 'TCG_semantics_main'
-    GRAMMAR_NAME = 'TCG_grammar_VB_2route'
+    GRAMMAR_NAME = 'TCG_grammar_VB_main(light)'
     
     # Default Parameters
     VERBOSE = verbose
     SEED = None
     SAVE = True
     ANIM = False
-    MAX_TIME = 1500
-    SPEED_PARAM = 200
-    OFFSET = 10
+    MAX_TIME = 2000
+    SPEED_PARAM = 100
+    OFFSET = 100
     ANIM_STEP = 1
     PROB_TIMES = []
 

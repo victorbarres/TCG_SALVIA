@@ -149,6 +149,13 @@
 			 "utterance" :["boy", "eat", "cake", "in", "bedroom"],
 			 "timing":[],
 			 "comments": ""
+			},
+			
+		"thesis_example":{
+			"utter_rate": 1,
+			 "utterance" :["woman", "that", "is", "kiss", "-ed", "by", "man", "kick", "dog", "ball", "while", "boy", "cry"],
+			 "timing":[],
+			 "comments": ""
 			}
 	}
 }

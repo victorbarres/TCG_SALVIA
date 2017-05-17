@@ -1,0 +1,464 @@
+{
+	"CONCEPTUAL_KNOWLEDGE" : 
+	{
+		"EVENT":
+		{
+		
+		},
+		
+		"ENTITY" : 
+		{
+			"OBJECT" : 
+			{
+				"HUMAN" :
+				{
+					"PEOPLE" : {},
+					"BALLERINA" : {},
+					"CELLIST" :{},
+					"FENCER" : {},
+					"ROBBER" : {},
+					"POLICEMAN" : {},
+					"HUNTER" : {},
+					"ADULT" : 
+					{
+						"MAN" : {},
+						"WOMAN" : {}
+					},
+					"CHILD" :
+					{
+						"BOY" : {},
+						"GIRL" :{}
+					}
+					
+				},
+				"ITEM" : 
+				{
+					"CLOTHING" : 
+					{
+						"DRESS" : {},
+						"TSHIRT" : {},
+						"SHIRT" : {},
+						"SUIT" : {}
+					},
+					"FOOD":
+					{
+						"BREAD": {},
+						"CAKE" : {},
+						"APPLE" : {}
+					},
+					"CELLO" : {},
+					"TREE" : {},
+					"BAG" :{},
+					"WATERING_CAN" : {}, 
+					"HOOK" : {},
+					"BOOKSHELF" :{},
+					"WAGON" : {}, 
+					"BALL" :{},
+					"TOY" :
+					{
+						"MERRY_GO_ROUND" : {}
+					},
+					"VEHICLE" :
+					{
+						"MOTORCYCLE" : {}
+					}
+				},
+				"ANIMAL" : 
+				{
+					"MOUSE" :{},
+					"TURTLE" : {},
+					"DOG" : {},
+					"TIGER" :{},
+					"CHEETAH" :{}
+				}
+			},
+			"PLACE" :
+			{
+				"BOXINGRING" : {},
+				"PARK" : {}
+			},
+
+			"ANIMATE" : 
+			{ 
+				"HUMAN" : {},
+				"ANIMAL" : {}
+			},
+
+			"MALE" : 
+			{ 
+				"MAN" : {},
+				"BOY" : {}
+			},
+
+			"FEMALE"  : 
+			{ 
+				"WOMAN" : {},
+				"GIRL" : {},
+				"BALLERINA" :{}
+			}
+		},
+		
+		"ACTION" : 
+		{
+			"TRANS_ACT" :
+			{
+				"SQUIRT" : {},
+				"TALK" : {},
+				"HIT" : {},
+				"KICK" : {},
+				"WEAR" : {},
+				"SPLASH" : {},
+				"PUNCH" : {},
+				"KISS" : {},
+				"WATCH" : {},
+				"MEET" : {},
+				"CHASE" : {},
+				"FLEE" : {},
+				"EAT" : {},
+				"RIDE": {}
+			},
+			
+			"SYM_ACT":
+			{
+				"MEET" : {},
+				"SHAKE_HANDS" : {}
+			},
+			
+			"INTRANS_ACT" :
+			{
+				"LAUGH" : {},
+				"TALK" : {},
+				"FLEE" : {},
+				"EAT" : {}
+			},
+			
+			"DITRANS_ACT" :
+			{
+				"GIVE": {},
+				"SEND": {}
+			}
+		},
+		
+		"PROPERTY" :
+		{
+			"QUALITY":{
+				"COLOR" :
+				{
+					"BLACK" : {},
+					"WHITE" : {},
+					"BLUE" : {},
+					"GREEN" : {},
+					"RED" : {}
+				},
+				"SIZE" :
+				{
+					"SMALL" : {},
+					"BIG" : {}
+				},		
+				"APPEARANCE" :
+				{
+					"PRETTY" : {},
+					"HANDSOME" : {},
+					"YOUNG" : {}
+				}
+			},
+			"DISCOURSE_PROPERTY":
+			{
+				"DEFINITE" : {},
+				"INDEFINITE" : {}
+			}
+		},
+		
+		"RELATION" : {
+			
+			"IS":{},
+			
+			"OBJECT_FRAME":{
+				"MODIFY" : {},
+				"ATTR" : {}
+			},
+				
+			"ACTION_FRAME" :
+			{
+				"ATTR" : {},
+				"AGT_PT":{
+					"AGENT": {
+						"AGT+PT" : {}
+						},
+					"PATIENT": {
+						"AGT+PT" : {}
+						}
+				},
+				"THEME" : {},
+				"RECIPIENT" : {},
+				"MODIFY" : {}
+			},
+			
+			"EVENT_FRAME":
+			{
+				"SPATIAL" : 
+				{ 
+					"IN" : {} 
+				},
+				"TEMPORAL" :
+				{
+				"SUCCESSIVE" : {},
+				"CONCURRENT" : {}
+				}
+			}
+		}
+	},
+	
+	"WK_FRAMES":[
+	],
+
+	"PERCEPTUAL_KNOWLEDGE" :
+	{
+	
+		"SCENE":
+		[
+			"EVENT_SCENE",
+			"ACTION_SCENE",
+			"ENTITY_SCENE"
+		],
+		
+		"OBJECT":
+		[
+			
+			"MAN",
+			"BOY",
+			"WOMAN",
+			"GIRL",
+			"HUMAN",
+			"ANIMAL",
+			"MOUSE",
+			"TURTLE",
+			"DRESS",
+			"TSHIRT",
+			"PEOPLE",
+			"BALLERINA",
+			"CELLIST",
+			"FENCER", 
+			"CELLO",
+			"TREE",
+			"BAG",
+			"WATERING_CAN",
+			"SHIRT",
+			"SUIT",
+			"ROBBER",
+			"POLICEMAN",
+			"HUNTER",
+			"DOG",
+			"TIGER", 
+			"CHEETAH",
+			"HOOK",
+			"BOOKSHELF",
+			"WAGON", 
+			"BALL",
+			"BREAD",
+			"MOTORCYCLE",
+			"MERRY_GO_ROUND",
+			"CAKE",
+			"APPLE"
+		],
+		
+		"PLACE":
+		[
+			"BOXINGRING",
+			"PARK"
+		],
+		
+		"ACTION":
+		[
+			"SQUIRT",
+			"TALK",
+			"HIT",
+			"WEAR",
+			"KICK",
+			"LAUGH",
+			"WATCH",
+			"SPLASH",
+			"MEET",
+			"PUNCH",
+			"KISS",
+			"SHAKE_HANDS",
+			"CHASE",
+			"FLEE",
+			"EAT",
+			"RIDE"
+		],
+		
+		"QUALITY":
+		{
+			"COLOR":
+			[
+				"RED",
+				"BLUE",
+				"GREEN",
+				"BLACK",
+				"WHITE"
+			],
+			"SIZE":
+			[
+				"SMALL",
+				"BIG"
+			],
+			
+			"APPEARANCE":
+			[
+				"YOUNG",
+				"PRETTY",
+				"HANDSOME"
+			]
+		},
+		
+		"RELATION":
+		{
+			"SCENE_REL":
+			[
+				"IS"
+			],
+			
+			"ACTION_REL":
+			[
+				"SQUIRTER",
+				"TALKER",
+				"HITER",
+				"WEARER",
+				"KICKER",
+				"LAUGHER",
+				"WATCHER",
+				"SQUIRTEE",
+				"HEARER",
+				"HITEE",
+				"WEAREE",
+				"KICKEE",
+				"WATCHEE",
+				"SPLASHER",
+				"SPLASHEE",
+				"GIVER",
+				"GIVEE",
+				"GIVEN",
+				"SENDER",
+				"SENDEE",
+				"SENT",
+				"PUNCHER",
+				"PUNCHEE",
+				"MEET_REL",
+				"SHAKE_HANDS_REL",
+				"KISSER",
+				"KISSEE",
+				"CHASER", 
+				"CHASEE", 
+				"FLEEER", 
+				"FLEEEE", 
+				"EATER", 
+				"EATEE", 
+				"RIDER", 
+				"RIDEE"
+			],
+			"SPATIAL_REL":
+			[
+				"CONTAIN" 
+			],
+			"QUALITY_REL":
+			[
+				"HAS_PARAM"
+			],
+			"TEMP_REL":
+			[
+				"CONCURRENT",
+				"SUCCESSIVE"
+			]
+		}
+	},
+	
+	"CONCEPTUALIZATION":
+	{	
+		"ENTITY": ["ENTITY_SCENE"],
+		"ACTION" : ["ACTION_SCENE"],
+		"EVENT" : ["EVENT_SCENE"],
+		
+		"MAN" : ["MAN"],
+		"BOY" : ["BOY"],
+		"WOMAN" : ["WOMAN"],
+		"GIRL" : ["GIRL"],
+		"HUMAN" : ["HUMAN"],
+		"ANIMAL" : ["ANIMAL"],
+		"MOUSE" : ["MOUSE"],
+		"TURTLE" : ["TURTLE"],
+		"DRESS" : ["DRESS"],
+		"TSHIRT" : ["TSHIRT"],
+		"BOXINGRING" : ["BOXINGRING"],
+		"PARK" : ["PARK"],
+		"PEOPLE" : ["PEOPLE"],
+		"BALLERINA" : ["BALLERINA"],
+		"CELLIST" : ["CELLIST"],
+		"FENCER" : ["FENCER"],
+		"CELLO" : ["CELLO"],
+		"TREE" : ["TREE"],
+		"BAG" : ["BAG"],
+		"WATERING_CAN" :["WATERING_CAN"],
+		"SHIRT" :["SHIRT"],
+		"SUIT" :["SUIT"],
+		"ROBBER" : ["ROBBER"],
+		"POLICEMAN" : ["POLICEMAN"],
+		"HUNTER" : ["HUNTER"],
+		"DOG" : ["DOG"],
+		"TIGER" : ["TIGER"],
+		"CHEETAH" : ["CHEETAH"],
+		"HOOK" : ["HOOK"],
+		"BOOKSHELF" : ["BOOKSHELF"],
+		"WAGON" : ["WAGON"],
+		"BALL" : ["BALL"],
+		"BREAD" : ["BREAD"],
+		"MOTORCYCLE" : ["MOTORCYCLE"],
+		"MERRY_GO_ROUND" : ["MERRY_GO_ROUND"],
+		"CAKE" : ["CAKE"],
+		"APPLE" : ["APPLE"],
+		
+		"SQUIRT" : ["SQUIRT"],
+		"TALK" : ["TALK"],
+		"HIT" : ["HIT"],
+		"WEAR" : ["WEAR"],
+		"KICK" : ["KICK"],
+		"LAUGH" : ["LAUGH"],
+		"WATCH" : ["WATCH"],
+		"SPLASH" : ["SPLASH"],
+		"MEET" : ["MEET"],
+		"PUNCH" : ["PUNCH"],
+		"KISS" : ["KISS"],
+		"SHAKE_HANDS" : ["SHAKE_HANDS"],
+		"CHASE" : ["CHASE"],
+		"FLEE" : ["FLEE"],
+		"EAT" : ["EAT"], 
+		"RIDE" : ["RIDE"],
+		
+		"RED" : ["RED"],
+		"BLUE" : ["BLUE"],
+		"GREEN" : ["GREEN"],
+		"BLACK" : ["BLACK"],
+		"WHITE" : ["WHITE"],
+		"BIG" : ["BIG"],
+		"SMALL" : ["SMALL"],
+		"YOUNG" : ["YOUNG"],
+		"PRETTY": ["PRETTY"],
+		"HANDSOME" : ["HANDSOME"],
+				
+		
+		"IS" : ["IS"],
+		"MODIFY" : ["HAS_PARAM"],
+		
+		"IN" : ["CONTAIN"],
+		
+		"SUCCESSIVE" : ["SUCCESSIVE"],
+		"CONCURRENT" : ["CONCURRENT"],
+
+		"AGENT" : ["SQUIRTER", "TALKER", "HITER", "WEARER", "KICKER", "LAUGHER", "WATCHER", "SPLASHER", "GIVER", "SENDER", "PUNCHER", "KISSER", "CHASER", "FLEEER", "EATER", "RIDER"],
+		"PATIENT" : ["SQUIRTEE", "HEARER", "HITEE", "WEAREE", "KICKEE", "WATCHEE", "SPLASHEE", "PUNCHEE", "KISSEE", "CHASEE", "FLEEEE", "EATEE", "RIDEE"],
+		"AGT+PT" :["MEET_REL", "SHAKE_HANDS_REL"],
+		"THEME": ["GIVEN", "SENT"],
+		"RECIPIENT" : ["GIVEE", "SENDEE"]
+	}
+}
+
