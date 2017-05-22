@@ -1137,6 +1137,7 @@ class TCG_VIEWER:
             img = plt.imread(img_name)
             plt.imshow(img)
             plt.show()
+        
             
     @staticmethod
     def display_scene(scene, img_file):

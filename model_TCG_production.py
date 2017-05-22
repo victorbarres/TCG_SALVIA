@@ -80,7 +80,7 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
     
     return sem_gen
     
-def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10):
+def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10, all_imgs=True):
     """
     Run the model "model" for an semantic generator "sem_gen" using the input "input_name"
     Verbose modes: 0,1 -> no output printed. 2 -> only final utterance printed, 3 -> input and utterances printed as they are received and produced. >3 -> 10steps after sem_input received added to prob_times as well as 10 steps before max_time
@@ -135,7 +135,7 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
                 print "t:%i, '%s'" %(t, ' '.join(output['Grammatical_WM_P'][0]['phon_form']))
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
-        if t in prob_times: # Saving figures for prob times.
+        if t in prob_times or all_imgs: # Saving figures for prob times.
             TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
             TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
             TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
@@ -300,17 +300,17 @@ def run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_
     
 ###############
 #### DIAGNOSTIC 
-def run_diagnostics(verbose=2, prob_times=[]):
+def run_diagnostics(verbose=3, prob_times=[]):
     """
     Allows to run a set of diagnostics.
     """
-    DIAGNOSTIC_FILE = 'threshold_experiment.json'
+    DIAGNOSTIC_FILE = 'diagnostic.json'
     SEM_MACRO = False
     SPEED_PARAM = 100
     OFFSET = 10
     STD = .3
-    MODEL_PARAMS = {'Control.task.start_produce':1, 
-                    'Control.task.time_pressure':30, 
+    MODEL_PARAMS = {'Control.task.start_produce':500, 
+                    'Control.task.time_pressure':100, 
                     'Grammatical_WM_P.dyn.ext_weight':1.0, 
                     'Grammatical_WM_P.C2.prune_threshold': 0.01}
     
@@ -324,10 +324,10 @@ def run_diagnostics(verbose=2, prob_times=[]):
     ### GENERAL PARAMETERS
     semantics_name = 'TCG_semantics_main'
     grammar_name='TCG_grammar_VB_main'  
-    max_time = 2000
-    seed = None
+    max_time = 1500
+    seed = 133380470
     save = True
-    anim = False
+    anim = True
     anim_step = 1
     ###    
     
