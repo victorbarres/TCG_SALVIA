@@ -80,7 +80,7 @@ def set_inputs(model, input_name, sem_input_file='diagnostic.json', sem_input_ma
     
     return sem_gen
     
-def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10, all_imgs=True):
+def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10, all_imgs=False):
     """
     Run the model "model" for an semantic generator "sem_gen" using the input "input_name"
     Verbose modes: 0,1 -> no output printed. 2 -> only final utterance printed, 3 -> input and utterances printed as they are received and produced. >3 -> 10steps after sem_input received added to prob_times as well as 10 steps before max_time
@@ -139,10 +139,6 @@ def run(model, sem_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time
             TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
             TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
             TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
-#        if t>=2000: # Saving all_figures
-##            TCG_VIEWER.display_lingWM_state(model.schemas['Semantic_WM_P'], model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
-#            TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_P'], concise=True, folder = FOLDER, file_type='png', show=False)
-##            TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_P'], folder = FOLDER, file_type='png', show=False)
     if save:
         model.save_sim(file_path = FOLDER, file_name = 'output')
         
@@ -697,7 +693,7 @@ def grid_search_to_csv(grid_output, folder, input_name, meta_params, model_param
             f.write(new_line)
     
 if __name__=='__main__':
-    run_diagnostics(verbose=2, prob_times=[])
+    run_diagnostics(verbose=3, prob_times=[])
 #    run_grid_search()
 #    output  = run_grid_search(sim_name='kuchinksy_Jin_SVO_only', sim_folder=TMP_FOLDER, seed=None, save=True, intermediate_save=True, speak=False)
 #    run_model()

@@ -2852,17 +2852,20 @@ class GRAMMATICAL_WM_C(WM):
         
         # Define when meaning read-out should take place
 #        if ctrl_input and ctrl_input['produce'] == self.t:
-        if self.t in [5*t for t in range(1, 200)]:
+        #if self.t in [5*t for t in range(1, 200)]:
+        if self.t in [100*t for t in range(1, 10)]:
             output = self.produce_meaning()
             if output:
                 self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
                 self.outputs['to_semantic_WM']['instances'] = output['sem_WM_output']
 
-#        if ctrl_input and ctrl_input['produce'] == self.t:
-        output = self.produce_meaning()
-        if output:
-            self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
-            self.outputs['to_semantic_WM']['instances'] = output['sem_WM_output']
+        
+
+##        if ctrl_input and ctrl_input['produce'] == self.t:
+#        output = self.produce_meaning()
+#        if output:
+#            self.outputs['to_phonological_WM_C'] = output['phon_WM_output']
+#            self.outputs['to_semantic_WM']['instances'] = output['sem_WM_output']
 
     def to_output(self):
         """
