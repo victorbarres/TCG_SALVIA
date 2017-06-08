@@ -1315,6 +1315,8 @@ class SEMANTIC_WM_C2_C(WM):
          
         node_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a") or cpt1.match(cpt2, match_type="is_a")
         edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
+        
+
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
         
@@ -1323,6 +1325,7 @@ class SEMANTIC_WM_C2_C(WM):
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
+            print "EDGE MATCH CONSTRAINTS"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)
@@ -1333,6 +1336,7 @@ class SEMANTIC_WM_C2_C(WM):
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
+            print "NO EDGE MATCH CONSTRAINTS"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)
@@ -3140,9 +3144,9 @@ class GRAMMATICAL_WM_C(WM):
             In particular the mapping between constructions and SemRep might need to be going both ways.
         """
         assemblages = self.assemble()
-#        # Discard assemblages that only contain instances that have already been expressed.
-#        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
-#        assemblages = [a for a in assemblages if not is_expressed(a)]
+        # Discard assemblages that only contain instances that have already been expressed.
+        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
+        assemblages = [a for a in assemblages if not is_expressed(a)]
         if assemblages:
             sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
