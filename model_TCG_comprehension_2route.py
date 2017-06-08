@@ -75,7 +75,7 @@ def set_inputs(model, ling_input_file='ling_inputs_2route.json', input_name='ALL
     return utter_gen
     
     
-def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10):
+def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=1, all_imgs=True):
     """
     Run the model "model" for an utterance gerator "utter_gen" using the input "input_name"
     Verbose modes: 0,1 -> no output printed. 2 -> only semantic state printed, 3 -> input and semantic state printed as they are received and produced. >3 -> 10steps after utter_input received added to prob_times as well as 10 steps before max_time
@@ -134,7 +134,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
                 print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after Semantic output
-        if t in prob_times: # Saving figures for prob times.
+        if t in prob_times or all_imgs: # Saving figures for prob times (or for all time if all_imgs=True).
             TCG_VIEWER.display_gramWM_state(model.schemas['Grammatical_WM_C'], concise=True, folder = FOLDER)
             TCG_VIEWER.display_semWM_state(model.schemas['Semantic_WM_C'], folder = FOLDER)
     
@@ -219,8 +219,8 @@ def run_diagnostic(verbose=3):
     SEMANTICS_NAME = 'TCG_semantics_dev'
     GRAMMAR_NAME = 'TCG_grammar_VB_2route'
     VERBOSE = verbose
-    SEED = None
-    ANIM = False
+    SEED = 1984
+    ANIM = True
     MAX_TIME = 1000
     SPEED_PARAM = 100
     OFFSET = 10

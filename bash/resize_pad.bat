@@ -1,0 +1,1 @@
+ffmpeg -i SemWM_state_wk_wins.mp4 -vf "pad=width=1200:height=274:x=0:y=0:color=white" SemWM_state_wk_wins_padded.mp4  
