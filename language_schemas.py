@@ -3149,9 +3149,10 @@ class GRAMMATICAL_WM_C(WM):
             In particular the mapping between constructions and SemRep might need to be going both ways.
         """
         assemblages = self.assemble()
-        # Discard assemblages that only contain instances that have already been expressed.
-        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
-        assemblages = [a for a in assemblages if not is_expressed(a)]
+        # TO FIX: ERROR IF THIS IS UNCOMMENTED. CHECK EDGE MATCH!!
+#        # Discard assemblages that only contain instances that have already been expressed.
+#        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
+#        assemblages = [a for a in assemblages if not is_expressed(a)]
         if assemblages:
             sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
