@@ -1350,6 +1350,7 @@ class SEMANTIC_WM_C2_C(WM):
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
+            print "FOUND PARTIAL SUBGRAPH ISOMORPHISMS"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)
