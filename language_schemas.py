@@ -1327,7 +1327,7 @@ class SEMANTIC_WM_C2_C(WM):
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
-            print "EDGE MATCH CONSTRAINTS"
+            print "SEM INPUT SUBGRAPH OF SEMREP (EDGE MATCH CONSTRAINTS)"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)
@@ -1338,17 +1338,29 @@ class SEMANTIC_WM_C2_C(WM):
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
-            print "NO EDGE MATCH CONSTRAINTS"
+            print "SEM INPUT SUBGRAPH OF SEMREP (NO EDGE MATCH CONSTRAINTS)"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)
             return filtered_sub_isos
         
+        # Test for partial sub-graph isomorphims between frame_graph and SemRep, withedge matching constraints
+        sub_isos = TCG_graph.find_max_partial_iso(self.SemRep, frame_graph, node_match=nm, edge_match=em, target_induce_type='edge', source_induce_type='edge')
+        #Enforcing co-reference
+        filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
+        if filtered_sub_isos:
+            print "FOUND PARTIAL SUBGRAPH ISOMORPHISMS (EDGE MATCH CONSTRAINTS)"
+            if len(filtered_sub_isos)>1:
+                error_msg = "Multi_sub_iso!!"
+                raise ValueError(error_msg)
+            return filtered_sub_isos            
+            
+        # Test for partial sub-graph isomorphims between frame_graph and SemRep, without edge matching constraints
         sub_isos = TCG_graph.find_max_partial_iso(self.SemRep, frame_graph, node_match=nm, edge_match=None, target_induce_type='edge', source_induce_type='edge')
         #Enforcing co-reference
         filtered_sub_isos = [s for s in sub_isos if iso_coref_filter(s, refs_s, refs_t, corefs)]
         if filtered_sub_isos:
-            print "FOUND PARTIAL SUBGRAPH ISOMORPHISMS"
+            print "FOUND PARTIAL SUBGRAPH ISOMORPHISMS (NO EDGE MATCH CONSTRAINTS)"
             if len(filtered_sub_isos)>1:
                 error_msg = "Multi_sub_iso!!"
                 raise ValueError(error_msg)
@@ -3157,13 +3169,15 @@ class GRAMMATICAL_WM_C(WM):
         """
         assemblages = self.assemble()
         # TO FIX: ERROR IF THIS IS UNCOMMENTED. DISCARDING ASSEMBLAGES LEADS TO EDGE MATCHING ERRORS IN THE CASE OF 2 ROUTES.
-#        # Discard assemblages that only contain instances that have already been expressed.
-#        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
-#        assemblages = [a for a in assemblages if not is_expressed(a)]
+        # Discard assemblages that only contain instances that have already been expressed.
+        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
+        assemblages = [a for a in assemblages if not is_expressed(a)]
         if assemblages:
             sem_WM_output = {'SemFrame':None, 'sem_map':{}}
             (winner_assemblage, eq_inst, a2i_map) = self.get_winner_assemblage(assemblages)
             if winner_assemblage.activation > self.params['C2']['confidence_threshold']:
+                print "USING FORM_MEANING MAPPING: %s" %eq_inst.name
+                eq_inst.content.show()
                 sem_WM_output['SemFrame'] = eq_inst.content.SemFrame
                 sem_WM_output['sem_map'] = a2i_map['sem_map']
                 phon_WM_output = eq_inst.covers.values()
