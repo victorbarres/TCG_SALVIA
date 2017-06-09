@@ -216,7 +216,7 @@ def run_diagnostic(verbose=3):
     """
     import json
     LING_INPUT_FILE = 'ling_inputs_2route.json'
-    SEMANTICS_NAME = 'TCG_semantics_dev_no_frames'
+    SEMANTICS_NAME = 'TCG_semantics_dev'
     GRAMMAR_NAME = 'TCG_grammar_VB_2route'
     VERBOSE = verbose
     SEED = 1984
