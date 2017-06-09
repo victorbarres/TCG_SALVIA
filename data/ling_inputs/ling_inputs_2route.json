@@ -54,27 +54,27 @@
 			 "timing":[],
 			 "comments": ""
 			},
-		"boy_eat_apple(act)": {
+		"boy_eat_cake(act)": {
 			"utter_rate": 1,
-			 "utterance" :["boy", "eat", "apple"],
+			 "utterance" :["boy", "eat", "cake"],
 			 "timing":[],
 			 "comments": ""
 			},
-		"boy_eat_apple(pas)": {
+		"boy_eat_cake(pas)": {
 			"utter_rate": 1,
-			 "utterance" :["apple", "is", "eat", "-ed", "by", "boy"],
+			 "utterance" :["cake", "is", "eat", "-ed", "by", "boy"],
 			 "timing":[],
 			 "comments": ""
 			},
-		"apple_eat_boy(act)": {
+		"cake_eat_boy(act)": {
 			"utter_rate": 1,
-			 "utterance" :["apple", "eat", "boy"],
+			 "utterance" :["cake", "eat", "boy"],
 			 "timing":[],
 			 "comments": ""
 			},
-		"apple_eat_boy(pas)": {
+		"cake_eat_boy(pas)": {
 			"utter_rate": 1,
-			 "utterance" :["boy", "is", "eat", "-ed", "by","apple"],
+			 "utterance" :["boy", "is", "eat", "-ed", "by","cake"],
 			 "timing":[],
 			 "comments": ""
 			},

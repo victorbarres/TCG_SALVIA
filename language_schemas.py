@@ -991,7 +991,6 @@ class SEMANTIC_WM_C2_C(WM):
         state_changed = self.update_SemRep(new_insts)
         if state_changed:
             self.show_state()
-#        self.outputs['to_output'] = True 
         self.outputs['to_output'] =  state_changed
 
     def instantiate_gram_cpts(self, SemFrame, sem_map, cpt_schemas):
@@ -1319,7 +1318,6 @@ class SEMANTIC_WM_C2_C(WM):
          
         node_concept_match = lambda cpt1,cpt2: cpt2.match(cpt1, match_type="is_a") or cpt1.match(cpt2, match_type="is_a")
         edge_concept_match = lambda cpt1,cpt2: cpt1.match(cpt2, match_type="is_a") # "equal" for strict matching
-
 
         nm = TCG_graph.node_iso_match("concept", "", node_concept_match)
         em = TCG_graph.multi_edge_iso_match("concept", "", edge_concept_match)
@@ -3158,7 +3156,7 @@ class GRAMMATICAL_WM_C(WM):
             In particular the mapping between constructions and SemRep might need to be going both ways.
         """
         assemblages = self.assemble()
-        # FIX BUT: DISCARDING ASSEMBLAGES LEADS TO EDGE MATCHING ERRORS IN THE CASE OF 2 ROUTES.
+        # TO FIX: ERROR IF THIS IS UNCOMMENTED. DISCARDING ASSEMBLAGES LEADS TO EDGE MATCHING ERRORS IN THE CASE OF 2 ROUTES.
 #        # Discard assemblages that only contain instances that have already been expressed.
 #        is_expressed = lambda assemblage: [i for i in assemblage.schema_insts if not(i.expressed)] == []
 #        assemblages = [a for a in assemblages if not is_expressed(a)]

@@ -74,8 +74,7 @@ def set_inputs(model, ling_input_file='ling_inputs_2route.json', input_name='ALL
     utter_gen = ls.UTTER_GENERATOR(ling_inputs, speed_param=speed_param, offset=offset, std=std, ground_truths=ground_truths)
     return utter_gen
     
-    
-def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=10, all_imgs=False):
+def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_time=900, seed=None, verbose=0, prob_times=[], save=False, anim=False, anim_step=1, all_imgs=False):
     """
     Run the model "model" for an utterance generator "utter_gen" using the input "input_name"
     Verbose modes: 0,1 -> no output printed. 2 -> only semantic state printed, 3 -> input and semantic state printed as they are received and produced. >3 -> 10steps after utter_input received added to prob_times as well as 10 steps before max_time
@@ -684,7 +683,7 @@ if __name__=='__main__':
 #    model.system2dot(image_type='png', disp=True)
     out = run_diagnostic()
 #    print out
-#    run_grid_search(sim_name='aphasia_sim_route_weights_WK05_7')
+#    run_grid_search(sim_name='test')
 
 
 

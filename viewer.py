@@ -952,7 +952,7 @@ class TCG_VIEWER:
             plt.show()
             
     @staticmethod
-    def display_gramWM_state(WM, concise=False, folder='./tmp/', file_type='svg', show=False):
+    def display_gramWM_state(WM, concise=False, folder='./tmp/', file_type='png', show=False):
         """
         Nicer display for wm state.
         """
@@ -992,7 +992,7 @@ class TCG_VIEWER:
             plt.show()
             
     @staticmethod
-    def display_semWM_state(semWM, folder='./tmp/', file_type='svg', show=False):
+    def display_semWM_state(semWM, folder='./tmp/', file_type='png', show=False):
         """
         Create graph images for the semanic working memory
         Uses graphviz with pydot implementation.

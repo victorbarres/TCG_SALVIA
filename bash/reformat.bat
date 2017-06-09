@@ -1,0 +1,1 @@
+ffmpeg -i input.avi -c:v libx264 -crf 23 output.mp4

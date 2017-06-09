@@ -49,7 +49,7 @@ def parameters(system_names):
         'dyn.noise_mean':0.0,
         'dyn.noise_std':0.1,
         'C2.confidence_threshold':0.0,
-        'C2.prune_threshold':0.01,
+        'C2.prune_threshold':0.0,
         'C2.coop_weight':0.0,
         'C2.comp_weight':0.0,
         'C2.max_capacity':None
@@ -247,14 +247,14 @@ def weights(connect_names):
         'C8':1.0,
         'C9':1.0, # Phon2Gram
         'C10':1.0,
-        'C11':1.0, # Gram2Sem
+        'C11':1.0, #0.7, # Gram2Sem
         'C12':1.0,
         'C13':1.0,
         
         'WK1':1.0,
         'WK2':1.0,
         'WK3':1.0,
-        'WK4':1.0, # WK2Sem
+        'WK4':0.5, #1.0, # WK2Sem
         'WK5':1.0, # Phon2WK
         
         'V1':1.0,
