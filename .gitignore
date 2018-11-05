@@ -10,3 +10,4 @@ simulation_analyses/*
 simulations/*
 doc/build/*
 tcg_salvia/*
+.idea
