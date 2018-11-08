@@ -4,8 +4,8 @@
 
 Define semantic network related classes for TCG.
 """
-from __future__ import division
 from knowledge_rep import K_ENT, K_REL, K_NET
+
 
 class CONCEPT(K_ENT):
     """
@@ -17,12 +17,13 @@ class CONCEPT(K_ENT):
         - conceptual_knowledge (CONCEPTUAL_KNOWLEDGE): The conceptual knowledge instance the concept is part of.
 
     """
-    CONCEPTUAL_KNOWLEDGE= None  
-    def __init__(self, name='',  meaning='', conceptual_knowledge=None):
+    CONCEPTUAL_KNOWLEDGE = None
+
+    def __init__(self, name='', meaning='', conceptual_knowledge=None):
         K_ENT.__init__(self, name=name, meaning=meaning)
         self.conceptual_knowledge = conceptual_knowledge
-    
-    def match(self, cpt, match_type = "is_a"):
+
+    def match(self, cpt, match_type="is_a"):
         """
         Check if it matches cpt. 
         Uses CONCEPTUAL_KNOWLEDGE.match() method.
@@ -32,18 +33,19 @@ class CONCEPT(K_ENT):
         if self.conceptual_knowledge:
             return self.conceptual_knowledge.match(self, cpt, match_type)
         else:
-            print "ERROR: The concept is not linked to any conceptual knowledge."
-    
+            print("ERROR: The concept is not linked to any conceptual knowledge.")
+
     def similarity(self, cpt):
         """
         Returns a similarity score with cpt.
         Uses CONCEPTUAL_KNOWLEDGE.similarity() method.
         """
         if self.conceptual_knowledge:
-            return self.conceptual_knowledge.similarity(self ,cpt)
+            return self.conceptual_knowledge.similarity(self, cpt)
         else:
-            print "ERROR: The concept is not linked to any conceptual knowledge."
-    
+            print("ERROR: The concept is not linked to any conceptual knowledge.")
+
+
 class SEM_REL(K_REL):
     """
     Semantic relation between concept
@@ -54,9 +56,10 @@ class SEM_REL(K_REL):
         - pTo (CONCEPT): Target concept.
     
     Note: ONLY is_a IMPLEMENTED FOR NOW.
-    """    
-    def __init__(self, aType = 'UNDEFINED', from_cpt = None, to_cpt = None):
-        K_REL.__init__(self,aType = aType, from_ent=from_cpt, to_ent = to_cpt)
+    """
+
+    def __init__(self, aType='UNDEFINED', from_cpt=None, to_cpt=None):
+        K_REL.__init__(self, aType=aType, from_ent=from_cpt, to_ent=to_cpt)
 
 
 class CONCEPTUAL_KNOWLEDGE(K_NET):
@@ -75,12 +78,12 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
     
     """
     NEUTRAL_CONCEPT = "?"
-    
+
     def __init__(self, nodes=[], edges=[]):
         K_NET.__init__(self, nodes=nodes[:], edges=edges[:])
         self.neutral = None
         self._set_neutral(CONCEPTUAL_KNOWLEDGE.NEUTRAL_CONCEPT)
-        
+
     def _set_neutral(self, val=None):
         """
         Set the meaning and name of the neutral element to val.
@@ -94,22 +97,22 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
         """
         self.neutral = CONCEPT(name=val, meaning=val, conceptual_knowledge=self)
         self.nodes.append(self.neutral)
-    
+
     def add_ent(self, concept):
         """
         Adds a concept to the the conceptual knowlege while also linking the conceptual knowledge back to the concept.
         """
-        flag  = super(CONCEPTUAL_KNOWLEDGE, self).add_ent(concept)
+        flag = super(CONCEPTUAL_KNOWLEDGE, self).add_ent(concept)
         if flag:
             concept.conceptual_knowledge = self
         return flag
-       
+
     def concepts(self):
         """
         Returns all the concepts
         """
         return self.nodes
-    
+
     def has_concept(self, concept_name):
         """
         Returns concept iff there is a concept with name "name".
@@ -118,7 +121,7 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             - concept_name (STR):
         """
         return self._has_entity(concept_name)
-        
+
     def find_meaning(self, meaning):
         """
         Find concept with meaning "meaning". Returns the concept if found, else returns None.
@@ -127,7 +130,7 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
             - meaning (): Meaning of a concept
         """
         return super(CONCEPTUAL_KNOWLEDGE, self).find_meaning(meaning)
-                     
+
     def similarity(self, cpt1, cpt2):
         """
         Returns a similarity score between cpt1 and cpt2.
@@ -152,10 +155,10 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
         if self.neutral and ((cpt1 == self.neutral) or (cpt2 == self.neutral)):
             sim = 1
             return sim
-            
-        return super(CONCEPTUAL_KNOWLEDGE, self).similarity(cpt1, cpt2)        
-    
-    def match(self, cpt1, cpt2, match_type = "is_a"):
+
+        return super(CONCEPTUAL_KNOWLEDGE, self).similarity(cpt1, cpt2)
+
+    def match(self, cpt1, cpt2, match_type="is_a"):
         """        
         Check if cpt1 matches cpt2. 
         Type = "is_a":  cpt1 matches cpt2 if cpt2 is a hyponym of cpt2 (or equal to cpt2)
@@ -174,35 +177,29 @@ class CONCEPTUAL_KNOWLEDGE(K_NET):
         # First check if one of the concept is the neutral element.
         if self.neutral and ((cpt1 == self.neutral) or (cpt2 == self.neutral)):
             return True
-            
-        return super(CONCEPTUAL_KNOWLEDGE, self).match(cpt1, cpt2, match_type = match_type)
 
-###############################################################################
-if __name__=='__main__':
-    import viewer # I have a bug in the module loading (circularity). This is a cheap hack to make it work for now.
+        return super(CONCEPTUAL_KNOWLEDGE, self).match(cpt1, cpt2, match_type=match_type)
+
+
+if __name__ == '__main__':
+    import viewer  # I have a bug in the module loading (circularity). This is a cheap hack to make it work for now.
     from loader import TCG_LOADER
+
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics.json", "./data/semantics/")
     clothing = my_conceptual_knowledge.find_meaning('CLOTHING')
-    dress =  my_conceptual_knowledge.find_meaning('DRESS')
-    print dress.match(clothing)
-    
-    color = my_conceptual_knowledge.find_meaning('COLOR')
-    blue =  my_conceptual_knowledge.find_meaning('BLUE')
-    print blue.match(color)
-    
-    human = my_conceptual_knowledge.find_meaning('HUMAN')
-    woman =  my_conceptual_knowledge.find_meaning('WOMAN')
-    obj=  my_conceptual_knowledge.find_meaning('OBJECT')
-    print woman.match(human)
-    
-    clothing = my_conceptual_knowledge.find_meaning('CLOTHING')
-    neutral =  my_conceptual_knowledge.find_meaning('?')
-    print clothing.match(neutral)
-    print neutral.match(clothing)
-    
+    dress = my_conceptual_knowledge.find_meaning('DRESS')
+    print(dress.match(clothing))
 
-    
-    
-    
-    
-    
+    color = my_conceptual_knowledge.find_meaning('COLOR')
+    blue = my_conceptual_knowledge.find_meaning('BLUE')
+    print(blue.match(color))
+
+    human = my_conceptual_knowledge.find_meaning('HUMAN')
+    woman = my_conceptual_knowledge.find_meaning('WOMAN')
+    obj = my_conceptual_knowledge.find_meaning('OBJECT')
+    print(woman.match(human))
+
+    clothing = my_conceptual_knowledge.find_meaning('CLOTHING')
+    neutral = my_conceptual_knowledge.find_meaning('?')
+    print(clothing.match(neutral))
+    print(neutral.match(clothing))

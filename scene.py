@@ -4,12 +4,13 @@
 
 Defines visual scene structure related classes for TCG.
 """
-from __future__ import division
-import perceptual_schemas as ps  
+import perceptual_schemas as ps
+
+
 ###########################
 #### Perceptual process ###
 ###########################
-#class PERCEPT:
+# class PERCEPT:
 #    """
 #    Schema perception. ## -> THIS NEEDS TO BE REPLACED!!! It should use the conceptualizer.
 #    
@@ -32,16 +33,16 @@ import perceptual_schemas as ps
 #    
 #    def __str__(self):
 #        p = ''
-#        p += 'schema: %s\n' % self.schema.name
+#        p += 'schema: {}\n'.format(self.schema.name)
 #        if self.concept:
-#            p += 'concept: %s\n' % self.concept.name
+#            p += 'concept: {}\n'.format(self.concept.name)
 #        else:
-#            p += 'concept: %s\n' % self.concept
-#        p += 'replace: %s\n' % self.replace_concept
+#            p += 'concept: {}\n'.format(self.concept)
+#        p += 'replace: {}\n'.format(self.replace_concept)
 #        return p
 #        
 #        
-#class REGION:
+# class REGION:
 #    """
 #    Scene region.
 #    
@@ -83,9 +84,10 @@ class SUB_SCENE(object):
         - saliency (FLOAT):  Perceptual saliency of subscene
     """
     NEXT_ID = 0
+
     def __init__(self, name=''):
         self.id = SUB_SCENE.NEXT_ID
-        SUB_SCENE.NEXT_ID +=1
+        SUB_SCENE.NEXT_ID += 1
         self.name = name
         self.nodes = []
         self.edges = []
@@ -93,7 +95,7 @@ class SUB_SCENE(object):
         self.anchor = None
         self.uncertainty = 0
         self.saliency = 0
-    
+
     def add_per_schema(self, schema_inst, update_uncertainty=True):
         """
         Adds a percetual schema to the sub_scenes.
@@ -114,15 +116,15 @@ class SUB_SCENE(object):
             if update_uncertainty:
                 self.update_uncertainty()
             return True
-        
+
         return False
-    
+
     def set_anchor(self, schema_inst):
         """
         Define the anchor schema instance
         """
         self.anchor = schema_inst
-    
+
     def find_schema(self, name):
         """
         Find schema instance with name "name'. If found, return instance, else, return None.
@@ -131,7 +133,7 @@ class SUB_SCENE(object):
             if schema_inst.name == name:
                 return schema_inst
         return None
-            
+
     def update_area(self):
         """
         Recalculates the area associated with the subscene based on associated schema instances.
@@ -146,7 +148,7 @@ class SUB_SCENE(object):
         for schema_inst in schema_insts[1:]:
             self.area = ps.AREA.hull(self.area, schema_inst.content['area'])
         return True
-    
+
     def update_uncertainty(self):
         """
         Recalculates the uncertainty associated with the subscene based on associated schema instances.
@@ -162,19 +164,19 @@ class SUB_SCENE(object):
         for schema_inst in schema_insts:
             self.uncertainty += schema_inst.content['uncertainty']
         return True
-    
+
     ####################
     ### JSON METHODS ###
     ####################
     def get_info(self):
         """
         """
-        data = {'name':self.name, 'id':self.id, 'uncertainty':self.uncertainty, 'saliency':self.saliency}
+        data = {'name': self.name, 'id': self.id, 'uncertainty': self.uncertainty, 'saliency': self.saliency}
         data['area'] = self.area.get_info()
         data['nodes'] = [p.name for p in self.nodes]
         data['edges'] = [p.name for p in self.edges]
         return data
-        
+
 
 class SCENE(object):
     """
@@ -186,13 +188,13 @@ class SCENE(object):
         - subscenes ([SUB_SCENE]): List of all subscenes associated with the scene.
         - schemas ([SCHEMA_INST]): List of perceptual schemas instances associated with the scene.
     """
-    
+
     def __init__(self):
         self.width = 0
         self.height = 0
         self.subscenes = []
         self.schemas = []
-    
+
     def reset(self):
         """
         Reset scene.
@@ -210,7 +212,7 @@ class SCENE(object):
             if s.name == name:
                 return s
         return None
-        
+
     def find_subscene(self, name):
         """
         Find subscene with name 'name' (STR) in scene.
@@ -219,25 +221,26 @@ class SCENE(object):
             if ss.name == name:
                 return ss
         return None
-    
+
     def add_subscene(self, ss):
         """
         Add subscene ss (SUB_SCENE) to scene if no duplication.
         """
         # Check validity
-        if(not(ss) or ss.name == ''):
+        if (not (ss) or ss.name == ''):
             return False
-        
+
         # Check duplication
         if self.find_subscene(ss.name):
             return False
-        
+
         # Add new schema
         self.subscenes.append(ss)
         for schema_inst in ss.nodes + ss.edges:
-            if not(self.find_schema(schema_inst.name)):
+            if not (self.find_schema(schema_inst.name)):
                 self.schemas.append(schema_inst)
         return True
+
 
 class SCENE_LIGHT(object):
     """
@@ -248,24 +251,25 @@ class SCENE_LIGHT(object):
         - subscenes ({STR:[CPT_INST]}): maps subscene names onto array of concept instances.
         - scene_structure (DICT): Directed acyclic graph dictionary with nodes as subscenes.
     """
+
     def __init__(self):
         """
         """
         self.subscenes = {}
         self.scene_structure = {}
-    
+
     def reset(self):
         """
         Reset scene.
         """
         self.subscenes = {}
         self.scene_structure = {}
-    
+
     def add_subscene(self, ss_name, content, saliency, anchor):
         """
         Add subscene to scene
         """
-        self.subscenes[ss_name] = {"content":content, "saliency":saliency, "anchor":anchor}
+        self.subscenes[ss_name] = {"content": content, "saliency": saliency, "anchor": anchor}
 
     def find_subscene(self, anchor_name):
         """
@@ -274,17 +278,17 @@ class SCENE_LIGHT(object):
             - anchor_name(STR): Name of an anchor schema inst
         """
         subscenes = [ss_name for ss_name, val in self.subscenes.iteritems() if val["anchor"].name == anchor_name]
-        
+
         subscene = subscenes[0] if subscenes else None
         return subscene
-    
+
     def find_daughters(self, ss_name):
         """
         Finds the daughters of the subscene with name ss_name in the scene_structure
         """
         daughters = self.scene_structure.get(ss_name, [])
         return daughters
-    
+
     def find_parents(self, ss_name):
         """
         Finds the parents of the subscene with name ss_name in the scene_sturcture
@@ -293,14 +297,14 @@ class SCENE_LIGHT(object):
         for name, daughters in self.scene_structure.iteritems():
             if ss_name in daughters:
                 parents.append(name)
-                
+
         return parents
-        
+
     def get_content(self, ss_name):
         """
         """
         return self.subscenes[ss_name]['content']
-    
+
     def get_saliency(self, ss_name):
         """
         """
@@ -310,16 +314,14 @@ class SCENE_LIGHT(object):
         """
         """
         return self.subscenes[ss_name]['anchor']
-    
+
     def update_saliency(self, ss_name, saliency_val):
         """
         Updates the saliency of ss_name to saliency_val
         """
         self.subscenes[ss_name]['saliency'] = saliency_val
-        
-    
-    
-    
+
+
 ###############################################################################
-if __name__=='__main__':
-    print "No test case implemented."
+if __name__ == '__main__':
+    print("No test case implemented.")

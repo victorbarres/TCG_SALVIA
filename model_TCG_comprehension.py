@@ -3,7 +3,6 @@
 @author: Victor Barres
 TCG comprehension model
 """
-from __future__ import division
 import random
 import time
 
@@ -74,11 +73,11 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
     sim_time = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     
     if not(sim_name):
-        sim_name = '%s_%s_(%s)' %(sim_time, input_name, str(seed))
+        sim_name = '{}_{}_({})'.format(sim_time, input_name, str(seed))
     else:
-        sim_name = '%s_%s_(%s)' %(sim_time, sim_name, str(seed))
+        sim_name = '{}_{}_({})'.format(sim_time, sim_name, str(seed))
     
-    FOLDER = '%s/%s/' %(sim_folder, sim_name)
+    FOLDER = '{}/{}/'.format(sim_folder, sim_name)
     
     if save: # Saving model and sem_gen
         st_save(model, model.name, FOLDER)
@@ -113,7 +112,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
             outputs[t]['Semantic_WM_C'] = state_ISRF[1]
             if verbose > 2:
                 state_ISRF = isrf_writer.write_ISRF()
-                print "\nt:%i, Semantic state:\n%s\n" %(state_ISRF[0], state_ISRF[1])
+                print("\nt:{}, Semantic state:\n{}\n".format(state_ISRF[0], state_ISRF[1]))
             if verbose > 1:
                 prob_times.append(t + 10) #Will save the state 10 steps after utterance
         if t in prob_times: # Saving figures for prob times.
@@ -131,7 +130,7 @@ def run(model, utter_gen, input_name, sim_name='', sim_folder=TMP_FOLDER, max_ti
        
     if anim:
         if save:
-            print "saving animation (might take some time!)"
+            print("saving animation (might take some time!)")
             model.schemas['Grammatical_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
             model.schemas['Semantic_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
             model.schemas['Phonological_WM_C'].show_dynamics_anim(folder=FOLDER, step=anim_step)
@@ -184,37 +183,37 @@ def run_diagnostic(verbose=3):
     ANIM_STEP = 1
     PROB_TIMES = []
 
-    print "Data files:"
-    print "Ling inputs: %s" % LING_INPUT_FILE
-    print "Semantics: %s" % SEMANTICS_NAME
-    print "Grammar: %s" % GRAMMAR_NAME
+    print("Data files:")
+    print("Ling inputs: {}".format(LING_INPUT_FILE))
+    print("Semantics: {}".format(SEMANTICS_NAME))
+    print("Grammar: {}".format(GRAMMAR_NAME))
     
     # Get user inputs
     with open('./data/ling_inputs/' + LING_INPUT_FILE, 'r') as f:
         json_data = json.load(f)
     input_names = json_data['inputs'].keys()
     input_names.sort()
-    print "\nInput list:\n %s" %'\n '.join(input_names)
-    input_name = raw_input('\nEnter input name: ')
+    print("\nInput list:\n {}".format('\n '.join(input_names)))
+    input_name = input('\nEnter input name: ')
     
-    set_params1 = raw_input('\nSet parameters? (y/n): ') == 'y'
+    set_params1 = input('\nSet parameters? (y/n): ') == 'y'
     if set_params1:
-        VERBOSE = int(raw_input('\nVerbose (0,1,2,...): '))
-        SAVE = raw_input('\nSave? (y/n): ') == 'y'
-        ANIM = raw_input('\nAnim? (y/n): ') == 'y'
+        VERBOSE = int(input('\nVerbose (0,1,2,...): '))
+        SAVE = input('\nSave? (y/n): ') == 'y'
+        ANIM = input('\nAnim? (y/n): ') == 'y'
     
-    print "\n#### Processing -> %s\n" % input_name
+    print("\n#### Processing -> {}\n".format(input_name))
     
     res = run_model(semantics_name=SEMANTICS_NAME, grammar_name=GRAMMAR_NAME, sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file=LING_INPUT_FILE, max_time=MAX_TIME, seed=SEED, speed_param=SPEED_PARAM, offset=OFFSET, prob_times=PROB_TIMES, verbose=VERBOSE, save=SAVE, anim=ANIM,  anim_step=ANIM_STEP)
-#    print "\nRESULTS:\n"
-#    print res
+#    print("\nRESULTS:\n")
+#    print(res)
 
 if __name__=='__main__':
 #    input_names = [u'test_in_loc_S', u'test_SYMMETRIC_TRANS', u'test_naming', u'test_SVO', u'test_subj_rel_SVO', u'test_SV', u'test_in_blue', u'test_obj_rel_PAS_SVO', u'test_obj_rel_SVO', u'test_complex1', u'test_DOUBLE_OBJ', u'test_OBLIQUE_DATIVE', u'test_SPA', u'test_subj_rel_PAS_SVO', u'test_PAS_SVO', u'test_in_loc_N']
 #    num = len(input_names)
 #    for input_name in input_names:
-#        print "#### Processing -> %s" % input_name
-#        print "%i more to go!" % num
+#        print("#### Processing -> {}".format(input_name))
+#        print("{} more to go!".format(num))
 #        num -=1
 #        run_model(semantics_name='TCG_semantics_main', grammar_name='TCG_grammar_VB_main', sim_name='', sim_folder=TMP_FOLDER, model_params = {}, input_name=input_name, ling_input_file='ling_inputs.json', max_time=900, seed=None, speed_param=10, offset=10, prob_times=[], verbose=4, save=True, anim=True,  anim_step=1)
     run_diagnostic()

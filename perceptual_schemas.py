@@ -13,7 +13,6 @@ Dependencies:
     - Uses viewer
     - Uses scene
 """
-from __future__ import division
 import random
 
 import numpy as np
@@ -30,7 +29,8 @@ class AREA(object):
     """
     Defines an area in the visual input
     """
-    ID_next = 0 # Global area ID counter
+    ID_next = 0  # Global area ID counter
+
     def __init__(self, x=0, y=0, w=0, h=0, saliency=0):
         """
         Areas are defined as boxes.
@@ -40,37 +40,37 @@ class AREA(object):
         h = height
         saliency = Bottom-up saliency of the area.
         """
-        self.id  = AREA.ID_next
+        self.id = AREA.ID_next
         AREA.ID_next += 1
         self.x = x
         self.y = y
         self.w = w
         self.h = h
         self.saliency = saliency
-    
+
     def contains(self, eye_pos):
-       """
-       Returns True if eye_pos falls in the area.
-       """
-       x = eye_pos[0]
-       y = eye_pos[1]
-       res = (x>=self.x) and (x<=self.x+self.h) and (y>=self.y) and (y<=self.y+self.w)
-       return res
-      
+        """
+        Returns True if eye_pos falls in the area.
+        """
+        x = eye_pos[0]
+        y = eye_pos[1]
+        res = (x >= self.x) and (x <= self.x + self.h) and (y >= self.y) and (y <= self.y + self.w)
+        return res
+
     def center(self):
         """
         Returns the coordinates of the center of th area.
         """
-        x = self.x + self.h/2
-        y = self.y + self.w/2
-        return (x,y)
-    
+        x = self.x + self.h / 2
+        y = self.y + self.w / 2
+        return (x, y)
+
     def radius(self):
         """
         Defines a radius value for the area (so that it can be considered a circle instead of a box)
         """
-        return max(self.h/2, self.w/2) 
-    
+        return max(self.h / 2, self.w / 2)
+
     def includes(self, area):
         """                    
         Returns True if self includes area.
@@ -81,21 +81,21 @@ class AREA(object):
         Args:
             - area (AREA)
         """
-        cond1  = self.contains(area.center())
-        cond2 = (self.w*self.h) >= (area.w*area.h)
-        
+        cond1 = self.contains(area.center())
+        cond2 = (self.w * self.h) >= (area.w * area.h)
+
         return (cond1 and cond2)
-    
+
     def set_BU_saliency(self, BU_saliency_map=None):
         """
         Sets the area saliency based on a BU saliency map
         TO BE WRITTEN
         """
-        if not(BU_saliency_map):
+        if not (BU_saliency_map):
             self.saliency = random.random()
         else:
-            self.saliency = 0 # to be defined.
-    
+            self.saliency = 0  # to be defined.
+
     @staticmethod
     def hull(area1, area2):
         """
@@ -107,17 +107,18 @@ class AREA(object):
         merge_area.y = min([area1.y, area2.y])
         merge_area.w = max([area1.y + area1.w, area2.y + area2.w]) - merge_area.y
         merge_area.h = max([area1.x + area1.h, area2.x + area2.h]) - merge_area.x
-        merge_area.saliency = (area1.saliency + area2.saliency)/2 # THIS MIGHT NOT BE A GOOD IDEA!!
+        merge_area.saliency = (area1.saliency + area2.saliency) / 2  # THIS MIGHT NOT BE A GOOD IDEA!!
         return merge_area
-        
+
     ####################
     ### JSON METHODS ###
     ####################
     def get_info(self):
         """
         """
-        data = {'id': self.id, 'x':self.x, 'y':self.y, 'w':self.w, 'h':self.h, 'saliency':self.saliency}
+        data = {'id': self.id, 'x': self.x, 'y': self.y, 'w': self.w, 'h': self.h, 'saliency': self.saliency}
         return data
+
 
 ####################################
 ### PERCEPTUAL KNOWLEDGE SCHEMAS ###
@@ -153,116 +154,140 @@ class PERCEPT_SCHEMA(KNOWLEDGE_SCHEMA):
     ACTION_REL = 'ACTION_REL'
     QUALITY_REL = 'QUALITY_REL'
     TEMP_REL = 'TEMP_REL'
-    
+
     def __init__(self, name, percept, init_act):
         KNOWLEDGE_SCHEMA.__init__(self, name=name, content=None, init_act=init_act)
         self.type = PERCEPT_SCHEMA.UNDEFINED
-        self.set_content({'percept':percept, 'features':None})
-    
+        self.set_content({'percept': percept, 'features': None})
+
     def set_features(self, features):
         self.content['features'] = features
-    
+
     ### -> Set the initial activation
     # To be done.
+
 
 class PERCEPT_OBJECT(PERCEPT_SCHEMA):
     """
     Object schema
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.OBJECT
+
 
 class PERCEPT_PLACE(PERCEPT_SCHEMA):
     """
     Place schema
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.PLACE
+
 
 class PERCEPT_ACTION(PERCEPT_SCHEMA):
     """
     Action schema.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.ACTION
+
 
 class PERCEPT_QUALITY(PERCEPT_SCHEMA):
     """
     Quality schema.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.QUALITY
+
 
 class PERCEPT_SCENE(PERCEPT_SCHEMA):
     """
     Scene schema
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.SCENE
 
-class PERCEPT_SCHEMA_REL(PERCEPT_SCHEMA): ### SHOULD COME WITH PERCEPTUAL SCHEMAS BY DEFAULT AS FROM and To (A VARIABLE! (unbound), eg. something is red). Think about that....
+
+class PERCEPT_SCHEMA_REL(
+    PERCEPT_SCHEMA):  ### SHOULD COME WITH PERCEPTUAL SCHEMAS BY DEFAULT AS FROM and To (A VARIABLE! (unbound), eg. something is red). Think about that....
     """
     Defines relation between perceptual schemas.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA.__init__(self, name, percept, init_act)
         self.content['pFrom'] = None
         self.content['pTo'] = None
-    
+
     def set_area(self):
         """
         The area of relation schemas is defines as the hull of the schemas they link.
         """
-        if not(self.content['pFrom']) or not(self.content['pTo']):
+        if not (self.content['pFrom']) or not (self.content['pTo']):
             return False
         self.area = AREA.hull(self.content['pFrom'].content['area'], self.content['pTo'].content['area'])
         return True
+
 
 class PERCEPT_SCENE_REL(PERCEPT_SCHEMA_REL):
     """
     Scene relation schema. Define relation (edge) between two schemas (PERCEPT_SCENE) pFrom and pTo.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.SCENE_REL
+
 
 class PERCEPT_SPATIAL_REL(PERCEPT_SCHEMA_REL):
     """
     Spatial relation schema. Define relation (edge) between two object schemas (PERCEPT_OBJECT) pFrom and pTo.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.SPATIAL_REL
-        
+
+
 class PERCEPT_ACTION_REL(PERCEPT_SCHEMA_REL):
     """
     Action relation schema. Define relation (edge) between an action schemas (PERCEPT_ACTION) pFrom and and object schema (PERCEPT_OBJECT) pTo.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.ACTION_REL
-        
+
+
 class PERCEPT_QUALITY_REL(PERCEPT_SCHEMA_REL):
     """
     Quality relation schema. Define relation (edge) between a quality schemas (PERCEPT_QUALITY) pFrom and another percept schema (PERCEPT_SCHEMA) pTo.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.QUALITY_REL
+
 
 class PERCEPT_TEMP_REL(PERCEPT_SCHEMA_REL):
     """
     Temporal relation schema. Define relation (edge) between two action schemas (PERCEPT_ACTION) pFrom and pTo.
     """
+
     def __init__(self, name, percept, init_act):
         PERCEPT_SCHEMA_REL.__init__(self, name, percept, init_act)
         self.type = PERCEPT_SCHEMA.TEMP_REL
-    
+
+
 class PERCEPT_SCHEMA_INST(SCHEMA_INST):
     """
     Perceptual schema instance.
@@ -276,19 +301,20 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
         Trace is left empty, one can think that in a more realistic preceptual model, 
             perceptual schemas would be instantiated on the basis of other perceptual schemas (See VISION model)
     """
+
     def __init__(self, per_schema, trace):
         SCHEMA_INST.__init__(self, schema=per_schema, trace=trace)
         content_copy = per_schema.content.copy()
         self.content = content_copy
-        self.covers = {'cpt_inst':None}
-    
+        self.covers = {'cpt_inst': None}
+
     def set_area(self, area):
         """
         Args:
             - area (AREA)
         """
         self.content['area'] = area
-    
+
     def set_saliency(self, saliency=0.0):
         """
         Might differ from area saliency
@@ -297,10 +323,11 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
         """
         self.content['saliency'] = saliency
 
+
 #################################
 ### PERCEPTUAL SYSTEM SCHEMAS ###
 #################################
-#class SALIENCY_MAP(SYSTEM_SCHEMA):
+# class SALIENCY_MAP(SYSTEM_SCHEMA):
 #    """
 #    Data:
 #        - BU_saliency_map (array): BOTTOM-up saliency data generated by Itti-Koch matlab saliency toolbox.
@@ -362,7 +389,7 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
 #        ior_mask['mask'][boundaries[0,0]:boundaries[0,1], boundaries[1,0]:boundaries[1,1]] = self.BU_saliency_map[boundaries[0,0]:boundaries[0,1], boundaries[1,0]:boundaries[1,1]]
 #        self.IOR_masks.append(ior_mask)
 #
-#class SACCADE_SYSTEM(SYSTEM_SCHEMA):
+# class SACCADE_SYSTEM(SYSTEM_SCHEMA):
 #    """
 #    """
 #    def __init__(self, name='Saccade_system'):
@@ -409,7 +436,7 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
 #        data['next_fixation'] = self.next_fixation
 #        return data
 #
-#class FIXATION(SYSTEM_SCHEMA):
+# class FIXATION(SYSTEM_SCHEMA):
 #    """
 #    CHANGE NAME TO FOCUS?
 #    """
@@ -434,10 +461,11 @@ class PERCEPT_SCHEMA_INST(SCHEMA_INST):
 #        """
 #        data = super(FIXATION, self).get_state() 
 #        data['eye_pos'] = self.eye_pos
-        
+
 class VISUAL_WM(WM):
     """
     """
+
     def __init__(self, name='Visual_WM'):
         WM.__init__(self, name)
         self.add_port('IN', 'from_subscene_rec')
@@ -446,20 +474,23 @@ class VISUAL_WM(WM):
         self.add_port('OUT', 'to_saliency_map')
         self.add_port('OUT', 'to_subscene_rec')
         self.add_port('OUT', 'to_conceptualizer')
-        self.params['dyn'] = {'tau':1000.0, 'int_weight':1.0, 'ext_weight':1.0, 'act_rest':0.001, 'k':10.0, 'noise_mean':0.0, 'noise_std':0.0}
-        self.params['C2'] = {'coop_weight':0.0, 'comp_weight':0.0, 'prune_threshold':0.01, 'confidence_threshold':0.0, 'coop_asymmetry':1, 'comp_asymmetry':0, 'max_capacity':None, 'P_comp':1.0, 'P_coop':1.0} # C2 is not implemented in this WM.
+        self.params['dyn'] = {'tau': 1000.0, 'int_weight': 1.0, 'ext_weight': 1.0, 'act_rest': 0.001, 'k': 10.0,
+                              'noise_mean': 0.0, 'noise_std': 0.0}
+        self.params['C2'] = {'coop_weight': 0.0, 'comp_weight': 0.0, 'prune_threshold': 0.01,
+                             'confidence_threshold': 0.0, 'coop_asymmetry': 1, 'comp_asymmetry': 0,
+                             'max_capacity': None, 'P_comp': 1.0, 'P_coop': 1.0}  # C2 is not implemented in this WM.
         self.SceneRep = nx.DiGraph()
-    
+
     def reset(self):
         """
         """
         super(VISUAL_WM, self).reset()
         self.SceneRep = nx.DiGraph()
-        
+
     def process(self):
         """
         """
-        ss_input= self.inputs['from_subscene_rec']
+        ss_input = self.inputs['from_subscene_rec']
         if ss_input:
             sub_scene = ss_input['subscene']
             init_act = ss_input['init_act']
@@ -471,11 +502,11 @@ class VISUAL_WM(WM):
             self.update_SceneRep(new_insts)
         self.update_activations()
         self.prune()
-        self.outputs['to_conceptualizer'] =  self.SceneRep
-        
+        self.outputs['to_conceptualizer'] = self.SceneRep
+
         missing_info = self.inputs['from_semantic_WM']
-        self.outputs['to_subscene_rec'] = missing_info # For now just passing the message.
-    
+        self.outputs['to_subscene_rec'] = missing_info  # For now just passing the message.
+
     def update_SceneRep(self, per_insts):
         """
         Updates the SceneRep: Adds the nodes and edges needed based on the receivd percept instances.
@@ -487,40 +518,45 @@ class VISUAL_WM(WM):
         # Add new instances
         if per_insts:
             # First process all the instances that are not relations.
-            for inst in [i for i in per_insts if not(isinstance(i.trace, PERCEPT_SCHEMA_REL))]:
+            for inst in [i for i in per_insts if not (isinstance(i.trace, PERCEPT_SCHEMA_REL))]:
                 area_center = inst.content['area'].center()
-                node_pos = (area_center[1], -1*area_center[0])
-                self.SceneRep.add_node(inst.name, pos=node_pos, per_inst=inst, percept=inst.content['percept'], new=True)
-            
+                node_pos = (area_center[1], -1 * area_center[0])
+                self.SceneRep.add_node(inst.name, pos=node_pos, per_inst=inst, percept=inst.content['percept'],
+                                       new=True)
+
             # Then add the relations
             for rel_inst in [i for i in per_insts if isinstance(i.trace, PERCEPT_SCHEMA_REL)]:
                 node_from = rel_inst.content['pFrom'].name
                 node_to = rel_inst.content['pTo'].name
-                self.SceneRep.add_edge(node_from, node_to, per_inst=rel_inst, percept=rel_inst.content['percept'],  new=True)
-        
-    
+                self.SceneRep.add_edge(node_from, node_to, per_inst=rel_inst, percept=rel_inst.content['percept'],
+                                       new=True)
+
     def show_SceneRep(self):
-        node_labels = dict((n, '%s(%.1f)' %(n, d['per_inst'].activity)) for n,d in self.SceneRep.nodes(data=True))
-        edge_labels = dict(((u,v), '%s(%.1f)' %(d['percept'].name, d['per_inst'].activity)) for u,v,d in self.SceneRep.edges(data=True))
-#        pos = nx.spring_layout(self.SceneRep) # uses a spring layout.
-        pos=nx.get_node_attributes(self.SceneRep,'pos') #Uses the position attribute in SceneRep to position nodes.
+        node_labels = dict(
+            (n, '{}({:.1f})'.format(n, d['per_inst'].activity)) for n, d in self.SceneRep.nodes(data=True))
+        edge_labels = dict(((u, v), '{}({:.1f})'.format(d['percept'].name, d['per_inst'].activity)) for u, v, d in
+                           self.SceneRep.edges(data=True))
+        #        pos = nx.spring_layout(self.SceneRep) # uses a spring layout.
+        pos = nx.get_node_attributes(self.SceneRep, 'pos')  # Uses the position attribute in SceneRep to position nodes.
         plt.figure(facecolor='white')
         plt.axis('off')
-        title = '%s state (t=%i)' %(self.name,self.t)
+        title = '{} state (t={})'.format(self.name, self.t)
         plt.title(title)
-        nx.draw_networkx(self.SceneRep, pos=pos, with_labels= False)
-        nx.draw_networkx_labels(self.SceneRep, pos=pos, labels= node_labels)
+        nx.draw_networkx(self.SceneRep, pos=pos, with_labels=False)
+        nx.draw_networkx_labels(self.SceneRep, pos=pos, labels=node_labels)
         nx.draw_networkx_edge_labels(self.SceneRep, pos=pos, edge_labels=edge_labels)
-    
+
+
 class PERCEPT_LTM(LTM):
     """
     """
+
     def __init__(self, name='Percept_LTM'):
         LTM.__init__(self, name)
         self.add_port('OUT', 'to_subscene_rec')
         self.perceptual_knowledge = None
         self.params['init_act'] = 0.5
-    
+
     def initialize(self, per_knowledge):
         """
         Initilize the state of the PERCEPTUAL LTM with percetual_schema based on the content of percetual_knowledge
@@ -529,7 +565,7 @@ class PERCEPT_LTM(LTM):
             - per_knowledge (PERCEPTUAL_KNOWLEDGE): TCG percetpual knowledge data
         """
         self.perceptual_knowledge = per_knowledge
-        
+
         obj = per_knowledge.find_meaning('OBJECT')
         place = per_knowledge.find_meaning('PLACE')
         action = per_knowledge.find_meaning('ACTION')
@@ -540,7 +576,7 @@ class PERCEPT_LTM(LTM):
         spatial_rel = per_knowledge.find_meaning('SPATIAL_REL')
         qual_rel = per_knowledge.find_meaning('QUALITY_REL')
         temp_rel = per_knowledge.find_meaning('TEMP_REL')
-        
+
         for percept in per_knowledge.percepts(type='TOKEN'):
             new_schema = None
             res = per_knowledge.satisfy_rel(percept, 'is_token', None)
@@ -548,34 +584,34 @@ class PERCEPT_LTM(LTM):
             if per_knowledge.match(per_cat, obj, match_type="is_a"):
                 new_schema = PERCEPT_OBJECT(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, place, match_type="is_a"):
-                 new_schema = PERCEPT_PLACE(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_PLACE(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, action, match_type="is_a"):
-                 new_schema = PERCEPT_ACTION(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_ACTION(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, qual, match_type="is_a"):
-                 new_schema = PERCEPT_QUALITY(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_QUALITY(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, scene, match_type="is_a"):
-                 new_schema = PERCEPT_SCENE(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_SCENE(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, action_rel, match_type="is_a"):
-                 new_schema = PERCEPT_ACTION_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_ACTION_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, spatial_rel, match_type="is_a"):
-                 new_schema = PERCEPT_SPATIAL_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_SPATIAL_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, qual_rel, match_type="is_a"):
-                 new_schema = PERCEPT_QUALITY_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_QUALITY_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, temp_rel, match_type="is_a"):
-                 new_schema = PERCEPT_TEMP_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_TEMP_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             elif per_knowledge.match(per_cat, scene_rel, match_type="is_a"):
-                 new_schema = PERCEPT_SCENE_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
+                new_schema = PERCEPT_SCENE_REL(name=percept.name, percept=percept, init_act=self.params['init_act'])
             else:
-                print "%s: unknown percept type" %percept.meaning
-            
+                print("{}: unknown percept type".format(percept.meaning))
+
             if new_schema:
                 self.add_schema(new_schema)
-    
+
     def process(self):
         """
         """
-        self.outputs['to_subscene_rec'] =  self.schemas
-    
+        self.outputs['to_subscene_rec'] = self.schemas
+
     ####################
     ### JSON METHODS ###
     ####################
@@ -585,6 +621,7 @@ class PERCEPT_LTM(LTM):
         data = super(PERCEPT_LTM, self).get_info()
         data['params'] = self.params
         return data
+
 
 class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
     """
@@ -601,20 +638,21 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         - focus_area (AREA): Current focus area. None -> no specific focus area.
         
     """
+
     def __init__(self, name='Subscene_recognition'):
         SYSTEM_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_visual_WM')
-        self.add_port('OUT','to_visual_WM')
-        self.add_port('OUT','to_output')
-        self.params = {'recognition_time':10}
+        self.add_port('OUT', 'to_visual_WM')
+        self.add_port('OUT', 'to_output')
+        self.params = {'recognition_time': 10}
         self.scene = None
         self.subscene = None
         self.uncertainty = 0
-        self.next_saccade = False 
-        self.eye_pos = (0,0)
+        self.next_saccade = False
+        self.eye_pos = (0, 0)
         self.focus_area = None
-    
+
     def reset(self):
         """
         """
@@ -622,51 +660,51 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         self.scene = None
         self.subscene = None
         self.uncertainty = 0
-        self.next_saccade = False 
-        self.eye_pos = (0,0)
+        self.next_saccade = False
+        self.eye_pos = (0, 0)
         self.focus_area = None
-          
-    
+
     def process(self):
         """
         """
         if self.inputs['from_input']:
             self.scene = self.inputs['from_input']
             # Initialize eye_pos to center of scene and get ready for saccade.
-            self.eye_pos = (self.scene.width/2, self.scene.height/2)
+            self.eye_pos = (self.scene.width / 2, self.scene.height / 2)
             self.next_saccade = True
 
         # Start saccade and subscene recognition process        
-        output = {'eye_pos':None, 'focus_area':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
+        output = {'eye_pos': None, 'focus_area': None, 'subscene': None, 'saliency': None, 'next_saccade': None,
+                  'uncertainty': None}
         if self.next_saccade:
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
                 self.eye_pos = self.subscene.area.center()
                 output['eye_pos'] = self.eye_pos
-                output['subscene'] = {'name':self.subscene.name, 'radius': self.subscene.area.radius()}
+                output['subscene'] = {'name': self.subscene.name, 'radius': self.subscene.area.radius()}
                 output['saliency'] = self.subscene.saliency
                 output['focus_area'] = (self.focus_area.center(), self.focus_area.radius()) if self.focus_area else None
-                print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene.name, self.subscene.saliency)
-                print "Eye pos: (%.1f,%.1f)" %(self.eye_pos[0], self.eye_pos[1])
-                self.uncertainty = self.subscene.uncertainty*self.params['recognition_time']
+                print("Perceiving subscene: {} (saliency: {:.2f})".format(self.subscene.name, self.subscene.saliency))
+                print("Eye pos: ({:.1f},{:.1f})".format(self.eye_pos[0], self.eye_pos[1]))
+                self.uncertainty = self.subscene.uncertainty * self.params['recognition_time']
                 output['uncertainty'] = self.uncertainty
-        
+
         if self.subscene:
             self.uncertainty -= 1
             output['uncertainty'] = self.uncertainty
-            if self.uncertainty <0:
+            if self.uncertainty < 0:
                 self.next_saccade = True
                 output['next_saccade'] = self.t
-                print 't: %i, trigger next saccade' % self.t
-                self.outputs['to_visual_WM'] =  {'subscene':self.subscene, 'init_act':self.subscene.saliency}
-                self.subscene.saliency = - 1 # THIS NEEDS TO BE CHANGED!! 
+                print('t: {}, trigger next saccade'.format(self.t))
+                self.outputs['to_visual_WM'] = {'subscene': self.subscene, 'init_act': self.subscene.saliency}
+                self.subscene.saliency = - 1  # THIS NEEDS TO BE CHANGED!!
                 self.subscene = None
-        
+
         # TD guidance
         self.TD_guidance()
-        
-        self.outputs['to_output'] =  output
+
+        self.outputs['to_output'] = output
 
     def get_subscene(self):
         """
@@ -676,17 +714,18 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         max_saliency = 0
         new_ss = self.subscene
         in_focus_ss = self.in_focus()
-        
+
         for ss in in_focus_ss:
             if ss.saliency > max_saliency:
                 max_saliency = ss.saliency
                 new_ss = ss
 
         self.subscene = new_ss
-#        ############ Test of strategy of zoom-in first. #############
-#        if not(self.focus_area):
-#            self.focus_area = self.subscene.area 
-    
+
+    #        ############ Test of strategy of zoom-in first. #############
+    #        if not(self.focus_area):
+    #            self.focus_area = self.subscene.area
+
     def in_focus(self):
         """
         Returns the set of subscenes that are currently in focus.
@@ -699,38 +738,41 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         """
         in_focus_ss = []
         candidates = [ss for ss in self.scene.subscenes]
-        
+
         if self.focus_area:
             for ss in candidates:
-#                if ss.area != self.focus_area and self.focus_area.includes(ss.area):
+                #                if ss.area != self.focus_area and self.focus_area.includes(ss.area):
                 if self.focus_area.includes(ss.area):
                     in_focus_ss.append(ss)
-                    
-            if not(in_focus_ss): # No subscene in focus
+
+            if not (in_focus_ss):  # No subscene in focus
                 self.focus_area = None
-        
-        if not(self.focus_area):
+
+        if not (self.focus_area):
             in_focus_ss = candidates
-        
+
         return in_focus_ss
-    
+
     def TD_guidance(self, verbose=1):
         """
         """
         percept_schema_inst = self.inputs['from_visual_WM']
         if percept_schema_inst:
-            self.focus_area = percept_schema_inst.content['area'] # Modify focus area
-            if verbose>0 and self.focus_area:
+            self.focus_area = percept_schema_inst.content['area']  # Modify focus area
+            if verbose > 0 and self.focus_area:
                 area_center = self.focus_area.center()
                 area_radius = self.focus_area.radius()
-                print "t:%i, TD focus orientation to %s, area (x=%i, y=%i, r=%i)" %(self.t, percept_schema_inst.name, area_center[0], area_center[1], area_radius)
-            
-            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccade.
+                print(
+                    "t:{}, TD focus orientation to {}, area (x={}, y={}, r={})".format(self.t, percept_schema_inst.name,
+                                                                                       area_center[0], area_center[1],
+                                                                                       area_radius))
+
+            self.next_saccade = True  # Even if the retrieval of the current subscene is not over, it retriggers saccade.
 
             in_focus_ss = self.in_focus()
             for ss in in_focus_ss:
-                ss.saliency = 1 # Boosts the saliency of all the subscenes in focus.
-        
+                ss.saliency = 1  # Boosts the saliency of all the subscenes in focus.
+
     #######################
     ### DISPLAY METHODS ###
     #######################
@@ -740,7 +782,7 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         from viewer import TCG_VIEWER
         if self.scene:
             TCG_VIEWER.display_scene(self.scene, img_file)
-    
+
     ####################
     ### JSON METHODS ###
     ####################
@@ -755,6 +797,7 @@ class SUBSCENE_RECOGNITION(SYSTEM_SCHEMA):
         data['uncertainty'] = self.uncertainty
         data['next_saccade'] = self.next_saccade
         return data
+
 
 class SCENE_PERCEPTION(SYSTEM_SCHEMA):
     """
@@ -773,32 +816,32 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
         - For now, given the simplicity of the defininion of focus, I am not making use of the scene structure.
         - But strategies of exploration could be also implemented.
     """
+
     def __init__(self, name='Scene_perception', verbose=1):
         SYSTEM_SCHEMA.__init__(self, name)
-        self.add_port('IN','from_input')
-        self.add_port('IN','from_semantic_WM')
-        self.add_port('OUT','to_semantic_WM')
-        self.add_port('OUT','to_output')
-        self.params = {'recognition_time':10}
+        self.add_port('IN', 'from_input')
+        self.add_port('IN', 'from_semantic_WM')
+        self.add_port('OUT', 'to_semantic_WM')
+        self.add_port('OUT', 'to_output')
+        self.params = {'recognition_time': 10}
         self.scene = None
         self.uncertainty = 0
         self.subscene = None
         self.next_saccade = False
         self.focus = None
         self.verbose = verbose
-    
+
     def reset(self):
         """
         """
         super(SCENE_PERCEPTION, self).reset()
-        self.params = {'recognition_time':10}
+        self.params = {'recognition_time': 10}
         self.scene = None
         self.uncertainty = 0
         self.subscene = None
         self.next_saccade = False
         self.focus = None
-    
-    
+
     def process(self):
         """
         """
@@ -806,40 +849,39 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
             self.scene = self.inputs['from_input']
             # Get ready for saccade.
             self.next_saccade = True
-        
+
         # Start saccade and subscene recognition process        
-        output = {'focus':None, 'subscene':None, 'saliency':None, 'next_saccade':None, 'uncertainty':None}
+        output = {'focus': None, 'subscene': None, 'saliency': None, 'next_saccade': None, 'uncertainty': None}
         if self.next_saccade:
             self.get_subscene()
             self.next_saccade = False
             if self.subscene:
                 saliency = self.scene.get_saliency(self.subscene)
-                output['subscene'] = {'name':self.subscene}
+                output['subscene'] = {'name': self.subscene}
                 output['saliency'] = saliency
                 output['focus'] = self.focus
                 if self.verbose > 0:
-                    print 't: %i, chaning gaze focus' % self.t
-                    print "Perceiving subscene: %s (saliency: %.2f)" %(self.subscene, saliency)
+                    print('t: {}, changing gaze focus'.format(self.t))
+                    print("Perceiving subscene: {} (saliency: {:.2f})".format(self.subscene, saliency))
                 self.uncertainty = self.params['recognition_time']
                 output['uncertainty'] = self.uncertainty
-        
+
         if self.subscene:
             self.uncertainty -= 1
             output['uncertainty'] = self.uncertainty
-            if self.uncertainty <0:
+            if self.uncertainty < 0:
                 self.next_saccade = True
                 output['next_saccade'] = self.t
                 sem_inputs = self.scene.get_content(self.subscene)
                 self.outputs['to_semantic_WM'] = sem_inputs
                 self.scene.update_saliency(self.subscene, -1)
                 self.subscene = None
-        
+
         # TD guidance
         self.TD_guidance()
-        
-        self.outputs['to_output'] =  output
-        
-    
+
+        self.outputs['to_output'] = output
+
     def get_subscene(self):
         """
         Get the subscene in focus with highest saliency that hasn't yet been processed.
@@ -847,18 +889,19 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
         max_saliency = 0
         new_ss = self.subscene
         in_focus_ss = self.in_focus()
-        
+
         for ss in in_focus_ss:
-            saliency = self.scene.get_saliency(ss) 
+            saliency = self.scene.get_saliency(ss)
             if saliency > max_saliency:
                 max_saliency = saliency
                 new_ss = ss
 
         self.subscene = new_ss
-#        ############ Test of strategy of zoom-in first. #############
-#        if not(self.focus):
-#            self.focus = self.subscene 
-    
+
+    #        ############ Test of strategy of zoom-in first. #############
+    #        if not(self.focus):
+    #            self.focus = self.subscene
+
     def in_focus(self):
         """
         Simplified version of the focus.
@@ -872,26 +915,26 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
             self.focus = None
         else:
             in_focus_ss = candidates
-        
-        return in_focus_ss 
-    
+
+        return in_focus_ss
+
     def TD_guidance(self):
         """
         """
         cpt_schema_inst_name = self.inputs['from_semantic_WM']
         if cpt_schema_inst_name:
-            if self.verbose >0:
-                print "t:%i, requesting more information about %s." %(self.t, cpt_schema_inst_name)
-            self.focus = self.scene.find_subscene(cpt_schema_inst_name) # Modify focus area
-            
-            if self.verbose>0 and self.focus:
-                print "t:%i, TD focus orientation to %s" %(self.t, self.focus)
-            
-            self.next_saccade = True # Even if the retrieval of the current subscene is not over, it retriggers saccade.
-    
-#            in_focus_ss = self.in_focus()
-#            for ss in in_focus_ss:
-#                self.scene.update_saliency(ss,1) # (Re)boosts the saliency of all the subscenes in focus.
+            if self.verbose > 0:
+                print("t:{}, requesting more information about {}.".format(self.t, cpt_schema_inst_name))
+            self.focus = self.scene.find_subscene(cpt_schema_inst_name)  # Modify focus area
+
+            if self.verbose > 0 and self.focus:
+                print("t:{}, TD focus orientation to {}".format(self.t, self.focus))
+
+            self.next_saccade = True  # Even if the retrieval of the current subscene is not over, it retriggers saccade.
+
+    #            in_focus_ss = self.in_focus()
+    #            for ss in in_focus_ss:
+    #                self.scene.update_saliency(ss,1) # (Re)boosts the saliency of all the subscenes in focus.
 
     #######################
     ### DISPLAY METHODS ###
@@ -900,7 +943,7 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
         """
         """
         pass
-    
+
     ####################
     ### JSON METHODS ###
     ####################
@@ -913,52 +956,52 @@ class SCENE_PERCEPTION(SYSTEM_SCHEMA):
         data['next_saccade'] = self.next_saccade
         return data
 
+
 class SIMPLE_SALIENCY_MAP(SYSTEM_SCHEMA):
     """
     Data:
         - BU_saliency_map (array): BOTTOM-up saliency data generated by Itti-Koch matlab saliency toolbox.
         - areas [AREA]:
     """
+
     def __init__(self, name='Saliency_map'):
         SYSTEM_SCHEMA.__init__(self, name)
         self.add_port('IN', 'from_input')
         self.add_port('IN', 'from_visual_WM')
-        self.add_port('OUT', 'to_visual_WM') 
+        self.add_port('OUT', 'to_visual_WM')
         self.add_port('OUT', 'to_subscene_rec')
         self.BU_saliency_map = None
         self.areas = []
-    
+
     def reset(self):
         """
         """
         super(SIMPLE_SALIENCY_MAP).reset()
         self.areas = []
-    
+
     def process(self):
         """
         """
         areas = self.inputs['from_visual_WM']
         if areas:
-            #add new areas
-            new_areas = [a for a in areas if not(a in self.areas)]
+            # add new areas
+            new_areas = [a for a in areas if not (a in self.areas)]
             self.areas.extend[new_areas]
-            
-            #remove unused areas
-            dead_areas = [a for a in self.areas if not(a in areas)]
+
+            # remove unused areas
+            dead_areas = [a for a in self.areas if not (a in areas)]
             for area in dead_areas:
                 self.areas.remove(area)
-        
+
         # NOTHING IS DONE HERE...                
-        
+
         # Send saliency value to visualWM and subscene_rec
         self.outputs['to_visual_WM'] = self.BU_saliency_map
-        self.outputs['to_subscene_rec'] =  self.BU_saliency_map
-         
+        self.outputs['to_subscene_rec'] = self.BU_saliency_map
+
 
 ###############################################################################
-if __name__=='__main__':
+if __name__ == '__main__':
     from test_TCG_scene_description import test
+
     test(seed=None)
-
-    
-

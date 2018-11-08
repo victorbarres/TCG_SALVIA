@@ -10,13 +10,15 @@ import sys
 import model_TCG_production as TCG_prod
 import model_TCG_comprehension as TCG_comp
 import model_TCG_comprehension_2route as TCG_C2
+
+
 def run_model():
     """
     """
     model_types = ['TCG_c', 'TCG_p', 'TCG_c_C2']
-    help_message = "Usage: python run.py model_type\nmodel_types: %s\n" %", ".join(model_types)
-    if len(sys.argv) <2 or sys.argv[1] not in model_types:
-        print help_message
+    help_message = "Usage: python run.py model_type\nmodel_types: {}\n".format(", ".join(model_types))
+    if len(sys.argv) < 2 or sys.argv[1] not in model_types:
+        print(help_message)
         return
     model_type = sys.argv[1]
     if model_type == model_types[0]:
@@ -26,12 +28,8 @@ def run_model():
     elif model_type == model_types[2]:
         TCG_C2.run_diagnostic()
     else:
-        print help_message
-        
-        
-    
+        print(help_message)
 
-if __name__ =='__main__':
+
+if __name__ == '__main__':
     run_model()
-
-

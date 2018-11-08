@@ -4,7 +4,6 @@
 
 Contains functions that can instantiate various TCG models and submodels.
 """
-from __future__ import division
 import schema_theory as st
 import language_schemas as ls
 import WK_schemas as wks
@@ -24,256 +23,260 @@ def parameters(system_names):
         - system_names ([STR])
     """
     params = {
-    'Percept_LTM':{
-        'init_act':1.0
+        'Percept_LTM': {
+            'init_act': 1.0
         },
-        
-    'Concept_LTM':{
-        'init_act':1.0
-        },
-        
-    'Grammatical_LTM':{
-        'init_act':0.3
-        },
-        
-    'WK_frame_LTM':{
-        'init_act':0.2
-        },    
-        
-    'Semantic_WM_P':{
-        'dyn.tau':10000.0,
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0,
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':0.1,
-        'C2.confidence_threshold':0.0,
-        'C2.prune_threshold':0.0,
-        'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0,
-        'C2.max_capacity':None
-        },
-        
-    'Semantic_WM_C':{
-        'dyn.tau':100.0,
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0,
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':0.1,
-        'C2.confidence_threshold':0.2,
-        'C2.prune_threshold':0.0,
-        'C2.coop_weight':0.0,
-        'C2.comp_weight':-1.0,
-        'C2.coop_asymmetry':0.0,
-        'C2.comp_asymmetry':0.0,
-        'C2.max_capacity':None
-        },
-        
-    'Conceptualizer':{},
-    
-    'Cxn_retrieval_P':{},
-        
-    'Grammatical_WM_P':{
-        'dyn.tau':100.0, # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0, # Need to analyze the impact of that factor.
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':0.1,
-        'C2.confidence_threshold':0.3, #0.7
-        'C2.prune_threshold':0.01, #0.01 # Manipulations can yield "broca's aphasia" (0.3)
-        'C2.coop_weight':1.0,
-        'C2.comp_weight':-10.0, # Needs to compensate for the dominance of cooperation link.
-        'C2.coop_asymmetry':1.0,
-        'C2.comp_asymmetry':0.0,
-        'C2.max_capacity':None,
-        'C2.sub_threshold_r':0.8,
-        'C2.deact_weight':0.0, # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
-        'C2.refractory_period':10
-        },
-        
-    'Phonological_WM_P':{
-        'dyn.tau':300.0,
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0,
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':1.0,
-        'C2.confidence_threshold':0.0,
-        'C2.prune_threshold':0.01,
-        'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0,
-        'C2.max_capacity':None
-        },
-        
-    'Utter':{
-        'speech_rate':1.0
-        },
-        
-    'Control':{
-        'task.mode':'produce',
-        'task.time_pressure': 100, #200.0,
-        'task.start_produce': 200.0, #400.0,
-        'style.activation':1.0, #0.7
-        'style.sem_length':1.0, #0.5
-        'style.form_length':0.0, #0.0
-        'style.continuity':0.3  #0.0
-        },
-    
-    'Phonological_WM_C':{
-        'dyn.tau':10000.0,
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0,
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':0.1,    
-        'C2.confidence_threshold':0.0,
-        'C2.prune_threshold':0.01,
-        'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0,
-        'C2.max_capacity':None,
-        },
-    
-    'Lex_cxn_retrieval_C':{},
 
-    'Cxn_retrieval_C':{},
-        
-    'Grammatical_WM_C':{
-        'dyn.tau':100.0, 
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0, 
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':0.1, 
-        'C2.confidence_threshold': 0.5, 
-        'C2.prune_threshold':0.01, 
-        'C2.coop_weight':1.0,
-        'C2.comp_weight':-1.0, 
-        'C2.coop_asymmetry':0.0,
-        'C2.comp_asymmetry':0.0,
-        'C2.max_capacity':None,
-        'C2.sub_threshold_r':0.8,
-        'C2.deact_weight':0.0,
-        'parser.pred_init':{'S':[1]},
-        'parser.parser_type':'Left-Corner'
+        'Concept_LTM': {
+            'init_act': 1.0
         },
-        
-    'Visual_WM':{
-        'dyn.tau':10000.0,
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0,
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':1.0,    
-        'C2.confidence_threshold':0.0,
-        'C2.prune_threshold':0.01,
-        'C2.coop_weight':0.0,
-        'C2.comp_weight':0.0,
-        'C2.max_capacity':None
+
+        'Grammatical_LTM': {
+            'init_act': 0.3
         },
-        
-    'WK_frame_retrieval':{},
-    
-    'WK_frame_WM':{
-        'dyn.tau':100.0,
-        'dyn.int_weight':1.0,
-        'dyn.ext_weight':1.0,
-        'dyn.act_rest':0.001,
-        'dyn.k':10.0,
-        'dyn.noise_mean':0.0,
-        'dyn.noise_std':0.1,
-        'C2.confidence_threshold':0.5,
-        'C2.prune_threshold':0.01,
-        'C2.coop_weight':1.0,
-        'C2.comp_weight':-1.0,
-        'C2.coop_asymmetry':0.0,
-        'C2.comp_asymmetry':0.0,
-        'C2.max_capacity':None
-    },
-        
-    'Subscene_recognition':{
-        'recognition_time':50
+
+        'WK_frame_LTM': {
+            'init_act': 0.2
         },
-        
-    'Scene_perception':{
-        'recognition_time':50
+
+        'Semantic_WM_P': {
+            'dyn.tau': 10000.0,
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 0.1,
+            'C2.confidence_threshold': 0.0,
+            'C2.prune_threshold': 0.0,
+            'C2.coop_weight': 0.0,
+            'C2.comp_weight': 0.0,
+            'C2.max_capacity': None
+        },
+
+        'Semantic_WM_C': {
+            'dyn.tau': 100.0,
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 0.1,
+            'C2.confidence_threshold': 0.2,
+            'C2.prune_threshold': 0.0,
+            'C2.coop_weight': 0.0,
+            'C2.comp_weight': -1.0,
+            'C2.coop_asymmetry': 0.0,
+            'C2.comp_asymmetry': 0.0,
+            'C2.max_capacity': None
+        },
+
+        'Conceptualizer': {},
+
+        'Cxn_retrieval_P': {},
+
+        'Grammatical_WM_P': {
+            'dyn.tau': 100.0,
+        # Need to analyze the impact of that factor with respect to the rates of input to other WM and their own tau.
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,  # Need to analyze the impact of that factor.
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 0.1,
+            'C2.confidence_threshold': 0.3,  # 0.7
+            'C2.prune_threshold': 0.01,  # 0.01 # Manipulations can yield "broca's aphasia" (0.3)
+            'C2.coop_weight': 1.0,
+            'C2.comp_weight': -10.0,  # Needs to compensate for the dominance of cooperation link.
+            'C2.coop_asymmetry': 1.0,
+            'C2.comp_asymmetry': 0.0,
+            'C2.max_capacity': None,
+            'C2.sub_threshold_r': 0.8,
+            'C2.deact_weight': 0.0,
+        # When set at 1, the output act as if the start_produce always occured right after new sem elements are introduced.
+            'C2.refractory_period': 10
+        },
+
+        'Phonological_WM_P': {
+            'dyn.tau': 300.0,
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 1.0,
+            'C2.confidence_threshold': 0.0,
+            'C2.prune_threshold': 0.01,
+            'C2.coop_weight': 0.0,
+            'C2.comp_weight': 0.0,
+            'C2.max_capacity': None
+        },
+
+        'Utter': {
+            'speech_rate': 1.0
+        },
+
+        'Control': {
+            'task.mode': 'produce',
+            'task.time_pressure': 100,  # 200.0,
+            'task.start_produce': 200.0,  # 400.0,
+            'style.activation': 1.0,  # 0.7
+            'style.sem_length': 1.0,  # 0.5
+            'style.form_length': 0.0,  # 0.0
+            'style.continuity': 0.3  # 0.0
+        },
+
+        'Phonological_WM_C': {
+            'dyn.tau': 10000.0,
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 0.1,
+            'C2.confidence_threshold': 0.0,
+            'C2.prune_threshold': 0.01,
+            'C2.coop_weight': 0.0,
+            'C2.comp_weight': 0.0,
+            'C2.max_capacity': None,
+        },
+
+        'Lex_cxn_retrieval_C': {},
+
+        'Cxn_retrieval_C': {},
+
+        'Grammatical_WM_C': {
+            'dyn.tau': 100.0,
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 0.1,
+            'C2.confidence_threshold': 0.5,
+            'C2.prune_threshold': 0.01,
+            'C2.coop_weight': 1.0,
+            'C2.comp_weight': -1.0,
+            'C2.coop_asymmetry': 0.0,
+            'C2.comp_asymmetry': 0.0,
+            'C2.max_capacity': None,
+            'C2.sub_threshold_r': 0.8,
+            'C2.deact_weight': 0.0,
+            'parser.pred_init': {'S': [1]},
+            'parser.parser_type': 'Left-Corner'
+        },
+
+        'Visual_WM': {
+            'dyn.tau': 10000.0,
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 1.0,
+            'C2.confidence_threshold': 0.0,
+            'C2.prune_threshold': 0.01,
+            'C2.coop_weight': 0.0,
+            'C2.comp_weight': 0.0,
+            'C2.max_capacity': None
+        },
+
+        'WK_frame_retrieval': {},
+
+        'WK_frame_WM': {
+            'dyn.tau': 100.0,
+            'dyn.int_weight': 1.0,
+            'dyn.ext_weight': 1.0,
+            'dyn.act_rest': 0.001,
+            'dyn.k': 10.0,
+            'dyn.noise_mean': 0.0,
+            'dyn.noise_std': 0.1,
+            'C2.confidence_threshold': 0.5,
+            'C2.prune_threshold': 0.01,
+            'C2.coop_weight': 1.0,
+            'C2.comp_weight': -1.0,
+            'C2.coop_asymmetry': 0.0,
+            'C2.comp_asymmetry': 0.0,
+            'C2.max_capacity': None
+        },
+
+        'Subscene_recognition': {
+            'recognition_time': 50
+        },
+
+        'Scene_perception': {
+            'recognition_time': 50
         }
     }
-    
+
     system_params = {}
     for system_name in system_names:
-        for k,v in params[system_name].iteritems():
-            path = '%s.%s' %(system_name, k)
+        for k, v in params[system_name].iteritems():
+            path = '{}.{}'.format(system_name, k)
             system_params[path] = v
     return system_params
+
 
 def weights(connect_names):
     """
     Returns a parameter dictionary containing the name and values for the weights associated with each connections whose name is given in connect_names
     Args:
         - connect_names ([STR])
-    """     
+    """
     weights = {
-        'P1':1.0,
-        'P2':1.0,
-        'P3':1.0,
-        'P4':1.0,
-        'P5':1.0,
-        'P6':1.0,
-        'P7':1.0,
-        'P8':1.0,
-        'P9':1.0,
-        'P10':1.0,
-        'P11':1.0,
-        'P12':1.0,
-        'P13':1.0,
-        'P14':1.0,
-        
-        'C1':1.0,
-        'C2':1.0,
-        'C3':1.0,
-        'C4':1.0,
-        'C5':1.0,
-        'C6':1.0,
-        'C7':1.0,
-        'C8':1.0,
-        'C9':1.0, # Phon2Gram
-        'C10':1.0,
-        'C11':1.0, #0.7, # Gram2Sem
-        'C12':1.0,
-        'C13':1.0,
-        
-        'WK1':1.0,
-        'WK2':1.0,
-        'WK3':1.0,
-        'WK4':0.5, #1.0, # WK2Sem
-        'WK5':1.0, # Phon2WK
-        
-        'V1':1.0,
-        'V2':1.0,
-        'V3':1.0,
-        'V4':1.0,
-        'V5':1.0  
+        'P1': 1.0,
+        'P2': 1.0,
+        'P3': 1.0,
+        'P4': 1.0,
+        'P5': 1.0,
+        'P6': 1.0,
+        'P7': 1.0,
+        'P8': 1.0,
+        'P9': 1.0,
+        'P10': 1.0,
+        'P11': 1.0,
+        'P12': 1.0,
+        'P13': 1.0,
+        'P14': 1.0,
+
+        'C1': 1.0,
+        'C2': 1.0,
+        'C3': 1.0,
+        'C4': 1.0,
+        'C5': 1.0,
+        'C6': 1.0,
+        'C7': 1.0,
+        'C8': 1.0,
+        'C9': 1.0,  # Phon2Gram
+        'C10': 1.0,
+        'C11': 1.0,  # 0.7, # Gram2Sem
+        'C12': 1.0,
+        'C13': 1.0,
+
+        'WK1': 1.0,
+        'WK2': 1.0,
+        'WK3': 1.0,
+        'WK4': 0.5,  # 1.0, # WK2Sem
+        'WK5': 1.0,  # Phon2WK
+
+        'V1': 1.0,
+        'V2': 1.0,
+        'V3': 1.0,
+        'V4': 1.0,
+        'V5': 1.0
     }
-    
+
     connect_weights = {}
     for connect_name in connect_names:
         connect_weights[connect_name] = weights[connect_name]
     return connect_weights
-    
-def TCG_production_system(name = 'language_system_P', 
-                          grammar_name = GRAMMAR_NAME, 
-                          semantics_name = SEMANTICS_NAME,
-                          grammar_path = GRAMMAR_PATH,
-                          semantics_path = SEMANTICS_PATH):
+
+
+def TCG_production_system(name='language_system_P',
+                          grammar_name=GRAMMAR_NAME,
+                          semantics_name=SEMANTICS_NAME,
+                          grammar_path=GRAMMAR_PATH,
+                          semantics_path=SEMANTICS_PATH):
     """
     Creates and returns the TCG production model.
     """
@@ -286,80 +289,82 @@ def TCG_production_system(name = 'language_system_P',
     phonWM_P = ls.PHON_WM_P()
     utter = ls.UTTER()
     control = ls.CONTROL()
-    
+
     # Defining schema to brain mappings.
-    language_mapping = {'Semantic_WM_P':['left_SFG', 'LIP', 'Hippocampus'],
-                        'Concept_LTM':[''],
-                        'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
-                        'Grammatical_LTM':['left_STG', 'left_MTG'],
-                        'Cxn_retrieval_P':[], 
-                        'Phonological_WM_P':['left_BA6'],
-                        'Control':['DLPFC'],
-                        'Utter':['']
+    language_mapping = {'Semantic_WM_P': ['left_SFG', 'LIP', 'Hippocampus'],
+                        'Concept_LTM': [''],
+                        'Grammatical_WM_P': ['left_BA45', 'leftBA44'],
+                        'Grammatical_LTM': ['left_STG', 'left_MTG'],
+                        'Cxn_retrieval_P': [],
+                        'Phonological_WM_P': ['left_BA6'],
+                        'Control': ['DLPFC'],
+                        'Utter': ['']
                         }
-   
+
     # Initializing model
     model = st.MODEL(name)
-    
+
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     model.brain_mapping = language_brain_mapping
-    
+
     # Setting up language model.
-    language_schemas = [conceptLTM, semanticWM_P, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter, control]
+    language_schemas = [conceptLTM, semanticWM_P, grammaticalLTM, cxn_retrieval_P, grammaticalWM_P, phonWM_P, utter,
+                        control]
 
     model.add_schemas(language_schemas)
-    
-    model.add_connection(semanticWM_P,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM', name='P1')
+
+    model.add_connection(semanticWM_P, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM', name='P1')
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM', name='P2')
     model.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P', name='P3')
     model.add_connection(semanticWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM', name='P4')
-    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P',name='P5')
-    model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P',name='P6')
+    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P', name='P5')
+    model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P', name='P6')
     model.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P', name='P7')
-    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM',name='P8')
+    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM', name='P8')
     model.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P', name='P9')
     model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P', name='P10')
     model.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control', name='P11')
     model.add_connection(control, 'to_semantic_WM', semanticWM_P, 'from_control', name='P12')
-    
+
     model.set_input_ports([semanticWM_P.find_port('from_conceptualizer')])
-    model.set_output_ports([utter.find_port('to_output'),phonWM_P.find_port('to_output'), grammaticalWM_P.find_port('to_output'), semanticWM_P.find_port('to_output')])
-    
+    model.set_output_ports(
+        [utter.find_port('to_output'), phonWM_P.find_port('to_output'), grammaticalWM_P.find_port('to_output'),
+         semanticWM_P.find_port('to_output')])
+
     # Parameters
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
-    
+
     # Weights
     connect_names = model.connections.keys()
     model_weights = weights(connect_names)
     model.update_weights(model_weights)
-    
-    
+
     control.set_mode('produce')
-    
+
     # Loading data
-    semantics_file = "%s.json" % semantics_name
+    semantics_file = "{}.json".format(semantics_name)
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
-    grammar_file = "%s.json" %grammar_name
+    grammar_file = "{}.json".format(grammar_name)
     my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
-    
+
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
-    
+
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
-    
+
     return model
 
 
-def TCG_comprehension_system(name = 'language_system_C',
-                             grammar_name = GRAMMAR_NAME, 
-                             semantics_name = SEMANTICS_NAME,
-                             grammar_path = GRAMMAR_PATH,
-                             semantics_path = SEMANTICS_PATH):
+def TCG_comprehension_system(name='language_system_C',
+                             grammar_name=GRAMMAR_NAME,
+                             semantics_name=SEMANTICS_NAME,
+                             grammar_path=GRAMMAR_PATH,
+                             semantics_path=SEMANTICS_PATH):
     """
     Creates and returns the TCG comprehension model.
     """
@@ -372,77 +377,82 @@ def TCG_comprehension_system(name = 'language_system_C',
     semanticWM_C = ls.SEMANTIC_WM_C()
     conceptLTM = ls.CONCEPT_LTM()
     control = ls.CONTROL()
-    
+
     # Defining schema to brain mappings.
-    language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
-                    'Lex_cxn_retrieval_C':[], 
-                    'Cxn_retrieval_C':[], 
-                    'Phonological_WM_C':['Wernicke'],
-                    'Grammatical_WM_C':['lBA44, lBA45'],
-                    'Semantic_WM_C':['left_SFG', 'LIP', 'Hippocampus'],
-                    'Concept_LTM':[''],
-                    'Control':['DLPFC']}
-    
+    language_mapping = {'Grammatical_LTM': ['left_STG', 'left_MTG'],
+                        'Lex_cxn_retrieval_C': [],
+                        'Cxn_retrieval_C': [],
+                        'Phonological_WM_C': ['Wernicke'],
+                        'Grammatical_WM_C': ['lBA44, lBA45'],
+                        'Semantic_WM_C': ['left_SFG', 'LIP', 'Hippocampus'],
+                        'Concept_LTM': [''],
+                        'Control': ['DLPFC']}
+
     # Initializing model
     model = st.MODEL(name)
-    
+
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     model.brain_mapping = language_brain_mapping
-    
+
     # Setting up language model.
-    language_schemas = [grammaticalLTM, lex_cxn_retrieval_C, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control]
+    language_schemas = [grammaticalLTM, lex_cxn_retrieval_C, cxn_retrieval_C, phonWM_C, grammaticalWM_C, semanticWM_C,
+                        conceptLTM, control]
     model.add_schemas(language_schemas)
 
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM', name='C1')
-    model.add_connection(grammaticalLTM, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_LTM', name='C2')
-    
+    model.add_connection(grammaticalLTM, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_LTM',
+                         name='C2')
+
     model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C', name='C3')
-    model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C',name='C4')
-    model.add_connection(grammaticalWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_WM_C', name='C5')
-    
+    model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C', name='C4')
+    model.add_connection(grammaticalWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_WM_C',
+                         name='C5')
+
     model.add_connection(phonWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_phonological_WM_C', name='C6')
-    model.add_connection(lex_cxn_retrieval_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_lex_cxn_retrieval_C', name='C7')
+    model.add_connection(lex_cxn_retrieval_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_lex_cxn_retrieval_C',
+                         name='C7')
     model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C', name='C8')
     model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C', name='C9')
-    
+
     model.add_connection(conceptLTM, 'to_semantic_WM', semanticWM_C, 'from_concept_LTM', name='C10')
     model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C', name='C11')
-    
+
     model.add_connection(control, 'to_semantic_WM', semanticWM_C, 'from_control', name='C12')
     model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control', name='C13')
-    
+
     model.set_input_ports([phonWM_C.find_port('from_input')])
     model.set_output_ports([semanticWM_C.find_port('to_output'), grammaticalWM_C.find_port('to_output')])
-    
+
     # Parameters
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
-    
+
     # Weights
     connect_names = model.connections.keys()
     model_weights = weights(connect_names)
     model.update_weights(model_weights)
-    
+
     control.set_mode('listen')
-    
+
     # Loading data
-    semantics_file = "%s.json" % semantics_name
+    semantics_file = "{}.json".format(semantics_name)
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
-    grammar_file = "%s.json" %grammar_name
+    grammar_file = "{}.json".format(grammar_name)
     my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
-    
+
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
-    
+
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
-    
+
     return model
-    
-#def TCG_comprehension_system_dev(name = 'language_system_C',
+
+
+# def TCG_comprehension_system_dev(name = 'language_system_C',
 #                             grammar_name = GRAMMAR_NAME, 
 #                             semantics_name = SEMANTICS_NAME,
 #                             grammar_path = GRAMMAR_PATH,
@@ -502,9 +512,9 @@ def TCG_comprehension_system(name = 'language_system_C',
 #    control.set_mode('listen')
 #    
 #    # Loading data
-#    semantics_file = "%s.json" % semantics_name
+#    semantics_file = "{}.json".format(semantics_name)
 #    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
-#    grammar_file = "%s.json" %grammar_name
+#    grammar_file = "{}.json".format(grammar_name)
 #    my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
 #    
 #    
@@ -515,12 +525,12 @@ def TCG_comprehension_system(name = 'language_system_C',
 #    conceptLTM.initialize(my_conceptual_knowledge)
 #    
 #    return model
-    
-def TCG_comprehension_2route_system(name = 'language_system_2route_C',
-                             grammar_name = GRAMMAR_NAME, 
-                             semantics_name = SEMANTICS_NAME,
-                             grammar_path = GRAMMAR_PATH,
-                             semantics_path = SEMANTICS_PATH):
+
+def TCG_comprehension_2route_system(name='language_system_2route_C',
+                                    grammar_name=GRAMMAR_NAME,
+                                    semantics_name=SEMANTICS_NAME,
+                                    grammar_path=GRAMMAR_PATH,
+                                    semantics_path=SEMANTICS_PATH):
     """
       Creates and returns the TCG comprehension 2 route model.
     """
@@ -536,91 +546,97 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
     wk_frame_LTM = wks.WK_FRAME_LTM()
     wk_frame_retrieval = wks.WK_FRAME_RETRIEVAL()
     wk_frame_WM = wks.WK_FRAME_WM()
-    
+
     # Defining schema to brain mappings.
-    language_mapping = {'Grammatical_LTM':['left_STG', 'left_MTG'],
-                    'Cxn_retrieval_C':[],
-                    'Lex_cxn_retrieval_C':[], 
-                    'Phonological_WM_C':['Wernicke'],
-                    'Grammatical_WM_C':['lBA44, lBA45'],
-                    'Semantic_WM_C':['left_SFG', 'LIP', 'Hippocampus'],
-                    'Concept_LTM':[''],
-                    'Control':['DLPFC'],
-                    'wk_frame_LTM':[],
-                    'WK_frame_WM':[],
-                    'WK_frame_retrieval':[]}
-    
+    language_mapping = {'Grammatical_LTM': ['left_STG', 'left_MTG'],
+                        'Cxn_retrieval_C': [],
+                        'Lex_cxn_retrieval_C': [],
+                        'Phonological_WM_C': ['Wernicke'],
+                        'Grammatical_WM_C': ['lBA44, lBA45'],
+                        'Semantic_WM_C': ['left_SFG', 'LIP', 'Hippocampus'],
+                        'Concept_LTM': [''],
+                        'Control': ['DLPFC'],
+                        'wk_frame_LTM': [],
+                        'WK_frame_WM': [],
+                        'WK_frame_retrieval': []}
+
     # Initializing model
     model = st.MODEL(name)
-    
+
     # Setting up schema to brain mappings
     language_brain_mapping = st.BRAIN_MAPPING()
     language_brain_mapping.schema_mapping = language_mapping
     model.brain_mapping = language_brain_mapping
-    
+
     # Setting up language model.
-    language_schemas = [grammaticalLTM, lex_cxn_retrieval_C, cxn_retrieval_C, phonWM_C,  grammaticalWM_C, semanticWM_C, conceptLTM, control, wk_frame_LTM, wk_frame_retrieval, wk_frame_WM]
+    language_schemas = [grammaticalLTM, lex_cxn_retrieval_C, cxn_retrieval_C, phonWM_C, grammaticalWM_C, semanticWM_C,
+                        conceptLTM, control, wk_frame_LTM, wk_frame_retrieval, wk_frame_WM]
     model.add_schemas(language_schemas)
-    
+
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_LTM', name='C1')
-    model.add_connection(grammaticalLTM, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_LTM', name='C2')
-    
+    model.add_connection(grammaticalLTM, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_LTM',
+                         name='C2')
+
     model.add_connection(grammaticalWM_C, 'to_phonological_WM_C', phonWM_C, 'from_grammatical_WM_C', name='C3')
-    model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C',name='C4')
-    model.add_connection(grammaticalWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_WM_C', name='C5')
-    
+    model.add_connection(grammaticalWM_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_grammatical_WM_C', name='C4')
+    model.add_connection(grammaticalWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_grammatical_WM_C',
+                         name='C5')
+
     model.add_connection(phonWM_C, 'to_lex_cxn_retrieval_C', lex_cxn_retrieval_C, 'from_phonological_WM_C', name='C6')
-    model.add_connection(lex_cxn_retrieval_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_lex_cxn_retrieval_C', name='C7')
+    model.add_connection(lex_cxn_retrieval_C, 'to_cxn_retrieval_C', cxn_retrieval_C, 'from_lex_cxn_retrieval_C',
+                         name='C7')
     model.add_connection(cxn_retrieval_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_cxn_retrieval_C', name='C8')
     model.add_connection(phonWM_C, 'to_grammatical_WM_C', grammaticalWM_C, 'from_phonological_WM_C', name='C9')
-    
+
     model.add_connection(conceptLTM, 'to_semantic_WM', semanticWM_C, 'from_concept_LTM', name='C10')
     model.add_connection(grammaticalWM_C, 'to_semantic_WM', semanticWM_C, 'from_grammatical_WM_C', name='C11')
-    
-    model.add_connection(wk_frame_LTM, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_wk_frame_LTM', name='WK1' )
-    model.add_connection(lex_cxn_retrieval_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_lex_cxn_retrieval_C', name='WK2')
+
+    model.add_connection(wk_frame_LTM, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_wk_frame_LTM', name='WK1')
+    model.add_connection(lex_cxn_retrieval_C, 'to_wk_frame_retrieval', wk_frame_retrieval, 'from_lex_cxn_retrieval_C',
+                         name='WK2')
     model.add_connection(wk_frame_retrieval, 'to_wk_frame_WM', wk_frame_WM, 'from_wk_frame_retrieval', name='WK3')
     model.add_connection(wk_frame_WM, 'to_semantic_WM', semanticWM_C, 'from_wk_frame_WM', name='WK4')
     model.add_connection(phonWM_C, 'to_wk_frame_WM', wk_frame_WM, 'from_phonological_WM_C', name='WK5')
-    
+
     model.add_connection(control, 'to_semantic_WM', semanticWM_C, 'from_control', name='C12')
     model.add_connection(control, 'to_grammatical_WM_C', grammaticalWM_C, 'from_control', name='C13')
-    
-    
+
     model.set_input_ports([phonWM_C.find_port('from_input')])
-    model.set_output_ports([semanticWM_C.find_port('to_output'), grammaticalWM_C.find_port('to_output'), wk_frame_WM.find_port('to_output')])
-    
+    model.set_output_ports([semanticWM_C.find_port('to_output'), grammaticalWM_C.find_port('to_output'),
+                            wk_frame_WM.find_port('to_output')])
+
     # Parameters
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
-    
+
     # Weights
     connect_names = model.connections.keys()
     model_weights = weights(connect_names)
     model.update_weights(model_weights)
-    
+
     control.set_mode('listen')
-    
+
     # Loading data
-    semantics_file = "%s.json" % semantics_name
+    semantics_file = "{}.json".format(semantics_name)
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
     my_wk_frames = TCG_LOADER.load_frame_knowledge(semantics_file, semantics_path, my_conceptual_knowledge)
-    grammar_file = "%s.json" %grammar_name
+    grammar_file = "{}.json".format(grammar_name)
     my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
-    
+
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
-    
+
     # Initialize conceptual LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
-    
+
     # Initialize WK frame LTM content
     wk_frame_LTM.initialize(my_wk_frames)
-    
+
     return model
 
-#def TCG_language_system(name = 'language_system',
+
+# def TCG_language_system(name = 'language_system',
 #                        grammar_name = GRAMMAR_NAME, 
 #                        semantics_name = SEMANTICS_NAME,
 #                        grammar_path = GRAMMAR_PATH,
@@ -700,9 +716,9 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
 #    model.update_params(model_params)
 #    
 #    # Loading data
-#    semantics_file = "%s.json" % semantics_name
+#    semantics_file = "{}.json".format(semantics_name)
 #    my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
-#    grammar_file = "%s.json" %grammar_name
+#    grammar_file = "{}.json".format(grammar_name)
 #    my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
 #    
 #    
@@ -713,12 +729,12 @@ def TCG_comprehension_2route_system(name = 'language_system_2route_C',
 #    grammaticalLTM.initialize(my_grammar)
 #    
 #    return model
-    
+
 def SALVIA_P(name='SALVIA_P',
-           grammar_name = GRAMMAR_NAME, 
-           semantics_name = SEMANTICS_NAME,
-           grammar_path = GRAMMAR_PATH,
-           semantics_path = SEMANTICS_PATH):
+             grammar_name=GRAMMAR_NAME,
+             semantics_name=SEMANTICS_NAME,
+             grammar_path=GRAMMAR_PATH,
+             semantics_path=SEMANTICS_PATH):
     """
     Creates and returns the SALVIA production model.
     """
@@ -726,10 +742,10 @@ def SALVIA_P(name='SALVIA_P',
     subscene_rec = ps.SUBSCENE_RECOGNITION()
     perceptLTM = ps.PERCEPT_LTM()
     visualWM = ps.VISUAL_WM()
-    
+
     conceptualizer = ls.CONCEPTUALIZER()
     conceptLTM = ls.CONCEPT_LTM()
-    
+
     semanticWM_P = ls.SEMANTIC_WM_P()
     grammaticalWM_P = ls.GRAMMATICAL_WM_P()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
@@ -737,116 +753,118 @@ def SALVIA_P(name='SALVIA_P',
     phonWM_P = ls.PHON_WM_P()
     control = ls.CONTROL()
     utter = ls.UTTER()
-    
+
     # Defining schema to brain mappings.
-    brain_mappings = {'Visual_WM':['ITG'], 
-                        'Percept_LTM':[''],
-                        'Subscene_recognition':['Ventral stream'],
-                        'Conceptualizer':['aTP'], 
-                        'Concept_LTM':[''],
-                        'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
-                        'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
-                        'Grammatical_LTM':['left_STG', 'left_MTG'],
-                        'Cxn_retrieval_P':[], 
-                        'Phonological_WM_P':['left_BA6'],
-                        'Utter':[''],
-                        'Control':['DLPFC']}
-                        
-    schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM_P, grammaticalWM_P, phonWM_P, utter, control] 
-   
-   # Creating model and adding system schemas
+    brain_mappings = {'Visual_WM': ['ITG'],
+                      'Percept_LTM': [''],
+                      'Subscene_recognition': ['Ventral stream'],
+                      'Conceptualizer': ['aTP'],
+                      'Concept_LTM': [''],
+                      'Semantic_WM': ['left_SFG', 'LIP', 'Hippocampus'],
+                      'Grammatical_WM_P': ['left_BA45', 'leftBA44'],
+                      'Grammatical_LTM': ['left_STG', 'left_MTG'],
+                      'Cxn_retrieval_P': [],
+                      'Phonological_WM_P': ['left_BA6'],
+                      'Utter': [''],
+                      'Control': ['DLPFC']}
+
+    schemas = [subscene_rec, visualWM, perceptLTM, conceptualizer, conceptLTM, grammaticalLTM, cxn_retrieval_P,
+               semanticWM_P, grammaticalWM_P, phonWM_P, utter, control]
+
+    # Creating model and adding system schemas
     model = st.MODEL(name)
     model.add_schemas(schemas)
-    
+
     # Defining connections    
-    model.add_connection(semanticWM_P,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM', name='P1')
+    model.add_connection(semanticWM_P, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM', name='P1')
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM', name='P2')
     model.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P', name='P3')
     model.add_connection(semanticWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM', name='P4')
-    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P',name='P5')
-    model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P',name='P6')
+    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P', name='P5')
+    model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P', name='P6')
     model.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P', name='P7')
-    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM',name='P8')
+    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM', name='P8')
     model.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P', name='P9')
     model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P', name='P10')
     model.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control', name='P11')
     model.add_connection(control, 'to_semantic_WM', semanticWM_P, 'from_control', name='P12')
-    
+
     model.add_connection(conceptLTM, 'to_conceptualizer', conceptualizer, 'from_concept_LTM', name='P13')
     model.add_connection(conceptualizer, 'to_semantic_WM', semanticWM_P, 'from_conceptualizer', name='P14')
-    
+
     model.add_connection(subscene_rec, 'to_visual_WM', visualWM, 'from_subscene_rec', name='V1')
     model.add_connection(visualWM, 'to_conceptualizer', conceptualizer, 'from_visual_WM', name='V2')
-    
-    
 
     model.set_input_ports([subscene_rec.find_port('from_input')])
     model.set_output_ports([utter.find_port('to_output'), subscene_rec.find_port('to_output')])
-    
+
     # Setting up schema to brain mappings
     description_brain_mapping = st.BRAIN_MAPPING()
     description_brain_mapping.schema_mapping = brain_mappings
     model.brain_mapping = description_brain_mapping
-    
+
     # Parameters
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
-    
+
     # Weights
     connect_names = model.connections.keys()
     model_weights = weights(connect_names)
     model.update_weights(model_weights)
-    
+
     grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']
     # Loading data
-    
-    semantics_file = "%s.json" % semantics_name
+
+    semantics_file = "{}.json".format(semantics_name)
     my_perceptual_knowledge = TCG_LOADER.load_perceptual_knowledge(semantics_file, semantics_path)
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
-    
-    my_conceptualization = TCG_LOADER.load_conceptualization(semantics_file, semantics_path, my_conceptual_knowledge, my_perceptual_knowledge)
-    
-    grammar_file = "%s.json" %grammar_name
+
+    my_conceptualization = TCG_LOADER.load_conceptualization(semantics_file, semantics_path, my_conceptual_knowledge,
+                                                             my_perceptual_knowledge)
+
+    grammar_file = "{}.json".format(grammar_name)
     my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
-    
+
     # Initialize perceptual LTM content
     perceptLTM.initialize(my_perceptual_knowledge)
-        
+
     # Initialize concept LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
-    
+
     # Initialize conceptualizer
     conceptualizer.initialize(my_conceptualization)
-    
+
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
-    
+
     return model
-    
+
+
 def SALVIA_P_verbal_guidance(name='SALVIA_P_verbal_guidance',
-                             grammar_name = GRAMMAR_NAME, 
-                             semantics_name = SEMANTICS_NAME,
-                             grammar_path = GRAMMAR_PATH,
-                             semantics_path = SEMANTICS_PATH):
+                             grammar_name=GRAMMAR_NAME,
+                             semantics_name=SEMANTICS_NAME,
+                             grammar_path=GRAMMAR_PATH,
+                             semantics_path=SEMANTICS_PATH):
     """
     Creates and returns the SALVIA model with verbal guidance.
     """
-    
+
     model = SALVIA_P(name, grammar_name, semantics_name, grammar_path, semantics_path)
     semanticWM_P = model.schemas['Semantic_WM_P']
     visualWM = model.schemas['Visual_WM']
     subscene_rec = model.schemas['Subscene_recognition']
     model.add_connection(semanticWM_P, 'to_visual_WM', visualWM, 'from_semantic_WM', name='V3')
     model.add_connection(visualWM, 'to_subscene_rec', subscene_rec, 'from_visual_WM', name='V4')
-    
+
     return model
-    
+
+
 def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
-                   grammar_name = GRAMMAR_NAME, 
-                   semantics_name = SEMANTICS_NAME,
-                   grammar_path = GRAMMAR_PATH,
-                   semantics_path = SEMANTICS_PATH):
+                   grammar_name=GRAMMAR_NAME,
+                   semantics_name=SEMANTICS_NAME,
+                   grammar_path=GRAMMAR_PATH,
+                   semantics_path=SEMANTICS_PATH):
     """
     Creates and returns a light version of the SALVIA production model.
     It bypasses the VisualWM and the Conceptualizer
@@ -855,7 +873,7 @@ def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
     scene_perception = ps.SCENE_PERCEPTION()
 
     conceptLTM = ls.CONCEPT_LTM()
-    
+
     semanticWM_P = ls.SEMANTIC_WM()
     grammaticalWM_P = ls.GRAMMATICAL_WM_P()
     grammaticalLTM = ls.GRAMMATICAL_LTM()
@@ -863,79 +881,80 @@ def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
     phonWM_P = ls.PHON_WM_P()
     control = ls.CONTROL()
     utter = ls.UTTER()
-    
+
     # Defining schema to brain mappings.
-    brain_mappings = {'Scene_perception':['Ventral stream'],
-                        'Concept_LTM':[''],
-                        'Semantic_WM':['left_SFG', 'LIP', 'Hippocampus'], 
-                        'Grammatical_WM_P':['left_BA45', 'leftBA44'], 
-                        'Grammatical_LTM':['left_STG', 'left_MTG'],
-                        'Cxn_retrieval_P':[], 
-                        'Phonological_WM_P':['left_BA6'],
-                        'Utter':[''],
-                        'Control':['DLPFC']}
-                        
-    schemas = [scene_perception, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM_P, grammaticalWM_P, phonWM_P, utter, control] 
-   
-   # Creating model and adding system schemas
+    brain_mappings = {'Scene_perception': ['Ventral stream'],
+                      'Concept_LTM': [''],
+                      'Semantic_WM': ['left_SFG', 'LIP', 'Hippocampus'],
+                      'Grammatical_WM_P': ['left_BA45', 'leftBA44'],
+                      'Grammatical_LTM': ['left_STG', 'left_MTG'],
+                      'Cxn_retrieval_P': [],
+                      'Phonological_WM_P': ['left_BA6'],
+                      'Utter': [''],
+                      'Control': ['DLPFC']}
+
+    schemas = [scene_perception, conceptLTM, grammaticalLTM, cxn_retrieval_P, semanticWM_P, grammaticalWM_P, phonWM_P,
+               utter, control]
+
+    # Creating model and adding system schemas
     model = st.MODEL(name)
     model.add_schemas(schemas)
-    
+
     # Defining connections
-    
-    model.add_connection(semanticWM_P,'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM', name='P1')
+
+    model.add_connection(semanticWM_P, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_semantic_WM', name='P1')
     model.add_connection(grammaticalLTM, 'to_cxn_retrieval_P', cxn_retrieval_P, 'from_grammatical_LTM', name='P2')
     model.add_connection(cxn_retrieval_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_cxn_retrieval_P', name='P3')
     model.add_connection(semanticWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_semantic_WM', name='P4')
-    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P',name='P5')
-    model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P',name='P6')
+    model.add_connection(grammaticalWM_P, 'to_semantic_WM', semanticWM_P, 'from_grammatical_WM_P', name='P5')
+    model.add_connection(grammaticalWM_P, 'to_phonological_WM_P', phonWM_P, 'from_grammatical_WM_P', name='P6')
     model.add_connection(phonWM_P, 'to_grammatical_WM_P', grammaticalWM_P, 'from_phonological_WM_P', name='P7')
-    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM',name='P8')
+    model.add_connection(semanticWM_P, 'to_control', control, 'from_semantic_WM', name='P8')
     model.add_connection(phonWM_P, 'to_utter', utter, 'from_phonological_WM_P', name='P9')
     model.add_connection(phonWM_P, 'to_control', control, 'from_phonological_WM_P', name='P10')
     model.add_connection(control, 'to_grammatical_WM_P', grammaticalWM_P, 'from_control', name='P11')
     model.add_connection(control, 'to_semantic_WM', semanticWM_P, 'from_control', name='P12')
-    
+
     model.add_connection(scene_perception, 'to_semantic_WM', semanticWM_P, 'from_conceptualizer', name='V5')
     model.add_connection(semanticWM_P, 'to_visual_WM', scene_perception, 'from_semantic_WM', name='V6')
-    
 
     model.set_input_ports([scene_perception.find_port('from_input')])
     model.set_output_ports([utter.find_port('to_output'), scene_perception.find_port('to_output')])
-    
+
     # Setting up schema to brain mappings
     description_brain_mapping = st.BRAIN_MAPPING()
     description_brain_mapping.schema_mapping = brain_mappings
     model.brain_mapping = description_brain_mapping
-    
+
     # Parameters
     system_names = model.schemas.keys()
     model_params = parameters(system_names)
     model.update_params(model_params)
-    
+
     # Weights
     connect_names = model.connections.keys()
     model_weights = weights(connect_names)
     model.update_weights(model_weights)
-    
+
     grammaticalLTM.init_act = grammaticalWM_P.params['C2']['confidence_threshold']
     # Loading data
-    
-    semantics_file = "%s.json" % semantics_name
+
+    semantics_file = "{}.json".format(semantics_name)
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge(semantics_file, semantics_path)
-    
-    grammar_file = "%s.json" %grammar_name
+
+    grammar_file = "{}.json".format(grammar_name)
     my_grammar = TCG_LOADER.load_grammar(grammar_file, grammar_path, my_conceptual_knowledge)
-        
+
     # Initialize concept LTM content
     conceptLTM.initialize(my_conceptual_knowledge)
-    
+
     # Initialize grammatical LTM content
     grammaticalLTM.initialize(my_grammar)
-    
+
     return model
-    
-#def SALVIA_P_saliency(name='SALVIA_P_saliency'):
+
+
+# def SALVIA_P_saliency(name='SALVIA_P_saliency'):
 #    """
 #    Creates and returns the SALVIA production model that include a simple saliency map
 #    """
@@ -965,17 +984,17 @@ def SALVIA_P_light(name='SALVIA_P_verbal_guidance',
 #    return model
 
 
-#def create_model(model_name):
+# def create_model(model_name):
 #    """
 #    For now does not handle inputs... not used
 #    """
 #    possibles = globals().copy()
 #    function = possibles.get(model_name)
 #    if not function:
-#        raise NotImplementedError("model %s not implemented" % model_name)
+#        raise NotImplementedError("model {} not implemented".format(model_name))
 #    model = function()
 #    return model
-        
+
 
 if __name__ == '__main__':
     model = TCG_comprehension_2route_system()

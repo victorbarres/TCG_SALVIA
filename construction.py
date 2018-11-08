@@ -7,7 +7,6 @@ The Template Classes define all the basic template elements that are used to bui
 
 Uses NetworkX module to represent construction SemFrame graph and SynForm graph.
 """
-from __future__ import division
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -59,7 +58,7 @@ class TP_NODE(TP_SEM_ELEM):
     
     def copy(self):
         new_node = TP_NODE()
-        new_node.name = '%s_%i' %(self.name, new_node.id)
+        new_node.name = '{}_{}'.format(self.name, new_node.id)
         name_corr = (self.name, new_node.name)
         new_node.concept = self.concept
         new_node.head = self.head
@@ -83,7 +82,7 @@ class TP_REL(TP_SEM_ELEM):
     
     def copy(self):
         new_rel = TP_REL()
-        new_rel.name = '%s_%i' %(self.name, new_rel.id)
+        new_rel.name = '{}_{}'.format(self.name, new_rel.id)
         name_corr = (self.name, new_rel.name)
         new_rel.concept = self.concept
         new_rel.pfrom = self.pFrom
@@ -119,7 +118,7 @@ class TP_SLOT(TP_SYN_ELEM):
     
     def copy(self):
         new_slot = TP_SLOT()
-        new_slot.name = '%s_%i' %(self.name, new_slot.id)
+        new_slot.name = '{}_{}'.format(self.name, new_slot.id)
         name_corr = (self.name, new_slot.name)
         new_slot.order = self.order
         new_slot.cxn_classes = self.cxn_classes[:]
@@ -141,7 +140,7 @@ class TP_PHON(TP_SYN_ELEM):
     
     def copy(self):
         new_phon = TP_PHON()
-        new_phon.name = '%s_%i' %(self.name, new_phon.id)
+        new_phon.name = '{}_{}'.format(self.name, new_phon.id)
         name_corr = (self.name, new_phon.name)
         new_phon.order = self.order
         new_phon.cxn_phonetics = self.cxn_phonetics
@@ -540,8 +539,8 @@ class CXN(object):
         (new_synform, syn_corr, u_map_syn) = TP_SYNFORM.unify(cxn_p.SynForm, slot_p.name, cxn_c.SynForm)
         
         new_cxn = CXN()
-#        new_cxn.name = "[%s-U(%i)-%s]" %(cxn_p.name, slot_p.order, cxn_c.name)
-        new_cxn.name = "%s__U__%s" %(cxn_p.name, cxn_c.name)
+#        new_cxn.name = "[{}-U({})-{}]".format(cxn_p.name, slot_p.order, cxn_c.name)
+        new_cxn.name = "{}__U__{}".format(cxn_p.name, cxn_c.name)
         new_cxn.clss = cxn_p.clss
         new_cxn.preference = None # For now does not need to be defined....
         new_cxn.group = None # For now does not need to be defined....
@@ -625,13 +624,13 @@ class GRAMMAR:
 #    
 #    def print_cxn(self, cxn_name):
 #        """
-#        Print the cxn with name cxn_name (STR) if it is found in the grammar.
+#        print(the cxn with name cxn_name (STR) if it is found in the grammar.)
 #        """        
 #        cxn = self.find_construction(cxn_name)
 #        if not(cxn):
-#            print "%s not found..." % cxn_name
+#            print("{} not found...".format(cxn_name))
 #        else:
-#            print cxn     
+#            print(cxn)
 ###############################################################################
 
 if __name__=='__main__':
@@ -641,7 +640,7 @@ if __name__=='__main__':
     grammar_name = 'TCG_grammar_VB_main'
     
     my_conceptual_knowledge = TCG_LOADER.load_conceptual_knowledge("TCG_semantics_main.json", "./data/semantics/")
-    grammar_file = "%s.json" %grammar_name
+    grammar_file = "{}.json".format(grammar_name)
     my_grammar = TCG_LOADER.load_grammar(grammar_file, "./data/grammars/", my_conceptual_knowledge)
     
     cxn = my_grammar.constructions[0]
@@ -649,8 +648,8 @@ if __name__=='__main__':
     
     (cxn3, c, u_map) = CXN.unify(cxn, cxn.SynForm.form[0], cxn2)
 #    cxn3.SemFrame.draw()
-#    print [f.name for f in cxn3.SynForm.form]
-#    print cxn3.SymLinks.SL
+#    print([f.name for f in cxn3.SynForm.form])
+#    print(cxn3.SymLinks.SL)
     
     cxn3.show()
     

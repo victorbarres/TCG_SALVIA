@@ -6,12 +6,12 @@ TCG graph operations
 
 Uses networkx
 """
-from __future__ import division
 from networkx import DiGraph, MultiDiGraph
 from networkx.algorithms import isomorphism
 
+
 ## Find subgraph isomorphisms ###
-def find_sub_iso(G_subgraphs, G_pat, node_match=None, edge_match=None, iso_filter=lambda x:True):
+def find_sub_iso(G_subgraphs, G_pat, node_match=None, edge_match=None, iso_filter=lambda x: True):
     """
     Returns the list of all the graph isomorphisms between one of the subgraphs of G in G_subgraphs and the graph pattern G_pat. 
     Each isomorphim is defined as a dictionary with keys "nodes" itself a dictionary mapping G_pat nodes to G nodes, and "edges" a dictionary mapping G_pat edges to G edges.
@@ -25,25 +25,27 @@ def find_sub_iso(G_subgraphs, G_pat, node_match=None, edge_match=None, iso_filte
     """
     sub_iso = []
     mappings = []
-    
+
     for subgraph in G_subgraphs:
-            DiGM = isomorphism.DiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
-            if DiGM.is_isomorphic():
-                mappings.append(DiGM.mapping)
-                
+        DiGM = isomorphism.DiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
+        if DiGM.is_isomorphic():
+            mappings.append(DiGM.mapping)
+
     for mapping in mappings:
-        iso = {"nodes":{}, "edges":{}}
+        iso = {"nodes": {}, "edges": {}}
         for key in mapping:
-            iso["nodes"][mapping[key]] = key # reverse mapping for convenience      
-        for edge in G_pat.edges(): # Add mapping between edges
+            iso["nodes"][mapping[key]] = key  # reverse mapping for convenience
+        for edge in G_pat.edges():  # Add mapping between edges
             iso["edges"][edge] = (iso["nodes"][edge[0]], iso["nodes"][edge[1]])
         sub_iso.append(iso)
-    
+
     output = [s for s in sub_iso if iso_filter(s)]
-    
+
     return output
 
-def find_sub_multi_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=lambda x:True, induce_type='edge', subgraph_filter=lambda x:True):
+
+def find_sub_multi_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=lambda x: True, induce_type='edge',
+                       subgraph_filter=lambda x: True):
     """Returns the list of all the multigraph isomorphisms between one of the subgraphs of G in G_subgraphs and the graph pattern G_pat. 
     Each isomorphim is defined as a dictionary with keys "nodes" itself a dictionary mapping G_pat nodes to G nodes, and "edges" a dictionary mapping G_pat edges to G edges
     with edge noted as a triple (key, origin, target) 
@@ -58,37 +60,41 @@ def find_sub_multi_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=la
         - subgraph_filter(callable): Boolean mapping to filter subgraphs
     """
     sub_iso = []
-    mappings = []  
-    G_subgraphs = build_submultigraphs(G, induced=induce_type, subgraph_filter=subgraph_filter)  
+    mappings = []
+    G_subgraphs = build_submultigraphs(G, induced=induce_type, subgraph_filter=subgraph_filter)
     for subgraph in G_subgraphs:
         MultDiGM = isomorphism.MultiDiGraphMatcher(subgraph, G_pat, node_match=node_match, edge_match=edge_match)
         is_isomorphic = MultDiGM.is_isomorphic()
-        if is_isomorphic and not MultDiGM.mapping in mappings: # Because of the way nx works, it migth return twice the same mapping for different multi edges. See comment below about trying to have nx returning edge_mapping directly...
+        if is_isomorphic and not MultDiGM.mapping in mappings:  # Because of the way nx works, it migth return twice the same mapping for different multi edges. See comment below about trying to have nx returning edge_mapping directly...
             mappings.append(MultDiGM.mapping)
-    
+
     for mapping in mappings:
-        iso = {"nodes":{}, "edges":{}}
+        iso = {"nodes": {}, "edges": {}}
         for key in mapping:
-            iso["nodes"][mapping[key]] = key # reverse mapping for convenience        
-        for u1,v1,k1,attr1 in G_pat.edges(data=True, keys=True): # Add mapping between edges, I need to find all the edges that match.
+            iso["nodes"][mapping[key]] = key  # reverse mapping for convenience
+        for u1, v1, k1, attr1 in G_pat.edges(data=True,
+                                             keys=True):  # Add mapping between edges, I need to find all the edges that match.
             u2 = iso["nodes"][u1]
             v2 = iso["nodes"][v1]
-            target_edges_dat = G.get_edge_data(u2,v2)
-#            name1 = attr1.get('name', None)
-#            iso["edges"][(u1, v1, k1, name1)] = []
+            target_edges_dat = G.get_edge_data(u2, v2)
+            #            name1 = attr1.get('name', None)
+            #            iso["edges"][(u1, v1, k1, name1)] = []
             iso["edges"][(u1, v1, k1)] = []
-            for k2,attr2 in target_edges_dat.iteritems():
-                if not(edge_match) or  edge_match({'attr':attr1}, {'attr':attr2}): # not completely sure about that. I wish I could figure out how to have nx return directly the edge mapping...
-#                    name2 = attr2.get('name', None)
-#                    iso["edges"][(u1, v1, k1, name1)].append((u2, v2, k2, name2))
+            for k2, attr2 in target_edges_dat.iteritems():
+                if not (edge_match) or edge_match({'attr': attr1}, {
+                    'attr': attr2}):  # not completely sure about that. I wish I could figure out how to have nx return directly the edge mapping...
+                    #                    name2 = attr2.get('name', None)
+                    #                    iso["edges"][(u1, v1, k1, name1)].append((u2, v2, k2, name2))
                     iso["edges"][(u1, v1, k1)].append((u2, v2, k2))
         sub_iso.append(iso)
-      
+
     output = [s for s in sub_iso if iso_filter(s)]
     return output
 
-    
-def find_max_partial_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=lambda x:True, target_induce_type='edge', target_subgraph_filter=lambda x:True, source_induce_type='edge', source_subgraph_filter=lambda x:True):
+
+def find_max_partial_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=lambda x: True,
+                         target_induce_type='edge', target_subgraph_filter=lambda x: True, source_induce_type='edge',
+                         source_subgraph_filter=lambda x: True):
     """Returns the list of all the max (partial) multigraph isomorphisms between one of the subgraphs of G in G_subgraphs and the graph pattern G_pat. 
     Each isomorphim is defined as a dictionary with keys "nodes" itself a dictionary mapping G_pat nodes to G nodes, and "edges" a dictionary mapping G_pat edges to G edges
     with edge noted as a triple (key, origin, target) 
@@ -107,11 +113,12 @@ def find_max_partial_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=
         - source_subgraph_filter(callable): Boolean mapping to filter subgraphs of G_pat
     """
     sub_isos = {}
-    G_pat_subgraphs = build_submultigraphs(G_pat, induced=source_induce_type, subgraph_filter = source_subgraph_filter)
+    G_pat_subgraphs = build_submultigraphs(G_pat, induced=source_induce_type, subgraph_filter=source_subgraph_filter)
     for G_pat_sub in G_pat_subgraphs:
-        sub_iso = find_sub_multi_iso(G, G_pat_sub, node_match, edge_match, iso_filter, induce_type=target_induce_type, subgraph_filter=target_subgraph_filter)
-        if sub_iso: # none empty sub_isos
-            if not(sub_isos):
+        sub_iso = find_sub_multi_iso(G, G_pat_sub, node_match, edge_match, iso_filter, induce_type=target_induce_type,
+                                     subgraph_filter=target_subgraph_filter)
+        if sub_iso:  # none empty sub_isos
+            if not (sub_isos):
                 sub_isos[G_pat_sub] = sub_iso
             else:
                 flag = False
@@ -125,12 +132,16 @@ def find_max_partial_iso(G, G_pat, node_match=None, edge_match=None, iso_filter=
     for iso in sub_isos.values():
         output.extend(iso)
     return output
-    
-def update_max_partial_iso(newG, G_pat, old_sub_iso, node_match=None, edge_match=None, iso_filter=lambda x:True, target_induce_type='edge', target_subgraph_filter=lambda x:True, source_induce_type='edge', source_subgraph_filter=lambda x:True):
+
+
+def update_max_partial_iso(newG, G_pat, old_sub_iso, node_match=None, edge_match=None, iso_filter=lambda x: True,
+                           target_induce_type='edge', target_subgraph_filter=lambda x: True, source_induce_type='edge',
+                           source_subgraph_filter=lambda x: True):
     """For a partial iso mapping old_sub_iso, checks if it can be expanded on newG.
     Returns:
         List of max_partial_iso that expand old_sub_iso on newG
     """
+
     def subgraph_filter_source(subgraph, iso_constraints=old_sub_iso):
         for n in iso_constraints['nodes'].keys():
             if n not in subgraph.nodes():
@@ -139,7 +150,7 @@ def update_max_partial_iso(newG, G_pat, old_sub_iso, node_match=None, edge_match
             if e not in subgraph.edges(keys=True):
                 return False
         return True
-    
+
     def subgraph_filter_target(subgraph, iso_constraints=old_sub_iso):
         for n in iso_constraints['nodes'].values():
             if n not in subgraph.nodes():
@@ -149,98 +160,104 @@ def update_max_partial_iso(newG, G_pat, old_sub_iso, node_match=None, edge_match
                 if e not in subgraph.edges(keys=True):
                     return False
         return True
-    
-    sub_isos = find_max_partial_iso(newG, G_pat, node_match, edge_match, iso_filter,  target_induce_type, target_subgraph_filter, source_induce_type, source_subgraph_filter)
-    
+
+    sub_isos = find_max_partial_iso(newG, G_pat, node_match, edge_match, iso_filter, target_induce_type,
+                                    target_subgraph_filter, source_induce_type, source_subgraph_filter)
+
     new_sub_isos = []
     for a_sub_iso in sub_isos:
-        if sub_multi_iso_include(a_sub_iso, old_sub_iso): # Check the new sub_iso includes old sub_iso
+        if sub_multi_iso_include(a_sub_iso, old_sub_iso):  # Check the new sub_iso includes old sub_iso
             new_sub_isos.append(a_sub_iso)
     return new_sub_isos
-    
+
 
 def sub_iso_include_nodes(sub_iso1, sub_iso2):
     """
     Compare two subgraph isomorphisms from a graph G1 onto a graph G2
     Returns True if sub_iso1 node mapping includes sub_iso2 node mapping
-    """ 
+    """
     nodes_map1 = sub_iso1['nodes']
     nodes_map2 = sub_iso2['nodes']
     node_flag = True
-    for n,v in nodes_map2.iteritems():
-        if not(n in nodes_map1) or nodes_map1[n] != v:
+    for n, v in nodes_map2.iteritems():
+        if not (n in nodes_map1) or nodes_map1[n] != v:
             node_flag = False
             break
     return node_flag
-    
+
+
 def sub_iso_include_edges(sub_iso1, sub_iso2):
     """
     Compare two subgraph isomorphisms from a graph G1 onto a graph G2
     Returns True if sub_iso1 edge mapping includes sub_iso2 edge mapping
-    """ 
+    """
     edges_map1 = sub_iso1['edges']
     edges_map2 = sub_iso2['edges']
     edge_flag = True
-    for e,v in edges_map2.iteritems():
-        if not(e in edges_map1) or edges_map1[e] != v:
+    for e, v in edges_map2.iteritems():
+        if not (e in edges_map1) or edges_map1[e] != v:
             edge_flag = False
             break
     return edge_flag
+
 
 def sub_iso_include(sub_iso1, sub_iso2):
     """
     Compare two subgraph isomorphisms from a graph G1 onto a graph G2
     Returns True if sub_iso1 includes sub_iso2
-    """ 
+    """
     node_flag = sub_iso_include_nodes(sub_iso1, sub_iso2)
-    edge_flag = sub_iso_include_edges(sub_iso1, sub_iso2)        
-    return node_flag and edge_flag   
-    
-    
+    edge_flag = sub_iso_include_edges(sub_iso1, sub_iso2)
+    return node_flag and edge_flag
+
+
 def sub_multi_iso_include_nodes(sub_iso1, sub_iso2):
     """
     Compare two sub multigraph isomorphisms from a graph G1 onto a graph G2
     Returns True if sub_iso1 node mapping includes sub_iso2 node mapping
-    """ 
-    
+    """
+
     nodes_map1 = sub_iso1['nodes']
     nodes_map2 = sub_iso2['nodes']
-    
+
     node_flag = True
-    for n,v in nodes_map2.iteritems():
-        if not(n in nodes_map1) or nodes_map1[n] != v:
+    for n, v in nodes_map2.iteritems():
+        if not (n in nodes_map1) or nodes_map1[n] != v:
             node_flag = False
             break
     return node_flag
+
 
 def sub_multi_iso_include_edges(sub_iso1, sub_iso2):
     """
     Compare two sub multigraph isomorphisms from a graph G1 onto a graph G2
     Returns True if sub_iso1 edge mapping includes sub_iso2 edge mapping
-    """ 
+    """
     edges_map1 = sub_iso1['edges']
     edges_map2 = sub_iso2['edges']
     edge_flag = True
-    for e,v in edges_map2.iteritems():   
-        if not(e in edges_map1):
-            edge_flag =  False 
+    for e, v in edges_map2.iteritems():
+        if not (e in edges_map1):
+            edge_flag = False
             break
         s1 = set(edges_map1[e])
         s2 = set(v)
         if not s2.issubset(s1):
-            edge_flag =  False 
+            edge_flag = False
             break
     return edge_flag
-                               
+
+
 def sub_multi_iso_include(sub_iso1, sub_iso2):
     """
     Compare two sub mutltigraph isomorphisms from a graph G1 onto a graph G2
     Returns True if sub_iso1 includes sub_iso2
     """
     node_flag = sub_multi_iso_include_nodes(sub_iso1, sub_iso2)
-    edge_flag = sub_multi_iso_include_edges(sub_iso1, sub_iso2)        
-    return node_flag and edge_flag   
-        
+    edge_flag = sub_multi_iso_include_edges(sub_iso1, sub_iso2)
+    return node_flag and edge_flag
+
+
 def is_subgraph(G1, G2):
     """
     Returns true if G1 is a subgraph of G2
@@ -250,10 +267,9 @@ def is_subgraph(G1, G2):
     nodes2 = set(G2.nodes())
     edges2 = set(G2.edges())
     return nodes1.issubset(nodes2) and edges1.issubset(edges2)
-            
-    
-    
-def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
+
+
+def build_subgraphs(G, induced='edge', subgraph_filter=lambda x: True):
     """
     Returns the list of subgraphs of G (DiGraph) filtered by subgraph_filter
     induced:
@@ -268,61 +284,63 @@ def build_subgraphs(G, induced='edge', subgraph_filter=lambda x:True):
     """
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
-        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
-    
+        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if
+                     nbunch != []]  # Builds all the node induced subgraphs (except empty graph).
+
     if induced == 'node*':
         node_power_set = list_powerset(G.nodes(data=True))
         subgraphs = []
-        for n_list in [n for n in node_power_set if n !=[]]:
+        for n_list in [n for n in node_power_set if n != []]:
             subG = DiGraph()
             subG.add_nodes_from(n_list)
             subgraphs.append(subG)
-            
+
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
-            subG = DiGraph(e_list) # Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]:  # Not creating empty graph
+            subG = DiGraph(e_list)  # Creating subraph from edges
             for n in subG.node.keys():
-                subG.node[n] = G.node[n] # Transfering node attributes
+                subG.node[n] = G.node[n]  # Transfering node attributes
             subgraphs.append(subG)
-            
+
     if induced == 'edge+':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
-            subG = DiGraph(e_list) # Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]:  # Not creating empty graph
+            subG = DiGraph(e_list)  # Creating subraph from edges
             for n in subG.node.keys():
-                subG.node[n] = G.node[n] # Transfering node attributes
+                subG.node[n] = G.node[n]  # Transfering node attributes
             subgraphs.append(subG)
-            
+
         # Adding single nodes
         for n, d in G.nodes(data=True):
             subG = DiGraph()
-            subG.add_node(n,d)
+            subG.add_node(n, d)
             subgraphs.append(subG)
-            
+
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
-            subG = DiGraph(e_list) # Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]:  # Not creating empty graph
+            subG = DiGraph(e_list)  # Creating subraph from edges
             for n in subG.node.keys():
-                subG.node[n] = G.node[n] # Transfering node attributes
+                subG.node[n] = G.node[n]  # Transfering node attributes
             subgraphs.append(subG)
-            
+
         node_powerset = list_powerset(G.nodes(data=True))
-        for n_list in [n for n in node_powerset if n!=[]]:
+        for n_list in [n for n in node_powerset if n != []]:
             subG = DiGraph()
             subG.add_nodes_from(n_list)
             subgraphs.append(subG)
-    
+
     # Filtering
     subgraphs = [sG for sG in subgraphs if subgraph_filter(sG)]
 
     return subgraphs
-    
-def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
+
+
+def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x: True):
     """
     Returns the list of subgraphs of G (MutliDiGraph) filtered by subgraph_filter
     induced:
@@ -333,52 +351,54 @@ def build_submultigraphs(G, induced='edge', subgraph_filter=lambda x:True):
     """
     if induced == 'node':
         node_power_set = list_powerset(G.nodes())
-        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if nbunch != []] # Builds all the node induced subgraphs (except empty graph).
-        
+        subgraphs = [G.subgraph(nbunch) for nbunch in node_power_set if
+                     nbunch != []]  # Builds all the node induced subgraphs (except empty graph).
+
     if induced == 'edge':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
-            subG = MultiDiGraph(e_list)# Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]:  # Not creating empty graph
+            subG = MultiDiGraph(e_list)  # Creating subraph from edges
             for n in subG.node.keys():
-                subG.node[n] = G.node[n] # Transfering node attributes
+                subG.node[n] = G.node[n]  # Transfering node attributes
             subgraphs.append(subG)
-            
+
     if induced == 'edge+':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
-            subG = MultiDiGraph(e_list)# Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]:  # Not creating empty graph
+            subG = MultiDiGraph(e_list)  # Creating subraph from edges
             for n in subG.node.keys():
-                subG.node[n] = G.node[n] # Transfering node attributes
+                subG.node[n] = G.node[n]  # Transfering node attributes
             subgraphs.append(subG)
-            
+
         # Adding single nodes
         for n, d in G.nodes(data=True):
             subG = MultiDiGraph()
-            subG.add_node(n,d)
-            subgraphs.append(subG) 
-            
+            subG.add_node(n, d)
+            subgraphs.append(subG)
+
     if induced == 'edge*':
         edge_powerset = list_powerset(G.edges(data=True))
         subgraphs = []
-        for e_list in [e for e in edge_powerset if e != []]: # Not creating empty graph
-            subG = MultiDiGraph(e_list)# Creating subraph from edges
+        for e_list in [e for e in edge_powerset if e != []]:  # Not creating empty graph
+            subG = MultiDiGraph(e_list)  # Creating subraph from edges
             for n in subG.node.keys():
-                subG.node[n] = G.node[n] # Transfering node attributes
+                subG.node[n] = G.node[n]  # Transfering node attributes
             subgraphs.append(subG)
-            
+
         node_powerset = list_powerset(G.nodes(data=True))
-        for n_list in [n for n in node_powerset if n!=[]]:
+        for n_list in [n for n in node_powerset if n != []]:
             subG = MultiDiGraph()
             subG.add_nodes_from(n_list)
             subgraphs.append(subG)
-    
+
     # Filtering
     subgraphs = [sG for sG in subgraphs if subgraph_filter(sG)]
-                 
+
     return subgraphs
-        
+
+
 def list_powerset(lst):
     """
     Returns the powerset of all the elements in lst
@@ -387,6 +407,7 @@ def list_powerset(lst):
     for x in lst:
         result.extend([subset + [x] for subset in result])
     return result
+
 
 def node_iso_match(attr, attr_default, op):
     """
@@ -402,6 +423,7 @@ def node_iso_match(attr, attr_default, op):
     nm = isomorphism.generic_node_match(attr, attr_default, op)
     return nm
 
+
 def edge_iso_match(attr, attr_default, op):
     """
     Returns an edge_match function that can be used in find_sub_iso()
@@ -416,6 +438,7 @@ def edge_iso_match(attr, attr_default, op):
     em = isomorphism.generic_edge_match(attr, attr_default, op)
     return em
 
+
 def multi_edge_iso_match(attr, attr_default, op):
     """
     Returns an edge_match function that can be used in find_sub_multi_iso()
@@ -429,155 +452,160 @@ def multi_edge_iso_match(attr, attr_default, op):
     """
     em = isomorphism.generic_multiedge_match(attr, attr_default, op)
     return em
-    
-    
+
+
 def test1():
     """Test Digraph isomorphisms
     """
-    import networkx as nx   
+    import networkx as nx
     import matplotlib.pyplot as plt
-    
+
     # Main graph
     G = nx.DiGraph()
-    
+
     G.add_node(0, attr=0)
     G.add_node(1, attr=0)
     G.add_node(2, attr=0)
     G.add_node(3, attr=0)
-    
-    G.add_edge(0,1, attr=-1)
-    G.add_edge(1,2, attr=-1)
-    G.add_edge(2,0, attr=-1)
-    
-#    nx.draw(G)
-#    plt.show()
-    
+
+    G.add_edge(0, 1, attr=-1)
+    G.add_edge(1, 2, attr=-1)
+    G.add_edge(2, 0, attr=-1)
+
+    #    nx.draw(G)
+    #    plt.show()
+
     # Graph pattern
-    G_pat= nx.DiGraph()
-    
+    G_pat = nx.DiGraph()
+
     G_pat.add_node("a", attr=0)
     G_pat.add_node("b", attr=0)
     G_pat.add_node("c", attr=0)
-    
-    G_pat.add_edge("a","b", attr=-1)
-    G_pat.add_edge("b","c", attr=-1)
-#    
-#    nx.draw(G_pat)
-#    plt.show()
-    
-    G_subgraphs = build_subgraphs(G, induced='edge') # In this example, if induced = 'nodes' it won't find any isomorphisms.
-    
+
+    G_pat.add_edge("a", "b", attr=-1)
+    G_pat.add_edge("b", "c", attr=-1)
+    #
+    #    nx.draw(G_pat)
+    #    plt.show()
+
+    G_subgraphs = build_subgraphs(G,
+                                  induced='edge')  # In this example, if induced = 'nodes' it won't find any isomorphisms.
+
     # Categorical match functions
     nm_cat = isomorphism.categorical_node_match("attr", 1)
     em_cat = isomorphism.categorical_edge_match("attr", 1)
-    
-    print find_sub_iso(G_subgraphs, G_pat, node_match = nm_cat, edge_match=em_cat)
-    
+
+    print(find_sub_iso(G_subgraphs, G_pat, node_match=nm_cat, edge_match=em_cat))
+
     # Numerical match functions
-    nm_num = isomorphism.numerical_node_match("attr", 0, atol=0.5, rtol=1e-05) # Matches if |x-y|<= atol + abs(y)*rtol
-    print find_sub_iso(G_subgraphs, G_pat, node_match = nm_num, edge_match=None)
-    
+    nm_num = isomorphism.numerical_node_match("attr", 0, atol=0.5, rtol=1e-05)  # Matches if |x-y|<= atol + abs(y)*rtol
+    print(find_sub_iso(G_subgraphs, G_pat, node_match=nm_num, edge_match=None))
+
     # Generic match functions
-    op = lambda x,y: x >= y
+    op = lambda x, y: x >= y
     nm_gen = isomorphism.generic_node_match("attr", 0, op)
-    sub_iso = find_sub_iso(G_subgraphs, G_pat, node_match = nm_gen, edge_match=None)
-    
+    sub_iso = find_sub_iso(G_subgraphs, G_pat, node_match=nm_gen, edge_match=None)
+
     if sub_iso:
-        print sub_iso[0]["nodes"].values()
-        
+        print(sub_iso[0]["nodes"].values())
+
+
 def test2():
     """Test extension to MultiDiGraphs
     """
-    import networkx as nx    
-    
+    import networkx as nx
+
     # Main graph
     G = nx.MultiDiGraph()
-    
-#    G.add_node(0, attr_dict={'val':1})
-#    G.add_node(1, attr_dict={'val':2})
-#    G.add_node(2, attr_dict={'val':3})
-#    G.add_node(3, attr_dict={'val':0})
-#    
-#    G.add_edge(0,1, attr_dict={'val':1})
-#    G.add_edge(0,1, attr_dict={'val':2})
-#    G.add_edge(0,1, attr_dict={'val':3})
-#    G.add_edge(1,2, attr_dict={'val':1})
-#    G.add_edge(1,2, attr_dict={'val':2})
-#    G.add_edge(2,0, attr_dict={'val':1})
 
-    G.add_node(1, attr_dict={'val':1})
-    G.add_node(2, attr_dict={'val':2})
-    G.add_node(3, attr_dict={'val':1})
-    
-    G.add_edge(1,2, attr_dict={'val':1})
-    G.add_edge(3,2, attr_dict={'val':2})
+    #    G.add_node(0, attr_dict={'val':1})
+    #    G.add_node(1, attr_dict={'val':2})
+    #    G.add_node(2, attr_dict={'val':3})
+    #    G.add_node(3, attr_dict={'val':0})
+    #
+    #    G.add_edge(0,1, attr_dict={'val':1})
+    #    G.add_edge(0,1, attr_dict={'val':2})
+    #    G.add_edge(0,1, attr_dict={'val':3})
+    #    G.add_edge(1,2, attr_dict={'val':1})
+    #    G.add_edge(1,2, attr_dict={'val':2})
+    #    G.add_edge(2,0, attr_dict={'val':1})
 
-    
+    G.add_node(1, attr_dict={'val': 1})
+    G.add_node(2, attr_dict={'val': 2})
+    G.add_node(3, attr_dict={'val': 1})
+
+    G.add_edge(1, 2, attr_dict={'val': 1})
+    G.add_edge(3, 2, attr_dict={'val': 2})
+
     # Graph pattern
-    G_pat= nx.MultiDiGraph()
-    
-    G_pat.add_node("a", attr_dict={'val':1})
-    G_pat.add_node("b", attr_dict={'val':2})
-    G_pat.add_node("c", attr_dict={'val':1})
-    
-    G_pat.add_edge("a","b", attr_dict={'val':2})
-    G_pat.add_edge("c","b", attr_dict={'val':1})
-    
-    G_subgraphs = build_submultigraphs(G, induced='edge') # In this example, if induced = 'nodes' it won't find any isomorphisms.
-    
+    G_pat = nx.MultiDiGraph()
+
+    G_pat.add_node("a", attr_dict={'val': 1})
+    G_pat.add_node("b", attr_dict={'val': 2})
+    G_pat.add_node("c", attr_dict={'val': 1})
+
+    G_pat.add_edge("a", "b", attr_dict={'val': 2})
+    G_pat.add_edge("c", "b", attr_dict={'val': 1})
+
+    G_subgraphs = build_submultigraphs(G,
+                                       induced='edge')  # In this example, if induced = 'nodes' it won't find any isomorphisms.
+
     # Generic match functions
-    op = lambda x,y: x == y
+    op = lambda x, y: x == y
     nm_gen = node_iso_match("val", 0, op)
     em_gen = multi_edge_iso_match("val", 0, op)
     sub_iso = find_sub_multi_iso(G, G_pat, node_match=nm_gen, edge_match=em_gen)
-    
+
     if sub_iso:
-        print sub_iso
-        
+        print(sub_iso)
+
+
 def test3():
     """Test extension to max partial isomorphism
     """
-    import networkx as nx    
-    
+    import networkx as nx
+
     # Main graph
     G = nx.MultiDiGraph()
-    
-    G.add_node(0, attr_dict={'val':1})
-    G.add_node(1, attr_dict={'val':2})
-    G.add_node(2, attr_dict={'val':3})
-    G.add_node(3, attr_dict={'val':0})
-    
-    G.add_edge(0,1, attr_dict={'val':1})
-    G.add_edge(0,1, attr_dict={'val':2})
-    G.add_edge(0,1, attr_dict={'val':3})
-    G.add_edge(1,2, attr_dict={'val':1})
-    G.add_edge(1,2, attr_dict={'val':2})
-    G.add_edge(2,0, attr_dict={'val':1})
-    
+
+    G.add_node(0, attr_dict={'val': 1})
+    G.add_node(1, attr_dict={'val': 2})
+    G.add_node(2, attr_dict={'val': 3})
+    G.add_node(3, attr_dict={'val': 0})
+
+    G.add_edge(0, 1, attr_dict={'val': 1})
+    G.add_edge(0, 1, attr_dict={'val': 2})
+    G.add_edge(0, 1, attr_dict={'val': 3})
+    G.add_edge(1, 2, attr_dict={'val': 1})
+    G.add_edge(1, 2, attr_dict={'val': 2})
+    G.add_edge(2, 0, attr_dict={'val': 1})
+
     # Graph pattern
-    G_pat= nx.MultiDiGraph()
-    G_pat.add_node("a", attr_dict={'val':1})
-    G_pat.add_node("b", attr_dict={'val':2})
-    G_pat.add_node("c", attr_dict={'val':3})
-    
-    G_pat.add_edge("a","b", attr_dict={'val':1})
-    G_pat.add_edge("b","c", attr_dict={'val':1})
-    G_pat.add_edge("b","c", attr_dict={'val':2})
-    
-    
+    G_pat = nx.MultiDiGraph()
+    G_pat.add_node("a", attr_dict={'val': 1})
+    G_pat.add_node("b", attr_dict={'val': 2})
+    G_pat.add_node("c", attr_dict={'val': 3})
+
+    G_pat.add_edge("a", "b", attr_dict={'val': 1})
+    G_pat.add_edge("b", "c", attr_dict={'val': 1})
+    G_pat.add_edge("b", "c", attr_dict={'val': 2})
+
     # Generic match functions
-    op = lambda x,y: x == y
+    op = lambda x, y: x == y
     nm_gen = node_iso_match("val", 0, op)
     em_gen = multi_edge_iso_match("val", 0, op)
-    sub_iso = find_max_partial_iso(G, G_pat, node_match = nm_gen, edge_match=em_gen, target_induce_type='edge', source_induce_type='edge+') # In this example, if target_induced = 'nodes' it won't find any isomorphisms.
-    
-    print sub_iso
-        
-    G.add_edge(0,1, attr_dict={'val':1})
-    
-    new_sub_isos = update_max_partial_iso(G, G_pat, sub_iso[0], node_match=nm_gen, edge_match=em_gen, target_induce_type='edge', source_induce_type='edge+')
-    print new_sub_isos
-    
+    sub_iso = find_max_partial_iso(G, G_pat, node_match=nm_gen, edge_match=em_gen, target_induce_type='edge',
+                                   source_induce_type='edge+')  # In this example, if target_induced = 'nodes' it won't find any isomorphisms.
+
+    print(sub_iso)
+
+    G.add_edge(0, 1, attr_dict={'val': 1})
+
+    new_sub_isos = update_max_partial_iso(G, G_pat, sub_iso[0], node_match=nm_gen, edge_match=em_gen,
+                                          target_induce_type='edge', source_induce_type='edge+')
+    print(new_sub_isos)
+
+
 ###############################################################################
-if __name__=="__main__":
+if __name__ == "__main__":
     test2()
